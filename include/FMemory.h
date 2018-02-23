@@ -42,7 +42,7 @@ public:
   // Manipulation
   static void* Copy(void* Dest, size_t DestLen, const void* Src, size_t Num);
   static void* Move(void* Dest, size_t DestLen, const void* Src, size_t Num);
-  static void* Set (void* Ptr, u8 Value, size_t Num);
+  static void* Set (void* Ptr, u8 Value, size_t Num) {return NULL;}
   
   // Compare
   static bool Compare(const void* Ptr1, const void* Ptr2, size_t Num);

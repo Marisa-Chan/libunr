@@ -19,13 +19,15 @@ set (HEADERS ${LIBUNR_INC}/FArchive.h
 
 
 set (SOURCES ${LIBUNR_SRC}/FArchiveFile.cpp
+             ${LIBUNR_SRC}/FCompactIndex.cpp
              ${LIBUNR_SRC}/FMemory.cpp
              ${LIBUNR_SRC}/FName.cpp
              ${LIBUNR_SRC}/UPackage.cpp
-
 )
 
 include_directories (${LIBUNR_INC} /usr/include)
 add_library (libunr SHARED ${SOURCES})
-add_definitions ("-Wno-attributes")
+add_definitions ("-Wno-attributes" "-g")
 set_target_properties (libunr PROPERTIES PREFIX "")
+
+install(TARGETS libunr DESTINATION /usr/local/lib)

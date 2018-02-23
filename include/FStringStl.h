@@ -152,7 +152,7 @@ public:
   size_t FindLastNotOf( const char* s, size_t Pos, size_t n ) { return RealStr.find_last_not_of( s, Pos, n ); }
   size_t FindLastNotOf( char c, size_t Pos = 0 ) { return RealStr.find_last_not_of( c, Pos ); }
   
-  FString Substr( size_t Pos = 0, size_t Len = MAX_SIZE ) { return FString( RealStr.substr( Pos, Len ) ); }
+  FString Substr( size_t Pos = 0, size_t Len = MAX_SIZE ) { return FString( RealStr.substr( Pos ) ); }
   void ReplaceChars( char Old, char New )
   {
     for (std::string::iterator it = RealStr.begin (); it != RealStr.end (); ++it)

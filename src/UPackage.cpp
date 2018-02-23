@@ -38,8 +38,8 @@ std::istream& FExport::operator>> ( std::istream& In, FExport& Export )
   SerialSize   = ReadCompactIndex ( In );
   SerialOffset = ReadCompactIndex ( In );
 }
-
-std::istream& UPackageHeader::operator>> ( std::istream& In, UPackageHeader& Header )
+*/
+FArchive& operator>> ( FArchive& In, UPackageHeader& Header )
 {
   In >> Header.Signature;
   In >> Header.PackageVersion;
@@ -51,10 +51,10 @@ std::istream& UPackageHeader::operator>> ( std::istream& In, UPackageHeader& Hea
   In >> Header.ExportOffset;
   In >> Header.ImportCount;
   In >> Header.ImportOffset;
-  In.read ( Header.GUID, 16 );
+  In.Read ( Header.GUID, 16 );
   return In;
 }
-*/
+
 UPackage::UPackage()
 {
   FMemory::Set ( &Header, 0, sizeof ( UPackageHeader ) );
@@ -77,7 +77,13 @@ bool UPackage::Load( const char* File )
   
   Path.Assign( File );
   Path.ReplaceChars( '\\', '/' );
-  Name = Path.Substr( Path.FindLastOf ( "/" ) );
+  
+  u64 LastDirSlash = Path.FindLastOf( "/" );
+  
+  if (LastDirSlash != MAX_SIZE)
+    Name = Path.Substr( Path.FindLastOf( "/" ) );
+  else
+    Name = Path;
   
   FArchiveFileIn* FileStream = new FArchiveFileIn();
   if ( !FileStream->Open( Path ) )
@@ -91,4 +97,25 @@ bool UPackage::Load( const char* File )
   FileStream->Seek( Header.NameOffset, ESeekBase::Begin );
   for ( TArray<FName>::Iterator Name = Names->Begin(); Name != Names->End(); Name++ )
     Name->Read( *FileStream, Header.PackageVersion );
+
+  printf( "***DEBUG***\n" );
+  printf( "\tSignature = %p\n", Header.Signature );
+  printf( "\tVersion   = %p\n", Header.PackageVersion );
+  printf( "\tLicense   = %p\n", Header.LicenseMode );
+  printf( "\tFlags     = %p\n", Header.PackageFlags );
+  printf( "\tNameCnt   = %p\n", Header.NameCount );
+  printf( "\tNameOff   = %p\n", Header.NameOffset );
+  printf( "\tExportCnt = %p\n", Header.ExportCount );
+  printf( "\tExportOff = %p\n", Header.ExportOffset );
+  printf( "\tImportCnt = %p\n", Header.ImportCount );
+  printf( "\tImportOff = %p\n", Header.ImportOffset );
+}
+
+bool UPackage::Save( const char* File )
+{
+  return false;
+}
+
+void UPackage::Close()
+{
 }

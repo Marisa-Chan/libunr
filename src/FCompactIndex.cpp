@@ -73,7 +73,7 @@ DLL_EXPORT FArchive& operator>>( FArchive& Ar, FCompactIndex& Index )
   if (negate)
     Index.Value = -Index.Value;
   
-  return output;
+  return Ar;
 }
 
 DLL_EXPORT FArchive& operator<<( FArchive& Ar, FCompactIndex& Index )
@@ -122,6 +122,6 @@ DLL_EXPORT FArchive& operator<<( FArchive& Ar, FCompactIndex& Index )
       byte_out |= ((Index.Value >> (6 + ((j - 1) * 7))) & 0x7F);
     }
     
-    Out << byte_out;
+    Ar << byte_out;
   }
 }

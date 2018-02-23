@@ -96,9 +96,9 @@ public:
   virtual void Close();
   
   UPackageHeader* GetHeaderCopy();
-
-protected:
   UPackageHeader Header;
+  
+protected:
   FString        Path;
   FString        Name;
   
