@@ -18,3 +18,6 @@ Linux:
 	
 Windows:
 	TBA
+	
+### Licensing ###
+	GNU General Public License v3
