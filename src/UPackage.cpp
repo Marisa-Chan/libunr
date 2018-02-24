@@ -27,19 +27,34 @@
 #include "FArchiveFile.h"
 #include "FMemory.h"
 
-/*
-std::istream& FExport::operator>> ( std::istream& In, FExport& Export )
+
+FArchive& operator>>( FArchive& In, FExport& Export )
 {
-  Class        = ReadCompactIndex ( In );
-  Super        = ReadCompactIndex ( In );
-  In          >> Group;
-  ObjectName   = ReadCompactIndex ( In );
-  In          >> ObjectFlags;
-  SerialSize   = ReadCompactIndex ( In );
-  SerialOffset = ReadCompactIndex ( In );
+  In >> CINDEX( Export.Class );
+  In >> CINDEX( Export.Super );
+  In >> Export.Group;
+  In >> CINDEX( Export.ObjectName );
+  In >> Export.ObjectFlags;
+  In >> CINDEX( Export.SerialSize );
+  
+  if (Export.SerialSize > 0)
+    In >> CINDEX( Export.SerialOffset );
+  else
+    Export.SerialOffset = -1;
+  
+  return In;
 }
-*/
-FArchive& operator>> ( FArchive& In, UPackageHeader& Header )
+
+FArchive& operator>>( FArchive& In, FImport& Import )
+{
+  In >> CINDEX( Import.ClassPackage );
+  In >> CINDEX( Import.ClassName );
+  In >> Import.Package;
+  In >> CINDEX( Import.ObjectName );
+  return In;
+}
+
+FArchive& operator>>( FArchive& In, UPackageHeader& Header )
 {
   In >> Header.Signature;
   In >> Header.PackageVersion;
@@ -58,7 +73,7 @@ FArchive& operator>> ( FArchive& In, UPackageHeader& Header )
 UPackage::UPackage()
 {
   FMemory::Set ( &Header, 0, sizeof ( UPackageHeader ) );
-  Names = new TArray<FName>();
+  Names = new TArray<FNameEntry>();
   Exports = new TArray<FExport>();
   Imports = new TArray<FImport>();
 }
@@ -92,23 +107,28 @@ bool UPackage::Load( const char* File )
   // read in the header
   *FileStream >> Header;
   
-  // read in name data
+  // read in the name table
   Names->Resize( Header.NameCount );
   FileStream->Seek( Header.NameOffset, ESeekBase::Begin );
-  for ( TArray<FName>::Iterator Name = Names->Begin(); Name != Names->End(); Name++ )
-    Name->Read( *FileStream, Header.PackageVersion );
-
-  printf( "***DEBUG***\n" );
-  printf( "\tSignature = %p\n", Header.Signature );
-  printf( "\tVersion   = %p\n", Header.PackageVersion );
-  printf( "\tLicense   = %p\n", Header.LicenseMode );
-  printf( "\tFlags     = %p\n", Header.PackageFlags );
-  printf( "\tNameCnt   = %p\n", Header.NameCount );
-  printf( "\tNameOff   = %p\n", Header.NameOffset );
-  printf( "\tExportCnt = %p\n", Header.ExportCount );
-  printf( "\tExportOff = %p\n", Header.ExportOffset );
-  printf( "\tImportCnt = %p\n", Header.ImportCount );
-  printf( "\tImportOff = %p\n", Header.ImportOffset );
+  for ( TArray<FNameEntry>::Iterator NameIt = Names->Begin(); NameIt != Names->End(); NameIt++ )
+    NameIt->Read( *FileStream, Header.PackageVersion );
+  
+  // read in imports
+  Imports->Resize( Header.ImportCount );
+  FileStream->Seek( Header.ImportOffset, ESeekBase::Begin );
+  for ( TArray<FImport>::Iterator Import = Imports->Begin(); Import != Imports->End(); Import++ )
+    *FileStream >> *Import;
+  
+  // read in exports
+  Exports->Resize( Header.ExportCount );
+  FileStream->Seek( Header.ExportOffset, ESeekBase::Begin );
+  for ( TArray<FExport>::Iterator Export = Exports->Begin(); Export != Exports->End(); Export++ )
+    *FileStream >> *Export;
+  
+  FileStream->Close();
+  delete FileStream;
+  
+  return true;
 }
 
 bool UPackage::Save( const char* File )
@@ -118,4 +138,34 @@ bool UPackage::Save( const char* File )
 
 void UPackage::Close()
 {
+}
+
+UPackageHeader* UPackage::GetHeader()
+{
+  return &Header;
+}
+
+FNameEntry* UPackage::GetNameEntry( size_t Index )
+{
+  return &(*Names)[Index];
+}
+
+FImport* UPackage::GetImport( size_t Index )
+{
+  return &(*Imports)[Index];
+}
+
+FExport* UPackage::GetExport( size_t Index )
+{
+  return &(*Exports)[Index];
+}
+
+const char* UPackage::GetFilePath()
+{
+  return Path.Data();
+}
+
+const char* UPackage::GetFileName()
+{
+  return Name.Data();
 }

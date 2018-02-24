@@ -55,7 +55,7 @@ struct DLL_EXPORT FImport
 {
   idx ClassPackage;
   idx ClassName;
-  u32 Package;
+  int Package;
   idx ObjectName;
   
   friend FArchive& operator>>( FArchive& In, FImport& Import );
@@ -95,16 +95,21 @@ public:
   virtual bool Save( const char* File = NULL );
   virtual void Close();
   
-  UPackageHeader* GetHeaderCopy();
-  UPackageHeader Header;
+  UPackageHeader* GetHeader();
+  FNameEntry*     GetNameEntry( size_t Index );
+  FImport*        GetImport( size_t Index );
+  FExport*        GetExport( size_t Index );
+  const char*     GetFilePath();
+  const char*     GetFileName();
   
 protected:
-  FString        Path;
-  FString        Name;
+  FString Path;
+  FString Name;
   
-  TArray<FName>*   Names;
-  TArray<FExport>* Exports;
-  TArray<FImport>* Imports;
+  UPackageHeader Header;
+  TArray<FNameEntry>* Names;
+  TArray<FExport>*    Exports;
+  TArray<FImport>*    Imports;
 
 };
 

@@ -29,18 +29,24 @@
 #include "FArchive.h"
 #define NAME_LEN 64
 
-struct DLL_EXPORT FName
+struct FNameEntry
 {
-   FName();
-   FName(const char* InStr);
-  ~FName();
+   FNameEntry();
+   FNameEntry(const char* InStr);
+  ~FNameEntry();
   
   void Read ( FArchive& File, size_t PackageVersion );
   void Write( FArchive& File, size_t PackageVersion );
   
   char Name[NAME_LEN];
-  u32 Index; // is this really needed?
+  u32 Index;
   int Flags;
+};
+
+struct FName
+{
+  u32 Index;
+  char* Name; // FNameEntry->Name or constant string
 };
 
 #endif

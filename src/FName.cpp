@@ -26,14 +26,14 @@
 #include "FName.h"
 #include "FMemory.h"
 
-FName::FName()
+FNameEntry::FNameEntry()
 {
   FMemory::Set( Name, 0, NAME_LEN );
   Index = -1;
   Flags = 0;
 }
 
-FName::FName( const char* InStr )
+FNameEntry::FNameEntry( const char* InStr )
 {
   strncpy( Name, InStr, NAME_LEN );
   Name[NAME_LEN-1] = '\0';
@@ -41,11 +41,11 @@ FName::FName( const char* InStr )
   Index = -1;
 }
 
-FName::~FName()
+FNameEntry::~FNameEntry()
 {
 }
 
-void FName::Read( FArchive& File, size_t PackageVersion )
+void FNameEntry::Read( FArchive& File, size_t PackageVersion )
 {
   if( PackageVersion <= PKG_VER_UN_220 )
   {
@@ -61,7 +61,7 @@ void FName::Read( FArchive& File, size_t PackageVersion )
   }
   else
   {
-    int len;
+    int len = 0;
     File >> CINDEX( len );
     if( len > 0 && len < NAME_LEN )
       File.Read( Name, len );
@@ -69,7 +69,7 @@ void FName::Read( FArchive& File, size_t PackageVersion )
   File >> Flags;
 }
 
-void FName::Write( FArchive& File, size_t PackageVersion )
+void FNameEntry::Write( FArchive& File, size_t PackageVersion )
 {
   Name[NAME_LEN-1] = '\0'; // just in case
   
