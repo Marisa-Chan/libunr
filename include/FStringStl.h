@@ -24,7 +24,6 @@
 */
 
 #include "FUtil.h"
-#include "FArchive.h"
 
 /*
  * Each class should have their own definition of an Iterator and ReverseIterator

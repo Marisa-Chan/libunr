@@ -26,6 +26,7 @@
 #ifndef __FARCHIVEFILE_H__
 #define __FARCHIVEFILE_H__
 
+#include "FArchive.h"
 #include "FString.h"
 
 /*-----------------------------------------------------------------------------

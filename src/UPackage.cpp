@@ -27,6 +27,18 @@
 #include "FArchiveFile.h"
 #include "FMemory.h"
 
+EPkgLoadOpts UPackage::LoadOpts = PO_OpenOnLoad;
+
+int CalcObjRefValue( int ObjRef )
+{
+  if (ObjRef == 0)
+    return ObjRef;
+  
+  else if (ObjRef < 0)
+    ObjRef = -ObjRef;
+  
+  return ObjRef - 1;
+}
 
 FArchive& operator>>( FArchive& In, FExport& Export )
 {
@@ -66,6 +78,11 @@ FArchive& operator>>( FArchive& In, UPackageHeader& Header )
   In >> Header.ExportOffset;
   In >> Header.ImportCount;
   In >> Header.ImportOffset;
+  if (Header.PackageVersion < PKG_VER_UT_400)
+  {
+    In >> Header.HeritageCount;
+    In >> Header.HeritageOffset;
+  }
   In.Read ( Header.GUID, 16 );
   return In;
 }
@@ -100,7 +117,7 @@ bool UPackage::Load( const char* File )
   else
     Name = Path;
   
-  FArchiveFileIn* FileStream = new FArchiveFileIn();
+  FileStream = new FArchiveFileIn();
   if ( !FileStream->Open( Path ) )
     return false;
   
@@ -124,9 +141,6 @@ bool UPackage::Load( const char* File )
   FileStream->Seek( Header.ExportOffset, ESeekBase::Begin );
   for ( TArray<FExport>::Iterator Export = Exports->Begin(); Export != Exports->End(); Export++ )
     *FileStream >> *Export;
-  
-  FileStream->Close();
-  delete FileStream;
   
   return true;
 }
@@ -168,4 +182,51 @@ const char* UPackage::GetFilePath()
 const char* UPackage::GetFileName()
 {
   return Name.Data();
+}
+
+const char* UPackage::ResolveNameFromIdx( idx Index )
+{
+  return GetNameEntry( Index )->Name;
+}
+
+const char* UPackage::ResolveNameFromObjRef( int ObjRef )
+{
+  if (ObjRef == 0)
+    return "None";
+  else if (ObjRef < 0)
+    return GetNameEntry( GetImport( CalcObjRefValue( ObjRef ) )->ObjectName )->Name;
+  else
+    return GetNameEntry( GetExport( CalcObjRefValue( ObjRef ) )->ObjectName )->Name;
+}
+
+bool UPackage::BeginLoad()
+{
+  if (FileStream == NULL)
+  {
+    FileStream = new FArchiveFileIn();
+    return FileStream->Open( Path );
+  }
+  return true;
+}
+
+void UPackage::EndLoad()
+{
+  // Only release package handle if our load options say so
+  if (LoadOpts == PO_OpenOnLoad)
+  {
+    FileStream->Close();
+    delete FileStream;
+    FileStream = NULL;
+  }
+}
+
+bool UPackage::ReadRawObject( idx Index, void* Buffer )
+{
+  if (Index < 0 || !Buffer || !FileStream)
+    return false;
+  
+  FExport* Export = &(*Exports)[Index];
+  FileStream->Seek( Export->SerialOffset, ESeekBase::Begin );
+  FileStream->Read( Buffer, Export->SerialSize );
+  return true;
 }

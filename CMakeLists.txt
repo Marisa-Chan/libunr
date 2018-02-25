@@ -29,5 +29,3 @@ include_directories (${LIBUNR_INC} /usr/include)
 add_library (libunr SHARED ${SOURCES})
 add_definitions ("-Wno-attributes" "-g")
 set_target_properties (libunr PROPERTIES PREFIX "")
-
-install(TARGETS libunr DESTINATION /usr/local/lib)

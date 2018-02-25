@@ -96,10 +96,10 @@ bool FArchiveFileIn::Open( const FString& Filename )
 -----------------------------------------------------------------------------*/
 bool FArchiveFileOut::Open( const char* Filename )
 {
-  return (Stream = fopen( Filename, "rb" )) != NULL;
+  return (Stream = fopen( Filename, "wb" )) != NULL;
 }
 
 bool FArchiveFileOut::Open( const FString& Filename )
 {
-  return (Stream = fopen( Filename.Data(), "rb" )) != NULL;
+  return (Stream = fopen( Filename.Data(), "wb" )) != NULL;
 }

@@ -76,9 +76,19 @@ struct DLL_EXPORT UPackageHeader
   u32 ExportOffset;
   u32 ImportCount;
   u32 ImportOffset;
+  u32 HeritageCount;
+  u32 HeritageOffset;
   u8  GUID[16];
   
   friend FArchive& operator>>( FArchive& In, UPackageHeader& Header );
+};
+
+// Decides how packages are maintained during loading and idle states
+enum EPkgLoadOpts
+{
+  PO_OpenOnLoad,  // Opens a package if objects are requested, closing it after ending load
+  PO_KeepOpen,    // Keeps a package open as long as there are references to the package (not implemented)
+  PO_LoadToMem,   // Loads the entire package to memory (not implemented)
 };
 
 // UPackage
@@ -102,15 +112,29 @@ public:
   const char*     GetFilePath();
   const char*     GetFileName();
   
+  // Name resolution
+  const char* ResolveNameFromIdx( idx Index );
+  const char* ResolveNameFromObjRef( int ObjRef );
+  
+  // Object reading
+  bool BeginLoad();
+  void EndLoad();
+  bool ReadRawObject( idx Index, void* Buffer );
+
+  // Object writing
+  
 protected:
   FString Path;
   FString Name;
   
+  FArchive* FileStream;
   UPackageHeader Header;
   TArray<FNameEntry>* Names;
   TArray<FExport>*    Exports;
   TArray<FImport>*    Imports;
 
+  // Global package variables
+  static EPkgLoadOpts LoadOpts;
 };
 
 #endif

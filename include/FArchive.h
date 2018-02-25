@@ -26,7 +26,7 @@
 #ifndef __FARCHIVE_H__
 #define __FARCHIVE_H__
 
-#include "FUtil.h"
+#include "FString.h"
 
 enum ESeekBase
 {
@@ -44,6 +44,9 @@ public:
   FArchive() {};
   virtual ~FArchive() {};
   
+  virtual bool Open( const char* Filename ) { return false; }
+  virtual bool Open( const FString& Filename ) { return false; }
+  virtual void Close() {}
   virtual size_t Read( void* Dest, size_t Len ) { return 0; }
   virtual size_t Write( void* Src, size_t Len ) { return 0; }
   virtual size_t Seek( size_t Off, ESeekBase Base ) { return 0; }
