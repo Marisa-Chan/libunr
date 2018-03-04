@@ -28,15 +28,15 @@
 
 FNameEntry::FNameEntry()
 {
-  FMemory::Set( Name, 0, NAME_LEN );
+  FMemory::Set( Data, 0, NAME_LEN );
   Index = -1;
   Flags = 0;
 }
 
 FNameEntry::FNameEntry( const char* InStr )
 {
-  strncpy( Name, InStr, NAME_LEN );
-  Name[NAME_LEN-1] = '\0';
+  strncpy( Data, InStr, NAME_LEN );
+  Data[NAME_LEN-1] = '\0';
   Flags = 0;
   Index = -1;
 }
@@ -45,39 +45,41 @@ FNameEntry::~FNameEntry()
 {
 }
 
-void FNameEntry::Read( FArchive& File, size_t PackageVersion )
+FArchive& operator>>( FArchive& Ar, FNameEntry& Name )
 {
-  if( PackageVersion <= PKG_VER_UN_220 )
+  if( Ar.Ver <= PKG_VER_UN_220 )
   {
     u8 b;
-    char* ptr = Name;
+    char* ptr = Name.Data;
     do
     {
-      File >> b;
+      Ar >> b;
       *ptr++ = b;
       
-    } while( b && ptr <( Name + NAME_LEN ) );
+    } while( b && ptr < (Name.Data + NAME_LEN ) );
     *ptr = '\0'; // in case we ran up against the name size limit
   }
   else
   {
     int len = 0;
-    File >> CINDEX( len );
+    Ar >> CINDEX( len );
     if( len > 0 && len < NAME_LEN )
-      File.Read( Name, len );
+      Ar.Read( Name.Data, len );
   }
-  File >> Flags;
+  Ar >> Name.Flags;
+  return Ar;
 }
 
-void FNameEntry::Write( FArchive& File, size_t PackageVersion )
+FArchive& operator<<( FArchive& Ar, FNameEntry& Name )
 {
-  Name[NAME_LEN-1] = '\0'; // just in case
+  Name.Data[NAME_LEN-1] = '\0'; // just in case
   
-  if( PackageVersion > PKG_VER_UN_220 )
+  if( Ar.Ver > PKG_VER_UN_220 )
   {
-    int len = strlen( Name );
-    File << CINDEX( len );
+    int len = strlen( Name.Data );
+    Ar << CINDEX( len );
   }
   
-  File << Name;
+  Ar << Name;
+  return Ar;
 }

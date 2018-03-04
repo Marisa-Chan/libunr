@@ -25,6 +25,9 @@
 
 #include "FUtil.h"
 
+#define TARRAY_LOOP( type, array, itname ) \
+  for (TArray<type>::Iterator itname = array->Begin(); itname != array->End(); ++itname)
+
 #if defined LIBUNR_USE_STL
   #include "TArrayStl.h"
 #else

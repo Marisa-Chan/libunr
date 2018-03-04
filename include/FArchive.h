@@ -74,6 +74,8 @@ public:
   friend FORCEINLINE FArchive& operator<<( FArchive& Ar, float& f )  { Ar.Write( &f, 4 ); return Ar; }
   friend FORCEINLINE FArchive& operator<<( FArchive& Ar, double& d ) { Ar.Write( &d, 8 ); return Ar; }
   friend FORCEINLINE FArchive& operator<<( FArchive& Ar, char* s )   { Ar.Write( s, strlen(s) ); return Ar; }
+  
+  u16 Ver; // version of package
 };
 
 /*-----------------------------------------------------------------------------

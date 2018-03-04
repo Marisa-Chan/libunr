@@ -17,36 +17,43 @@
 \*========================================================================*/
 
 /*========================================================================
- * FName.h - Name table stuff
+ * UStaticClassInit.cpp - Initializes the object class for all native objects
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#ifndef __FNAME_H__
-#define __FNAME_H__
+#include "UObject.h"
+#include "UClass.h"
+#include "UMusic.h"
+#include "USound.h"
 
-#include "FArchive.h"
-#define NAME_LEN 64
+#define INIT_CLASS(cls) cls::StaticInitializeClass()
 
-struct FNameEntry
+bool InitStaticUClasses()
 {
-   FNameEntry();
-   FNameEntry(const char* InStr);
-  ~FNameEntry();
+  INIT_CLASS( UClass );
+  INIT_CLASS( UField );
+  INIT_CLASS( UConst );
+  INIT_CLASS( UEnum );
+  INIT_CLASS( UProperty );
+  INIT_CLASS( UStruct );
+  INIT_CLASS( UFunction );
+  INIT_CLASS( UState );
+  INIT_CLASS( UObject );
   
-  friend FArchive& operator>>( FArchive& Ar, FNameEntry& Name );
-  friend FArchive& operator<<( FArchive& Ar, FNameEntry& Name );
-  
-  char Data[NAME_LEN];
-  u32 Index;
-  int Flags;
-};
+  INIT_CLASS( UMusic );
+  INIT_CLASS( USound );
+}
 
-// this is gonna be pretty unused until loading maps kicks off
-struct FName
-{
-  size_t Index;
-};
-
-#endif
+IMPLEMENT_CLASS( UClass );
+IMPLEMENT_CLASS( UField );
+IMPLEMENT_CLASS( UConst );
+IMPLEMENT_CLASS( UEnum );
+IMPLEMENT_CLASS( UProperty );
+IMPLEMENT_CLASS( UStruct );
+IMPLEMENT_CLASS( UFunction );
+IMPLEMENT_CLASS( UState );
+IMPLEMENT_CLASS( UObject );
+IMPLEMENT_CLASS( UMusic );
+IMPLEMENT_CLASS( USound );

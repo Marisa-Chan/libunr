@@ -17,36 +17,27 @@
 \*========================================================================*/
 
 /*========================================================================
- * FName.h - Name table stuff
+ * UMusic.h - Native music object type
+ * See the 'Class Music' in UT-Package-File-Format.pdf
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#ifndef __FNAME_H__
-#define __FNAME_H__
+#include "UObject.h"
 
-#include "FArchive.h"
-#define NAME_LEN 64
-
-struct FNameEntry
+class UMusic : public UObject
 {
-   FNameEntry();
-   FNameEntry(const char* InStr);
-  ~FNameEntry();
+  DECLARE_CLASS( UMusic, UObject, CLASS_SafeReplace )
   
-  friend FArchive& operator>>( FArchive& Ar, FNameEntry& Name );
-  friend FArchive& operator<<( FArchive& Ar, FNameEntry& Name );
+  UMusic();
+  virtual bool ExportToFile();
+  virtual void LoadFromPackage( FArchive& Ar );
   
-  char Data[NAME_LEN];
-  u32 Index;
-  int Flags;
+  u16 ChunkCount; //?
+  u32 _unknown0; // PackageVerison > 61
+  idx ChunkSize;
+  u8* ChunkData;
+  
+  int MusicType;
 };
-
-// this is gonna be pretty unused until loading maps kicks off
-struct FName
-{
-  size_t Index;
-};
-
-#endif

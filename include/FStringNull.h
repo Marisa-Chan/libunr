@@ -150,6 +150,14 @@ public:
   FString Substr( size_t Pos = 0, size_t Len = MAX_SIZE );
   void ReplaceChars( char Old, char New );
   
+  bool operator==( const FString& lhs, const FString& rhs );
+  bool operator==( const char* lhs,    const FString& rhs );
+  bool operator==( const FString& lhs, const char*    rhs );
+  
+  bool operator!=( const FString& lhs, const FString& rhs );
+  bool operator!=( const char* lhs,    const FString& rhs );
+  bool operator!=( const FString& lhs, const char*    rhs );
+  
   friend FArchiveIn& operator<<( FArchiveIn& Ar, FString& Str );
   friend FArchiveOut& operator>>( FArchiveOut& Ar, FString& Str );
 };

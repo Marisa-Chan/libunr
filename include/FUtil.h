@@ -47,6 +47,9 @@ private: \
   #define UNLIKELY(condition) __builtin_expect(!!(condition), 0)
   #define DLL_EXPORT __attribute__((dllexport))
   
+  int stricmp ( const char* str1, const char* str2 );
+  int strnicmp( const char* str1, const char* str2, size_t count );
+  
   #if defined __x86_64__
     #define LIBUNR_64BIT
   #elif defined __i386__
@@ -65,6 +68,8 @@ private: \
   // No version of Visual Studio will be officially supported.
   
 #endif
+  
+char* strupper( const char* str );
 
 #define LIBUNR_USE_STL
 
@@ -131,10 +136,6 @@ typedef i32 idx; // signifies that an int type should be read from an FArchive a
   
 #define PtrSubtract(ptr1, ptr2) \
   (void*)((u8*)ptr1 - (u8*)ptr2)
-  
-int  ReadCompactIndex  (std::istream& In);
-void WriteCompactIndex (std::ostream& Out, int i);
-void StringReplaceChar (std::string& Str, char Old, char New);
 
 #endif
 //========================================================================

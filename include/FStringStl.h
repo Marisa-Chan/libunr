@@ -136,20 +136,20 @@ public:
   size_t FindFirstOf( const char* s, size_t Pos, size_t n ) { return RealStr.find_first_of( s, Pos, n ); }
   size_t FindFirstOf( char c, size_t Pos = 0 ) { return RealStr.find_first_of( c, Pos ); }
   
-  size_t FindLastOf( const FString& Str, size_t Pos = 0 ) { return RealStr.find_last_of( Str.RealStr, Pos ); }
-  size_t FindLastOf( const char* s, size_t Pos = 0 ) { return RealStr.find_last_of( s, Pos ); }
+  size_t FindLastOf( const FString& Str, size_t Pos = MAX_SIZE ) { return RealStr.find_last_of( Str.RealStr, Pos ); }
+  size_t FindLastOf( const char* s, size_t Pos = MAX_SIZE ) { return RealStr.find_last_of( s, Pos ); }
   size_t FindLastOf( const char* s, size_t Pos, size_t n ) { return RealStr.find_last_of( s, Pos, n ); }
-  size_t FindLastOf( char c, size_t Pos = 0 ) { return RealStr.find_last_of( c, Pos ); }
+  size_t FindLastOf( char c, size_t Pos = MAX_SIZE ) { return RealStr.find_last_of( c, Pos ); }
   
   size_t FindFirstNotOf( const FString& Str, size_t Pos = 0 ) { return RealStr.find_first_not_of( Str.RealStr, Pos ); }
   size_t FindFirstNotOf( const char* s, size_t Pos = 0 ) { return RealStr.find_first_not_of( s, Pos ); }
   size_t FindFirstNotOf( const char* s, size_t Pos, size_t n ) { return RealStr.find_first_not_of( s, Pos, n ); }
   size_t FindFirstNotOf( char c, size_t Pos = 0 ) { return RealStr.find_first_not_of( c, Pos ); }
   
-  size_t FindLastNotOf( const FString& Str, size_t Pos = 0 ) { return RealStr.find_last_not_of( Str.RealStr, Pos ); }
-  size_t FindLastNotOf( const char* s, size_t Pos = 0 ) { return RealStr.find_last_not_of( s, Pos ); }
+  size_t FindLastNotOf( const FString& Str, size_t Pos = MAX_SIZE ) { return RealStr.find_last_not_of( Str.RealStr, Pos ); }
+  size_t FindLastNotOf( const char* s, size_t Pos = MAX_SIZE ) { return RealStr.find_last_not_of( s, Pos ); }
   size_t FindLastNotOf( const char* s, size_t Pos, size_t n ) { return RealStr.find_last_not_of( s, Pos, n ); }
-  size_t FindLastNotOf( char c, size_t Pos = 0 ) { return RealStr.find_last_not_of( c, Pos ); }
+  size_t FindLastNotOf( char c, size_t Pos = MAX_SIZE ) { return RealStr.find_last_not_of( c, Pos ); }
   
   FString Substr( size_t Pos = 0, size_t Len = MAX_SIZE ) { return FString( RealStr.substr( Pos ) ); }
   void ReplaceChars( char Old, char New )
@@ -161,7 +161,14 @@ public:
     }
   }
   
+  friend bool operator==( const FString& lhs, const FString& rhs );
+  friend bool operator==( const char* lhs,    const FString& rhs );
+  friend bool operator==( const FString& lhs, const char*    rhs );
+
+  friend bool operator!=( const FString& lhs, const FString& rhs );
+  friend bool operator!=( const char* lhs,    const FString& rhs );
+  friend bool operator!=( const FString& lhs, const char*    rhs );
+  
   //friend FArchiveIn& operator<<( FArchiveIn& Ar, FString& Str );
   //friend FArchiveOut& operator>>( FArchiveOut& Ar, FString& Str );
 };
-

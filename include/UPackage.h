@@ -26,7 +26,7 @@
 #ifndef __UPACKAGE_H__
 #define __UPACKAGE_H__
 
-#include "FName.h"
+#include "UObject.h"
 #include "FString.h"
 #include "TArray.h"
 
@@ -93,13 +93,10 @@ enum EPkgLoadOpts
 
 // UPackage
 // An object which keeps track of any information relating to a package
-class DLL_EXPORT UPackage
+class UPackage : public UObject
 {
-  BLOCK_COPY_CTOR( UPackage );
-  
-public:
-   UPackage();
-  ~UPackage();
+  DECLARE_CLASS( UPackage, UObject, 0 )
+  UPackage();
   
   virtual bool Load( const char* File );
   virtual bool Save( const char* File = NULL );
@@ -112,20 +109,25 @@ public:
   const char*     GetFilePath();
   const char*     GetFileName();
   
+  int FindName( const char* Name );
+  
   // Name resolution
   const char* ResolveNameFromIdx( idx Index );
   const char* ResolveNameFromObjRef( int ObjRef );
+  FExport*    ResolveExportFromName( int Name );
   
   // Object reading
-  bool BeginLoad();
-  void EndLoad();
-  bool ReadRawObject( idx Index, void* Buffer );
-
-  // Object writing
+  bool LoadObject( UObject** Obj, const char* ObjName );
+  
+  // Accessors 
+  FString& GetPackageName();
   
 protected:
-  FString Path;
   FString Name;
+  FString Path;
+  
+  bool BeginLoad( FExport* Export );
+  void EndLoad();
   
   FArchive* FileStream;
   UPackageHeader Header;
@@ -135,6 +137,62 @@ protected:
 
   // Global package variables
   static EPkgLoadOpts LoadOpts;
+};
+
+class UObjectManager
+{
+public:
+  UObjectManager();
+  ~UObjectManager();
+  
+  bool LoadPkg( const char* Filepath );
+  
+  template <class T> T* CreateObject( const char* PkgName, const char* ObjName, const char* ClassName = NULL )
+  {
+    TArray<UPackage*>::Iterator PkgIt;
+    UPackage* Pkg;
+    char* RealPkgName;
+    const char* ExtSeperator = strchr( PkgName, '.' );
+    
+    if (ExtSeperator != NULL)
+    {
+      size_t ExtOffset = (size_t)PtrSubtract( ExtSeperator, PkgName );
+      RealPkgName = strdup( PkgName );
+      RealPkgName[ExtOffset] = '\0';
+    }
+    else
+    {
+      RealPkgName = (char*)PkgName;
+    }
+    
+    for ( PkgIt = Packages->Begin(); PkgIt != Packages->End(); ++PkgIt )
+    {
+      if ( (*PkgIt)->GetPackageName() == RealPkgName )
+      {
+        Pkg = *PkgIt;
+        break;
+      }
+    }
+    
+    if (Pkg == NULL)
+      return NULL;
+    
+    T* Obj = new T();
+    if (!Pkg->LoadObject( (UObject**)&Obj, ObjName ))
+    {
+      if (Obj)
+        delete Obj;
+      return NULL;
+    }
+    
+    if ( RealPkgName != PkgName )
+      free( RealPkgName );
+    
+    return Obj;
+  }
+  
+private:
+  TArray<UPackage*>* Packages;
 };
 
 #endif

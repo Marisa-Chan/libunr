@@ -17,36 +17,57 @@
 \*========================================================================*/
 
 /*========================================================================
- * FName.h - Name table stuff
+ * FString.cpp - Implements useful string functions
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#ifndef __FNAME_H__
-#define __FNAME_H__
+#include "FString.h"
 
-#include "FArchive.h"
-#define NAME_LEN 64
-
-struct FNameEntry
+char* strupper( const char* str )
 {
-   FNameEntry();
-   FNameEntry(const char* InStr);
-  ~FNameEntry();
+  char* strUp = strdup( str );
+  size_t len = strlen( strUp );
+  for (size_t i = 0; i < len && i != MAX_SIZE; i++)
+    strUp[i] = toupper( strUp[i] );
   
-  friend FArchive& operator>>( FArchive& Ar, FNameEntry& Name );
-  friend FArchive& operator<<( FArchive& Ar, FNameEntry& Name );
-  
-  char Data[NAME_LEN];
-  u32 Index;
-  int Flags;
-};
+  return strUp;
+}
 
-// this is gonna be pretty unused until loading maps kicks off
-struct FName
+int stricmp( const char* str1, const char* str2 )
 {
-  size_t Index;
-};
+  char* strUp1 = strupper( str1 );
+  char* strUp2 = strupper( str2 );
+  
+  int result = strcmp( strUp1, strUp2 );
+  
+  free( strUp1 );
+  free( strUp2 );
+  
+  return result;
+}
 
+int strnicmp( const char* str1, const char* str2, size_t count )
+{
+  char* strUp1 = strupper( str1 );
+  char* strUp2 = strupper( str2 );
+  
+  int result = strncmp( strUp1, strUp2, count );
+  
+  free( strUp1 );
+  free( strUp2 );
+  
+  return result;
+}
+
+#if defined LIBUNR_USE_STL
+  bool operator==( const FString& lhs, const FString& rhs ) { return lhs.RealStr == rhs.RealStr; }
+  bool operator==( const char* lhs,    const FString& rhs ) { return lhs == rhs.RealStr; }
+  bool operator==( const FString& lhs, const char*    rhs ) { return lhs.RealStr == rhs; }
+
+  bool operator!=( const FString& lhs, const FString& rhs ) { return lhs.RealStr != rhs.RealStr; }
+  bool operator!=( const char* lhs,    const FString& rhs ) { return lhs != rhs.RealStr; }
+  bool operator!=( const FString& lhs, const char*    rhs ) { return lhs.RealStr != rhs; }
 #endif
+

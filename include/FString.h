@@ -34,12 +34,4 @@
   #include "FStringNull.h"
 #endif
 
-bool operator==(const FString& lhs, const FString& rhs);
-bool operator==(const char* lhs, const FString& rhs);
-bool operator==(const FString& lhs, const char* rhs);
-bool operator!=(const FString& lhs, const FString& rhs);
-bool operator!=(const char* lhs, const FString& rhs);
-bool operator!=(const FString& lhs, const char* rhs);
-void Swap(FString& x, FString& y);
-
 #endif

@@ -17,36 +17,46 @@
 \*========================================================================*/
 
 /*========================================================================
- * FName.h - Name table stuff
+ * UObject.cpp - Generic object functions
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#ifndef __FNAME_H__
-#define __FNAME_H__
+#include "UObject.h"
+#include "UClass.h"
 
-#include "FArchive.h"
-#define NAME_LEN 64
-
-struct FNameEntry
+UClass* UObject::StaticAllocateClass( u32 Flags )
 {
-   FNameEntry();
-   FNameEntry(const char* InStr);
-  ~FNameEntry();
-  
-  friend FArchive& operator>>( FArchive& Ar, FNameEntry& Name );
-  friend FArchive& operator<<( FArchive& Ar, FNameEntry& Name );
-  
-  char Data[NAME_LEN];
-  u32 Index;
-  int Flags;
-};
+  return new UClass( Flags );
+}
 
-// this is gonna be pretty unused until loading maps kicks off
-struct FName
+FArchive& operator>>( FArchive& Ar, UObject& Obj )
 {
-  size_t Index;
-};
+  Obj.LoadFromPackage( Ar );
+  return Ar;
+}
 
-#endif
+UObject::UObject()
+{
+}
+
+UObject::~UObject()
+{
+}
+
+bool UObject::ExportToFile()
+{
+  return false;
+}
+
+void UObject::LoadFromPackage( FArchive& Ar )
+{
+}
+
+void UObject::SetPkgProperties( UPackage* InPkg, int InExpIdx, int InNameIdx )
+{
+  Pkg = InPkg;
+  ExpIdx = InExpIdx;
+  NameIdx = InNameIdx;
+}

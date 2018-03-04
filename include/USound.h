@@ -17,36 +17,21 @@
 \*========================================================================*/
 
 /*========================================================================
- * FName.h - Name table stuff
+ * USound.h - Native sound object type
+ * See the 'Class Sound' in UT-Package-File-Format.pdf
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#ifndef __FNAME_H__
-#define __FNAME_H__
+#include "UObject.h"
 
-#include "FArchive.h"
-#define NAME_LEN 64
-
-struct FNameEntry
+class USound : public UObject
 {
-   FNameEntry();
-   FNameEntry(const char* InStr);
-  ~FNameEntry();
+  DECLARE_CLASS( USound, UObject, CLASS_SafeReplace )
   
-  friend FArchive& operator>>( FArchive& Ar, FNameEntry& Name );
-  friend FArchive& operator<<( FArchive& Ar, FNameEntry& Name );
-  
-  char Data[NAME_LEN];
-  u32 Index;
-  int Flags;
+  FName SoundFormat;
+  u32   OffsetNext;  // PackageVersion >= 63
+  idx   SoundSize;
+  u8*   SoundData;
 };
-
-// this is gonna be pretty unused until loading maps kicks off
-struct FName
-{
-  size_t Index;
-};
-
-#endif

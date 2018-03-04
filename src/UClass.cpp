@@ -17,36 +17,40 @@
 \*========================================================================*/
 
 /*========================================================================
- * FName.h - Name table stuff
+ * UClass.cpp - Objects that describe classes of Unreal objects
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#ifndef __FNAME_H__
-#define __FNAME_H__
+#include "UClass.h"
 
-#include "FArchive.h"
-#define NAME_LEN 64
-
-struct FNameEntry
+// UField
+UField::~UField()
 {
-   FNameEntry();
-   FNameEntry(const char* InStr);
-  ~FNameEntry();
-  
-  friend FArchive& operator>>( FArchive& Ar, FNameEntry& Name );
-  friend FArchive& operator<<( FArchive& Ar, FNameEntry& Name );
-  
-  char Data[NAME_LEN];
-  u32 Index;
-  int Flags;
-};
+}
 
-// this is gonna be pretty unused until loading maps kicks off
-struct FName
+// UStruct
+UStruct::~UStruct()
 {
-  size_t Index;
-};
+}
 
-#endif
+// UState
+UState::~UState()
+{
+}
+
+// UClass
+UClass::UClass()
+{
+}
+
+UClass::UClass( u32 Flags )
+{
+  ClassFlags = Flags;
+}
+
+UClass::~UClass()
+{
+}
+

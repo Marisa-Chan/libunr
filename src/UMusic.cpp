@@ -17,36 +17,57 @@
 \*========================================================================*/
 
 /*========================================================================
- * FName.h - Name table stuff
+ * UMusic.cpp - Native music object type
+ * See the 'Class Music' in UT-Package-File-Format.pdf
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#ifndef __FNAME_H__
-#define __FNAME_H__
+#include "UMusic.h"
+#include "UPackage.h"
+#include "FArchiveFile.h"
 
-#include "FArchive.h"
-#define NAME_LEN 64
-
-struct FNameEntry
+UMusic::UMusic()
 {
-   FNameEntry();
-   FNameEntry(const char* InStr);
-  ~FNameEntry();
-  
-  friend FArchive& operator>>( FArchive& Ar, FNameEntry& Name );
-  friend FArchive& operator<<( FArchive& Ar, FNameEntry& Name );
-  
-  char Data[NAME_LEN];
-  u32 Index;
-  int Flags;
-};
+  MusicType = 0; // Index 0 in a package's name table always points to music type
+}
 
-// this is gonna be pretty unused until loading maps kicks off
-struct FName
+UMusic::~UMusic()
 {
-  size_t Index;
-};
+}
 
-#endif
+void UMusic::LoadFromPackage( FArchive& Ar )
+{
+  Ar >> ChunkCount;
+  
+  if ( Ar.Ver > PKG_VER_UN_200 )
+    Ar >> _unknown0;
+  
+  Ar >> CINDEX( ChunkSize );
+  
+  ChunkData = new u8[ChunkSize];
+  Ar.Read( ChunkData, ChunkSize );
+}
+
+bool UMusic::ExportToFile()
+{
+  // Set up filename
+  FString* Filename = new FString( Pkg->ResolveNameFromIdx( NameIdx ) );
+  const char* Ext = Pkg->ResolveNameFromIdx( MusicType );
+  Filename->Append( "." );
+  Filename->Append( Ext );
+  
+  // Open file
+  FArchiveFileOut* Out = new FArchiveFileOut();
+  Out->Open( *Filename );
+  
+  // Write
+  Out->Write( ChunkData, ChunkSize );
+  
+  // Close
+  Out->Close();
+  delete Out;
+  delete Filename;  
+  return true;
+}

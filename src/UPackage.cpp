@@ -69,7 +69,10 @@ FArchive& operator>>( FArchive& In, FImport& Import )
 FArchive& operator>>( FArchive& In, UPackageHeader& Header )
 {
   In >> Header.Signature;
+  
   In >> Header.PackageVersion;
+  In.Ver = Header.PackageVersion;
+  
   In >> Header.LicenseMode;
   In >> Header.PackageFlags;
   In >> Header.NameCount;
@@ -117,6 +120,9 @@ bool UPackage::Load( const char* File )
   else
     Name = Path;
   
+  
+  Name.Erase( Name.FindLastOf( "." ) );
+  
   FileStream = new FArchiveFileIn();
   if ( !FileStream->Open( Path ) )
     return false;
@@ -128,7 +134,7 @@ bool UPackage::Load( const char* File )
   Names->Resize( Header.NameCount );
   FileStream->Seek( Header.NameOffset, ESeekBase::Begin );
   for ( TArray<FNameEntry>::Iterator NameIt = Names->Begin(); NameIt != Names->End(); NameIt++ )
-    NameIt->Read( *FileStream, Header.PackageVersion );
+    *FileStream >> *NameIt;
   
   // read in imports
   Imports->Resize( Header.ImportCount );
@@ -141,6 +147,8 @@ bool UPackage::Load( const char* File )
   FileStream->Seek( Header.ExportOffset, ESeekBase::Begin );
   for ( TArray<FExport>::Iterator Export = Exports->Begin(); Export != Exports->End(); Export++ )
     *FileStream >> *Export;
+  
+  EndLoad();
   
   return true;
 }
@@ -186,7 +194,7 @@ const char* UPackage::GetFileName()
 
 const char* UPackage::ResolveNameFromIdx( idx Index )
 {
-  return GetNameEntry( Index )->Name;
+  return GetNameEntry( Index )->Data;
 }
 
 const char* UPackage::ResolveNameFromObjRef( int ObjRef )
@@ -194,39 +202,115 @@ const char* UPackage::ResolveNameFromObjRef( int ObjRef )
   if (ObjRef == 0)
     return "None";
   else if (ObjRef < 0)
-    return GetNameEntry( GetImport( CalcObjRefValue( ObjRef ) )->ObjectName )->Name;
+    return GetNameEntry( GetImport( CalcObjRefValue( ObjRef ) )->ObjectName )->Data;
   else
-    return GetNameEntry( GetExport( CalcObjRefValue( ObjRef ) )->ObjectName )->Name;
+    return GetNameEntry( GetExport( CalcObjRefValue( ObjRef ) )->ObjectName )->Data;
 }
 
-bool UPackage::BeginLoad()
+bool UPackage::LoadObject( UObject** Obj, const char* ObjName )
 {
-  if (FileStream == NULL)
+  if ( Obj == NULL || *Obj == NULL )
+    return false;
+  
+  size_t i;
+  
+  // Doesn't this kind of defeat the purpose of the name table?
+  // Find the name in this package's name table
+  int NameIndex = -1;
+  for (i = 0; i < Names->Size() || i < MAX_SIZE; i++)
+  {
+    if (strnicmp( (*Names)[i].Data, ObjName, NAME_LEN ) == 0)
+    {
+      NameIndex = i;
+      break;
+    }
+  }
+  if (NameIndex < 0)
+    return false;
+  
+  // Now find the export associated with this name
+  FExport* Export = NULL;
+  for (i = 0; i < Exports->Size() || i < MAX_SIZE; i++)
+  {
+    if ( (*Exports)[i].ObjectName == NameIndex )
+    {
+      Export = &(*Exports)[i];
+      break;
+    }
+  }
+
+  // Prepare the package to load an object
+  if (!BeginLoad( Export ))
+    return false;
+  
+  // Load
+  *FileStream >> **Obj;
+  (*Obj)->SetPkgProperties( this, i, NameIndex );
+  
+  // Finalize load
+  EndLoad();
+  
+  return true;
+}
+
+FString& UPackage::GetPackageName()
+{
+  return Name;
+}
+
+bool UPackage::BeginLoad( FExport* Export )
+{
+  if ( Export == NULL )
+    return false;
+  
+  if ( LoadOpts == PO_OpenOnLoad && FileStream == NULL )
   {
     FileStream = new FArchiveFileIn();
-    return FileStream->Open( Path );
+    
+    if (FileStream == NULL)
+      return false;
+    if (!FileStream->Open( Path ))
+      return false;
   }
+
+  FileStream->Seek( Export->SerialOffset, Begin );
   return true;
 }
 
 void UPackage::EndLoad()
 {
-  // Only release package handle if our load options say so
-  if (LoadOpts == PO_OpenOnLoad)
+  if ( LoadOpts == PO_OpenOnLoad )
   {
-    FileStream->Close();
     delete FileStream;
     FileStream = NULL;
   }
 }
 
-bool UPackage::ReadRawObject( idx Index, void* Buffer )
+// UObjectManager
+UObjectManager::UObjectManager()
 {
-  if (Index < 0 || !Buffer || !FileStream)
+  Packages = new TArray<UPackage*>();
+}
+
+// This should only be called on exit
+UObjectManager::~UObjectManager()
+{
+  // Check a request exit variable?
+  for ( TArray<UPackage*>::Iterator Pkg = Packages->Begin(); Pkg != Packages->End(); ++Pkg )
+    delete *Pkg;
+  
+  delete Packages;
+}
+
+bool UObjectManager::LoadPkg( const char* Filepath )
+{
+  UPackage* Pkg = new UPackage();
+  if (!Pkg)
     return false;
   
-  FExport* Export = &(*Exports)[Index];
-  FileStream->Seek( Export->SerialOffset, ESeekBase::Begin );
-  FileStream->Read( Buffer, Export->SerialSize );
+  if (!Pkg->Load( Filepath ))
+    return false;
+  
+  Packages->PushBack( Pkg );
   return true;
 }
