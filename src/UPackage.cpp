@@ -273,6 +273,7 @@ bool UPackage::BeginLoad( FExport* Export )
       return false;
   }
 
+  FileStream->Ver = Header.PackageVersion;
   FileStream->Seek( Export->SerialOffset, Begin );
   return true;
 }
