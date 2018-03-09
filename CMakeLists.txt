@@ -25,6 +25,7 @@ set (SOURCES ${LIBUNR_SRC}/FArchiveFile.cpp
              ${LIBUNR_SRC}/FString.cpp
              ${LIBUNR_SRC}/UClass.cpp
              ${LIBUNR_SRC}/UMusic.cpp
+             ${LIBUNR_SRC}/USound.cpp
              ${LIBUNR_SRC}/UObject.cpp
              ${LIBUNR_SRC}/UPackage.cpp
              ${LIBUNR_SRC}/UStaticClassInit.cpp

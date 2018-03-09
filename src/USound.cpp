@@ -17,48 +17,51 @@
 \*========================================================================*/
 
 /*========================================================================
- * UMusic.cpp - Native music object type
- * See the 'Class Music' in UT-Package-File-Format.pdf
+ * USound.cpp - Native sound object type
+ * See the 'Class Sound' in UT-Package-File-Format.pdf
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#include "UMusic.h"
+#include "USound.h"
 #include "UPackage.h"
 #include "FArchiveFile.h"
 
-UMusic::UMusic()
+USound::USound()
 {
-  MusicType = 0; // Index 0 in a package's name table always points to music type
-  ChunkSize = 0;
-  ChunkData = NULL;
+  SoundFormat = 0;
+  SoundSize = 0;
+  SoundData = NULL;
 }
 
-UMusic::~UMusic()
+USound::~USound()
 {
-  if (ChunkData != NULL)
-    delete ChunkData;
+  if (SoundData != NULL)
+    delete SoundData;
 }
 
-void UMusic::LoadFromPackage( FArchive& Ar )
+void USound::LoadFromPackage( FArchive& Ar )
 {
-  Ar >> ChunkCount;
+  // Read the properties, but since it always starts with None, just eat it
+  idx NoneProp = 0;
+  Ar >> CINDEX( NoneProp );
   
-  if ( Ar.Ver > PKG_VER_UN_200 )
-    Ar >> _unknown0;
+  Ar >> CINDEX( SoundFormat );
+  if (Ar.Ver >= PKG_VER_UN_220)
+    Ar >> OffsetNext;
   
-  Ar >> CINDEX( ChunkSize );
+  Ar >> CINDEX( SoundSize );
   
-  ChunkData = new u8[ChunkSize];
-  Ar.Read( ChunkData, ChunkSize );
+  SoundData = new u8[SoundSize];
+  Ar.Read( SoundData, SoundSize );
 }
 
-bool UMusic::ExportToFile()
+bool USound::ExportToFile()
 {
   // Set up filename
   FString* Filename = new FString( Pkg->ResolveNameFromIdx( NameIdx ) );
-  const char* Ext = Pkg->ResolveNameFromIdx( MusicType );
+  const char* Ext = Pkg->ResolveNameFromIdx( SoundFormat );
   Filename->Append( "." );
   Filename->Append( Ext );
   
@@ -67,7 +70,7 @@ bool UMusic::ExportToFile()
   Out->Open( *Filename );
   
   // Write
-  Out->Write( ChunkData, ChunkSize );
+  Out->Write( SoundData, SoundSize );
   
   // Close
   Out->Close();

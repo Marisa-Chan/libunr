@@ -30,8 +30,12 @@ class USound : public UObject
 {
   DECLARE_CLASS( USound, UObject, CLASS_SafeReplace )
   
-  FName SoundFormat;
-  u32   OffsetNext;  // PackageVersion >= 63
-  idx   SoundSize;
-  u8*   SoundData;
+  USound();
+  virtual bool ExportToFile();
+  virtual void LoadFromPackage( FArchive& Ar );
+  
+  int SoundFormat;
+  u32 OffsetNext;  // PackageVersion >= 63
+  idx SoundSize;
+  u8* SoundData;
 };
