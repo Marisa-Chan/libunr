@@ -26,6 +26,16 @@
 
 #include "UObject.h"
 
+enum EMusicTransition
+{
+	MTRAN_None,
+	MTRAN_Instant,
+	MTRAN_Segue,
+	MTRAN_Fade,
+	MTRAN_FastFade,
+	MTRAN_SlowFade,
+};
+
 class UMusic : public UObject
 {
   DECLARE_CLASS( UMusic, UObject, CLASS_SafeReplace )
@@ -33,6 +43,8 @@ class UMusic : public UObject
   UMusic();
   virtual bool ExportToFile();
   virtual void LoadFromPackage( FArchive& Ar );
+  
+  static UClass* ConstructNativeClass( u32 Flags );
   
   u16 ChunkCount; //?
   u32 _unknown0; // PackageVerison > 61

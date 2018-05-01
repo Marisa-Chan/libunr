@@ -26,9 +26,11 @@
 #include "UObject.h"
 #include "UClass.h"
 #include "UMusic.h"
+#include "UProperty.h"
 #include "USound.h"
+#include "UTexture.h"
 
-#define INIT_CLASS(cls) cls::StaticInitializeClass()
+#define INIT_CLASS(cls) cls::StaticInitializeClass();
 
 bool InitStaticUClasses()
 {
@@ -44,6 +46,7 @@ bool InitStaticUClasses()
   
   INIT_CLASS( UMusic );
   INIT_CLASS( USound );
+  INIT_CLASS( UTexture );
 }
 
 IMPLEMENT_CLASS( UClass );
@@ -57,3 +60,4 @@ IMPLEMENT_CLASS( UState );
 IMPLEMENT_CLASS( UObject );
 IMPLEMENT_CLASS( UMusic );
 IMPLEMENT_CLASS( USound );
+IMPLEMENT_CLASS( UTexture );

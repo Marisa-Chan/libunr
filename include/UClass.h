@@ -23,8 +23,10 @@
  *========================================================================
 */
 
+#ifndef __UCLASS_H__
+#define __UCLASS_H__
+
 #include "UObject.h"
-#include "TArray.h"
 
 class UTextBuffer : public UObject
 {
@@ -58,17 +60,6 @@ class UEnum : public UField
   NO_DEFAULT_CONSTRUCTOR( UEnum )
   
   TArray<FName> Names;
-};
-
-class UProperty : public UField
-{
-  DECLARE_ABSTRACT_CLASS( UProperty, UField, 0 )
-  
-  u16 ArrayDim;
-  u16 ElementSize;
-  u32 PropertyFlags;
-  FName Category;
-  u16 ReplicationOffset; // only exists since objects may store this variable
 };
 
 class UStruct : public UField
@@ -136,3 +127,5 @@ class UClass : public UState
   UClass* ClassWithin;
   FName ClassConfigName;
 };
+
+#endif

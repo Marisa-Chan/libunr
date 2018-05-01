@@ -26,6 +26,17 @@
 
 #include "UObject.h"
 
+enum ESoundSlot
+{
+	SLOT_None,
+	SLOT_Misc,
+	SLOT_Pain,
+	SLOT_Interact,
+	SLOT_Ambient,
+	SLOT_Talk,
+	SLOT_Interface,
+};
+
 class USound : public UObject
 {
   DECLARE_CLASS( USound, UObject, CLASS_SafeReplace )
@@ -33,6 +44,8 @@ class USound : public UObject
   USound();
   virtual bool ExportToFile();
   virtual void LoadFromPackage( FArchive& Ar );
+  
+  static UClass* ConstructNativeClass( u32 Flags );
   
   int SoundFormat;
   u32 OffsetNext;  // PackageVersion >= 63

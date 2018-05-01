@@ -7,17 +7,6 @@ set (LIBUNR_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 set (LIBUNR_INC ${LIBUNR_ROOT}/include)
 set (LIBUNR_SRC ${LIBUNR_ROOT}/src)
 
-set (HEADERS ${LIBUNR_INC}/FArchive.h
-             ${LIBUNR_INC}/FArchiveFile.h
-             ${LIBUNR_INC}/FMemory.h
-             ${LIBUNR_INC}/FName.h
-             ${LIBUNR_INC}/FString.h
-             ${LIBUNR_INC}/FUtil.h
-             ${LIBUNR_INC}/TArray.h
-             ${LIBUNR_INC}/UPackage.h
-)
-
-
 set (SOURCES ${LIBUNR_SRC}/FArchiveFile.cpp
              ${LIBUNR_SRC}/FCompactIndex.cpp
              ${LIBUNR_SRC}/FMemory.cpp
@@ -28,10 +17,13 @@ set (SOURCES ${LIBUNR_SRC}/FArchiveFile.cpp
              ${LIBUNR_SRC}/USound.cpp
              ${LIBUNR_SRC}/UObject.cpp
              ${LIBUNR_SRC}/UPackage.cpp
+             ${LIBUNR_SRC}/UProperty.cpp
+             ${LIBUNR_SRC}/UTexture.cpp
              ${LIBUNR_SRC}/UStaticClassInit.cpp
 )
 
 include_directories (${LIBUNR_INC} /usr/include)
 add_library (libunr SHARED ${SOURCES})
+add_definitions("-std=c++11")
 add_definitions ("-Wno-attributes" "-g")
 set_target_properties (libunr PROPERTIES PREFIX "")

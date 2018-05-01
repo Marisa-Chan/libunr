@@ -23,6 +23,9 @@
  *========================================================================
 */
 
+#ifndef __TARRAY_H__
+#define __TARRAY_H__
+
 #include "FUtil.h"
 
 #define TARRAY_LOOP( type, array, itname ) \
@@ -32,4 +35,6 @@
   #include "TArrayStl.h"
 #else
   #include "TArrayNull.h"
+#endif
+    
 #endif

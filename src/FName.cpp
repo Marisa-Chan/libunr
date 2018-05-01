@@ -83,3 +83,13 @@ FArchive& operator<<( FArchive& Ar, FNameEntry& Name )
   Ar << Name;
   return Ar;
 }
+
+FName::FName()
+{
+  Index = 0;
+}
+
+FName::FName( size_t InIndex )
+{
+  Index = InIndex;
+}

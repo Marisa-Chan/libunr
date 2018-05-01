@@ -29,9 +29,12 @@
 
 #include "FArchive.h"
 #include "FName.h"
+#include "TArray.h"
 
 class UClass;
 class UPackage;
+class UProperty;
+struct FPropertyRecord;
 
 // Flags for loading objects.
 enum ELoadFlags
@@ -166,6 +169,8 @@ enum EObjectFlags
   protected: cls() {} public:
 
 #define DECLARE_BASE_CLASS(cls, supcls, clsflags) \
+protected: \
+  virtual void ConstructNativeClass(); \
 private: \
   static UClass* ObjectClass; \
 public: \
@@ -190,7 +195,7 @@ public: \
   
 #define IMPLEMENT_CLASS(cls) \
   UClass* cls::ObjectClass = NULL; \
-
+  
 class UObject
 {
   DECLARE_BASE_CLASS( UObject, UObject, CLASS_Abstract )
@@ -202,6 +207,8 @@ class UObject
   virtual void SetPkgProperties( UPackage* InPkg, int InExpIdx, int InNameIdx );
   
 protected:
+  void ReadProperties( FArchive& Ar );
+  
   static UClass* StaticAllocateClass( u32 Flags );
 
   int           Index;   // Index of the object in object pool
@@ -212,6 +219,8 @@ protected:
   UClass*       Class;   // Class of this object
   UPackage*     Pkg;     // Package this object was loaded from
   int           RefCnt;  // Number of references this object has (-1 = object must be explicitly purged)
+  
+  TArray<UProperty*> Properties;
 };
 
 bool InitStaticUClasses();

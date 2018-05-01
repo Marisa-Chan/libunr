@@ -46,6 +46,9 @@ struct FNameEntry
 // this is gonna be pretty unused until loading maps kicks off
 struct FName
 {
+  FName();
+  FName( size_t InIndex );
+  
   size_t Index;
 };
 
