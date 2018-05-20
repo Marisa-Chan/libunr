@@ -43,9 +43,7 @@ class USound : public UObject
   
   USound();
   virtual bool ExportToFile();
-  virtual void LoadFromPackage( FArchive& Ar );
-  
-  static UClass* ConstructNativeClass( u32 Flags );
+  virtual void LoadFromPackage( FPackageFileIn& Ar );
   
   int SoundFormat;
   u32 OffsetNext;  // PackageVersion >= 63

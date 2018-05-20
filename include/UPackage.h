@@ -23,18 +23,57 @@
  *========================================================================
 */
 
-#ifndef __UPACKAGE_H__
-#define __UPACKAGE_H__
+#pragma once
+
+#include "Array.h"
+#include "FileStream.h"
+#include "String.h"
 
 #include "UObject.h"
-#include "FString.h"
-#include "TArray.h"
 
 #define UE1_PKG_SIG 0x9e2a83c1
 
-// FExport
-// A data struct that contains information about a single object
-// that a package will expose to outside sources
+using namespace xstl;
+
+/*-----------------------------------------------------------------------------
+ * FPackageFileIn
+ * Keeps track of package specifics when reading a package from a file
+-----------------------------------------------------------------------------*/
+class FPackageFileIn : public FileStreamIn
+{
+public:
+  int Ver;
+};
+
+/*-----------------------------------------------------------------------------
+ * FPackageFileOut
+ * Keeps track of package specifics when writing a package to a file
+-----------------------------------------------------------------------------*/
+class FPackageFileOut : public FileStreamOut
+{
+public:
+  int Ver;
+};
+
+/*-----------------------------------------------------------------------------
+ * FCompactIndex
+ * https://wiki.beyondunreal.com/Legacy:Package_File_Format/Data_Details
+-----------------------------------------------------------------------------*/
+class DLL_EXPORT FCompactIndex
+{
+public:
+  int Value;
+  friend FPackageFileIn& operator>> ( FPackageFileIn& Ar,  FCompactIndex& Index );
+  friend FPackageFileOut& operator<<( FPackageFileOut& Ar, FCompactIndex& Index );
+};
+
+#define CINDEX(val) (*(FCompactIndex*)&val)
+
+/*-----------------------------------------------------------------------------
+ * FExport
+ * A data struct that contains information about a single object
+ * that a package will expose to outside sources
+-----------------------------------------------------------------------------*/
 struct DLL_EXPORT FExport
 {
   idx Class;
@@ -45,12 +84,14 @@ struct DLL_EXPORT FExport
   idx SerialSize;
   idx SerialOffset;  
   
-  friend FArchive& operator>>( FArchive& In, FExport& Export );
+  void Read( FPackageFileIn& Pkg );
 };
 
-// FImport
-// A data struct that contains information about a single object
-// which is required for the complete loading of a package
+/*-----------------------------------------------------------------------------
+ * FImport
+ * A data struct that contains information about a single object
+ * which is required for the complete loading of a package
+-----------------------------------------------------------------------------*/
 struct DLL_EXPORT FImport
 {
   idx ClassPackage;
@@ -58,12 +99,14 @@ struct DLL_EXPORT FImport
   int Package;
   idx ObjectName;
   
-  friend FArchive& operator>>( FArchive& In, FImport& Import );
+  void Read( FPackageFileIn& Pkg );
 };
 
-// UPackageHeader
-// A data struct which contains information about a single package
-// This information is always located at the top of a package file
+/*-----------------------------------------------------------------------------
+ * UPackageHeader
+ * A data struct which contains information about a single package
+ * This information is always located at the top of a package file
+-----------------------------------------------------------------------------*/
 struct DLL_EXPORT UPackageHeader
 {
   u32 Signature;
@@ -80,7 +123,7 @@ struct DLL_EXPORT UPackageHeader
   u32 HeritageOffset;
   u8  GUID[16];
   
-  friend FArchive& operator>>( FArchive& In, UPackageHeader& Header );
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, UPackageHeader& Header );
 };
 
 // Decides how packages are maintained during loading and idle states
@@ -91,8 +134,10 @@ enum EPkgLoadOpts
   PO_LoadToMem,   // Loads the entire package to memory (not implemented)
 };
 
-// UPackage
-// An object which keeps track of any information relating to a package
+/*-----------------------------------------------------------------------------
+ * UPackage
+ * An object which keeps track of any information relating to a package
+-----------------------------------------------------------------------------*/
 class UPackage : public UObject
 {
   DECLARE_CLASS( UPackage, UObject, 0 )
@@ -108,6 +153,7 @@ class UPackage : public UObject
   FExport*        GetExport( size_t Index );
   const char*     GetFilePath();
   const char*     GetFileName();
+  int             GetPackageVer();
   
   int FindName( const char* Name );
   
@@ -120,25 +166,29 @@ class UPackage : public UObject
   bool LoadObject( UObject** Obj, const char* ObjName );
   
   // Accessors 
-  FString& GetPackageName();
+  String& GetPackageName();
   
 protected:
-  FString Name;
-  FString Path;
-  
+    
   bool BeginLoad( FExport* Export );
   void EndLoad();
   
-  FArchive* FileStream;
+  String Name;
+  String Path;
+  FileStream* Stream;
   UPackageHeader Header;
-  TArray<FNameEntry>* Names;
-  TArray<FExport>*    Exports;
-  TArray<FImport>*    Imports;
+  Array<FNameEntry>* Names;
+  Array<FExport>*    Exports;
+  Array<FImport>*    Imports;
 
   // Global package variables
   static EPkgLoadOpts LoadOpts;
 };
 
+/*-----------------------------------------------------------------------------
+ * UObjectManager
+ * Manages the loading and saving of any objects from a package
+-----------------------------------------------------------------------------*/
 class UObjectManager
 {
 public:
@@ -149,8 +199,7 @@ public:
   
   template <class T> T* CreateObject( const char* PkgName, const char* ObjName, const char* ClassName = NULL )
   {
-    TArray<UPackage*>::Iterator PkgIt;
-    UPackage* Pkg;
+    UPackage* Pkg = NULL;
     char* RealPkgName;
     const char* ExtSeperator = strchr( PkgName, '.' );
     
@@ -165,20 +214,18 @@ public:
       RealPkgName = (char*)PkgName;
     }
     
-    for ( PkgIt = Packages->Begin(); PkgIt != Packages->End(); ++PkgIt )
+    for ( int i = 0; i < Packages->Size(); i++ )
     {
-      if ( (*PkgIt)->GetPackageName() == RealPkgName )
-      {
-        Pkg = *PkgIt;
+      Pkg = Packages->Data()[i];
+      if ( Pkg->GetPackageName() == RealPkgName )
         break;
-      }
     }
     
     if (Pkg == NULL)
       return NULL;
     
     T* Obj = new T();
-    if (!Pkg->LoadObject( (UObject**)&Obj, ObjName ))
+    if ( !Pkg->LoadObject( (UObject**)&Obj, ObjName ) )
     {
       if (Obj)
         delete Obj;
@@ -192,7 +239,6 @@ public:
   }
   
 private:
-  TArray<UPackage*>* Packages;
+  Array<UPackage*>* Packages;
 };
 
-#endif

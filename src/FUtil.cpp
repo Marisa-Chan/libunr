@@ -17,37 +17,8 @@
 \*========================================================================*/
 
 /*========================================================================
- * FMemory.h - Class for memory based operations
+ * FUtil.cpp - Utility functions
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
-
-#ifndef __FMEMORY_H__
-#define __FMEMORY_H__
-
-#include "FUtil.h"
-
-// TODO: Implement some way of swapping memory allocators at compile time
-class FMemory
-{
-public:
-  // Allocation
-  // These functions should have enforcement with regard to invalid parameters
-  static void* Malloc (size_t Num);
-  static void* Realloc(void* Ptr, size_t Num);
-  static void* Calloc (size_t Num, size_t Size);
-  static void  Free   (void* Ptr);
-  
-  // Manipulation
-  static void* Copy(void* Dest, size_t DestLen, const void* Src, size_t Num);
-  static void* Move(void* Dest, size_t DestLen, const void* Src, size_t Num);
-  static void* Set (void* Ptr, u8 Value, size_t Num) {return NULL;}
-  
-  // Compare
-  static bool Compare(const void* Ptr1, const void* Ptr2, size_t Num);
-  static const void* Search(const void* Ptr, u8 Value, size_t Num);
-  static void* Search(void* Ptr, u8 Value, size_t Num);
-};
-
-#endif

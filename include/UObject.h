@@ -27,10 +27,14 @@
 #ifndef __UOBJECT__
 #define __UOBJECT__
 
-#include "FArchive.h"
+#include "Array.h"
+#include "Stream.h"
 #include "FName.h"
-#include "TArray.h"
 
+using namespace xstl;
+
+class FPackageFileIn;
+class FPackageFileOut;
 class UClass;
 class UPackage;
 class UProperty;
@@ -170,7 +174,7 @@ enum EObjectFlags
 
 #define DECLARE_BASE_CLASS(cls, supcls, clsflags) \
 protected: \
-  virtual void ConstructNativeClass(); \
+  static UClass* ConstructNativeClass( u32 Flags ); \
 private: \
   static UClass* ObjectClass; \
 public: \
@@ -182,8 +186,8 @@ public: \
   } \
   typedef supcls Super; \
   virtual ~cls(); \
-  friend FArchive& operator>>( FArchive& Ar, cls& Obj ); \
-  friend FArchive& operator<<( FArchive& Ar, cls& Obj ); \
+  friend FPackageFileIn& operator>>( FPackageFileIn& Ar, cls& Obj ); \
+  friend FPackageFileOut& operator<<( FPackageFileOut& Ar, cls& Obj ); \
 
 #define DECLARE_CLASS(cls, supcls, flags) \
   DECLARE_BASE_CLASS(cls, supcls, flags) \
@@ -202,25 +206,25 @@ class UObject
   UObject();
   
   virtual bool ExportToFile();
-  virtual void LoadFromPackage( FArchive& Ar );
+  virtual void LoadFromPackage( FPackageFileIn& Ar );
   
   virtual void SetPkgProperties( UPackage* InPkg, int InExpIdx, int InNameIdx );
   
 protected:
-  void ReadProperties( FArchive& Ar );
+  void ReadProperties( FPackageFileIn& Ar );
   
   static UClass* StaticAllocateClass( u32 Flags );
 
-  int           Index;   // Index of the object in object pool
-  int           ExpIdx;  // Index of this object in the export table
-  int           NameIdx; // Index of this object's name in the package's name table
-  u32           Flags;   // Object flags
-  UObject*      Outer;   // Object that this object resides in
-  UClass*       Class;   // Class of this object
-  UPackage*     Pkg;     // Package this object was loaded from
-  int           RefCnt;  // Number of references this object has (-1 = object must be explicitly purged)
+  int       Index;   // Index of the object in object pool
+  int       ExpIdx;  // Index of this object in the export table
+  int       NameIdx; // Index of this object's name in the package's name table
+  u32       Flags;   // Object flags
+  UObject*  Outer;   // Object that this object resides in
+  UClass*   Class;   // Class of this object
+  UPackage* Pkg;     // Package this object was loaded from
+  int       RefCnt;  // Number of references this object has (-1 = object must be explicitly purged)
   
-  TArray<UProperty*> Properties;
+  Array<UProperty*> Properties;
 };
 
 bool InitStaticUClasses();

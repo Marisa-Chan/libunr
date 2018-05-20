@@ -26,7 +26,6 @@
 
 #include "USound.h"
 #include "UPackage.h"
-#include "FArchiveFile.h"
 
 USound::USound()
 {
@@ -41,7 +40,7 @@ USound::~USound()
     delete SoundData;
 }
 
-void USound::LoadFromPackage( FArchive& Ar )
+void USound::LoadFromPackage( FPackageFileIn& Ar )
 {
   // Read the properties, but since it always starts with None, just eat it
   idx NoneProp = 0;
@@ -60,13 +59,13 @@ void USound::LoadFromPackage( FArchive& Ar )
 bool USound::ExportToFile()
 {
   // Set up filename
-  FString* Filename = new FString( Pkg->ResolveNameFromIdx( NameIdx ) );
+  String* Filename = new String( Pkg->ResolveNameFromIdx( NameIdx ) );
   const char* Ext = Pkg->ResolveNameFromIdx( SoundFormat );
   Filename->Append( "." );
   Filename->Append( Ext );
   
   // Open file
-  FArchiveFileOut* Out = new FArchiveFileOut();
+  FileStreamOut* Out = new FileStreamOut();
   Out->Open( *Filename );
   
   // Write

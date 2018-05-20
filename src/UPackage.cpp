@@ -23,11 +23,113 @@
  *========================================================================
 */
 
+#include "Memory.h"
 #include "UPackage.h"
-#include "FArchiveFile.h"
-#include "FMemory.h"
 
 EPkgLoadOpts UPackage::LoadOpts = PO_OpenOnLoad;
+
+#define CI_6_BIT_LIMIT  64 - 1
+#define CI_13_BIT_LIMIT 8192 - 1
+#define CI_20_BIT_LIMIT 1048576 - 1
+#define CI_27_BIT_LIMIT 134217728  - 1
+
+using namespace xstl;
+
+DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FCompactIndex& Index )
+{
+  bool negate = false;
+  
+  for (int i = 0; i < 5; i++)
+  {
+    u8 x = 0;
+    In.Read ((char*)&x, 1);
+    
+    // First byte
+    if (i == 0)
+    {
+      // Bit: X0000000
+      if ((x & 0x80) > 0)
+        negate = true;
+      // Bits: 00XXXXXX
+      Index.Value |= (x & 0x3f);
+      // Bit: 0X000000
+      if ((x & 0x40) == 0)
+        break;
+    }
+    
+    // Last byte
+    else if (i == 4)
+    {
+      // Bits: 000XXXXX
+      Index.Value |= (x & 0x1f) << (6 + (3 * 7));
+    }
+    
+    // Middle bytes
+    else
+    {
+      // Bits: 0XXXXXXX
+      Index.Value |= (x & 0x7f) << (6 + ((i - 1) * 7));
+      // Bit: X0000000
+      if ((x & 0x80) == 0)
+        break;
+    }
+  }
+  
+  if (negate)
+    Index.Value = -Index.Value;
+  
+  return In;
+}
+
+DLL_EXPORT FPackageFileOut& operator<<( FPackageFileOut& Out, FCompactIndex& Index )
+{
+  // looks bad but it's faster than calling pow() potentially 4 times
+  u8 num_bytes = 0;
+  if (Index.Value <= (CI_6_BIT_LIMIT - 1) && Index.Value >= (-CI_6_BIT_LIMIT))
+    num_bytes = 1;
+  else if (Index.Value <= (CI_13_BIT_LIMIT - 1) && Index.Value >= (-CI_13_BIT_LIMIT))
+    num_bytes = 2;
+  else if (Index.Value <= (CI_20_BIT_LIMIT - 1) && Index.Value >= (-CI_20_BIT_LIMIT))
+    num_bytes = 3;
+  else if (Index.Value <= (CI_27_BIT_LIMIT - 1) && Index.Value >= (-CI_27_BIT_LIMIT))
+    num_bytes = 4;
+  else
+    num_bytes = 5;
+    
+  u8 byte_out;
+  for (int j = 0; j < num_bytes; j++)
+  {
+    byte_out = 0;
+    // First byte
+    if (j == 0)
+    {
+      if (Index.Value < 0)
+        byte_out |= 0x80;
+        
+      if (j+1 < num_bytes)
+        byte_out |= 0x40;
+        
+      byte_out |= (Index.Value & 0x3F);
+    }
+    
+    // Last byte
+    else if (j == 4)
+    {
+      byte_out |= ((Index.Value & 0x7F000000) >> 24);
+    }
+    
+    // Middle bytes
+    else
+    {
+      if (j+1 < num_bytes)
+        byte_out |= 0x80;
+        
+      byte_out |= ((Index.Value >> (6 + ((j - 1) * 7))) & 0x7F);
+    }
+    
+    Out << byte_out;
+  }
+}
 
 int CalcObjRefValue( int ObjRef )
 {
@@ -40,7 +142,7 @@ int CalcObjRefValue( int ObjRef )
   return ObjRef - 1;
 }
 
-FArchive& operator>>( FArchive& In, FExport& Export )
+FPackageFileIn& operator>>( FPackageFileIn& In, FExport& Export )
 {
   In >> CINDEX( Export.Class );
   In >> CINDEX( Export.Super );
@@ -57,7 +159,7 @@ FArchive& operator>>( FArchive& In, FExport& Export )
   return In;
 }
 
-FArchive& operator>>( FArchive& In, FImport& Import )
+FPackageFileIn& operator>>( FPackageFileIn& In, FImport& Import )
 {
   In >> CINDEX( Import.ClassPackage );
   In >> CINDEX( Import.ClassName );
@@ -66,13 +168,11 @@ FArchive& operator>>( FArchive& In, FImport& Import )
   return In;
 }
 
-FArchive& operator>>( FArchive& In, UPackageHeader& Header )
+FPackageFileIn& operator>>( FPackageFileIn& In, UPackageHeader& Header )
 {
   In >> Header.Signature;
-  
   In >> Header.PackageVersion;
   In.Ver = Header.PackageVersion;
-  
   In >> Header.LicenseMode;
   In >> Header.PackageFlags;
   In >> Header.NameCount;
@@ -92,10 +192,10 @@ FArchive& operator>>( FArchive& In, UPackageHeader& Header )
 
 UPackage::UPackage()
 {
-  FMemory::Set ( &Header, 0, sizeof ( UPackageHeader ) );
-  Names = new TArray<FNameEntry>();
-  Exports = new TArray<FExport>();
-  Imports = new TArray<FImport>();
+  xstl::Set( &Header, 0, sizeof ( UPackageHeader ) );
+  Names = new Array<FNameEntry>();
+  Exports = new Array<FExport>();
+  Imports = new Array<FImport>();
 }
 
 UPackage::~UPackage()
@@ -123,30 +223,30 @@ bool UPackage::Load( const char* File )
   
   Name.Erase( Name.FindLastOf( "." ) );
   
-  FileStream = new FArchiveFileIn();
-  if ( !FileStream->Open( Path ) )
+  Stream = new FPackageFileIn();
+  if ( !Stream->Open( Path ) )
     return false;
   
   // read in the header
-  *FileStream >> Header;
+  *((FPackageFileIn*)Stream) >> Header;
   
   // read in the name table
   Names->Resize( Header.NameCount );
-  FileStream->Seek( Header.NameOffset, ESeekBase::Begin );
-  for ( TArray<FNameEntry>::Iterator NameIt = Names->Begin(); NameIt != Names->End(); NameIt++ )
-    *FileStream >> *NameIt;
+  Stream->Seek( Header.NameOffset, ESeekBase::Begin );
+  for ( int i = 0; i < Header.NameCount; i++ )
+    *((FPackageFileIn*)Stream) >> (*Names)[i];
   
   // read in imports
   Imports->Resize( Header.ImportCount );
-  FileStream->Seek( Header.ImportOffset, ESeekBase::Begin );
-  for ( TArray<FImport>::Iterator Import = Imports->Begin(); Import != Imports->End(); Import++ )
-    *FileStream >> *Import;
+  Stream->Seek( Header.ImportOffset, ESeekBase::Begin );
+  for ( int i = 0; i < Header.ImportCount; i++ )
+    *((FPackageFileIn*)Stream) >> (*Imports)[i];
   
   // read in exports
   Exports->Resize( Header.ExportCount );
-  FileStream->Seek( Header.ExportOffset, ESeekBase::Begin );
-  for ( TArray<FExport>::Iterator Export = Exports->Begin(); Export != Exports->End(); Export++ )
-    *FileStream >> *Export;
+  Stream->Seek( Header.ExportOffset, ESeekBase::Begin );
+  for ( int i = 0; i < Header.ExportCount; i++ )
+    *((FPackageFileIn*)Stream) >> (*Exports)[i];
   
   EndLoad();
   
@@ -244,7 +344,8 @@ bool UPackage::LoadObject( UObject** Obj, const char* ObjName )
     return false;
   
   // Load
-  *FileStream >> **Obj;
+  FPackageFileIn* PackageFile = (FPackageFileIn*)Stream;
+  *PackageFile >> **Obj;
   (*Obj)->SetPkgProperties( this, i, NameIndex );
   
   // Finalize load
@@ -253,7 +354,7 @@ bool UPackage::LoadObject( UObject** Obj, const char* ObjName )
   return true;
 }
 
-FString& UPackage::GetPackageName()
+String& UPackage::GetPackageName()
 {
   return Name;
 }
@@ -263,18 +364,18 @@ bool UPackage::BeginLoad( FExport* Export )
   if ( Export == NULL )
     return false;
   
-  if ( LoadOpts == PO_OpenOnLoad && FileStream == NULL )
+  if ( LoadOpts == PO_OpenOnLoad && Stream == NULL )
   {
-    FileStream = new FArchiveFileIn();
+    Stream = new FPackageFileIn();
     
-    if (FileStream == NULL)
+    if (Stream == NULL)
       return false;
-    if (!FileStream->Open( Path ))
+    if (!Stream->Open( Path ))
       return false;
   }
 
-  FileStream->Ver = Header.PackageVersion;
-  FileStream->Seek( Export->SerialOffset, Begin );
+  ((FPackageFileIn*)Stream)->Ver = Header.PackageVersion;
+  Stream->Seek( Export->SerialOffset, Begin );
   return true;
 }
 
@@ -282,23 +383,23 @@ void UPackage::EndLoad()
 {
   if ( LoadOpts == PO_OpenOnLoad )
   {
-    delete FileStream;
-    FileStream = NULL;
+    delete Stream;
+    Stream = NULL;
   }
 }
 
 // UObjectManager
 UObjectManager::UObjectManager()
 {
-  Packages = new TArray<UPackage*>();
+  Packages = new Array<UPackage*>();
 }
 
 // This should only be called on exit
 UObjectManager::~UObjectManager()
 {
   // Check a request exit variable?
-  for ( TArray<UPackage*>::Iterator Pkg = Packages->Begin(); Pkg != Packages->End(); ++Pkg )
-    delete *Pkg;
+  for ( int i = 0; i < Packages->Size(); i++ )
+    delete Packages->Data()[i];
   
   delete Packages;
 }

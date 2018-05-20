@@ -23,12 +23,13 @@
  *========================================================================
 */
 
+#include "Memory.h"
 #include "FName.h"
-#include "FMemory.h"
+#include "UPackage.h"
 
 FNameEntry::FNameEntry()
 {
-  FMemory::Set( Data, 0, NAME_LEN );
+  xstl::Set( Data, 0, NAME_LEN );
   Index = -1;
   Flags = 0;
 }
@@ -45,15 +46,15 @@ FNameEntry::~FNameEntry()
 {
 }
 
-FArchive& operator>>( FArchive& Ar, FNameEntry& Name )
+FPackageFileIn& operator>>( FPackageFileIn& In, FNameEntry& Name )
 {
-  if( Ar.Ver <= PKG_VER_UN_220 )
+  if( In.Ver <= PKG_VER_UN_220 )
   {
     u8 b;
     char* ptr = Name.Data;
     do
     {
-      Ar >> b;
+      In >> b;
       *ptr++ = b;
       
     } while( b && ptr < (Name.Data + NAME_LEN ) );
@@ -62,26 +63,24 @@ FArchive& operator>>( FArchive& Ar, FNameEntry& Name )
   else
   {
     int len = 0;
-    Ar >> CINDEX( len );
+    In >> CINDEX( len );
     if( len > 0 && len < NAME_LEN )
-      Ar.Read( Name.Data, len );
+      In.Read( Name.Data, len );
   }
-  Ar >> Name.Flags;
-  return Ar;
+  In >> Name.Flags;
 }
 
-FArchive& operator<<( FArchive& Ar, FNameEntry& Name )
+FPackageFileOut& operator<<( FPackageFileOut& Out, FNameEntry& Name )
 {
   Name.Data[NAME_LEN-1] = '\0'; // just in case
   
-  if( Ar.Ver > PKG_VER_UN_220 )
+  if( Out.Ver > PKG_VER_UN_220 )
   {
     int len = strlen( Name.Data );
-    Ar << CINDEX( len );
+    Out << CINDEX( len );
   }
   
-  Ar << Name;
-  return Ar;
+  Out << Name;
 }
 
 FName::FName()

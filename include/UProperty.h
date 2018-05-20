@@ -57,7 +57,7 @@ class UProperty : public UField
   u16 ReplicationOffset; // only exists since objects may store this variable
   
   // Instance variables
-  FName Name;
+  idx Name;
   void* Value;
   
   // Static variables

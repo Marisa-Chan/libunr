@@ -26,7 +26,6 @@
 
 #include "UMusic.h"
 #include "UPackage.h"
-#include "FArchiveFile.h"
 
 UMusic::UMusic()
 {
@@ -41,7 +40,7 @@ UMusic::~UMusic()
     delete ChunkData;
 }
 
-void UMusic::LoadFromPackage( FArchive& Ar )
+void UMusic::LoadFromPackage( FPackageFileIn& Ar )
 {
   Ar >> ChunkCount;
   
@@ -57,13 +56,13 @@ void UMusic::LoadFromPackage( FArchive& Ar )
 bool UMusic::ExportToFile()
 {
   // Set up filename
-  FString* Filename = new FString( Pkg->ResolveNameFromIdx( NameIdx ) );
+  String* Filename = new String( Pkg->ResolveNameFromIdx( NameIdx ) );
   const char* Ext = Pkg->ResolveNameFromIdx( MusicType );
   Filename->Append( "." );
   Filename->Append( Ext );
   
   // Open file
-  FArchiveFileOut* Out = new FArchiveFileOut();
+  FileStreamOut* Out = new FileStreamOut();
   Out->Open( *Filename );
   
   // Write

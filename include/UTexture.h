@@ -27,8 +27,9 @@
 #ifndef __UTEXTURE_H__
 #define __UTEXTURE_H__
 
-#include "FMemory.h"
+#include "Memory.h"
 #include "UObject.h"
+#include "UPackage.h"
 
 enum ETextureFormat
 {
@@ -46,13 +47,13 @@ class FColor
 public:
   u32 Data;
   
-  friend FArchive& operator<< ( FArchive& Ar, FColor& Color )
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FColor& Color )
   {
     u8 Channels[4];
-    Ar >> Channels[0];
-    Ar >> Channels[1];
-    Ar >> Channels[2];
-    Ar >> Channels[3];
+    In >> Channels[0];
+    In >> Channels[1];
+    In >> Channels[2];
+    In >> Channels[3];
     
     #ifdef LIBUNR_BIG_ENDIAN
       Color.Data = (Channels[3] << 24) | (Channels[2] << 16) | (Channels[1] << 8) | Channels[0];
@@ -60,7 +61,7 @@ public:
       Color.Data = (Channels[0] << 24) | (Channels[1] << 16) | (Channels[2] << 8) | Channels[3];
     #endif
     
-    return Ar;
+    return In;
   }
 };
 
@@ -68,7 +69,7 @@ class FMipmap
 {
 public:
   int USize, VSize;
-  TArray<u8> DataArray;
+  Array<u8> DataArray;
   
   FMipmap() 
   {}
@@ -80,7 +81,7 @@ public:
   
   void Clear()
   {
-    FMemory::Set( DataArray.Data(), 0, USize * VSize );
+    xstl::Set( DataArray.Data(), 0, USize * VSize );
   }
 };
 
@@ -90,7 +91,7 @@ class UPalette : public UObject
   
   UPalette();
   
-  TArray<FColor> Colors;
+  Array<FColor> Colors;
 };
 
 class UBitmap : public UObject
@@ -141,15 +142,13 @@ class UTexture : public UBitmap
   float MinFrameRate, MaxFrameRate;
   float Accumulator;
   
-  TArray<FMipmap> Mips;
-  TArray<FMipmap> CompMips;
-  ETextureFormat  CompFormat;
+  Array<FMipmap> Mips;
+  Array<FMipmap> CompMips;
+  ETextureFormat CompFormat;
   
   UTexture();
   virtual bool ExportToFile();
-  virtual void LoadFromPackage( FArchive& Ar );
-
-  static UClass* ConstructNativeClass( u32 Flags );
+  virtual void LoadFromPackage( FPackageFileIn& Ar );
 };
 
 #endif 

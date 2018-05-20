@@ -23,7 +23,8 @@
  *========================================================================
 */
 
-#include "FMemory.h"
+//#include "FLog.h"
+#include "Memory.h"
 #include "UObject.h"
 #include "UClass.h"
 #include "UProperty.h"
@@ -34,9 +35,14 @@ UClass* UObject::StaticAllocateClass( u32 Flags )
   return new UClass( Flags );
 }
 
-FArchive& operator>>( FArchive& Ar, UObject& Obj )
+FPackageFileIn& operator>>( FPackageFileIn& Ar, UObject& Obj )
 {
   Obj.LoadFromPackage( Ar );
+  return Ar;
+}
+
+FPackageFileOut& operator<<( FPackageFileOut& Ar, UObject& Obj )
+{
   return Ar;
 }
 
@@ -53,7 +59,7 @@ bool UObject::ExportToFile()
   return false;
 }
 
-void UObject::LoadFromPackage( FArchive& Ar )
+void UObject::LoadFromPackage( FPackageFileIn& Ar )
 {
 }
 
@@ -64,7 +70,7 @@ void UObject::SetPkgProperties( UPackage* InPkg, int InExpIdx, int InNameIdx )
   NameIdx = InNameIdx;
 }
 
-void UObject::ReadProperties( FArchive& Ar )
+void UObject::ReadProperties( FPackageFileIn& Ar )
 {
   char C;
   char* StrPtr;
@@ -119,27 +125,27 @@ void UObject::ReadProperties( FArchive& Ar )
         break;
       case PROP_String:
         Prop = new UStringProperty();
-        printf("UStringProperty serialization unimplemented.\n");
+        //Log->Print( LOG_WARN, "UStringProperty serialization unimplemented." );
         break;
       case PROP_Class:
         Prop = new UClassProperty();
-        printf("UClassProperty serialization unimplemented.\n");
+        //Log->Print( LOG_WARN, "UClassProperty serialization unimplemented." );
         break;
       case PROP_Array:
         Prop = new UArrayProperty();
-        printf("UArrayProperty serialization unimplemented.\n");
+        //Log->Print( LOG_WARN, "UArrayProperty serialization unimplemented." );
         break;
       case PROP_Struct:
         Prop = new UStructProperty();
-        printf("UStructProperty serialization unimplemented.\n");
+        //Log->Print( LOG_WARN, "UStructProperty serialization unimplemented.");
         break;
       case PROP_Vector:
         Prop = new UVectorProperty();
-        printf("UVectorProperty serialization unimplemented.\n");
+        //Log->Print( LOG_WARN, "UVectorProperty serialization unimplemented.");
         break;
       case PROP_Rotator:
         Prop = new URotatorProperty();
-        printf("URotatorProperty serialization unimplemented.\n");
+        //Log->Print( LOG_WARN, "URotatorProperty serialization unimplemented.");
         break;
       case PROP_Ascii:
         Prop = new UAsciiStrProperty();
@@ -148,12 +154,12 @@ void UObject::ReadProperties( FArchive& Ar )
         Ar >> CINDEX( AsciiStr->Length );
         AsciiStr->Length++;
         
-        AsciiStr->Value = FMemory::Malloc( AsciiStr->Length );
+        AsciiStr->Value = xstl::Malloc( AsciiStr->Length );
         StrPtr = (char*)AsciiStr->Value;
         for (int i = 0; i < AsciiStr->Length; i++) {
           Ar.Read( &C, 1 );
           if (C == '\0' && i != (AsciiStr->Length - 1)) {
-            printf("Written length does not match actual length!\n");
+            //Log->Print( LOG_WARN, "Written length does not match actual length!");
             AsciiStr->Length = 0;
             AsciiStr->Value  = NULL;
           }
@@ -162,14 +168,14 @@ void UObject::ReadProperties( FArchive& Ar )
         break;
       case PROP_Map:
         Prop = new UMapProperty();
-        printf("UMapProperty serialization unimplemented.\n");
+        //Log->Print( LOG_WARN, "UMapProperty serialization unimplemented." );
         break;
       case PROP_FixArr:
         Prop = new UFixedArrayProperty();
-        printf("UFixedArrayProperty serialization unimplemented.\n");
+        //Log->Print( LOG_WARN, "UFixedArrayProperty serialization unimplemented." );
         break;
       default:
-        printf("Bad property type!\n");
+        //Log->Print( LOG_WARN, "Bad property type!" );
         return;
     }
   }

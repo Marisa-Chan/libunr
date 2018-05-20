@@ -42,9 +42,7 @@ class UMusic : public UObject
   
   UMusic();
   virtual bool ExportToFile();
-  virtual void LoadFromPackage( FArchive& Ar );
-  
-  static UClass* ConstructNativeClass( u32 Flags );
+  virtual void LoadFromPackage( FPackageFileIn& Ar );
   
   u16 ChunkCount; //?
   u32 _unknown0; // PackageVerison > 61

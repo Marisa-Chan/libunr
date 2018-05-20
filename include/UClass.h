@@ -23,10 +23,13 @@
  *========================================================================
 */
 
-#ifndef __UCLASS_H__
-#define __UCLASS_H__
+#pragma once
 
+#include "Array.h"
+#include "String.h"
 #include "UObject.h"
+
+using namespace xstl;
 
 class UTextBuffer : public UObject
 {
@@ -34,7 +37,7 @@ class UTextBuffer : public UObject
   NO_DEFAULT_CONSTRUCTOR( UTextBuffer )
   
   u32 Pos, Top;
-  FString Text;
+  String Text;
 };
 
 class UField : public UObject
@@ -51,7 +54,7 @@ class UConst : public UField
   DECLARE_CLASS( UConst, UField, 0 )
   NO_DEFAULT_CONSTRUCTOR( UConst )
   
-  FString Value;
+  String Value;
 };
 
 class UEnum : public UField
@@ -59,7 +62,7 @@ class UEnum : public UField
   DECLARE_CLASS( UEnum, UField, 0 )
   NO_DEFAULT_CONSTRUCTOR( UEnum )
   
-  TArray<FName> Names;
+  Array<FName> Names;
 };
 
 class UStruct : public UField
@@ -122,10 +125,9 @@ class UClass : public UState
   u32 ClassFlags;
   u32 ClassGuid[4];
   idx DepCount;
-  TArray<FDependency> Dependencies;
-  TArray<FName> PackageImports;
+  Array<FDependency> Dependencies;
+  Array<int> PackageImports;
   UClass* ClassWithin;
-  FName ClassConfigName;
+  int ClassConfigName;
 };
 
-#endif

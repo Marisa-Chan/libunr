@@ -26,17 +26,22 @@
 #ifndef __FNAME_H__
 #define __FNAME_H__
 
-#include "FArchive.h"
+#include "FUtil.h"
 #define NAME_LEN 64
+
+using namespace xstl;
+
+class FPackageFileIn;
+class FPackageFileOut;
 
 struct FNameEntry
 {
    FNameEntry();
-   FNameEntry(const char* InStr);
+   FNameEntry( const char* InStr );
   ~FNameEntry();
   
-  friend FArchive& operator>>( FArchive& Ar, FNameEntry& Name );
-  friend FArchive& operator<<( FArchive& Ar, FNameEntry& Name );
+  friend FPackageFileIn&  operator>>( FPackageFileIn& In,  FNameEntry& Name );
+  friend FPackageFileOut& operator<<( FPackageFileOut& In, FNameEntry& Name );
   
   char Data[NAME_LEN];
   u32 Index;

@@ -24,12 +24,31 @@
  *========================================================================
 */
 
+//#include "FLog.h"
 #include "UMusic.h"
 #include "UPackage.h"
+#include "UProperty.h"
 #include "UTexture.h"
-#include "FArchiveFile.h"
+
+UBitmap::UBitmap()
+{
+  Format = TEXF_P8;
+  UBits = 0;
+  VBits = 0;
+  USize = 0;
+  VSize = 0;
+  UClamp = 0;
+  VClamp = 0;
+  InternalTime[0] = 0;
+  InternalTime[1] = 0;
+}
+
+UBitmap::~UBitmap()
+{
+}
 
 UTexture::UTexture()
+  : UBitmap()
 {
   BumpMap = NULL;
   DetailTexture = NULL;
@@ -68,12 +87,17 @@ UTexture::~UTexture()
 {
 }
 
-void UTexture::LoadFromPackage( FArchive& Ar )
+void UTexture::LoadFromPackage( FPackageFileIn& Ar )
 {
   // Load UProperties
   // TODO: String comparison is really slow, implement faster property lookup
   UObject::ReadProperties( Ar );
   for (u64 i = 0; i < Properties.Size() && i != MAX_UINT64; i++) {
+    if (strncmp( Pkg->ResolveNameFromIdx( Properties[i]->Name ), "DetailTexture", NAME_LEN ) == 0) {
+      //Log->Print( LOG_WARN, "UTexture->DetailTexture loading not implemented" );
+      DetailTexture = NULL;
+    }
+    
   }
 }
 
