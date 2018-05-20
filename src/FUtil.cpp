@@ -22,3 +22,38 @@
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
+
+#include "FUtil.h"
+#include "stdarg.h"
+
+#define MAX_MSG_LEN  512
+#define MAX_TYPE_LEN 32
+#define MAX_LINE_LEN (MAX_MSG_LEN + MAX_TYPE_LEN - 1)
+
+void DefaultPrintFunc( const char* Msg, size_t Len )
+{
+  printf("%s\n", Msg);
+}
+
+DebugPrintFunc DebugPrint = DefaultPrintFunc;
+
+void Logf( const char* Type, const char* Str, ... )
+{
+  static char StrBuf[MAX_MSG_LEN];
+  static char Msg[MAX_LINE_LEN];
+  
+  va_list vl;
+  va_start( vl, Str );
+  vsnprintf( StrBuf, MAX_MSG_LEN, Str, vl );
+  va_end( vl );
+  
+  size_t MsgLen = snprintf( Msg, MAX_LINE_LEN, "[%s] %s\n", Type, StrBuf );
+  size_t WriteLen = MsgLen;
+  if ( MsgLen > MAX_LINE_LEN ) 
+  {
+    Logf( LOG_WARN, "Following log message exceeds maximum length" );
+    WriteLen = MAX_LINE_LEN;
+  }
+  
+  DebugPrint( Msg, WriteLen );
+}

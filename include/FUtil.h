@@ -78,6 +78,16 @@ typedef i32 idx;
 // Unreal Tournament 99
 #define PKG_VER_UT_400 68
 #define PKG_VER_UT_432 69
+
+#define LOG_INFO "Info"
+#define LOG_WARN "Warning"
+#define LOG_ERR  "Error"
+#define LOG_CRIT "Critical"
+
+typedef void(*DebugPrintFunc)( const char* Str, size_t Len );
+extern DebugPrintFunc DebugPrint;
+
+void Logf( const char* Type, const char* Str, ... );
   
 //========================================================================
 // EOF

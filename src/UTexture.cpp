@@ -94,10 +94,9 @@ void UTexture::LoadFromPackage( FPackageFileIn& Ar )
   UObject::ReadProperties( Ar );
   for (u64 i = 0; i < Properties.Size() && i != MAX_UINT64; i++) {
     if (strncmp( Pkg->ResolveNameFromIdx( Properties[i]->Name ), "DetailTexture", NAME_LEN ) == 0) {
-      //Log->Print( LOG_WARN, "UTexture->DetailTexture loading not implemented" );
+      Logf( LOG_WARN, "UTexture->DetailTexture loading not implemented" );
       DetailTexture = NULL;
     }
-    
   }
 }
 

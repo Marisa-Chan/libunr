@@ -23,7 +23,7 @@
  *========================================================================
 */
 
-//#include "FLog.h"
+//#include "FLogf.h"
 #include "Memory.h"
 #include "UObject.h"
 #include "UClass.h"
@@ -125,27 +125,27 @@ void UObject::ReadProperties( FPackageFileIn& Ar )
         break;
       case PROP_String:
         Prop = new UStringProperty();
-        //Log->Print( LOG_WARN, "UStringProperty serialization unimplemented." );
+        Logf( LOG_WARN, "UStringProperty serialization unimplemented." );
         break;
       case PROP_Class:
         Prop = new UClassProperty();
-        //Log->Print( LOG_WARN, "UClassProperty serialization unimplemented." );
+        Logf( LOG_WARN, "UClassProperty serialization unimplemented." );
         break;
       case PROP_Array:
         Prop = new UArrayProperty();
-        //Log->Print( LOG_WARN, "UArrayProperty serialization unimplemented." );
+        Logf( LOG_WARN, "UArrayProperty serialization unimplemented." );
         break;
       case PROP_Struct:
         Prop = new UStructProperty();
-        //Log->Print( LOG_WARN, "UStructProperty serialization unimplemented.");
+        Logf( LOG_WARN, "UStructProperty serialization unimplemented.");
         break;
       case PROP_Vector:
         Prop = new UVectorProperty();
-        //Log->Print( LOG_WARN, "UVectorProperty serialization unimplemented.");
+        Logf( LOG_WARN, "UVectorProperty serialization unimplemented.");
         break;
       case PROP_Rotator:
         Prop = new URotatorProperty();
-        //Log->Print( LOG_WARN, "URotatorProperty serialization unimplemented.");
+        Logf( LOG_WARN, "URotatorProperty serialization unimplemented.");
         break;
       case PROP_Ascii:
         Prop = new UAsciiStrProperty();
@@ -159,7 +159,7 @@ void UObject::ReadProperties( FPackageFileIn& Ar )
         for (int i = 0; i < AsciiStr->Length; i++) {
           Ar.Read( &C, 1 );
           if (C == '\0' && i != (AsciiStr->Length - 1)) {
-            //Log->Print( LOG_WARN, "Written length does not match actual length!");
+            Logf( LOG_WARN, "Written length does not match actual length!");
             AsciiStr->Length = 0;
             AsciiStr->Value  = NULL;
           }
@@ -168,14 +168,14 @@ void UObject::ReadProperties( FPackageFileIn& Ar )
         break;
       case PROP_Map:
         Prop = new UMapProperty();
-        //Log->Print( LOG_WARN, "UMapProperty serialization unimplemented." );
+        Logf( LOG_WARN, "UMapProperty serialization unimplemented." );
         break;
       case PROP_FixArr:
         Prop = new UFixedArrayProperty();
-        //Log->Print( LOG_WARN, "UFixedArrayProperty serialization unimplemented." );
+        Logf( LOG_WARN, "UFixedArrayProperty serialization unimplemented." );
         break;
       default:
-        //Log->Print( LOG_WARN, "Bad property type!" );
+        Logf( LOG_WARN, "Bad property type!" );
         return;
     }
   }
