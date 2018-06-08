@@ -45,44 +45,45 @@ enum ETextureFormat
 class FColor
 {
 public:
-  u32 Data;
+  union 
+  {
+    struct
+    {
+      u8 R, G, B, A;
+    };
+    
+    u32 Data;
+  };
   
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FColor& Color )
   {
-    u8 Channels[4];
-    In >> Channels[0];
-    In >> Channels[1];
-    In >> Channels[2];
-    In >> Channels[3];
-    
-    #ifdef LIBUNR_BIG_ENDIAN
-      Color.Data = (Channels[3] << 24) | (Channels[2] << 16) | (Channels[1] << 8) | Channels[0];
-    #else
-      Color.Data = (Channels[0] << 24) | (Channels[1] << 16) | (Channels[2] << 8) | Channels[3];
-    #endif
-    
+    In >> Color.R;
+    In >> Color.G;
+    In >> Color.B;
+    In >> Color.A;
+  
     return In;
   }
 };
 
 class FMipmap
 {
-public:
-  int USize, VSize;
-  Array<u8> DataArray;
-  
+public:  
   FMipmap() 
   {}
   
   FMipmap( int InUSize, int InVSize )
   : USize( InUSize ), VSize( InVSize )
-  , DataArray( InUSize * InVSize, 0 )
+  , DataArray( (size_t)(InUSize * InVSize), 0 )
   {}
   
   void Clear()
   {
     xstl::Set( DataArray.Data(), 0, USize * VSize );
   }
+  
+  int USize, VSize;
+  Array<u8> DataArray;
 };
 
 class UPalette : public UObject
@@ -90,8 +91,9 @@ class UPalette : public UObject
   DECLARE_CLASS( UPalette, UObject, CLASS_SafeReplace )
   
   UPalette();
+  virtual void LoadFromPackage( FPackageFileIn& Ar );
   
-  Array<FColor> Colors;
+  FColor Colors[256];
 };
 
 class UBitmap : public UObject
@@ -116,6 +118,7 @@ class UTexture : public UBitmap
   UTexture* BumpMap;
   UTexture* DetailTexture;
   UTexture* MacroTexture;
+  UPalette* Palette;
   
   float Diffuse;
   float Specular;
@@ -124,8 +127,8 @@ class UTexture : public UBitmap
   float Friction;
   float MipMult;
   
-  // USound* FootstepSound[6]
-  // USound* HitSound;
+  USound* FootstepSound[6]
+  USound* HitSound;
   
   bool bHighColorQuality;
   bool bHighTextureQuality;

@@ -27,66 +27,157 @@
 
 u8 UProperty::PropertySizes[8] = { 1, 2, 4, 12, 16, 1, 2, 4 };
 
+UProperty::UProperty()
+{
+  ArrayDim = 0;
+  ElementSize = 0;
+  PropertyFlags = 0;
+  Category = 0;
+  Value = 0;
+}
+
+UProperty::UProperty( int InNameIdx )
+{
+  NameIdx = InNameIdx;
+  ArrayDim = 0;
+  ElementSize = 0;
+  PropertyFlags = 0;
+  Category = 0;
+  Value = 0;
+}
+
 UProperty::~UProperty()
 {
+  if ( LIKELY( PropNext ) )
+    delete PropNext;
 }
 
-UByteProperty::~UByteProperty()
+UProperty* UProperty::LoadProperty( FPackageFileIn& In )
 {
 }
 
-UIntProperty::~UIntProperty()
+FPropertyList::FPropertyList( UProperty* InProp )
+  : Prop( InProp )
 {
 }
 
-UBoolProperty::~UBoolProperty()
+FPropertyList::~FPropertyList()
 {
 }
 
-UFloatProperty::~UFloatProperty()
+FPropertyHash::FPropertyHash()
 {
+  HashArray = NULL;
 }
 
-UObjectProperty::~UObjectProperty()
+FPropertyHash::~FPropertyHash()
 {
+  if ( LIKELY( HashArray ) )
+    delete HashArray;
 }
 
-UNameProperty::~UNameProperty()
+void FPropertyHash::LoadPropertyList( FPackageFileIn& Ar )
 {
-}
-
-UStringProperty::~UStringProperty()
-{
-}
-
-UClassProperty::~UClassProperty()
-{
-}
-
-UArrayProperty::~UArrayProperty()
-{
-}
-
-UStructProperty::~UStructProperty()
-{
-}
-
-UVectorProperty::~UVectorProperty()
-{
-}
-
-URotatorProperty::~URotatorProperty()
-{
-}
-
-UAsciiStrProperty::~UAsciiStrProperty()
-{
-}
-
-UMapProperty::~UMapProperty()
-{
-}
-
-UFixedArrayProperty::~UFixedArrayProperty()
-{
+  
+//   int Name;
+//   int PrevName;
+//   const char* NameStr;
+//   UProperty* Prop = NULL;
+//   while( 1 )
+//   {
+//     // Get the name
+//     Ar >> CINDEX( Name );
+//     NameStr = Pkg->ResolveNameFromIdx( Name );
+//     
+//     // Finished when we hit None
+//     if ( strncmp( NameStr, "None", 4 ) == 0 )
+//       break;
+//     
+//     // Get info
+//     u8 Info;
+//     Ar >> Info;
+//     EPropertyType Type = (EPropertyType)(Info & 0xF);
+//     u8 Size = UProperty::PropertySizes[Info & 0x70];
+//     bool Bit7 = Info & 0x80;
+//     
+//     if ( !Prop || PrevName != Name )
+//     {
+//       Prop = new UProperty( Name );
+//     }
+//     else
+//     {
+//       Prop->ArrayDim++;
+//       if ( Prop->ArrayDim == 2 )
+//         bCreateArray = true;
+//     }
+//     
+//     switch( Type )
+//     {
+//       case PROP_Byte:
+//         LoadByteProperty( Ar, Prop, bCreateArray );
+//         break;
+//       case PROP_Int:
+//         LoadIntProperty( Ar, Prop, bCreateArray );
+//         break;
+//       case PROP_Bool:
+//         Prop->Value = (u64)Bit7;
+//         break;
+//       case PROP_Float:
+//         LoadFloatProperty( Ar, Prop, bCreateArray );
+//         break;
+//       case PROP_Object:
+//         LoadObjectProperty( Ar, Prop, bCreateArray );
+//         break;
+//       case PROP_Name:
+//         Ar >> CINDEX( *((int*)Prop->Value) );
+//         break;
+//       case PROP_String:
+//         Logf( LOG_WARN, "UStringProperty serialization unimplemented." );
+//         break;
+//       case PROP_Class:
+//         Logf( LOG_WARN, "UClassProperty serialization unimplemented." );
+//         break;
+//       case PROP_Array:
+//         Logf( LOG_WARN, "UArrayProperty serialization unimplemented." );
+//         break;
+//       case PROP_Struct:
+//         Logf( LOG_WARN, "UStructProperty serialization unimplemented.");
+//         break;
+//       case PROP_Vector:
+//         Logf( LOG_WARN, "UVectorProperty serialization unimplemented.");
+//         break;
+//       case PROP_Rotator:
+//         Logf( LOG_WARN, "URotatorProperty serialization unimplemented.");
+//         break;
+//       case PROP_Ascii:
+//         Logf( LOG_WARN, "UAsciiStrPropertty serialization unimplemented.");
+// //           Ar >> CINDEX( AsciiStr->Length );
+// //           AsciiStr->Length++;
+// //           
+// //           AsciiStr->Value = xstl::Malloc( AsciiStr->Length );
+// //           StrPtr = (char*)AsciiStr->Value;
+// //           for (int i = 0; i < AsciiStr->Length; i++) {
+// //             Ar.Read( &C, 1 );
+// //             if (C == '\0' && i != (AsciiStr->Length - 1)) {
+// //               Logf( LOG_WARN, "Written length does not match actual length!");
+// //               AsciiStr->Length = 0;
+// //               AsciiStr->Value  = NULL;
+// //             }
+// //             *StrPtr++ = C;
+// //           }
+//         break;
+//       case PROP_Map:
+//         Logf( LOG_WARN, "UMapProperty serialization unimplemented." );
+//         break;
+//       case PROP_FixArr:
+//         Logf( LOG_WARN, "UFixedArrayProperty serialization unimplemented." );
+//         break;
+//       default:
+//         Logf( LOG_WARN, "Bad property type!" );
+//         return;
+//     }
+// 
+//     PrevName = Name;
+//     bCreateArray = false;
+//   }
 }

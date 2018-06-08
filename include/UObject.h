@@ -29,15 +29,16 @@
 
 #include "Array.h"
 #include "Stream.h"
-#include "FName.h"
+#include "FUtil.h"
 
 using namespace xstl;
 
 class FPackageFileIn;
 class FPackageFileOut;
+class FPropertyHash;
+class UField;
 class UClass;
 class UPackage;
-class UProperty;
 struct FPropertyRecord;
 
 // Flags for loading objects.
@@ -171,13 +172,15 @@ enum EObjectFlags
 
 #define NO_DEFAULT_CONSTRUCTOR(cls) \
   protected: cls() {} public:
-
+    
 #define DECLARE_BASE_CLASS(cls, supcls, clsflags) \
 protected: \
   static UClass* ConstructNativeClass( u32 Flags ); \
 private: \
   static UClass* ObjectClass; \
 public: \
+  static UClass* StaticClass() \
+  { return ObjectClass; } \
   static bool StaticInitializeClass() \
   { \
     if (!ObjectClass) \
@@ -186,13 +189,9 @@ public: \
   } \
   typedef supcls Super; \
   virtual ~cls(); \
-  friend FPackageFileIn& operator>>( FPackageFileIn& Ar, cls& Obj ); \
-  friend FPackageFileOut& operator<<( FPackageFileOut& Ar, cls& Obj ); \
 
 #define DECLARE_CLASS(cls, supcls, flags) \
   DECLARE_BASE_CLASS(cls, supcls, flags) \
-  
-//  virtual void InitFromPkg( int InPkgIdx, u32 InFlags, UObject* InOuter, FName InName, UClass* InClass = NULL );\
 
 #define DECLARE_ABSTRACT_CLASS(cls, supcls, flags) \
   DECLARE_BASE_CLASS(cls, supcls, flags | CLASS_Abstract) 
@@ -200,33 +199,57 @@ public: \
 #define IMPLEMENT_CLASS(cls) \
   UClass* cls::ObjectClass = NULL; \
   
+#define OFFSET_OF(cls, var) \
+  ((size_t)&(((##cls *)0)->##var))
+  
+#define DEFINE_PROP_OFFSET(cls, var, off) \
+  static const size_t cls##var##Offset = off
+
+#define DECLARE_USCRIPT_VAR(cls, type, var) \
+  DEFINE_PROP_OFFSET(cls, var, OFFSET_OF(cls, var) ); \
+  type var
+  
+/*-----------------------------------------------------------------------------
+ * UObject
+ * The base class of all Unreal objects
+-----------------------------------------------------------------------------*/
 class UObject
 {
   DECLARE_BASE_CLASS( UObject, UObject, CLASS_Abstract )
   UObject();
   
+  u8* LoadScriptCode( FPackageFileIn& In, size_t Size );
+  virtual void LoadFromPackage( FPackageFileIn& In );
   virtual bool ExportToFile();
-  virtual void LoadFromPackage( FPackageFileIn& Ar );
-  
   virtual void SetPkgProperties( UPackage* InPkg, int InExpIdx, int InNameIdx );
   
-protected:
-  void ReadProperties( FPackageFileIn& Ar );
+  virtual UObject* Duplicate();
+  virtual void LinkNativeProperties();
   
+  const char* GetName();
+  UPackage* GetPackage();
+  
+  static Array<UObject*> ObjectPool;
+  
+  DECLARE_USCRIPT_VAR( UObject, int, ObjectInternal[6] ); // ???
+  DECLARE_USCRIPT_VAR( UObject, UObject*, Outer );  // Object that this object resides in
+  DECLARE_USCRIPT_VAR( UObject, u32, Flags );       // Object flags
+  DECLARE_USCRIPT_VAR( UObject, const char* Name ); // Name of this object
+  DECLARE_USCRIPT_VAR( UObject, UClass*, Class );   // Class of this object
+  
+protected:
+  void ReadPropertyList( FPackageFileIn& Ar );
   static UClass* StaticAllocateClass( u32 Flags );
 
   int       Index;   // Index of the object in object pool
   int       ExpIdx;  // Index of this object in the export table
   int       NameIdx; // Index of this object's name in the package's name table
-  u32       Flags;   // Object flags
-  UObject*  Outer;   // Object that this object resides in
-  UClass*   Class;   // Class of this object
+  UObject*  Next;    // The next object in the list
   UPackage* Pkg;     // Package this object was loaded from
   int       RefCnt;  // Number of references this object has (-1 = object must be explicitly purged)
+  size_t    Hash;    // Hash key to the name of this object
   
-  Array<UProperty*> Properties;
+  UField* Field; // The first field in a list
 };
-
-bool InitStaticUClasses();
 
 #endif

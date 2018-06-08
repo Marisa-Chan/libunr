@@ -48,10 +48,20 @@ FPackageFileOut& operator<<( FPackageFileOut& Ar, UObject& Obj )
 
 UObject::UObject()
 {
+  Index = -1;
+  ExpIdx = -1;
+  NameIdx = -1;
+  Flags = 0;
+  Outer = NULL;
+  Class = ObjectClass;
+  Pkg = NULL;
+  RefCnt = 1;
+  Properties = new FPropertyHash();
 }
 
 UObject::~UObject()
 {
+  delete Properties;
 }
 
 bool UObject::ExportToFile()
@@ -61,6 +71,17 @@ bool UObject::ExportToFile()
 
 void UObject::LoadFromPackage( FPackageFileIn& Ar )
 {
+  if ( Flags & RF_HasStack )
+  {
+    // Load stack info
+  }
+  
+  if ( !ObjectClass.IsA( UClass::StaticClass() ) )
+  {
+    // Load properties
+  }
+  
+  return;
 }
 
 void UObject::SetPkgProperties( UPackage* InPkg, int InExpIdx, int InNameIdx )
@@ -70,113 +91,11 @@ void UObject::SetPkgProperties( UPackage* InPkg, int InExpIdx, int InNameIdx )
   NameIdx = InNameIdx;
 }
 
-void UObject::ReadProperties( FPackageFileIn& Ar )
+void UObject::ReadPropertyList( FPackageFileIn& In )
 {
-  char C;
-  char* StrPtr;
-  UAsciiStrProperty* AsciiStr;
+}
+
+void UObject::LinkNativeProperties()
+{
   
-  while( 1 )
-  {
-    // Get the name
-    int Name;
-    const char* NameStr;
-    Ar >> CINDEX( Name );
-    NameStr = Pkg->ResolveNameFromIdx( Name );
-    
-    // Finished when we hit None
-    if ( strncmp( NameStr, "None", 4 ) == 0 )
-      break;
-    
-    // Get info
-    u8 Info;
-    Ar >> Info;
-    EPropertyType Type = (EPropertyType)(Info & 0xF);
-    u8 Size = UProperty::PropertySizes[Info & 0x70];
-    bool Bit7 = Info & 0x80;
-    
-    // Get property value
-    UProperty* Prop;
-    switch( Type )
-    {
-      case PROP_Byte:
-        Prop = new UByteProperty();
-        Ar >> *((u8*)Prop->Value);
-        break;
-      case PROP_Int:
-        Prop = new UIntProperty();
-        Ar >> *((int*)Prop->Value);
-        break;
-      case PROP_Bool:
-        Prop = new UBoolProperty();
-        Prop->Value = (void*)Bit7;
-        break;
-      case PROP_Float:
-        Prop = new UFloatProperty();
-        Ar >> *((float*)Prop->Value);
-        break;
-      case PROP_Object:
-        Prop = new UObjectProperty();
-        Ar >> CINDEX( *((int*)Prop->Value) );
-        break;
-      case PROP_Name:
-        Prop = new UNameProperty();
-        Ar >> CINDEX( *((int*)Prop->Value) );
-        break;
-      case PROP_String:
-        Prop = new UStringProperty();
-        Logf( LOG_WARN, "UStringProperty serialization unimplemented." );
-        break;
-      case PROP_Class:
-        Prop = new UClassProperty();
-        Logf( LOG_WARN, "UClassProperty serialization unimplemented." );
-        break;
-      case PROP_Array:
-        Prop = new UArrayProperty();
-        Logf( LOG_WARN, "UArrayProperty serialization unimplemented." );
-        break;
-      case PROP_Struct:
-        Prop = new UStructProperty();
-        Logf( LOG_WARN, "UStructProperty serialization unimplemented.");
-        break;
-      case PROP_Vector:
-        Prop = new UVectorProperty();
-        Logf( LOG_WARN, "UVectorProperty serialization unimplemented.");
-        break;
-      case PROP_Rotator:
-        Prop = new URotatorProperty();
-        Logf( LOG_WARN, "URotatorProperty serialization unimplemented.");
-        break;
-      case PROP_Ascii:
-        Prop = new UAsciiStrProperty();
-        AsciiStr = (UAsciiStrProperty*)Prop;
-        
-        Ar >> CINDEX( AsciiStr->Length );
-        AsciiStr->Length++;
-        
-        AsciiStr->Value = xstl::Malloc( AsciiStr->Length );
-        StrPtr = (char*)AsciiStr->Value;
-        for (int i = 0; i < AsciiStr->Length; i++) {
-          Ar.Read( &C, 1 );
-          if (C == '\0' && i != (AsciiStr->Length - 1)) {
-            Logf( LOG_WARN, "Written length does not match actual length!");
-            AsciiStr->Length = 0;
-            AsciiStr->Value  = NULL;
-          }
-          *StrPtr++ = C;
-        }
-        break;
-      case PROP_Map:
-        Prop = new UMapProperty();
-        Logf( LOG_WARN, "UMapProperty serialization unimplemented." );
-        break;
-      case PROP_FixArr:
-        Prop = new UFixedArrayProperty();
-        Logf( LOG_WARN, "UFixedArrayProperty serialization unimplemented." );
-        break;
-      default:
-        Logf( LOG_WARN, "Bad property type!" );
-        return;
-    }
-  }
 }

@@ -45,6 +45,8 @@ class UField : public UObject
   DECLARE_ABSTRACT_CLASS( UField, UObject, 0 )
   NO_DEFAULT_CONSTRUCTOR( UField )
   
+  virtual void LoadFromPackage( FPackageFileIn& Ar );
+  
   UField* SuperField; // Parent object
   UField* Next;       // Next object in list
 };
@@ -62,7 +64,7 @@ class UEnum : public UField
   DECLARE_CLASS( UEnum, UField, 0 )
   NO_DEFAULT_CONSTRUCTOR( UEnum )
   
-  Array<FName> Names;
+  Array<const char*> Names;
 };
 
 class UStruct : public UField
@@ -70,9 +72,11 @@ class UStruct : public UField
   DECLARE_CLASS( UStruct, UField, 0 )
   NO_DEFAULT_CONSTRUCTOR( UStruct )
   
+  virtual void LoadFromPackage( FPackageFileIn& Ar );
+  
   UTextBuffer* ScriptText;
   UField* Children;
-  FName FriendlyName;
+  const char* FriendlyName;
   u32 Line;
   u32 TextPos;
   u32 ScriptSize;
@@ -98,20 +102,31 @@ class UState : public UStruct
   DECLARE_CLASS( UState, UStruct, 0 )
   NO_DEFAULT_CONSTRUCTOR( UState )
   
+  virtual void LoadFromPackage( FPackageFileIn& Ar );
+  
   u64 ProbeMask;
   u64 IgnoreMask;
   u16 LabelTableOffset;
   u32 StateFlags;
 };
 
-class FDependency
+struct FDependency
 {
   FDependency();
-  FDependency( UClass* InClass, bool InDeep );
   
   UClass* Class;
   u32 Deep;
   u32 ScriptTextCRC;
+};
+
+class FNativeClassInfo
+{
+  FNativeClassInfo();
+  ~FNativeClassInfo();
+  
+  char* Name;
+  size_t Hash;
+  UObject* (*NativeCtor)();
 };
 
 class UClass : public UState
@@ -121,13 +136,21 @@ class UClass : public UState
   UClass();
   UClass( u32 Flags );
   
+  virtual void LoadFromPackage( FPackageFileIn& Ar );
+  
+  bool IsNative();
+  
   u32 OldClassRecordSize; // PackageVersion <= 61
   u32 ClassFlags;
   u32 ClassGuid[4];
-  idx DepCount;
   Array<FDependency> Dependencies;
   Array<int> PackageImports;
   UClass* ClassWithin;
-  int ClassConfigName;
+  const char* ClassConfigName;
+  
+  // Runtime variables
+  UObject* Default;
+  
+  static Array<FNativeClassInfo> NativeClasses;
 };
 

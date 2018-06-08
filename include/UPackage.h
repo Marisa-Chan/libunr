@@ -43,6 +43,7 @@ class FPackageFileIn : public FileStreamIn
 {
 public:
   int Ver;
+  UPackage* Pkg;
 };
 
 /*-----------------------------------------------------------------------------
@@ -53,6 +54,7 @@ class FPackageFileOut : public FileStreamOut
 {
 public:
   int Ver;
+  UPackage* Pkg;
 };
 
 /*-----------------------------------------------------------------------------
@@ -82,7 +84,9 @@ struct DLL_EXPORT FExport
   idx ObjectName;
   u32 ObjectFlags;
   idx SerialSize;
-  idx SerialOffset;  
+  idx SerialOffset;
+  
+  UObject* Obj;
   
   void Read( FPackageFileIn& Pkg );
 };
@@ -126,6 +130,26 @@ struct DLL_EXPORT UPackageHeader
   friend FPackageFileIn& operator>>( FPackageFileIn& In, UPackageHeader& Header );
 };
 
+/*-----------------------------------------------------------------------------
+ * FNameEntry
+ * A entry into a package's name table
+-----------------------------------------------------------------------------*/
+#define NAME_LEN 64
+struct FNameEntry
+{
+   FNameEntry();
+   FNameEntry( const char* InStr );
+  ~FNameEntry();
+  
+  friend FPackageFileIn&  operator>>( FPackageFileIn& In,  FNameEntry& Name );
+  friend FPackageFileOut& operator<<( FPackageFileOut& In, FNameEntry& Name );
+  
+  char Data[NAME_LEN];
+  int Flags;
+  size_t Hash;
+};
+
+
 // Decides how packages are maintained during loading and idle states
 enum EPkgLoadOpts
 {
@@ -136,7 +160,7 @@ enum EPkgLoadOpts
 
 /*-----------------------------------------------------------------------------
  * UPackage
- * An object which keeps track of any information relating to a package
+ * A container for default object types
 -----------------------------------------------------------------------------*/
 class UPackage : public UObject
 {
@@ -151,6 +175,7 @@ class UPackage : public UObject
   FNameEntry*     GetNameEntry( size_t Index );
   FImport*        GetImport( size_t Index );
   FExport*        GetExport( size_t Index );
+  const char*     GetName();
   const char*     GetFilePath();
   const char*     GetFileName();
   int             GetPackageVer();
@@ -160,13 +185,19 @@ class UPackage : public UObject
   // Name resolution
   const char* ResolveNameFromIdx( idx Index );
   const char* ResolveNameFromObjRef( int ObjRef );
-  FExport*    ResolveExportFromName( int Name );
   
   // Object reading
   bool LoadObject( UObject** Obj, const char* ObjName );
   
   // Accessors 
   String& GetPackageName();
+  
+  static bool StaticInit();
+  static int CalcObjRefValue( int ObjRef );
+  static UPackage* StaticLoadPkg( const char* Filepath );
+  static UObject* StaticLoadObject( const char* PkgName, const char* ObjName, const char* ClassName );
+  static UObject* StaticLoadObject( UPackage* Pkg, const char* ObjName, const char* ClassName );
+  static UObject* StaticLoadObject( UPackage* Pkg, idx ObjRef );
   
 protected:
     
@@ -175,6 +206,7 @@ protected:
   
   String Name;
   String Path;
+  size_t NameHash;
   FileStream* Stream;
   UPackageHeader Header;
   Array<FNameEntry>* Names;
@@ -183,62 +215,6 @@ protected:
 
   // Global package variables
   static EPkgLoadOpts LoadOpts;
-};
-
-/*-----------------------------------------------------------------------------
- * UObjectManager
- * Manages the loading and saving of any objects from a package
------------------------------------------------------------------------------*/
-class UObjectManager
-{
-public:
-  UObjectManager();
-  ~UObjectManager();
-  
-  bool LoadPkg( const char* Filepath );
-  
-  template <class T> T* CreateObject( const char* PkgName, const char* ObjName, const char* ClassName = NULL )
-  {
-    UPackage* Pkg = NULL;
-    char* RealPkgName;
-    const char* ExtSeperator = strchr( PkgName, '.' );
-    
-    if (ExtSeperator != NULL)
-    {
-      size_t ExtOffset = (size_t)PtrSubtract( ExtSeperator, PkgName );
-      RealPkgName = strdup( PkgName );
-      RealPkgName[ExtOffset] = '\0';
-    }
-    else
-    {
-      RealPkgName = (char*)PkgName;
-    }
-    
-    for ( int i = 0; i < Packages->Size(); i++ )
-    {
-      Pkg = Packages->Data()[i];
-      if ( Pkg->GetPackageName() == RealPkgName )
-        break;
-    }
-    
-    if (Pkg == NULL)
-      return NULL;
-    
-    T* Obj = new T();
-    if ( !Pkg->LoadObject( (UObject**)&Obj, ObjName ) )
-    {
-      if (Obj)
-        delete Obj;
-      return NULL;
-    }
-    
-    if ( RealPkgName != PkgName )
-      free( RealPkgName );
-    
-    return Obj;
-  }
-  
-private:
-  Array<UPackage*>* Packages;
+  static Array<UPackage*>* Packages;
 };
 

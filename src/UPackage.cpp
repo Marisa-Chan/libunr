@@ -25,6 +25,7 @@
 
 #include "Memory.h"
 #include "UPackage.h"
+#include "UTexture.h"
 
 EPkgLoadOpts UPackage::LoadOpts = PO_OpenOnLoad;
 
@@ -35,6 +36,9 @@ EPkgLoadOpts UPackage::LoadOpts = PO_OpenOnLoad;
 
 using namespace xstl;
 
+/*-----------------------------------------------------------------------------
+ * FCompactIndex
+-----------------------------------------------------------------------------*/
 DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FCompactIndex& Index )
 {
   bool negate = false;
@@ -131,17 +135,9 @@ DLL_EXPORT FPackageFileOut& operator<<( FPackageFileOut& Out, FCompactIndex& Ind
   }
 }
 
-int CalcObjRefValue( int ObjRef )
-{
-  if (ObjRef == 0)
-    return ObjRef;
-  
-  else if (ObjRef < 0)
-    ObjRef = -ObjRef;
-  
-  return ObjRef - 1;
-}
-
+/*-----------------------------------------------------------------------------
+ * FExport
+-----------------------------------------------------------------------------*/
 FPackageFileIn& operator>>( FPackageFileIn& In, FExport& Export )
 {
   In >> CINDEX( Export.Class );
@@ -156,9 +152,14 @@ FPackageFileIn& operator>>( FPackageFileIn& In, FExport& Export )
   else
     Export.SerialOffset = -1;
   
+  Export.Obj = NULL;
+  
   return In;
 }
 
+/*-----------------------------------------------------------------------------
+ * FImport
+-----------------------------------------------------------------------------*/
 FPackageFileIn& operator>>( FPackageFileIn& In, FImport& Import )
 {
   In >> CINDEX( Import.ClassPackage );
@@ -168,6 +169,9 @@ FPackageFileIn& operator>>( FPackageFileIn& In, FImport& Import )
   return In;
 }
 
+/*-----------------------------------------------------------------------------
+ * UPackageHeader
+-----------------------------------------------------------------------------*/
 FPackageFileIn& operator>>( FPackageFileIn& In, UPackageHeader& Header )
 {
   In >> Header.Signature;
@@ -190,6 +194,68 @@ FPackageFileIn& operator>>( FPackageFileIn& In, UPackageHeader& Header )
   return In;
 }
 
+/*-----------------------------------------------------------------------------
+ * FNameEntry
+-----------------------------------------------------------------------------*/
+FNameEntry::FNameEntry()
+{
+  xstl::Set( Data, 0, NAME_LEN );
+  Index = -1;
+  Flags = 0;
+}
+
+FNameEntry::FNameEntry( const char* InStr )
+{
+  strncpy( Data, InStr, NAME_LEN );
+  Data[NAME_LEN-1] = '\0';
+  Flags = 0;
+  Index = -1;
+}
+
+FNameEntry::~FNameEntry()
+{
+}
+
+FPackageFileIn& operator>>( FPackageFileIn& In, FNameEntry& Name )
+{
+  if( In.Ver <= PKG_VER_UN_220 )
+  {
+    u8 b;
+    char* ptr = Name.Data;
+    do
+    {
+      In >> b;
+      *ptr++ = b;
+      
+    } while( b && ptr < (Name.Data + NAME_LEN ) );
+    *ptr = '\0'; // in case we ran up against the name size limit
+  }
+  else
+  {
+    int len = 0;
+    In >> CINDEX( len );
+    if( len > 0 && len < NAME_LEN )
+      In.Read( Name.Data, len );
+  }
+  In >> Name.Flags;
+}
+
+FPackageFileOut& operator<<( FPackageFileOut& Out, FNameEntry& Name )
+{
+  Name.Data[NAME_LEN-1] = '\0'; // just in case
+  
+  if( Out.Ver > PKG_VER_UN_220 )
+  {
+    int len = strlen( Name.Data );
+    Out << CINDEX( len );
+  }
+  
+  Out << Name;
+}
+
+/*-----------------------------------------------------------------------------
+ * UPackage
+-----------------------------------------------------------------------------*/
 UPackage::UPackage()
 {
   xstl::Set( &Header, 0, sizeof ( UPackageHeader ) );
@@ -314,23 +380,23 @@ bool UPackage::LoadObject( UObject** Obj, const char* ObjName )
   
   size_t i;
   
-  // Doesn't this kind of defeat the purpose of the name table?
   // Find the name in this package's name table
   int NameIndex = -1;
-  for (i = 0; i < Names->Size() || i < MAX_SIZE; i++)
+  size_t NameHash = Fnv1aHashString( ObjName );
+  for ( i = 0; i < Names->Size() && i < MAX_SIZE; i++ )
   {
-    if (strnicmp( (*Names)[i].Data, ObjName, NAME_LEN ) == 0)
+    if ( NameHash == (*Names)[i].Hash )
     {
       NameIndex = i;
       break;
     }
   }
-  if (NameIndex < 0)
+  if ( NameIndex < 0 )
     return false;
   
   // Now find the export associated with this name
   FExport* Export = NULL;
-  for (i = 0; i < Exports->Size() || i < MAX_SIZE; i++)
+  for ( i = 0; i < Exports->Size() && i < MAX_SIZE; i++ )
   {
     if ( (*Exports)[i].ObjectName == NameIndex )
     {
@@ -339,14 +405,21 @@ bool UPackage::LoadObject( UObject** Obj, const char* ObjName )
     }
   }
 
-  // Prepare the package to load an object
+  // If we already loaded the object, return it
+  if ( Export->Obj )
+  {
+    *Obj = Export->Obj;
+    return true;
+  }
+
+  // Otherwise, prepare the package to load an object
   if (!BeginLoad( Export ))
     return false;
   
   // Load
   FPackageFileIn* PackageFile = (FPackageFileIn*)Stream;
-  *PackageFile >> **Obj;
   (*Obj)->SetPkgProperties( this, i, NameIndex );
+  *PackageFile >> **Obj;
   
   // Finalize load
   EndLoad();
@@ -357,6 +430,93 @@ bool UPackage::LoadObject( UObject** Obj, const char* ObjName )
 String& UPackage::GetPackageName()
 {
   return Name;
+}
+
+bool UPackage::StaticInit()
+{
+  if ( !Packages )
+  {
+    LoadOpts = PO_OpenOnLoad;
+    Packages = new Array<UPackage*>( 8 );
+  }
+}
+
+int UPackage::CalcObjRefValue( int ObjRef )
+{
+  if (ObjRef == 0)
+    return ObjRef;
+  
+  else if (ObjRef < 0)
+    ObjRef = -ObjRef;
+  
+  return ObjRef - 1;
+}
+
+UPackage* UPackage::LoadPkg( const char* Filepath )
+{
+  UPackage* Pkg = new UPackage();
+  if (!Pkg)
+    return NULL;
+  
+  if (!Pkg->Load( Filepath ))
+  {
+    delete Pkg;
+    return NULL;
+  }
+  
+  Packages->PushBack( Pkg );
+  return Pkg;
+}
+
+UObject* UPackage::StaticLoadObject( const char* PkgName, const char* ObjName, const char* ClassName )
+{
+  UObject*  Obj;
+  UClass*   Class;
+  UPackage* Pkg = NULL;
+  char* RealPkgName;
+  const char* ExtSeperator = strchr( PkgName, '.' );
+  
+  if ( ExtSeperator != NULL )
+  {
+    size_t ExtOffset = (size_t)PtrSubtract( ExtSeperator, PkgName );
+    RealPkgName = strdup( PkgName );
+    RealPkgName[ExtOffset] = '\0';
+  }
+  else
+  {
+    RealPkgName = (char*)PkgName;
+  }
+  
+  for ( int i = 0; i < Packages->Size(); i++ )
+  {
+    Pkg = Packages->Data()[i];
+    if ( Pkg->GetPackageName() == RealPkgName )
+      break;
+  }
+  
+  if ( Pkg == NULL )
+    return NULL;
+  
+  UObject* Obj = NULL;
+  if ( !strnicmp( ClassName, "None", 4 ) )
+  {
+    // Loading a class
+    Class 
+  }
+  else
+  {
+//     // Get object class
+//     UClass* Class = UObject::StaticGetClass( ClassName );
+//     if ( Class->IsNative() )
+  }
+   
+  if ( !Pkg->LoadObject( &Obj, ObjName ) )
+    return NULL;
+
+  if ( RealPkgName != PkgName )
+    free( RealPkgName );
+  
+  return Obj;
 }
 
 bool UPackage::BeginLoad( FExport* Export )
@@ -386,33 +546,4 @@ void UPackage::EndLoad()
     delete Stream;
     Stream = NULL;
   }
-}
-
-// UObjectManager
-UObjectManager::UObjectManager()
-{
-  Packages = new Array<UPackage*>();
-}
-
-// This should only be called on exit
-UObjectManager::~UObjectManager()
-{
-  // Check a request exit variable?
-  for ( int i = 0; i < Packages->Size(); i++ )
-    delete Packages->Data()[i];
-  
-  delete Packages;
-}
-
-bool UObjectManager::LoadPkg( const char* Filepath )
-{
-  UPackage* Pkg = new UPackage();
-  if (!Pkg)
-    return false;
-  
-  if (!Pkg->Load( Filepath ))
-    return false;
-  
-  Packages->PushBack( Pkg );
-  return true;
 }

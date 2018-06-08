@@ -42,23 +42,21 @@ enum EPropertyType
   PROP_Ascii   = 0xd,
   PROP_Map     = 0xe,
   PROP_FixArr  = 0xf,
+  PROP_Long    = 0x10,
 };
 
 class UProperty : public UField
 {
   DECLARE_ABSTRACT_CLASS( UProperty, UField, 0 )
   
-  void* GetValue() { return Value; }
-  
   u16 ArrayDim;
   u16 ElementSize;
   u32 PropertyFlags;
-  FName Category;
+  const char* Category;
   u16 ReplicationOffset; // only exists since objects may store this variable
   
   // Instance variables
-  idx Name;
-  void* Value;
+  u32 Offset; // Offset into the owner, giving the location of the value
   
   // Static variables
   static u8 PropertySizes[8];
@@ -68,55 +66,59 @@ class UByteProperty : public UProperty
 {
   DECLARE_CLASS( UByteProperty, UProperty, 0 )
   
-  u8 GetValue() { return *((u8*)&Value); }
+  UEnum* Enum;
+  
+  u8 GetValue();
 };
 
 class UIntProperty : public UProperty
 {
   DECLARE_CLASS( UIntProperty, UProperty, 0 )
   
-  int GetValue() { return *((u16*)&Value); }
+  int GetValue();
 };
 
 class UBoolProperty : public UProperty
 {
   DECLARE_CLASS( UBoolProperty, UProperty, 0 )
   
-  bool GetValue() { return *((bool*)&Value); }
+  bool GetValue();
 };
 
 class UFloatProperty : public UProperty
 {
   DECLARE_CLASS( UFloatProperty, UProperty, 0 )
   
-  float GetValue() { return *((float*)&Value); }
+  float GetValue();
 };
 
 class UObjectProperty : public UProperty
 {
   DECLARE_CLASS( UObjectProperty, UProperty, 0 )
   
-  UObject* GetValue() { return (UObject*)Value; }
+  UObject* GetValue();
 };
 
 class UNameProperty : public UProperty
 {
   DECLARE_CLASS( UNameProperty, UProperty, 0 )
   
-  FName GetValue() { return FName( (size_t)Value ); }
+  const char* GetValue();
 };
 
 // ?
 class UStringProperty : public UProperty
 {
   DECLARE_CLASS( UStringProperty, UProperty, 0 )
+  
+  String* GetValue();
 };
 
 class UClassProperty : public UProperty
 {
   DECLARE_CLASS( UClassProperty, UProperty, 0 )
   
-  UClass* GetValue() { return (UClass*)Value; }
+  UClass* GetValue();
 };
 
 // ?
@@ -129,7 +131,7 @@ class UStructProperty : public UProperty
 {
   DECLARE_CLASS( UStructProperty, UProperty, 0 )
   
-  UStruct* GetValue() { return (UStruct*)Value; }
+  UStruct* GetValue();
 };
 
 // ?
@@ -149,6 +151,8 @@ class UAsciiStrProperty : public UProperty
   DECLARE_CLASS( UAsciiStrProperty, UProperty, 0 )
   
   int Length;
+  
+  const char* GetValue();
 };
 
 // ?
@@ -162,3 +166,6 @@ class UFixedArrayProperty : public UProperty
 {
   DECLARE_CLASS( UFixedArrayProperty, UProperty, 0 )
 };
+
+
+

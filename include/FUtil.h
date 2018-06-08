@@ -88,6 +88,33 @@ typedef void(*DebugPrintFunc)( const char* Str, size_t Len );
 extern DebugPrintFunc DebugPrint;
 
 void Logf( const char* Type, const char* Str, ... );
+
+#if defined LIBUNR_64BIT
+  #define FNV_PRIME 1099511628211ULL
+  #define FNV_BASIS 14695981039346656037ULL
+#elif defined LIBUNR_32BIT
+  #define FNV_PRIME 16777619
+  #define FNV_BASIS 2166136261
+#endif 
+static inline size_t Fnv1aHash( const void* Data, size_t Len )
+{
+  size_t Hash = FNV_BASIS;
+  for (int i = 0; i < Len; i++) {
+    Hash ^= ((u8*)Data)[i];
+    Hash *= FNV_PRIME;
+  }
+  return Hash;
+}
+
+static inline size_t Fnv1aHashString( const char* Data )
+{
+  size_t Hash = FNV_BASIS;
+  while (*Data) {
+    Hash ^= *Data++;
+    Hash *= FNV_PRIME;
+  }
+  return Hash;
+}
   
 //========================================================================
 // EOF

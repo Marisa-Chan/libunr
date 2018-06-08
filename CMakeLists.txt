@@ -10,7 +10,6 @@ set (XSTL_ROOT  ${LIBUNR_ROOT}/../xstl)
 set (XSTL_INC   ${XSTL_ROOT}/include)
 
 set (SOURCES ${LIBUNR_SRC}/FUtil.cpp
-             ${LIBUNR_SRC}/FName.cpp
              ${LIBUNR_SRC}/UClass.cpp
              ${LIBUNR_SRC}/UMusic.cpp
              ${LIBUNR_SRC}/USound.cpp
