@@ -195,9 +195,13 @@ class UPackage : public UObject
   static bool StaticInit();
   static int CalcObjRefValue( int ObjRef );
   static UPackage* StaticLoadPkg( const char* Filepath );
-  static UObject* StaticLoadObject( const char* PkgName, const char* ObjName, const char* ClassName );
-  static UObject* StaticLoadObject( UPackage* Pkg, const char* ObjName, const char* ClassName );
-  static UObject* StaticLoadObject( UPackage* Pkg, idx ObjRef );
+  static UObject* StaticLoadObject( const char* PkgName, const char* ObjName, const char* ClassName, UObject* InOuter = NULL );
+  static UObject* StaticLoadObject( UPackage* Pkg, const char* ObjName, const char* ClassName, UObject* InOuter = NULL );
+  static UObject* StaticLoadObject( UPackage* Pkg, idx ObjRef, UObject* InOuter = NULL );
+  
+  static UObject* StaticConstructObject( const char* PkgName, const char* ObjName, const char* ClassName, UObject* InOuter = NULL );
+  static UObject* StaticConstructObject( UPackage* Pkg, const char* ClassName, UObject* InOuter = NULL );
+  static UObject* StaticConstructObject( UPackage* Pkg, idx ObjRef, const char* ObjName, UObject* InOuter = NULL );
   
 protected:
     

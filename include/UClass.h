@@ -45,7 +45,7 @@ class UField : public UObject
   DECLARE_ABSTRACT_CLASS( UField, UObject, 0 )
   NO_DEFAULT_CONSTRUCTOR( UField )
   
-  virtual void LoadFromPackage( FPackageFileIn& Ar );
+  virtual void LoadFromPackage( FPackageFileIn& In );
   
   UField* SuperField; // Parent object
   UField* Next;       // Next object in list
@@ -72,7 +72,7 @@ class UStruct : public UField
   DECLARE_CLASS( UStruct, UField, 0 )
   NO_DEFAULT_CONSTRUCTOR( UStruct )
   
-  virtual void LoadFromPackage( FPackageFileIn& Ar );
+  virtual void LoadFromPackage( FPackageFileIn& In );
   
   UTextBuffer* ScriptText;
   UField* Children;
@@ -81,6 +81,9 @@ class UStruct : public UField
   u32 TextPos;
   u32 ScriptSize;
   u8* ScriptCode;
+  
+  // Runtime variables
+  u32 StructSize;
 };
 
 class UFunction : public UStruct
@@ -102,7 +105,7 @@ class UState : public UStruct
   DECLARE_CLASS( UState, UStruct, 0 )
   NO_DEFAULT_CONSTRUCTOR( UState )
   
-  virtual void LoadFromPackage( FPackageFileIn& Ar );
+  virtual void LoadFromPackage( FPackageFileIn& In );
   
   u64 ProbeMask;
   u64 IgnoreMask;
@@ -119,16 +122,6 @@ struct FDependency
   u32 ScriptTextCRC;
 };
 
-class FNativeClassInfo
-{
-  FNativeClassInfo();
-  ~FNativeClassInfo();
-  
-  char* Name;
-  size_t Hash;
-  UObject* (*NativeCtor)();
-};
-
 class UClass : public UState
 {
   DECLARE_CLASS( UClass, UState, 0 )
@@ -136,7 +129,7 @@ class UClass : public UState
   UClass();
   UClass( u32 Flags );
   
-  virtual void LoadFromPackage( FPackageFileIn& Ar );
+  virtual void LoadFromPackage( FPackageFileIn& In );
   
   bool IsNative();
   
@@ -150,7 +143,6 @@ class UClass : public UState
   
   // Runtime variables
   UObject* Default;
-  
-  static Array<FNativeClassInfo> NativeClasses;
+  UObject* (*)(Constructor)(void);
 };
 

@@ -413,12 +413,12 @@ bool UPackage::LoadObject( UObject** Obj, const char* ObjName )
   }
 
   // Otherwise, prepare the package to load an object
-  if (!BeginLoad( Export ))
+  if ( !BeginLoad( Export ) )
     return false;
   
   // Load
   FPackageFileIn* PackageFile = (FPackageFileIn*)Stream;
-  (*Obj)->SetPkgProperties( this, i, NameIndex );
+  (*Obj)->SetProperties( this, i, NameIndex );
   *PackageFile >> **Obj;
   
   // Finalize load
@@ -443,10 +443,10 @@ bool UPackage::StaticInit()
 
 int UPackage::CalcObjRefValue( int ObjRef )
 {
-  if (ObjRef == 0)
+  if ( ObjRef == 0 )
     return ObjRef;
   
-  else if (ObjRef < 0)
+  else if ( ObjRef < 0 )
     ObjRef = -ObjRef;
   
   return ObjRef - 1;
@@ -458,7 +458,7 @@ UPackage* UPackage::LoadPkg( const char* Filepath )
   if (!Pkg)
     return NULL;
   
-  if (!Pkg->Load( Filepath ))
+  if ( !Pkg->Load( Filepath ) )
   {
     delete Pkg;
     return NULL;
@@ -468,10 +468,9 @@ UPackage* UPackage::LoadPkg( const char* Filepath )
   return Pkg;
 }
 
-UObject* UPackage::StaticLoadObject( const char* PkgName, const char* ObjName, const char* ClassName )
+UObject* UPackage::StaticLoadObject( const char* PkgName, const char* ObjName, const char* ClassName, UObject* InOwner )
 {
-  UObject*  Obj;
-  UClass*   Class;
+  UObject*  Obj = NULL;
   UPackage* Pkg = NULL;
   char* RealPkgName;
   const char* ExtSeperator = strchr( PkgName, '.' );
@@ -497,26 +496,51 @@ UObject* UPackage::StaticLoadObject( const char* PkgName, const char* ObjName, c
   if ( Pkg == NULL )
     return NULL;
   
-  UObject* Obj = NULL;
-  if ( !strnicmp( ClassName, "None", 4 ) )
+  if ( !Pkg->LoadObject( &Obj, ObjName ) )
+    return NULL;
+   
+  if ( RealPkgName != PkgName )
+    Free( RealPkgName );
+  
+  return Obj;
+}
+
+UObject* UPackage::StaticConstructObject( const char* PkgName, const char* ObjName, const char* ClassName, UObject* InOwner )
+{
+  UObject*  Obj = NULL;
+  UClass*   Class = NULL;
+  UPackage* Pkg = NULL;
+  char* RealPkgName;
+  const char* ExtSeperator = strchr( PkgName, '.' );
+  
+  if ( ExtSeperator != NULL )
   {
-    // Loading a class
-    Class 
+    size_t ExtOffset = (size_t)PtrSubtract( ExtSeperator, PkgName );
+    RealPkgName = strdup( PkgName );
+    RealPkgName[ExtOffset] = '\0';
   }
   else
   {
-//     // Get object class
-//     UClass* Class = UObject::StaticGetClass( ClassName );
-//     if ( Class->IsNative() )
+    RealPkgName = (char*)PkgName;
   }
-   
-  if ( !Pkg->LoadObject( &Obj, ObjName ) )
-    return NULL;
-
-  if ( RealPkgName != PkgName )
-    free( RealPkgName );
   
-  return Obj;
+  // Get package
+  for ( int i = 0; i < Packages->Size(); i++ )
+  {
+    Pkg = Packages->Data()[i];
+    if ( Pkg->GetPackageName() == RealPkgName )
+      break;
+  }
+  
+  if ( Pkg == NULL )
+    return NULL;
+  
+  // Get class object
+  Class = StaticLoadObject( Pkg, ClassName, "None" );
+  
+  // Begin object construction
+  // Construct the closest native parent object
+  Obj = StaticConstructNativeObject( Class );
 }
 
 bool UPackage::BeginLoad( FExport* Export )
@@ -528,9 +552,9 @@ bool UPackage::BeginLoad( FExport* Export )
   {
     Stream = new FPackageFileIn();
     
-    if (Stream == NULL)
+    if ( Stream == NULL )
       return false;
-    if (!Stream->Open( Path ))
+    if ( !Stream->Open( Path ) )
       return false;
   }
 

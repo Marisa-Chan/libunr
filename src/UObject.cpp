@@ -30,6 +30,36 @@
 #include "UProperty.h"
 #include "UPackage.h"
 
+FNativePropertyList::FNativePropertyList( size_t InHash, size_t InNum )
+{
+  Hash = InHash;
+  Num = InNum;
+  Added = 0;
+  Properties = new FNativePropertyLink[Num];
+}
+
+void FNativePropertyList::AddProperty( const char* Name, u32 Offset )
+{
+  if ( LIKELY( Added < Num ) )
+  {
+    Properties[Added].Hash = Fnv1aHashString( Name );
+    Properties[Added].Offset = Offset;
+    Added++;
+  }
+}
+
+void UObject::StaticLinkNativeProperties()
+{
+  if ( StaticInitNativePropList( 5 ) )
+  {
+    LINK_NATIVE_ARRAY( UObject, ObjectInternal );
+    LINK_NATIVE_PROPERTY( UObject, Outer );
+    LINK_NATIVE_PROPERTY( UObject, Flags );
+    LINK_NATIVE_PROPERTY( UObject, Name );
+    LINK_NATIVE_PROPERTY( UObject, Class );
+  }
+}
+
 UClass* UObject::StaticAllocateClass( u32 Flags )
 {
   return new UClass( Flags );
@@ -84,18 +114,15 @@ void UObject::LoadFromPackage( FPackageFileIn& Ar )
   return;
 }
 
-void UObject::SetPkgProperties( UPackage* InPkg, int InExpIdx, int InNameIdx )
+void UObject::SetProperties( UPackage* InPkg, int InExpIdx, int InNameIdx )
 {
   Pkg = InPkg;
   ExpIdx = InExpIdx;
   NameIdx = InNameIdx;
+  Name = Pkg->ResolveNameFromIdx( NameIdx );
 }
 
 void UObject::ReadPropertyList( FPackageFileIn& In )
-{
-}
-
-void UObject::LinkNativeProperties()
 {
   
 }

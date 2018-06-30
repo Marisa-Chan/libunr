@@ -52,132 +52,72 @@ UProperty::~UProperty()
     delete PropNext;
 }
 
-UProperty* UProperty::LoadProperty( FPackageFileIn& In )
+void UProperty::LoadFromPackage( FPackageFileIn& In )
 {
-}
-
-FPropertyList::FPropertyList( UProperty* InProp )
-  : Prop( InProp )
-{
-}
-
-FPropertyList::~FPropertyList()
-{
-}
-
-FPropertyHash::FPropertyHash()
-{
-  HashArray = NULL;
-}
-
-FPropertyHash::~FPropertyHash()
-{
-  if ( LIKELY( HashArray ) )
-    delete HashArray;
-}
-
-void FPropertyHash::LoadPropertyList( FPackageFileIn& Ar )
-{
+  Super::LoadFromPackage( In );
   
-//   int Name;
-//   int PrevName;
-//   const char* NameStr;
-//   UProperty* Prop = NULL;
-//   while( 1 )
-//   {
-//     // Get the name
-//     Ar >> CINDEX( Name );
-//     NameStr = Pkg->ResolveNameFromIdx( Name );
-//     
-//     // Finished when we hit None
-//     if ( strncmp( NameStr, "None", 4 ) == 0 )
-//       break;
-//     
-//     // Get info
-//     u8 Info;
-//     Ar >> Info;
-//     EPropertyType Type = (EPropertyType)(Info & 0xF);
-//     u8 Size = UProperty::PropertySizes[Info & 0x70];
-//     bool Bit7 = Info & 0x80;
-//     
-//     if ( !Prop || PrevName != Name )
-//     {
-//       Prop = new UProperty( Name );
-//     }
-//     else
-//     {
-//       Prop->ArrayDim++;
-//       if ( Prop->ArrayDim == 2 )
-//         bCreateArray = true;
-//     }
-//     
-//     switch( Type )
-//     {
-//       case PROP_Byte:
-//         LoadByteProperty( Ar, Prop, bCreateArray );
-//         break;
-//       case PROP_Int:
-//         LoadIntProperty( Ar, Prop, bCreateArray );
-//         break;
-//       case PROP_Bool:
-//         Prop->Value = (u64)Bit7;
-//         break;
-//       case PROP_Float:
-//         LoadFloatProperty( Ar, Prop, bCreateArray );
-//         break;
-//       case PROP_Object:
-//         LoadObjectProperty( Ar, Prop, bCreateArray );
-//         break;
-//       case PROP_Name:
-//         Ar >> CINDEX( *((int*)Prop->Value) );
-//         break;
-//       case PROP_String:
-//         Logf( LOG_WARN, "UStringProperty serialization unimplemented." );
-//         break;
-//       case PROP_Class:
-//         Logf( LOG_WARN, "UClassProperty serialization unimplemented." );
-//         break;
-//       case PROP_Array:
-//         Logf( LOG_WARN, "UArrayProperty serialization unimplemented." );
-//         break;
-//       case PROP_Struct:
-//         Logf( LOG_WARN, "UStructProperty serialization unimplemented.");
-//         break;
-//       case PROP_Vector:
-//         Logf( LOG_WARN, "UVectorProperty serialization unimplemented.");
-//         break;
-//       case PROP_Rotator:
-//         Logf( LOG_WARN, "URotatorProperty serialization unimplemented.");
-//         break;
-//       case PROP_Ascii:
-//         Logf( LOG_WARN, "UAsciiStrPropertty serialization unimplemented.");
-// //           Ar >> CINDEX( AsciiStr->Length );
-// //           AsciiStr->Length++;
-// //           
-// //           AsciiStr->Value = xstl::Malloc( AsciiStr->Length );
-// //           StrPtr = (char*)AsciiStr->Value;
-// //           for (int i = 0; i < AsciiStr->Length; i++) {
-// //             Ar.Read( &C, 1 );
-// //             if (C == '\0' && i != (AsciiStr->Length - 1)) {
-// //               Logf( LOG_WARN, "Written length does not match actual length!");
-// //               AsciiStr->Length = 0;
-// //               AsciiStr->Value  = NULL;
-// //             }
-// //             *StrPtr++ = C;
-// //           }
-//         break;
-//       case PROP_Map:
-//         Logf( LOG_WARN, "UMapProperty serialization unimplemented." );
-//         break;
-//       case PROP_FixArr:
-//         Logf( LOG_WARN, "UFixedArrayProperty serialization unimplemented." );
-//         break;
-//       default:
-//         Logf( LOG_WARN, "Bad property type!" );
-//         return;
-//     }
-// 
-//     PrevName = Name;
-//     bCreateArray = false;
-//   }
+  In >> ArrayDim;
+  In >> ElementSize;
+  In >> PropertyFlags;
+  In >> CINDEX( Category );
+  
+  if ( PropertyFlags & CPF_Net )
+    In >> ReplicationOffset;
+  
+  if ( PropertyFlags & CPF_Native )
+    Offset = GetNativeOffset( Outer->Name, Name );
+  // else
+    // no idea how thats gonna work yet
+    // probably have a pool of UScript properties for one object and just grab the next free object there
 }
+
+u32 UProperty::GetNativeOffset( const char* ClassName, const char* PropName )
+{
+  FNativePropertyList* NativePropList;
+  size_t ClassHash = Fnv1aHashString( ClassName );
+  for ( size_t i = 0; i < NativePropertyLists->Size() && i != MAX_SIZE; i++ )
+  {
+    NativePropList = NativePropertyLists->Data()[i];
+    if ( ClassHash == NativePropList->Hash )
+      break;
+  }
+  
+  size_t PropHash = Fnv1aHashString( PropName );
+  for ( size_t i = 0; i < NativePropList->Num; i++ )
+  {
+    if ( NativePropList->Properties[i].Hash == PropHash )
+      return NativePropList->Properties[i].Offset;
+  }
+  
+  return MAX_UINT32;
+}
+
+void UByteProperty::LoadFromPackage( FPackageFileIn& In )
+{
+  Super::LoadFromPackage( In );
+  
+  In >> CINDEX( EnumType );
+  if ( EnumType )
+    Enum = (UEnum*)UPackage::StaticLoadObject( Pkg, EnumType );
+}
+
+void UIntProperty::LoadFromPackage( FPackageFileIn& In )
+{
+  Super::LoadFromPackage( In );
+}
+
+void UBoolProperty::LoadFromPackage( FPackageFileIn& In )
+{
+  Super::LoadFromPackage( In );
+}
+
+void UFloatProperty::LoadFromPackage( FPackageFileIn& In )
+{
+  Super::LoadFromPackage( In );
+}
+
+void UObjectProperty::LoadFromPackage( FPackageFileIn& In )
+{
+  Super::LoadFromPackage( In );
+}
+

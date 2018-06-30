@@ -32,32 +32,67 @@
 
 #define INIT_CLASS(cls) cls::StaticInitializeClass();
 
-bool InitStaticUClasses()
+bool InitNativeClasses();
 {
-  INIT_CLASS( UClass );
-  INIT_CLASS( UField );
-  INIT_CLASS( UConst );
-  INIT_CLASS( UEnum );
-  INIT_CLASS( UProperty );
-  INIT_CLASS( UStruct );
-  INIT_CLASS( UFunction );
-  INIT_CLASS( UState );
-  INIT_CLASS( UObject );
-  
-  INIT_CLASS( UMusic );
-  INIT_CLASS( USound );
-  INIT_CLASS( UTexture );
+  bool Result = true;
+  Result &= UObject::StaticInit();
+    Result &= UField::StaticInit();
+      Result &= UConst::StaticInit();
+      Result &= UEnum::StaticInit();
+      Result &= UProperty::StaticInit();
+        Result &= UByteProperty::StaticInit();
+        Result &= UIntProperty::StaticInit();
+        Result &= UBoolProperty::StaticInit();
+        Result &= UFloatProperty::StaticInit();
+        Result &= UObjectProperty::StaticInit();
+          Result &= UClassProperty::StaticInit();
+        Result &= UNameProperty::StaticInit();
+        Result &= UStringProperty::StaticInit();
+        Result &= UArrayProperty::StaticInit();
+        Result &= UStructProperty::StaticInit();
+        Result &= UVectorProperty::StaticInit();
+        Result &= URotatorProperty::StaticInit();
+        Result &= UAsciiStrProperty::StaticInit();
+        Result &= UMapProperty::StaticInit();
+        Result &= UFixedArrayProperty::StaticInit();
+      Result &= UStruct::StaticInit();
+        Result &= UFunction::StaticInit();
+        Result &= UState::StaticInit();
+          Result &= UClass::StaticInit();
+    Result &= UMusic::StaticInit();
+    Result &= UTexture::StaticInit();
+    Result &= USound::StaticInit();
+    Result &= UPackage::StaticInit();
+  return Result;
 }
 
-IMPLEMENT_CLASS( UClass );
-IMPLEMENT_CLASS( UField );
-IMPLEMENT_CLASS( UConst );
-IMPLEMENT_CLASS( UEnum );
-IMPLEMENT_CLASS( UProperty );
-IMPLEMENT_CLASS( UStruct );
-IMPLEMENT_CLASS( UFunction );
-IMPLEMENT_CLASS( UState );
 IMPLEMENT_CLASS( UObject );
-IMPLEMENT_CLASS( UMusic );
-IMPLEMENT_CLASS( USound );
-IMPLEMENT_CLASS( UTexture );
+  IMPLEMENT_CLASS( UField );
+    IMPLEMENT_CLASS( UConst );
+    IMPLEMENT_CLASS( UEnum );
+    IMPLEMENT_CLASS( UProperty );
+      IMPLEMENT_CLASS( UByteProperty );
+      IMPLEMENT_CLASS( UIntProperty );
+      IMPLEMENT_CLASS( UBoolProperty );
+      IMPLEMENT_CLASS( UFloatProperty );
+      IMPLEMENT_CLASS( UObjectProperty );
+        IMPLEMENT_CLASS( UClassProperty );
+      IMPLEMENT_CLASS( UNameProperty );
+      IMPLEMENT_CLASS( UStringProperty );
+      IMPLEMENT_CLASS( UArrayProperty );
+      IMPLEMENT_CLASS( UStructProperty );
+      IMPLEMENT_CLASS( UVectorProperty );
+      IMPLEMENT_CLASS( URotatorProperty );
+      IMPLEMENT_CLASS( UAsciiStrProperty );
+      IMPLEMENT_CLASS( UMapProperty );
+      IMPLEMENT_CLASS( UFixedArrayProperty );
+    IMPLEMENT_CLASS( UStruct );
+      IMPLEMENT_CLASS( UFunction );
+      IMPLEMENT_CLASS( UState );
+        IMPLEMENT_CLASS( UClass );
+  IMPLEMENT_CLASS( UMusic );
+  IMPLEMENT_CLASS( UTexture );
+  IMPLEMENT_CLASS( USound );
+  IMPLEMENT_CLASS( UPackage );
+
+

@@ -36,7 +36,7 @@ UMusic::UMusic()
 
 UMusic::~UMusic()
 {
-  if (ChunkData != NULL)
+  if ( ChunkData != NULL )
     delete ChunkData;
 }
 

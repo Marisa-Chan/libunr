@@ -44,10 +44,10 @@ void UField::LoadFromPackage( FPackageFileIn& In )
   In >> CINDEX( NextIdx );
   
   if ( SuperIdx )
-    SuperField = (UField*)UPackage::StaticLoadObject( Pkg, SuperIdx );
+    SuperField = (UField*)UPackage::StaticLoadObject( Pkg, SuperIdx, Outer );
   
   if ( NextIdx )
-    Next = (UField*)UPackage::StaticLoadObject( Pkg, NextIdx );
+    Next = (UField*)UPackage::StaticLoadObject( Pkg, NextIdx, Outer );
 }
 
 // UStruct
@@ -67,11 +67,8 @@ void UStruct::LoadFromPackage( FPackageFileIn& In )
   In >> CINDEX( ChildIdx );
   In >> CINDEX( FriendlyNameIdx );
   
-//   // If we aren't an editor, then we don't need the script text
-//   if ( USystem::bIsEditor )
-    ScriptText = (UTextBuffer*)UPackage::StaticLoadObject( Pkg, ScriptTextIdx );
-    
-  Children = (UField*)UPackage::StaticLoadObject( Pkg, ChildIdx );
+  ScriptText = (UTextBuffer*)UPackage::StaticLoadObject( Pkg, ScriptTextIdx, this );
+  Children = (UField*)UPackage::StaticLoadObject( Pkg, ChildIdx, this );
   FriendlyName = Pkg->ResolveNameFromIdx( FriendlyNameIdx );
   In >> Line;
   In >> TextPos;
@@ -136,7 +133,7 @@ void UClass::LoadFromPackage( FPackageFileIn& In )
     Dependencies.PushBack( Dep );
   }
   
-  // I don't actually know what these are for, so just load their values until we know what we need them for
+  // I don't actually know what these are for
   idx NumPkgImports;
   In >> CINDEX( NumPkgImports );
   PackageImports.Reserve( NumPkgImports );
@@ -161,6 +158,9 @@ void UClass::LoadFromPackage( FPackageFileIn& In )
   }
   
   ReadProperties( In );
+  
+  // Construct default object
+  
 }
 
 bool UClass::IsNative()

@@ -170,6 +170,25 @@ enum EObjectFlags
   RF_ScriptMask       = RF_Transactional | RF_Public | RF_Transient | RF_NotForClient | RF_NotForServer | RF_NotForEdit // Script-accessible flags.
 };
 
+struct FNativePropertyLink
+{
+  size_t Hash;
+  u32 Offset;
+};
+
+struct FNativePropertyList
+{
+  FNativePropertyList( size_t InHash, size_t InNum );
+  void AddProperty( const char* Name, u32 InOffset );
+  
+  size_t Hash;
+  size_t Added;
+  size_t Num;
+  FNativePropertyLink* Properties;
+};
+
+extern Array<FNativePropertyList>* NativePropertyLists;
+
 #define NO_DEFAULT_CONSTRUCTOR(cls) \
   protected: cls() {} public:
     
@@ -179,15 +198,41 @@ protected: \
 private: \
   static UClass* ObjectClass; \
 public: \
+  typedef supcls Super; \
   static UClass* StaticClass() \
   { return ObjectClass; } \
+  static UObject* NativeConstructor() \
+  { \
+    return new cls(); \
+  } \
   static bool StaticInitializeClass() \
   { \
     if (!ObjectClass) \
-      return ((ObjectClass = UObject::StaticAllocateClass( clsflags )) != NULL); \
+      return ((ObjectClass = UObject::StaticAllocateClass( clsflags, Super::ObjectClass, NativeConstructor )) != NULL); \
     return true; \
   } \
-  typedef supcls Super; \
+  static inline bool StaticInitNativePropList( size_t NumProperties ) \
+  { \
+    if (!StaticNativePropLink) \
+      return (StaticNativePropList = new FNativePropertyList( Fnv1aHashString( #cls ), NumProperties ) != NULL); \
+    return false; \
+  } \
+  static void StaticLinkNativeProperties(); \
+  static bool StaticInit() \
+  { \
+    if ( !StaticInitializeClass() ) \
+    { \
+      Logf( LOG_CRIT, "%s::StaticInitializeClass() failed!\n", #s ); \
+      return false; \
+    } \
+    if ( !StaticInitNativePropList() ) \
+    { \
+      Logf( LOG_CRIT, "%s::StaticInitNativePropList() failed!\n", #s ); \
+      return false; \
+    } \
+    StaticLinkNativeProperties(); \
+    return true; \
+  } \
   virtual ~cls(); \
 
 #define DECLARE_CLASS(cls, supcls, flags) \
@@ -198,9 +243,7 @@ public: \
   
 #define IMPLEMENT_CLASS(cls) \
   UClass* cls::ObjectClass = NULL; \
-  
-#define OFFSET_OF(cls, var) \
-  ((size_t)&(((##cls *)0)->##var))
+  FNativePropertyList* cls::StaticNativePropList = NULL;
   
 #define DEFINE_PROP_OFFSET(cls, var, off) \
   static const size_t cls##var##Offset = off
@@ -208,6 +251,12 @@ public: \
 #define DECLARE_USCRIPT_VAR(cls, type, var) \
   DEFINE_PROP_OFFSET(cls, var, OFFSET_OF(cls, var) ); \
   type var
+  
+#define LINK_NATIVE_PROPERTY(cls, var) \
+  StaticNativePropList->AddProperty( #var, offsetof( cls, var ) );
+  
+#define LINK_NATIVE_ARRAY(cls, var) \
+  StaticNativePropList->AddProperty( #var, offsetof( cls, var##[0] ) );
   
 /*-----------------------------------------------------------------------------
  * UObject
@@ -222,8 +271,6 @@ class UObject
   virtual void LoadFromPackage( FPackageFileIn& In );
   virtual bool ExportToFile();
   virtual void SetPkgProperties( UPackage* InPkg, int InExpIdx, int InNameIdx );
-  
-  virtual UObject* Duplicate();
   virtual void LinkNativeProperties();
   
   const char* GetName();
@@ -231,25 +278,30 @@ class UObject
   
   static Array<UObject*> ObjectPool;
   
-  DECLARE_USCRIPT_VAR( UObject, int, ObjectInternal[6] ); // ???
-  DECLARE_USCRIPT_VAR( UObject, UObject*, Outer );  // Object that this object resides in
-  DECLARE_USCRIPT_VAR( UObject, u32, Flags );       // Object flags
-  DECLARE_USCRIPT_VAR( UObject, const char* Name ); // Name of this object
-  DECLARE_USCRIPT_VAR( UObject, UClass*, Class );   // Class of this object
+  // I think this was originally here to "hide" sensitive info for objects.
+  // This was due to the fact that C++ property offsets *HAVE* to match up
+  // with UScript offsets, or else the whole native/scripted setup falls
+  // apart. But we don't care about that now, so these will not be used.
+  int ObjectInternal[6];
+  
+  int         Index;   // Index of the object in object pool
+  int         ExpIdx;  // Index of this object in the export table
+  int         NameIdx; // Index of this object's name in the package's name table
+  UObject*    Next;    // The next object in the list
+  UPackage*   Pkg;     // Package this object was loaded from
+  int         RefCnt;  // Number of references this object has (-1 = object must be explicitly purged)
+  UObject*    Outer;        // Object that this object resides in
+  u32         Flags;             // Object flags
+  const char* Name;      // Name of this object
+  UClass*     Class;         // Class of this object
   
 protected:
   void ReadPropertyList( FPackageFileIn& Ar );
   static UClass* StaticAllocateClass( u32 Flags );
-
-  int       Index;   // Index of the object in object pool
-  int       ExpIdx;  // Index of this object in the export table
-  int       NameIdx; // Index of this object's name in the package's name table
-  UObject*  Next;    // The next object in the list
-  UPackage* Pkg;     // Package this object was loaded from
-  int       RefCnt;  // Number of references this object has (-1 = object must be explicitly purged)
-  size_t    Hash;    // Hash key to the name of this object
   
-  UField* Field; // The first field in a list
+  // UStruct kind of already has something like this
+  // in the case this is a UStruct, just point Field to Children
+  UField* Field;
 };
 
 #endif
