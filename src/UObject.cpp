@@ -48,7 +48,7 @@ void FNativePropertyList::AddProperty( const char* Name, u32 Offset )
   }
 }
 
-void UObject::StaticLinkNativeProperties()
+bool UObject::StaticLinkNativeProperties()
 {
   if ( StaticInitNativePropList( 5 ) )
   {
@@ -57,12 +57,39 @@ void UObject::StaticLinkNativeProperties()
     LINK_NATIVE_PROPERTY( UObject, Flags );
     LINK_NATIVE_PROPERTY( UObject, Name );
     LINK_NATIVE_PROPERTY( UObject, Class );
+		return true;
   }
+
+	return false;
 }
 
-UClass* UObject::StaticAllocateClass( u32 Flags )
+UObject* UObject::StaticConstructObject( const char* InName, UClass* InClass, UObject* InOuter )
 {
-  return new UClass( Flags );
+	// Construct object with class native ctor
+	UObject* Out = InClass->CreateObject();
+
+	// Set up object properties
+	Out->Hash = Fnv1aHashString( InName );
+	Out->Name = InName;
+	Out->Index = ObjectPool.Size();
+	Out->RefCnt = 1;
+	Out->Outer = InOuter;
+	Out->Flags = 0;
+	Out->Class = InClass;
+
+	// Add to object
+	ObjectPool.PushBack( Out );
+
+	// Script init (TODO)
+	
+	return Out;
+}
+
+UClass* AllocateClass( const char* ClassName, u32 Flags, UClass* SuperClass, 
+		UObject *(*NativeCtor)(size_t) )
+{
+	ClassName++; // We don't want the prefix indicating object type in the name of the class
+  return new UClass( ClassName, Flags, SuperClass, NativeCtor );
 }
 
 FPackageFileIn& operator>>( FPackageFileIn& Ar, UObject& Obj )
@@ -83,15 +110,14 @@ UObject::UObject()
   NameIdx = -1;
   Flags = 0;
   Outer = NULL;
-  Class = ObjectClass;
+  Class = NULL;
   Pkg = NULL;
   RefCnt = 1;
-  Properties = new FPropertyHash();
 }
 
+//TODO: write destructor
 UObject::~UObject()
 {
-  delete Properties;
 }
 
 bool UObject::ExportToFile()
@@ -106,7 +132,7 @@ void UObject::LoadFromPackage( FPackageFileIn& Ar )
     // Load stack info
   }
   
-  if ( !ObjectClass.IsA( UClass::StaticClass() ) )
+  if ( !ObjectClass->IsA( UClass::StaticClass() ) )
   {
     // Load properties
   }
@@ -114,12 +140,22 @@ void UObject::LoadFromPackage( FPackageFileIn& Ar )
   return;
 }
 
-void UObject::SetProperties( UPackage* InPkg, int InExpIdx, int InNameIdx )
+void UObject::SetPkgProperties( UPackage* InPkg, int InExpIdx, int InNameIdx )
 {
   Pkg = InPkg;
   ExpIdx = InExpIdx;
   NameIdx = InNameIdx;
   Name = Pkg->ResolveNameFromIdx( NameIdx );
+}
+
+bool UObject::IsA( UClass* ClassType )
+{
+	for ( UClass* Cls = Class; Cls != NULL; Cls = Cls->SuperClass )
+	{
+		if ( Cls == ClassType )
+			return true;
+	}
+	return false;
 }
 
 void UObject::ReadPropertyList( FPackageFileIn& In )

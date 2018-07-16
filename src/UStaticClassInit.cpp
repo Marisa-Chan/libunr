@@ -32,37 +32,37 @@
 
 #define INIT_CLASS(cls) cls::StaticInitializeClass();
 
-bool InitNativeClasses();
+bool InitNativeClasses()
 {
   bool Result = true;
-  Result &= UObject::StaticInit();
-    Result &= UField::StaticInit();
-      Result &= UConst::StaticInit();
-      Result &= UEnum::StaticInit();
-      Result &= UProperty::StaticInit();
-        Result &= UByteProperty::StaticInit();
-        Result &= UIntProperty::StaticInit();
-        Result &= UBoolProperty::StaticInit();
-        Result &= UFloatProperty::StaticInit();
-        Result &= UObjectProperty::StaticInit();
-          Result &= UClassProperty::StaticInit();
-        Result &= UNameProperty::StaticInit();
-        Result &= UStringProperty::StaticInit();
-        Result &= UArrayProperty::StaticInit();
-        Result &= UStructProperty::StaticInit();
-        Result &= UVectorProperty::StaticInit();
-        Result &= URotatorProperty::StaticInit();
-        Result &= UAsciiStrProperty::StaticInit();
-        Result &= UMapProperty::StaticInit();
-        Result &= UFixedArrayProperty::StaticInit();
-      Result &= UStruct::StaticInit();
-        Result &= UFunction::StaticInit();
-        Result &= UState::StaticInit();
-          Result &= UClass::StaticInit();
-    Result &= UMusic::StaticInit();
-    Result &= UTexture::StaticInit();
-    Result &= USound::StaticInit();
-    Result &= UPackage::StaticInit();
+  Result &= UObject::StaticClassInit();
+    Result &= UField::StaticClassInit();
+      Result &= UConst::StaticClassInit();
+      Result &= UEnum::StaticClassInit();
+      Result &= UProperty::StaticClassInit();
+        Result &= UByteProperty::StaticClassInit();
+        Result &= UIntProperty::StaticClassInit();
+        Result &= UBoolProperty::StaticClassInit();
+        Result &= UFloatProperty::StaticClassInit();
+        Result &= UObjectProperty::StaticClassInit();
+          Result &= UClassProperty::StaticClassInit();
+        Result &= UNameProperty::StaticClassInit();
+        Result &= UStringProperty::StaticClassInit();
+        Result &= UArrayProperty::StaticClassInit();
+        Result &= UStructProperty::StaticClassInit();
+        Result &= UVectorProperty::StaticClassInit();
+        Result &= URotatorProperty::StaticClassInit();
+        Result &= UAsciiStrProperty::StaticClassInit();
+        Result &= UMapProperty::StaticClassInit();
+        Result &= UFixedArrayProperty::StaticClassInit();
+      Result &= UStruct::StaticClassInit();
+        Result &= UFunction::StaticClassInit();
+        Result &= UState::StaticClassInit();
+          Result &= UClass::StaticClassInit();
+    Result &= UMusic::StaticClassInit();
+    Result &= UTexture::StaticClassInit();
+    Result &= USound::StaticClassInit();
+    Result &= UPackage::StaticClassInit();
   return Result;
 }
 

@@ -33,8 +33,7 @@ using namespace xstl;
 
 class UTextBuffer : public UObject
 {
-  DECLARE_ABSTRACT_CLASS( UTextBuffer, UObject, 0 )
-  NO_DEFAULT_CONSTRUCTOR( UTextBuffer )
+  DECLARE_ABSTRACT_CLASS( UTextBuffer, UObject, 0, Core )
   
   u32 Pos, Top;
   String Text;
@@ -42,8 +41,7 @@ class UTextBuffer : public UObject
 
 class UField : public UObject
 {
-  DECLARE_ABSTRACT_CLASS( UField, UObject, 0 )
-  NO_DEFAULT_CONSTRUCTOR( UField )
+  DECLARE_ABSTRACT_CLASS( UField, UObject, 0, Core )
   
   virtual void LoadFromPackage( FPackageFileIn& In );
   
@@ -53,25 +51,24 @@ class UField : public UObject
 
 class UConst : public UField
 {
-  DECLARE_CLASS( UConst, UField, 0 )
-  NO_DEFAULT_CONSTRUCTOR( UConst )
+  DECLARE_CLASS( UConst, UField, 0, Core )
   
   String Value;
 };
 
 class UEnum : public UField
 {
-  DECLARE_CLASS( UEnum, UField, 0 )
-  NO_DEFAULT_CONSTRUCTOR( UEnum )
+  DECLARE_CLASS( UEnum, UField, 0, Core )
   
   Array<const char*> Names;
 };
 
 class UStruct : public UField
 {
-  DECLARE_CLASS( UStruct, UField, 0 )
-  NO_DEFAULT_CONSTRUCTOR( UStruct )
-  
+  DECLARE_CLASS( UStruct, UField, 0, Core )
+ 
+	UStruct();
+	UStruct( size_t InNativeSize );
   virtual void LoadFromPackage( FPackageFileIn& In );
   
   UTextBuffer* ScriptText;
@@ -88,8 +85,7 @@ class UStruct : public UField
 
 class UFunction : public UStruct
 {
-  DECLARE_CLASS( UFunction, UStruct, 0 )
-  NO_DEFAULT_CONSTRUCTOR( UFunction )
+  DECLARE_CLASS( UFunction, UStruct, 0, Core )
   
   idx ParmsSize; // PackageVersion <= 63
   u16 iNative;   // Native function index
@@ -102,8 +98,7 @@ class UFunction : public UStruct
 
 class UState : public UStruct
 {
-  DECLARE_CLASS( UState, UStruct, 0 )
-  NO_DEFAULT_CONSTRUCTOR( UState )
+  DECLARE_CLASS( UState, UStruct, 0, Core )
   
   virtual void LoadFromPackage( FPackageFileIn& In );
   
@@ -124,15 +119,16 @@ struct FDependency
 
 class UClass : public UState
 {
-  DECLARE_CLASS( UClass, UState, 0 )
+  DECLARE_CLASS( UClass, UState, 0, Core )
   
   UClass();
-  UClass( u32 Flags );
+  UClass( const char* ClassName, u32 Flags, UClass* SuperClass, UObject *(*NativeCtor)(size_t) );
   
   virtual void LoadFromPackage( FPackageFileIn& In );
   
   bool IsNative();
-  
+	UObject* CreateObject();
+
   u32 OldClassRecordSize; // PackageVersion <= 61
   u32 ClassFlags;
   u32 ClassGuid[4];
@@ -142,7 +138,12 @@ class UClass : public UState
   const char* ClassConfigName;
   
   // Runtime variables
-  UObject* Default;
-  UObject* (*)(Constructor)(void);
+	UObject* Default;
+  UObject* (*Constructor)(size_t);
+	UClass*  SuperClass;
+	bool     NativeNeedsPkgLoad;
+
+private:
+	char* CreateDefaultObjectName();
 };
 

@@ -112,61 +112,12 @@ UTexture::~UTexture()
 void UTexture::LoadFromPackage( FPackageFileIn& Ar )
 {
   // load properties
-  Properties->LoadPropertyList( Ar );
-  DetailTexture = Properties->GetProperty<UTexture*>( "DetailTexture" );
-  Palette       = Properties->GetProperty<UPalette*>( "Palette" );
-  
-  Diffuse   = Properties->GetProperty<float>( "Diffuse" );
-  Specular  = Properties->GetProperty<float>( "Specular" );
-  Alpha     = Properties->GetProperty<float>( "Alpha" );
-  DrawScale = Properties->GetProperty<float>( "DrawScale" );
-  Friction  = Properties->GetProperty<float>( "Friction" );
-  MipMult   = Properties->GetProperty<float>( "MipMult" );
-  
-  bHighColorQuality   = Properties->GetProperty<bool>( "bHighColorQuality" );
-  bHighTextureQuality = Properties->GetProperty<bool>( "bHighTextureQuality" );
-  bRealtime           = Properties->GetProperty<bool>( "bRealtime" );
-  bParametric         = Properties->GetProperty<bool>( "bParametric" );
-  bRealtimeChanged    = Properties->GetProperty<bool>( "bRealtimeChanged" );
-  bHasComp            = Properties->GetProperty<bool>( "bHasComp" );
-  bFractical          = Properties->GetProperty<bool>( "bFractical" );
-  
-  AnimNext     = Properties->GetProperty<UTexture*>( "AnimNext" );
-  AnimCurrent  = Properties->GetProperty<UTexture*>( "AnimCurrent" );
-  PrimeCount   = Properties->GetProperty<u8>( "PrimeCount" );
-  MinFrameRate = Properties->GetProperty<float>( "MinFrameRate" );
-  MaxFrameRate = Properties->GetProperty<float>( "MaxFrameRate" );
-  
-  CompFormat = (ETextureFormat)Properties->GetProperty<u8>( "Format" );
-
-  // load mipmaps
-  u8 NumMips;
-  Ar >> NumMips;
-  Mips.Reserve( NumMips );
-//   for (int i = 0; i < NumMips; i++)
-//   {
-//     u32 WidthOffset;
-//     int MipMapSize;
-//     u32 Width;
-//     u32 Height;
-//     
-//     // Useless width offset...
-//     if ( Ar.Ver >= PKG_VER_UN_220 )
-//       Ar >> WidthOffset;
-//       
-//     Ar >> CINDEX( MipMapSize );
-//     Mips[i].DataArray.Reserve( MipMapSize );
-//     Ar.Read( Mips[i].DataArray.Data(), MipMapSize );
-//     Ar >> Width;
-//     Ar >> Height;
-//     Ar >> Mips[i].USize;
-//     Ar >> Mips[i].VSize;
-//   }
 }
 
 // TODO: Export textures besides TEXF_P8
 bool UTexture::ExportToFile()
 {
+/*
   String* Filename = new String( Pkg->ResolveNameFromIdx( NameIdx ) );
   Filename->Append( ".bmp" );
   
@@ -224,7 +175,7 @@ bool UTexture::ExportToFile()
     *Out << bfOffBits;
     
     Out->Close();
-    
+*/  
     return true;
-  }
+//	}
 }

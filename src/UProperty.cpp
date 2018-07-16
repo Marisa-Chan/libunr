@@ -24,16 +24,18 @@
 */
 
 #include "UProperty.h"
+#include "UPackage.h"
 
 u8 UProperty::PropertySizes[8] = { 1, 2, 4, 12, 16, 1, 2, 4 };
 
+// TODO: Create variable in Object to check for uninitialized properties?
 UProperty::UProperty()
 {
   ArrayDim = 0;
   ElementSize = 0;
   PropertyFlags = 0;
   Category = 0;
-  Value = 0;
+	Offset = 0;
 }
 
 UProperty::UProperty( int InNameIdx )
@@ -43,13 +45,11 @@ UProperty::UProperty( int InNameIdx )
   ElementSize = 0;
   PropertyFlags = 0;
   Category = 0;
-  Value = 0;
+  Offset = 0;
 }
 
 UProperty::~UProperty()
 {
-  if ( LIKELY( PropNext ) )
-    delete PropNext;
 }
 
 void UProperty::LoadFromPackage( FPackageFileIn& In )
@@ -77,7 +77,7 @@ u32 UProperty::GetNativeOffset( const char* ClassName, const char* PropName )
   size_t ClassHash = Fnv1aHashString( ClassName );
   for ( size_t i = 0; i < NativePropertyLists->Size() && i != MAX_SIZE; i++ )
   {
-    NativePropList = NativePropertyLists->Data()[i];
+    NativePropList = &NativePropertyLists->Data()[i]; // Can you take the address of an overloaded operator[] ?
     if ( ClassHash == NativePropList->Hash )
       break;
   }
@@ -95,10 +95,11 @@ u32 UProperty::GetNativeOffset( const char* ClassName, const char* PropName )
 void UByteProperty::LoadFromPackage( FPackageFileIn& In )
 {
   Super::LoadFromPackage( In );
-  
+ 
+	idx EnumType = 0;
   In >> CINDEX( EnumType );
   if ( EnumType )
-    Enum = (UEnum*)UPackage::StaticLoadObject( Pkg, EnumType );
+    Enum = (UEnum*)UPackage::StaticLoadObject( Pkg, EnumType, UEnum::StaticClass() );
 }
 
 void UIntProperty::LoadFromPackage( FPackageFileIn& In )

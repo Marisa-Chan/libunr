@@ -87,7 +87,8 @@ struct DLL_EXPORT FExport
   idx SerialOffset;
   
   UObject* Obj;
-  
+	int Index;
+
   void Read( FPackageFileIn& Pkg );
 };
 
@@ -164,7 +165,7 @@ enum EPkgLoadOpts
 -----------------------------------------------------------------------------*/
 class UPackage : public UObject
 {
-  DECLARE_CLASS( UPackage, UObject, 0 )
+  DECLARE_CLASS( UPackage, UObject, 0, Core )
   UPackage();
   
   virtual bool Load( const char* File );
@@ -175,6 +176,7 @@ class UPackage : public UObject
   FNameEntry*     GetNameEntry( size_t Index );
   FImport*        GetImport( size_t Index );
   FExport*        GetExport( size_t Index );
+	FExport*        GetExport( const char* ExportName );
   const char*     GetName();
   const char*     GetFilePath();
   const char*     GetFileName();
@@ -187,7 +189,7 @@ class UPackage : public UObject
   const char* ResolveNameFromObjRef( int ObjRef );
   
   // Object reading
-  bool LoadObject( UObject** Obj, const char* ObjName );
+  bool LoadObject( UObject** Obj, const char* ObjName, FExport* Export = NULL );
   
   // Accessors 
   String& GetPackageName();
@@ -195,16 +197,14 @@ class UPackage : public UObject
   static bool StaticInit();
   static int CalcObjRefValue( int ObjRef );
   static UPackage* StaticLoadPkg( const char* Filepath );
-  static UObject* StaticLoadObject( const char* PkgName, const char* ObjName, const char* ClassName, UObject* InOuter = NULL );
-  static UObject* StaticLoadObject( UPackage* Pkg, const char* ObjName, const char* ClassName, UObject* InOuter = NULL );
-  static UObject* StaticLoadObject( UPackage* Pkg, idx ObjRef, UObject* InOuter = NULL );
+  static UObject* StaticLoadObject( const char* PkgName, const char* ObjName, const char* ClassName, 
+			UObject* InOuter = NULL );
+  static UObject* StaticLoadObject( UPackage* Pkg, const char* ObjName, const char* ClassName, 
+			UObject* InOuter = NULL );
+  static UObject* StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass, UObject* InOuter = NULL );
+	static bool     StaticLoadPartialClass( const char* PkgName, UClass* NativeClass );
   
-  static UObject* StaticConstructObject( const char* PkgName, const char* ObjName, const char* ClassName, UObject* InOuter = NULL );
-  static UObject* StaticConstructObject( UPackage* Pkg, const char* ClassName, UObject* InOuter = NULL );
-  static UObject* StaticConstructObject( UPackage* Pkg, idx ObjRef, const char* ObjName, UObject* InOuter = NULL );
-  
-protected:
-    
+protected:    
   bool BeginLoad( FExport* Export );
   void EndLoad();
   

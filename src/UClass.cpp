@@ -25,6 +25,7 @@
 
 #include "UClass.h"
 #include "UPackage.h"
+#include "UProperty.h"
 
 // UField
 UField::~UField()
@@ -44,10 +45,36 @@ void UField::LoadFromPackage( FPackageFileIn& In )
   In >> CINDEX( NextIdx );
   
   if ( SuperIdx )
-    SuperField = (UField*)UPackage::StaticLoadObject( Pkg, SuperIdx, Outer );
+    SuperField = (UField*)UPackage::StaticLoadObject( Pkg, SuperIdx, NULL, Outer );
   
   if ( NextIdx )
-    Next = (UField*)UPackage::StaticLoadObject( Pkg, NextIdx, Outer );
+    Next = (UField*)UPackage::StaticLoadObject( Pkg, NextIdx, NULL, Outer );
+}
+
+UStruct::UStruct()
+{
+	ScriptText = NULL;
+	Children   = NULL;
+	FriendlyName = NULL;
+	Line = 0;
+	TextPos = 0;
+	ScriptSize = 0;
+	ScriptCode = NULL;
+	NativeSize = 0;
+	StructSize = 0;
+}
+
+UStruct::UStruct( size_t InNativeSize )
+{
+  ScriptText = NULL;
+	Children   = NULL;
+	FriendlyName = NULL;
+	Line = 0;
+	TextPos = 0;
+	ScriptSize = 0;
+	ScriptCode = NULL;
+	NativeSize = InNativeSize;
+	StructSize = 0;
 }
 
 // UStruct
@@ -67,14 +94,25 @@ void UStruct::LoadFromPackage( FPackageFileIn& In )
   In >> CINDEX( ChildIdx );
   In >> CINDEX( FriendlyNameIdx );
   
-  ScriptText = (UTextBuffer*)UPackage::StaticLoadObject( Pkg, ScriptTextIdx, this );
-  Children = (UField*)UPackage::StaticLoadObject( Pkg, ChildIdx, this );
+  ScriptText = (UTextBuffer*)UPackage::StaticLoadObject( Pkg, ScriptTextIdx, UTextBuffer::StaticClass(), this );
+  Children = (UField*)UPackage::StaticLoadObject( Pkg, ChildIdx, NULL, this );
   FriendlyName = Pkg->ResolveNameFromIdx( FriendlyNameIdx );
   In >> Line;
   In >> TextPos;
   In >> ScriptSize;
   
   ScriptCode = UObject::LoadScriptCode( In, ScriptSize );
+
+	// Calculate struct size
+	StructSize += NativeSize;
+	for ( UField* ChildIter = Children; ChildIter != NULL; ChildIter = ChildIter->Next )
+	{
+		if ( ChildIter->IsA( UProperty::StaticClass() ) )
+		{
+			UProperty* Prop = (UProperty*)ChildIter;
+			StructSize += Prop->ElementSize;
+		}
+	}
 }
 
 // UState
@@ -98,13 +136,19 @@ UClass::UClass()
   
 }
 
-UClass::UClass( u32 Flags )
+UClass::UClass( const char* ClassName, u32 Flags, UClass* InSuperClass, UObject *(*NativeCtor)(size_t) )
 {
+  Name = ClassName;
   ClassFlags = Flags;
+	SuperClass = InSuperClass;
+	Constructor = NativeCtor;
+	NativeNeedsPkgLoad = true;
 }
 
 UClass::~UClass()
 {
+	Default->RefCnt--;
+	delete Default;
 }
 
 void UClass::LoadFromPackage( FPackageFileIn& In )
@@ -125,7 +169,7 @@ void UClass::LoadFromPackage( FPackageFileIn& In )
     In >> CINDEX( DepObjRef );
     
     if ( stricmp( Pkg->ResolveNameFromObjRef( DepObjRef ), FriendlyName ) )
-      Dep.Class = (UClass*)UPackage::StaticLoadObject( Pkg, DepObjRef );
+      Dep.Class = (UClass*)UPackage::StaticLoadObject( Pkg, DepObjRef, UClass::StaticClass() );
     
     In >> Dep.Deep;
     In >> Dep.ScriptTextCRC;
@@ -153,14 +197,17 @@ void UClass::LoadFromPackage( FPackageFileIn& In )
     In >> CINDEX( ClassWithinIdx );
     In >> CINDEX( ClassConfigNameIdx );
     
-    ClassWithin = (UClass*)UPackage::StaticLoadObject( Pkg, ClassWithinIdx );
+    ClassWithin = (UClass*)UPackage::StaticLoadObject( Pkg, ClassWithinIdx, UClass::StaticClass() );
     ClassConfigName = Pkg->ResolveNameFromIdx( ClassConfigNameIdx );
   }
   
-  ReadProperties( In );
-  
   // Construct default object
-  
+  if ( Constructor == NULL )
+		Constructor = SuperClass->Constructor;
+
+	Default = CreateObject();
+	Default->Class = this;
+	Default->ReadPropertyList( In );
 }
 
 bool UClass::IsNative()
@@ -168,3 +215,18 @@ bool UClass::IsNative()
   // NOTE: this is NOT checking class flags
   return (Flags & RF_Native) != 0;
 }
+
+UObject* UClass::CreateObject()
+{
+	return Constructor( StructSize );
+}
+
+char* UClass::CreateDefaultObjectName()
+{
+	char* DefObjName = (char*)Malloc( 1024 );
+	memset( DefObjName, 0, 1024 );
+	strcat( DefObjName, "Default" );
+	strcat( DefObjName, Name );
+	return DefObjName;
+}
+

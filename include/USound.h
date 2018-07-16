@@ -24,6 +24,7 @@
  *========================================================================
 */
 
+#pragma once
 #include "UObject.h"
 
 enum ESoundSlot
@@ -39,7 +40,7 @@ enum ESoundSlot
 
 class USound : public UObject
 {
-  DECLARE_CLASS( USound, UObject, CLASS_SafeReplace )
+  DECLARE_CLASS( USound, UObject, CLASS_SafeReplace, Engine )
   
   USound();
   virtual bool ExportToFile();

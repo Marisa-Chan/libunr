@@ -30,6 +30,7 @@
 #include "Memory.h"
 #include "UObject.h"
 #include "UPackage.h"
+#include "USound.h"
 
 enum ETextureFormat
 {
@@ -88,7 +89,7 @@ public:
 
 class UPalette : public UObject
 {
-  DECLARE_CLASS( UPalette, UObject, CLASS_SafeReplace )
+  DECLARE_CLASS( UPalette, UObject, CLASS_SafeReplace, Engine )
   
   UPalette();
   virtual void LoadFromPackage( FPackageFileIn& Ar );
@@ -98,7 +99,7 @@ class UPalette : public UObject
 
 class UBitmap : public UObject
 {
-  DECLARE_CLASS( UBitmap, UObject, CLASS_SafeReplace )
+  DECLARE_CLASS( UBitmap, UObject, CLASS_SafeReplace, Engine )
   
   ETextureFormat Format;
   u8  UBits,  VBits;
@@ -113,8 +114,9 @@ class UBitmap : public UObject
 
 class UTexture : public UBitmap
 {
-  DECLARE_CLASS( UTexture, UBitmap, CLASS_SafeReplace )
-  
+  DECLARE_CLASS( UTexture, UBitmap, CLASS_SafeReplace, Engine )
+  UTexture();
+
   UTexture* BumpMap;
   UTexture* DetailTexture;
   UTexture* MacroTexture;
@@ -127,7 +129,7 @@ class UTexture : public UBitmap
   float Friction;
   float MipMult;
   
-  USound* FootstepSound[6]
+  USound* FootstepSound[6];
   USound* HitSound;
   
   bool bHighColorQuality;
@@ -149,7 +151,6 @@ class UTexture : public UBitmap
   Array<FMipmap> CompMips;
   ETextureFormat CompFormat;
   
-  UTexture();
   virtual bool ExportToFile();
   virtual void LoadFromPackage( FPackageFileIn& Ar );
 };

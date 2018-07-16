@@ -47,8 +47,10 @@ enum EPropertyType
 
 class UProperty : public UField
 {
-  DECLARE_ABSTRACT_CLASS( UProperty, UField, 0 )
-  
+  DECLARE_ABSTRACT_CLASS( UProperty, UField, 0, Core )
+	UProperty();
+	UProperty( int InNameIdx );
+
   u16 ArrayDim;
   u16 ElementSize;
   u32 PropertyFlags;
@@ -67,7 +69,7 @@ class UProperty : public UField
 
 class UByteProperty : public UProperty
 {
-  DECLARE_CLASS( UByteProperty, UProperty, 0 )
+  DECLARE_CLASS( UByteProperty, UProperty, 0, Core )
   
   UEnum* Enum;
   
@@ -77,7 +79,7 @@ class UByteProperty : public UProperty
 
 class UIntProperty : public UProperty
 {
-  DECLARE_CLASS( UIntProperty, UProperty, 0 )
+  DECLARE_CLASS( UIntProperty, UProperty, 0, Core )
   
   int GetValue();
   virtual void LoadFromPackage( FPackageFileIn& In );
@@ -85,7 +87,7 @@ class UIntProperty : public UProperty
 
 class UBoolProperty : public UProperty
 {
-  DECLARE_CLASS( UBoolProperty, UProperty, 0 )
+  DECLARE_CLASS( UBoolProperty, UProperty, 0, Core )
   
   bool GetValue();
   virtual void LoadFromPackage( FPackageFileIn& In );
@@ -93,7 +95,7 @@ class UBoolProperty : public UProperty
 
 class UFloatProperty : public UProperty
 {
-  DECLARE_CLASS( UFloatProperty, UProperty, 0 )
+  DECLARE_CLASS( UFloatProperty, UProperty, 0, Core )
   
   float GetValue();
   virtual void LoadFromPackage( FPackageFileIn& In );
@@ -101,7 +103,7 @@ class UFloatProperty : public UProperty
 
 class UObjectProperty : public UProperty
 {
-  DECLARE_CLASS( UObjectProperty, UProperty, 0 )
+  DECLARE_CLASS( UObjectProperty, UProperty, 0, Core )
   
   UClass* ObjectType;
   
@@ -111,7 +113,7 @@ class UObjectProperty : public UProperty
 
 class UNameProperty : public UProperty
 {
-  DECLARE_CLASS( UNameProperty, UProperty, 0 )
+  DECLARE_CLASS( UNameProperty, UProperty, 0, Core )
   
   const char* GetValue();
   virtual void LoadFromPackage( FPackageFileIn& In );
@@ -120,7 +122,7 @@ class UNameProperty : public UProperty
 // ?
 class UStringProperty : public UProperty
 {
-  DECLARE_CLASS( UStringProperty, UProperty, 0 )
+  DECLARE_CLASS( UStringProperty, UProperty, 0, Core )
   
   String* GetValue();
   virtual void LoadFromPackage( FPackageFileIn& In );
@@ -128,7 +130,7 @@ class UStringProperty : public UProperty
 
 class UClassProperty : public UObjectProperty
 {
-  DECLARE_CLASS( UClassProperty, UProperty, 0 )
+  DECLARE_CLASS( UClassProperty, UProperty, 0, Core )
   
   UClass* Class;
   
@@ -139,13 +141,13 @@ class UClassProperty : public UObjectProperty
 // ?
 class UArrayProperty : public UProperty
 {
-  DECLARE_CLASS( UArrayProperty, UProperty, 0 )
+  DECLARE_CLASS( UArrayProperty, UProperty, 0, Core )
   virtual void LoadFromPackage( FPackageFileIn& In );
 };
 
 class UStructProperty : public UProperty
 {
-  DECLARE_CLASS( UStructProperty, UProperty, 0 )
+  DECLARE_CLASS( UStructProperty, UProperty, 0, Core )
   
   UStruct* GetValue();
   virtual void LoadFromPackage( FPackageFileIn& In );
@@ -154,20 +156,20 @@ class UStructProperty : public UProperty
 // ?
 class UVectorProperty : public UProperty
 {
-  DECLARE_CLASS( UVectorProperty, UProperty, 0 )
+  DECLARE_CLASS( UVectorProperty, UProperty, 0, Core )
   virtual void LoadFromPackage( FPackageFileIn& In );
 };
 
 // ?
 class URotatorProperty : public UProperty
 {
-  DECLARE_CLASS( URotatorProperty, UProperty, 0 )
+  DECLARE_CLASS( URotatorProperty, UProperty, 0, Core )
   virtual void LoadFromPackage( FPackageFileIn& In );
 };
 
 class UAsciiStrProperty : public UProperty
 {
-  DECLARE_CLASS( UAsciiStrProperty, UProperty, 0 )
+  DECLARE_CLASS( UAsciiStrProperty, UProperty, 0, Core )
   
   int Length;
   
@@ -178,14 +180,14 @@ class UAsciiStrProperty : public UProperty
 // ?
 class UMapProperty : public UProperty
 {
-  DECLARE_CLASS( UMapProperty, UProperty, 0 )
+  DECLARE_CLASS( UMapProperty, UProperty, 0, Core )
   virtual void LoadFromPackage( FPackageFileIn& In );
 };
 
 // ?
 class UFixedArrayProperty : public UProperty
 {
-  DECLARE_CLASS( UFixedArrayProperty, UProperty, 0 )
+  DECLARE_CLASS( UFixedArrayProperty, UProperty, 0, Core )
   virtual void LoadFromPackage( FPackageFileIn& In );
 };
 
