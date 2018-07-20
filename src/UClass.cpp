@@ -26,6 +26,7 @@
 #include "UClass.h"
 #include "UPackage.h"
 #include "UProperty.h"
+#include "UScript.h"
 
 // UField
 UField::~UField()
@@ -82,6 +83,207 @@ UStruct::~UStruct()
 {
 }
 
+// Script loading
+#define LOAD_CODE( strct, var, type ) \
+	*(strct->ScriptCode)++ = var
+
+static inline void LoadScriptByte( UStruct* Struct, FPackageFileIn& In )
+{
+	u8 Byte;
+	In >> Byte;
+	LOAD_CODE( Struct, Byte, u8 );
+}
+
+static inline void LoadScriptWord( UStruct* Struct, FPackageFileIn& In )
+{
+	u16 Word;
+	In >> Word;
+	LOAD_CODE( Struct, Word, u16 );
+}
+
+static inline void LoadScriptDword( UStruct* Struct, FPackageFileIn& In )
+{
+	u32 Dword;
+	In >> Dword;
+	LOAD_CODE( Struct, Dword, u32 );
+}
+
+static inline void LoadScriptIndex( UStruct* Struct, FPackageFileIn& In )
+{
+	idx Index;
+	In >> CINDEX( Index );
+	LOAD_CODE( Struct, Index, idx );
+}
+
+static inline void LoadScriptFloat( UStruct* Struct, FPackageFileIn& In )
+{
+	float Float;
+	In >> Float;
+	LOAD_CODE( Struct, Float, float );
+}
+
+static inline void LoadScriptString( UStruct* Struct, FPackageFileIn& In )
+{
+	u8 Char = 0;
+	do
+	{
+		In >> Char;
+		LOAD_CODE( Struct, Char, u8 );
+		
+	} while ( Char != 0 );
+}
+
+// FIXME: We don't actually deal with unicode strings because we should be using
+// UTF-8 instead, should we convert the characters later?
+static inline void LoadScriptUnicodeString( UStruct* Struct, FPackageFileIn& In )
+{
+	u16 Wchar = 0;
+	do
+	{
+		In >> Wchar;
+		LOAD_CODE( Struct, Wchar, u16 );
+
+	} while ( Wchar != 0 ); 
+}
+
+static inline void LoadScriptLabelTable( UStruct* Struct, FPackageFileIn& In )
+{
+	FScriptLabel Label;
+	Label.Index = 0;
+	Label.Offset = 0;
+
+	while ( 1 )
+	{
+		In >> CINDEX( Label.Index );
+		In >> Label.Offset;
+
+		LOAD_CODE( Struct, Label.Index, idx );
+		LOAD_CODE( Struct, Label.Offset, u32 );
+
+		Struct->LabelTable->PushBack( Label );
+
+		if ( strncmp( "None", Struct->Pkg->ResolveNameFromIdx( Label.Index ), 4 ) == 0 )
+			break;
+	}
+}
+
+// Helper function to load script code
+// Does not care about type resolution whatsoever
+static inline void LoadScriptCode( UStruct* Struct, FPackageFileIn& In )
+{
+	u8 Token = -1;
+	bool bQueueReadIteratorWord = false;
+	bool bReadIteratorWord = false;
+	while ( Token != EX_LabelTable || Token != EX_Return )
+	{
+		In >> Token;
+		LOAD_CODE( Struct, Token, u8 );
+
+		// Handle extended native case up here since switch statements
+		// can't really handle this type of comparison
+		if ( UNLIKELY( (Token && 0xF0) == EX_ExtendedNative ) )
+		{
+			LoadScriptByte( Struct, In );
+			continue;
+		}
+
+		switch ( Token )
+		{
+			case EX_LocalVariable:
+			case EX_InstanceVariable:
+			case EX_DefaultVariable:
+			case EX_MetaCast:
+			case EX_VirtualFunction:
+			case EX_FinalFunction:
+			case EX_ObjectConst:
+			case EX_NameConst:
+			case EX_NativeParm:
+			case EX_DynamicCast:
+			case EX_StructCmpEq:
+			case EX_StructCmpNe:
+			case EX_StructMember:
+			case EX_GlobalFunction:
+				LoadScriptIndex( Struct, In );
+				break;
+			case EX_Switch:
+				LoadScriptByte( Struct, In );
+				break;
+			case EX_Jump:
+			case EX_JumpIfNot:
+			case EX_Assert:
+			case EX_Case:
+			case EX_Skip:
+				LoadScriptWord( Struct, In );
+				break;
+			case EX_LabelTable:
+				LoadScriptLabelTable( Struct, In );
+				break;
+			case EX_ClassContext:
+				LoadScriptIndex( Struct, In );
+				LoadScriptWord( Struct, In );
+				LoadScriptByte( Struct, In );
+				LoadScriptIndex( Struct, In );
+				break;
+			case EX_IntConst:
+				LoadScriptDword( Struct, In );
+				break;
+			case EX_FloatConst:
+				LoadScriptFloat( Struct, In );
+				break;
+			case EX_StringConst:
+				LoadScriptString( Struct, In );
+				break;
+			case EX_RotationConst:
+				LoadScriptDword( Struct, In );
+				LoadScriptDword( Struct, In );
+				LoadScriptDword( Struct, In );
+				break;
+			case EX_VectorConst:
+				LoadScriptFloat( Struct, In );
+				LoadScriptFloat( Struct, In );
+				LoadScriptFloat( Struct, In );
+				break;
+			case EX_Iterator:
+				// stupid edge cases... see below
+				bReadIteratorWord = true;
+				break;
+			case EX_UnicodeStringConst:
+				LoadScriptUnicodeString( Struct, In );
+				break;
+			case EX_Unk03:
+			case EX_Unk15:
+			case EX_Unk2b:
+			case EX_Unk35:
+			case EX_Unk37:
+			case EX_Unk5a:
+			case EX_Unk5b:
+			case EX_Unk5c:
+			case EX_Unk5d:
+			case EX_Unk5e:
+			case EX_Unk5f:
+				Logf( LOG_WARN, "Loading unknown UnrealScript opcode 0x%x, loading may not finish properly", Token );
+				break;
+			// Everything else loads another token or nothing at all,
+			// so we don't need explicit cases for them
+			default:
+				break;
+		}
+
+		// Iterator is the only opcode that has a word after a token
+		// Normally we just loop around, but that doesn't work here
+		if ( bQueueReadIteratorWord )
+		{
+			bReadIteratorWord = true;
+			bQueueReadIteratorWord = false;
+		}
+		else if ( bReadIteratorWord )
+		{
+			LoadScriptWord( Struct, In );
+			bReadIteratorWord = false;
+		}
+	}
+}
+
 void UStruct::LoadFromPackage( FPackageFileIn& In )
 {
   Super::LoadFromPackage( In );
@@ -101,7 +303,8 @@ void UStruct::LoadFromPackage( FPackageFileIn& In )
   In >> TextPos;
   In >> ScriptSize;
   
-  ScriptCode = UObject::LoadScriptCode( In, ScriptSize );
+	ScriptCode = new u8[ ScriptSize ];
+  ::LoadScriptCode( this, In );
 
 	// Calculate struct size
 	StructSize += NativeSize;

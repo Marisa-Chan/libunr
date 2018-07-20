@@ -34,7 +34,8 @@ using namespace xstl;
 class UTextBuffer : public UObject
 {
   DECLARE_ABSTRACT_CLASS( UTextBuffer, UObject, 0, Core )
-  
+	virtual void LoadFromPackage( FPackageFileIn& In );
+
   u32 Pos, Top;
   String Text;
 };
@@ -52,6 +53,9 @@ class UField : public UObject
 class UConst : public UField
 {
   DECLARE_CLASS( UConst, UField, 0, Core )
+
+	UConst();
+	virtual void LoadFromPackage( FPackageFileIn& In );
   
   String Value;
 };
@@ -59,8 +63,17 @@ class UConst : public UField
 class UEnum : public UField
 {
   DECLARE_CLASS( UEnum, UField, 0, Core )
+	
+	UEnum();
+	virtual void LoadFromPackage( FPackageFileIn& In );
   
   Array<const char*> Names;
+};
+
+struct FScriptLabel
+{
+	idx Index;
+	u32 Offset;
 };
 
 class UStruct : public UField
@@ -81,6 +94,7 @@ class UStruct : public UField
   
   // Runtime variables
   u32 StructSize;
+	Array<FScriptLabel>* LabelTable;
 };
 
 class UFunction : public UStruct

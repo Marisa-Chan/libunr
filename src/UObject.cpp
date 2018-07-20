@@ -135,6 +135,7 @@ void UObject::LoadFromPackage( FPackageFileIn& Ar )
   if ( !ObjectClass->IsA( UClass::StaticClass() ) )
   {
     // Load properties
+		ReadPropertyList( Ar );
   }
   
   return;
@@ -162,3 +163,4 @@ void UObject::ReadPropertyList( FPackageFileIn& In )
 {
   
 }
+
