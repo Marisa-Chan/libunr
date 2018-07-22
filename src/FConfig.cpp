@@ -326,4 +326,194 @@ bool FConfig::Save()
   return true;
 }
 
+char* FConfig::ReadString( const char* Category, const char* Variable, size_t Index )
+{
+  size_t CatHash = Fnv1aHashString( Category ); // meow
+  for ( size_t i = 0; i < Categories.Size() && i != MAX_HASH; i++ )
+  {
+    FConfigCategory* CatIter = Categories[i];
+    if ( CatIter->Hash == CatHash )
+    {
+      size_t VarHash = Fnv1aHashString( Variable );
+      for ( size_t j = 0; j < CatIter->Entries->Size; j++ )
+      {
+        FConfigEntry* Entry = (*CatIter->Entries)[j];
+        if ( Entry->Hash == VarHash )
+        {
+          char* Value = (*Entry->Values)[Index];
+          return StringDup( Value );
+        }
+      }
+    }
+  }
+  return NULL;
+}
+
+bool FConfig::ReadBool( const char* Category, const char* Variable, size_t Index )
+{
+  bool Value = false;
+  char* StrVar = ReadString( Category, Variable, Index );
+  if ( LIKELY( StrVar ) )
+  {
+    if ( strncmp( StrVar, "true", 4 ) == 0 )
+      Value = true;
+
+    Free( StrVar );
+  }
+  return Value;
+}
+
+static inline u64 ReadUInt( FConfig* Config, const char* Category, const char* Variable, size_t Index )
+{
+  u64 Value = 0;
+  char* StrVar = ReadString( Category, Variable, Index );
+  if ( LIKELY( StrVar ) )
+  {
+    Value = strtoull( StrVar, NULL, 10 );
+    if ( Value == MAX_UINT64 )
+      Value = 0;
+
+    Free( StrVar );
+  }
+  return Value;
+}
+
+u64 FConfig::ReadUInt64( const char* Category, const char* Variable, size_t Index )
+{
+  return ReadUInt( this, Category, Variable, Index );
+}
+
+u32 FConfig::ReadUInt32( const char* Category, const char* Variable, size_t Index )
+{
+  return ReadUInt( this, Category, Variable, Index ) & MAX_UINT32;
+}
+
+u16 FConfig::ReadUInt16( const char* Category, const char* Variable, size_t Index )
+{
+  return ReadUInt( this, Category, Variable, Index ) & MAX_UINT16;
+}
+
+u8 FConfig::ReadUInt8( const char* Category, const char* Variable, size_t Index )
+{
+  return ReadUInt( this, Category, Variable, Index ) & MAX_UINT8;
+}
+
+static inline i64 ReadInt( FConfig* Config, const char* Category, const char* Variable, size_t Index )
+{
+  i64 Value = 0;
+  char* StrVar = ReadString( Category, Variable, Index );
+  if ( LIKELY( StrVar ) )
+  {
+    Value = strtoll( StrVar, NULL, 10 );
+    if ( Value == MAX_INT64 || Value == MIN_INT64 )
+      Value = 0;
+
+    Free( StrVar );
+  }
+  return Value;
+}
+
+u64 FConfig::ReadInt64( const char* Category, const char* Variable, size_t Index )
+{
+  return ReadInt( this, Category, Variable, Index );
+}
+
+u32 FConfig::ReadInt32( const char* Category, const char* Variable, size_t Index )
+{
+  return ReadInt( this, Category, Variable, Index ) & MAX_UINT32;
+}
+
+u16 FConfig::ReadInt16( const char* Category, const char* Variable, size_t Index )
+{
+  return ReadInt( this, Category, Variable, Index ) & MAX_UINT16;
+}
+
+u8 FConfig::ReadInt8( const char* Category, const char* Variable, size_t Index )
+{
+  return ReadInt( this, Category, Variable, Index ) & MAX_UINT8;
+}
+
+float FConfig::ReadFloat( const char* Category, const char* Variable, size_t Index )
+{
+  float Value = 0.f;
+  char* StrVar = ReadString( Category, Variable, Value );
+  if ( LIKELY( StrVar ) )
+  {
+    Value = strtof( StrVar, NULL );
+    Free( StrVar );
+  }
+  return Value;
+}
+
+double FConfig::ReadDouble( const char* Category, const char* Variable, size_t Index )
+{
+  double Value = 0.0;
+  char* StrVar = ReadString( Category, Variable, Value );
+  if ( LIKELY( StrVar ) )
+  {
+    Value = strtod( StrVar, NULL );
+    Free( StrVar );
+  }
+  return Value;
+}
+
+void ReadObject( const char* Category, const char* Variable, UObject* Obj, size_t Index )
+{
+  char* StrVar = ReadString( Category, Variable, Index );
+  if ( LIKELY( StrVar ) )
+  {
+    bool bGotParenthesis = false;
+    bool bGotVariable = false;
+    char* Probe = StrVar;
+    while ( *Probe )
+    {
+      char C = *Probe;
+      if ( C == '(' )
+      {
+        if ( LIKELY( !bGotParenthesis ) )
+        {
+          bGotParenthesis = true;
+        }
+        else
+        {
+          Logf( LOG_WARN, "Got unexpected left parenthesis in object config variable '%s.%s'", 
+              Category, Variable );
+          break;
+        }
+      }
+      else if ( UNLIKELY( !bGotParenthesis ) )
+      {
+        Logf( LOG_WARN, "Missing expected left parentheis in object config variable '%s.%s'",
+            Category, Variable );
+        break;
+      }
+      else
+      {
+        if ( UNLIKELY( C == ')' ) )
+        {
+          if ( UNLIKELY( !bGotVariable ) )
+            Logf( LOG_WARN, "Got unexpected right parenthesis in object config variable '%s.%s'",
+                Category, Variable );
+          break;
+        }
+
+        else if ( C == '=' )
+        {
+          if ( UNLIKELY( !bGotVariable ) )
+          {
+            Logf( LOG_WARN, "Got unexpected equals sign in object config variable '%s.%s'",
+                Category, Variable );
+            break;
+          }
+
+          bGotVariable = true;
+        }
+      }
+
+      Probe++;
+    }
+
+    Free( StrVar );
+  }
+}
 

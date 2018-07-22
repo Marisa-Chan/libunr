@@ -44,42 +44,42 @@ public:
   // These functions will try to read the requested variable
   // If the Variable does not exist, a default value will be created and added to the config
   // If the SubVariable does not exist, a default value will be returned but not added to config
-  char* ReadString( const char* Category, const char* Variable );
-  bool  ReadBool  ( const char* Category, const char* Variable );
-  u64 ReadUInt64( const char* Category, const char* Variable ); 
-  u32 ReadUInt32( const char* Category, const char* Variable );
-  u16 ReadUInt16( const char* Category, const char* Variable );
-  u8  ReadUInt8 ( const char* Category, const char* Variable );
+  char* ReadString( const char* Category, const char* Variable, size_t Index = 0 );
+  bool  ReadBool  ( const char* Category, const char* Variable, size_t Index = 0 );
+  u64 ReadUInt64( const char* Category, const char* Variable, size_t Index = 0 ); 
+  u32 ReadUInt32( const char* Category, const char* Variable, size_t Index = 0 );
+  u16 ReadUInt16( const char* Category, const char* Variable, size_t Index = 0 );
+  u8  ReadUInt8 ( const char* Category, const char* Variable, size_t Index = 0 );
 
-  i64 ReadInt64( const char* Category, const char* Variable );
-  i32 ReadInt32( const char* Category, const char* Variable );
-  i16 ReadInt16( const char* Category, const char* Variable );
-  i8  ReadInt8 ( const char* Category, const char* Variable );
+  i64 ReadInt64( const char* Category, const char* Variable, size_t Index = 0 );
+  i32 ReadInt32( const char* Category, const char* Variable, size_t Index = 0 );
+  i16 ReadInt16( const char* Category, const char* Variable, size_t Index = 0 );
+  i8  ReadInt8 ( const char* Category, const char* Variable, size_t Index = 0 );
 
-  float  ReadFloat ( const char* Category, const char* Variable );
-  double ReadDouble( const char* Category, const char* Variable );
+  float  ReadFloat ( const char* Category, const char* Variable, size_t Index = 0 );
+  double ReadDouble( const char* Category, const char* Variable, size_t Index = 0 );
 
-  void ReadObject( const char* Category, const char* Variable, UObject* Obj );
+  void ReadObject( const char* Category, const char* Variable, UObject* Obj, size_t Index = 0 );
 
   // Write functions
   // These functions will write a variable to the config, updating it if it exists, creating
   // a new one otherwise
-  void WriteString( const char* Category, const char* Variable, const char* Value );
-  void WriteBool  ( const char* Category, const char* Variable, bool Value );
-  void WriteUInt64( const char* Category, const char* Variable, u64 Value );
-  void WriteUInt32( const char* Category, const char* Variable, u32 Value );
-  void WriteUInt16( const char* Category, const char* Variable, u16 Value );
-  void WriteUInt8 ( const char* Category, const char* Variable, u8 Value );
+  void WriteString( const char* Category, const char* Variable, const char* Value, size_t Index = 0 );
+  void WriteBool  ( const char* Category, const char* Variable, bool Value, size_t Index = 0 );
+  void WriteUInt64( const char* Category, const char* Variable, u64 Value, size_t Index = 0 );
+  void WriteUInt32( const char* Category, const char* Variable, u32 Value, size_t Index = 0 );
+  void WriteUInt16( const char* Category, const char* Variable, u16 Value, size_t Index = 0 );
+  void WriteUInt8 ( const char* Category, const char* Variable, u8 Value, size_t Index = 0 );
    
-  void WriteInt64( const char* Category, const char* Variable, i64 Value );
-  void WriteInt32( const char* Category, const char* Variable, i32 Value );
-  void WriteInt16( const char* Category, const char* Variable, i16 Value );
-  void WriteInt8 ( const char* Category, const char* Variable, i8 Value );
+  void WriteInt64( const char* Category, const char* Variable, i64 Value, size_t Index = 0 );
+  void WriteInt32( const char* Category, const char* Variable, i32 Value, size_t Index = 0 );
+  void WriteInt16( const char* Category, const char* Variable, i16 Value, size_t Index = 0 );
+  void WriteInt8 ( const char* Category, const char* Variable, i8 Value, size_t Index = 0 );
 
-  void WriteFloat ( const char* Category, const char* Variable, float Value );
-  void WriteDouble( const char* Category, const char* Variable, double Value );
+  void WriteFloat ( const char* Category, const char* Variable, float Value, size_t Index = 0 );
+  void WriteDouble( const char* Category, const char* Variable, double Value, size_t Index = 0 );
 
-  void WriteObject( const char* Category, const char* Variable, UObject* Obj );
+  void WriteObject( const char* Category, const char* Variable, UObject* Obj, size_t Index = 0 );
 
 private:
   struct FConfigEntry

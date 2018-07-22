@@ -48,8 +48,8 @@ enum EPropertyType
 class UProperty : public UField
 {
   DECLARE_ABSTRACT_CLASS( UProperty, UField, 0, Core )
-	UProperty();
-	UProperty( int InNameIdx );
+  UProperty();
+  UProperty( int InNameIdx );
 
   u16 ArrayDim;
   u16 ElementSize;
