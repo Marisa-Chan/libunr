@@ -386,6 +386,7 @@ void UStruct::LoadFromPackage( FPackageFileIn& In )
 
   // Calculate struct size
   StructSize += NativeSize;
+  u32 InfoSize = 0;
   for ( UField* ChildIter = Children; ChildIter != NULL; ChildIter = ChildIter->Next )
   {
     if ( ChildIter->IsA( UProperty::StaticClass() ) )
@@ -393,7 +394,17 @@ void UStruct::LoadFromPackage( FPackageFileIn& In )
       UProperty* Prop = (UProperty*)ChildIter;
       StructSize += Prop->ElementSize;
     }
+    InfoSize += ChildIter->GetNativeSize();
   }
+
+  // Okay, so now we've iterated through all children and gotten the native size
+  // of each child member. We're now going to resize the block of memory that
+  // holds this object so that we can recreate all of the child objects next
+  // to this one in memory. The idea is that if all the data for a class is
+  // next to each other, that the data cache will stay valid longer, giving
+  // us (potentially) faster execution time
+  if ( Class != UClass::StaticClass() )
+    RelocateChildrenToSelf(); // ...but let the class do it if thats what we really are
 }
 
 UFunction::UFunction()
@@ -461,7 +472,8 @@ UClass::~UClass()
 void UClass::LoadFromPackage( FPackageFileIn& In )
 {
   Super::LoadFromPackage( In );
-  
+  RelocateChildrenToSelf(); // now do the relocation
+
   In >> ClassFlags;
   In.Read( ClassGuid, sizeof( ClassGuid ) );
   

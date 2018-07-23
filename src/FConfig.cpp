@@ -329,13 +329,13 @@ bool FConfig::Save()
 char* FConfig::ReadString( const char* Category, const char* Variable, size_t Index )
 {
   size_t CatHash = Fnv1aHashString( Category ); // meow
-  for ( size_t i = 0; i < Categories.Size() && i != MAX_HASH; i++ )
+  for ( size_t i = 0; i < Categories.Size() && i != MAX_SIZE; i++ )
   {
     FConfigCategory* CatIter = Categories[i];
     if ( CatIter->Hash == CatHash )
     {
       size_t VarHash = Fnv1aHashString( Variable );
-      for ( size_t j = 0; j < CatIter->Entries->Size; j++ )
+      for ( size_t j = 0; j < CatIter->Entries->Size(); j++ )
       {
         FConfigEntry* Entry = (*CatIter->Entries)[j];
         if ( Entry->Hash == VarHash )
@@ -366,7 +366,7 @@ bool FConfig::ReadBool( const char* Category, const char* Variable, size_t Index
 static inline u64 ReadUInt( FConfig* Config, const char* Category, const char* Variable, size_t Index )
 {
   u64 Value = 0;
-  char* StrVar = ReadString( Category, Variable, Index );
+  char* StrVar = Config->ReadString( Category, Variable, Index );
   if ( LIKELY( StrVar ) )
   {
     Value = strtoull( StrVar, NULL, 10 );
@@ -401,7 +401,7 @@ u8 FConfig::ReadUInt8( const char* Category, const char* Variable, size_t Index 
 static inline i64 ReadInt( FConfig* Config, const char* Category, const char* Variable, size_t Index )
 {
   i64 Value = 0;
-  char* StrVar = ReadString( Category, Variable, Index );
+  char* StrVar = Config->ReadString( Category, Variable, Index );
   if ( LIKELY( StrVar ) )
   {
     Value = strtoll( StrVar, NULL, 10 );
@@ -413,22 +413,22 @@ static inline i64 ReadInt( FConfig* Config, const char* Category, const char* Va
   return Value;
 }
 
-u64 FConfig::ReadInt64( const char* Category, const char* Variable, size_t Index )
+i64 FConfig::ReadInt64( const char* Category, const char* Variable, size_t Index )
 {
   return ReadInt( this, Category, Variable, Index );
 }
 
-u32 FConfig::ReadInt32( const char* Category, const char* Variable, size_t Index )
+i32 FConfig::ReadInt32( const char* Category, const char* Variable, size_t Index )
 {
   return ReadInt( this, Category, Variable, Index ) & MAX_UINT32;
 }
 
-u16 FConfig::ReadInt16( const char* Category, const char* Variable, size_t Index )
+i16 FConfig::ReadInt16( const char* Category, const char* Variable, size_t Index )
 {
   return ReadInt( this, Category, Variable, Index ) & MAX_UINT16;
 }
 
-u8 FConfig::ReadInt8( const char* Category, const char* Variable, size_t Index )
+i8 FConfig::ReadInt8( const char* Category, const char* Variable, size_t Index )
 {
   return ReadInt( this, Category, Variable, Index ) & MAX_UINT8;
 }
@@ -457,7 +457,7 @@ double FConfig::ReadDouble( const char* Category, const char* Variable, size_t I
   return Value;
 }
 
-void ReadObject( const char* Category, const char* Variable, UObject* Obj, size_t Index )
+void FConfig::ReadObject( const char* Category, const char* Variable, UObject* Obj, size_t Index )
 {
   char* StrVar = ReadString( Category, Variable, Index );
   if ( LIKELY( StrVar ) )

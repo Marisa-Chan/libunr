@@ -57,38 +57,38 @@ bool UObject::StaticLinkNativeProperties()
     LINK_NATIVE_PROPERTY( UObject, Flags );
     LINK_NATIVE_PROPERTY( UObject, Name );
     LINK_NATIVE_PROPERTY( UObject, Class );
-		return true;
+    return true;
   }
 
-	return false;
+  return false;
 }
 
 UObject* UObject::StaticConstructObject( const char* InName, UClass* InClass, UObject* InOuter )
 {
-	// Construct object with class native ctor
-	UObject* Out = InClass->CreateObject();
+  // Construct object with the class constructor
+  UObject* Out = InClass->CreateObject();
 
-	// Set up object properties
-	Out->Hash = Fnv1aHashString( InName );
-	Out->Name = InName;
-	Out->Index = ObjectPool.Size();
-	Out->RefCnt = 1;
-	Out->Outer = InOuter;
-	Out->Flags = 0;
-	Out->Class = InClass;
+  // Set up object properties
+  Out->Hash = Fnv1aHashString( InName );
+  Out->Name = InName;
+  Out->Index = ObjectPool.Size();
+  Out->RefCnt = 1;
+  Out->Outer = InOuter;
+  Out->Flags = 0;
+  Out->Class = InClass;
 
-	// Add to object
-	ObjectPool.PushBack( Out );
+  // Add to object
+  ObjectPool.PushBack( Out );
 
-	// Script init (TODO)
-	
-	return Out;
+  // Script init (TODO)
+  
+  return Out;
 }
 
 UClass* AllocateClass( const char* ClassName, u32 Flags, UClass* SuperClass, 
-		UObject *(*NativeCtor)(size_t) )
+    UObject *(*NativeCtor)(size_t) )
 {
-	ClassName++; // We don't want the prefix indicating object type in the name of the class
+  ClassName++; // We don't want the prefix indicating object type in the name of the class
   return new UClass( ClassName, Flags, SuperClass, NativeCtor );
 }
 
@@ -135,7 +135,7 @@ void UObject::LoadFromPackage( FPackageFileIn& Ar )
   if ( !ObjectClass->IsA( UClass::StaticClass() ) )
   {
     // Load properties
-		ReadPropertyList( Ar );
+    ReadPropertyList( Ar );
   }
   
   return;
@@ -151,12 +151,12 @@ void UObject::SetPkgProperties( UPackage* InPkg, int InExpIdx, int InNameIdx )
 
 bool UObject::IsA( UClass* ClassType )
 {
-	for ( UClass* Cls = Class; Cls != NULL; Cls = Cls->SuperClass )
-	{
-		if ( Cls == ClassType )
-			return true;
-	}
-	return false;
+  for ( UClass* Cls = Class; Cls != NULL; Cls = Cls->SuperClass )
+  {
+    if ( Cls == ClassType )
+      return true;
+  }
+  return false;
 }
 
 void UObject::ReadPropertyList( FPackageFileIn& In )

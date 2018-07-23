@@ -218,8 +218,8 @@ public: \
   } \
   void* operator new( size_t sz, size_t ObjSize ) \
   { \
-    void* Mem = Malloc( sz + ObjSize ); \
-    Set( Mem, 0, sz + ObjSize ); \
+    void* Mem = Malloc( ObjSize ); \
+    Set( Mem, 0, ObjSize ); \
     return Mem; \
   } \
   static UClass* StaticClass() \
@@ -263,6 +263,10 @@ public: \
     return true; \
   } \
   static bool StaticLoadNativeClass(); \
+  virtual size_t GetNativeSize() \
+  { \
+    return NativeSize; \
+  } \
   virtual ~cls(); 
 
 #define DECLARE_CLASS(cls, supcls, flags, pkg) \
