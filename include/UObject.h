@@ -34,14 +34,6 @@
 
 using namespace xstl;
 
-class FPackageFileIn;
-class FPackageFileOut;
-class FPropertyHash;
-class UField;
-class UClass;
-class UPackage;
-struct FPropertyRecord;
-
 // Flags for loading objects.
 enum ELoadFlags
 {
@@ -196,6 +188,25 @@ extern Array<FNativePropertyList>* NativePropertyLists;
 
 // FIXME: Forward declarations are gross
 class UObject;
+class UStruct;
+class UProperty;
+class UByteProperty;
+class UIntProperty;
+class UBoolProperty;
+class UFloatProperty;
+class UObjectProperty;
+class UNameProperty;
+class UClassProperty;
+class UStructProperty;
+class UStrProperty;
+class FPackageFileIn;
+class FPackageFileOut;
+class FPropertyHash;
+class UField;
+class UClass;
+class UPackage;
+struct FPropertyRecord;
+
 UClass* AllocateClass( const char* ClassName, u32 Flags, UClass* SuperClass, UObject *(*NativeCtor)(size_t) );
 //const char* Core = "Core";
 //const char* Engine = "Engine";
@@ -316,7 +327,29 @@ class UObject
   void SetPkgProperties( UPackage* InPkg, int InExpIdx, int InNameIdx );
   bool IsA( UClass* ClassType );
   u8* LoadScriptCode( FPackageFileIn& In, size_t Size );
-  void ReadPropertyList( FPackageFileIn& Ar );  
+  void ReadDefaultProperties( FPackageFileIn& Ar );  
+
+  // Property getters
+  u8       GetByteProperty  ( UByteProperty* Prop, int Idx = 0 );
+  int      GetIntProperty   ( UIntProperty* Prop, int Idx = 0 );
+  bool     GetBoolProperty  ( UBoolProperty* Prop );
+  float    GetFloatProperty ( UFloatProperty* Prop, int Idx = 0 );
+  UObject* GetObjProperty   ( UObjectProperty* Prop, int Idx = 0 );
+  idx      GetNameProperty  ( UNameProperty* Prop, int Idx = 0 );
+  UClass*  GetClassProperty ( UClassProperty* Prop, int Idx = 0 );
+  UStruct* GetStructProperty( UStructProperty* Prop, int Idx = 0 );
+  const char* GetStrProperty( UStrProperty* Prop, int Idx = 0 );
+
+  // Property setters
+  void SetByteProperty  ( UByteProperty* Prop, u8 NewVal, int Idx = 0 );
+  void SetIntProperty   ( UIntProperty* Prop, int NewVal, int Idx = 0 );
+  void SetBoolProperty  ( UBoolProperty* Prop, bool NewVal );
+  void SetFloatProperty ( UFloatProperty* Prop, float NewVal, int Idx = 0 );
+  void SetObjProperty   ( UObjectProperty* Prop, UObject* NewVal, int Idx = 0 );
+  void SetNameProperty  ( UNameProperty* Prop, idx NewVal, int Idx = 0 );
+  void SetClassProperty ( UClassProperty* Prop, UClass* NewVal, int Idx = 0 );
+  void SetStructProperty( UStructProperty* Prop, UStruct* NewVal, int Idx = 0 );
+  void SetStrProperty   ( UStrProperty* Prop, const char* NewVal, int Idx = 0 );
 
   static UObject* StaticConstructObject( const char* InName, UClass* InClass, UObject* InOuter );
 
@@ -342,6 +375,8 @@ class UObject
   int ObjectInternal[6];
 
 protected:
+  UProperty* FindProperty( const char* PropName );
+
   static UClass* StaticAllocateClass( const char* ClassName, u32 Flags, UClass* SuperClass, 
       UObject *(*NativeCtor)(void) );
 
@@ -351,5 +386,13 @@ protected:
 };
 
 bool InitNativeClasses(void);
+template <class T> T* SafeCast( UObject* Obj )
+{
+  if ( !Obj->IsA( T::StaticClass() ) )
+    return NULL;
+
+  return (T*)Obj;
+}
+
 
 #endif

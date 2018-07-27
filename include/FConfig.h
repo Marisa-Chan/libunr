@@ -107,4 +107,6 @@ private:
   char* Name;
 };
 
-
+extern FConfig* GUnitechConfig; // Used only before loading any game
+extern FConfig* GGameConfig;    // Used after loading a game
+extern FConfig* GUserConfig;    // User specific config

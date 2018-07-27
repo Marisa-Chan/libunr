@@ -70,52 +70,42 @@ class UProperty : public UField
 class UByteProperty : public UProperty
 {
   DECLARE_CLASS( UByteProperty, UProperty, 0, Core )
-  
-  UEnum* Enum;
-  
-  u8 GetValue();
   virtual void LoadFromPackage( FPackageFileIn& In );
+  UEnum* Enum;
 };
 
 class UIntProperty : public UProperty
 {
   DECLARE_CLASS( UIntProperty, UProperty, 0, Core )
-  
-  int GetValue();
   virtual void LoadFromPackage( FPackageFileIn& In );
 };
 
 class UBoolProperty : public UProperty
 {
   DECLARE_CLASS( UBoolProperty, UProperty, 0, Core )
-  
-  bool GetValue();
   virtual void LoadFromPackage( FPackageFileIn& In );
 };
 
 class UFloatProperty : public UProperty
 {
   DECLARE_CLASS( UFloatProperty, UProperty, 0, Core )
-  
-  float GetValue();
   virtual void LoadFromPackage( FPackageFileIn& In );
 };
 
 class UObjectProperty : public UProperty
 {
   DECLARE_CLASS( UObjectProperty, UProperty, 0, Core )
-  
-  UClass* ObjectType;
-  
-  UObject* GetValue();
+  UObject* GetValue( int Idx = 0 );
+  void SetValue( UObject* NewVal, int Idx = 0 );
   virtual void LoadFromPackage( FPackageFileIn& In );
+  UClass* ObjectType;
 };
 
 class UNameProperty : public UProperty
 {
   DECLARE_CLASS( UNameProperty, UProperty, 0, Core )
-  
-  const char* GetValue();
+  const char* GetValue( int Idx = 0 );
+  void SetValue( idx NewVal, int Idx = 0 );
   virtual void LoadFromPackage( FPackageFileIn& In );
 };
 
@@ -123,19 +113,18 @@ class UNameProperty : public UProperty
 class UStringProperty : public UProperty
 {
   DECLARE_CLASS( UStringProperty, UProperty, 0, Core )
-  
-  String* GetValue();
+  String* GetValue( int Idx = 0 );
+  void SetValue( u8 NewVal, int Idx = 0 );
   virtual void LoadFromPackage( FPackageFileIn& In );
 };
 
 class UClassProperty : public UObjectProperty
 {
   DECLARE_CLASS( UClassProperty, UProperty, 0, Core )
-  
-  UClass* Class;
-  
-  UClass* GetValue();
+  UClass* GetValue( int Idx = 0 );
+  void SetValue( UClass* NewVal, int Idx = 0 );
   virtual void LoadFromPackage( FPackageFileIn& In );
+  UClass* Class;
 };
 
 // ?
@@ -149,32 +138,18 @@ class UStructProperty : public UProperty
 {
   DECLARE_CLASS( UStructProperty, UProperty, 0, Core )
   
-  UStruct* GetValue();
+  UStruct* GetValue( int Idx = 0 );
+  void SetValue( UStruct* NewVal, int Idx = 0 );
   virtual void LoadFromPackage( FPackageFileIn& In );
 };
 
-// ?
-class UVectorProperty : public UProperty
+class UStrProperty : public UProperty
 {
-  DECLARE_CLASS( UVectorProperty, UProperty, 0, Core )
+  DECLARE_CLASS( UStrProperty, UProperty, 0, Core )
+  const char* GetValue( int Idx = 0 );
+  void SetValue( const char* NewVal, int Idx = 0 );
   virtual void LoadFromPackage( FPackageFileIn& In );
-};
-
-// ?
-class URotatorProperty : public UProperty
-{
-  DECLARE_CLASS( URotatorProperty, UProperty, 0, Core )
-  virtual void LoadFromPackage( FPackageFileIn& In );
-};
-
-class UAsciiStrProperty : public UProperty
-{
-  DECLARE_CLASS( UAsciiStrProperty, UProperty, 0, Core )
-  
   int Length;
-  
-  const char* GetValue();
-  virtual void LoadFromPackage( FPackageFileIn& In );
 };
 
 // ?

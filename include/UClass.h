@@ -86,8 +86,6 @@ class UStruct : public UField
   UStruct( size_t InNativeSize );
   virtual void LoadFromPackage( FPackageFileIn& In );
  
-	void RelocateChildrenToSelf();
-
   UTextBuffer* ScriptText;
   UField* Children;
   const char* FriendlyName;
@@ -121,7 +119,7 @@ enum EFunctionFlags
   FUNC_NoExport    = 0x00004000,  // Don't export intrinsic function to C++.
   FUNC_Const       = 0x00008000,  // Function doesn't modify this object.
   FUNC_Invariant   = 0x00010000,  // Return value is purely dependent on parameters; 
-	                                //   no state dependencies or internal state changes.
+                                  //   no state dependencies or internal state changes.
 
   // Combinations of flags.
   FUNC_FuncInherit        = FUNC_Exec | FUNC_Event,

@@ -35,7 +35,7 @@ UProperty::UProperty()
   ElementSize = 0;
   PropertyFlags = 0;
   Category = 0;
-	Offset = 0;
+  Offset = 0;
 }
 
 UProperty::UProperty( int InNameIdx )
@@ -96,7 +96,7 @@ void UByteProperty::LoadFromPackage( FPackageFileIn& In )
 {
   Super::LoadFromPackage( In );
  
-	idx EnumType = 0;
+  idx EnumType = 0;
   In >> CINDEX( EnumType );
   if ( EnumType )
     Enum = (UEnum*)UPackage::StaticLoadObject( Pkg, EnumType, UEnum::StaticClass() );

@@ -26,6 +26,7 @@
 #include "Memory.h"
 #include "UClass.h"
 #include "UPackage.h"
+#include "USystem.h"
 #include "UTexture.h"
 
 EPkgLoadOpts UPackage::LoadOpts = PO_OpenOnLoad;
@@ -201,7 +202,7 @@ FPackageFileIn& operator>>( FPackageFileIn& In, UPackageHeader& Header )
 FNameEntry::FNameEntry()
 {
   xstl::Set( Data, 0, NAME_LEN );
-	Hash = 0;
+  Hash = 0;
   Flags = 0;
 }
 
@@ -313,10 +314,10 @@ bool UPackage::Load( const char* File )
   Exports->Resize( Header.ExportCount );
   Stream->Seek( Header.ExportOffset, ESeekBase::Begin );
   for ( int i = 0; i < Header.ExportCount; i++ )
-	{
+  {
     *((FPackageFileIn*)Stream) >> (*Exports)[i];
-		(*Exports)[i].Index = i;
-	}
+    (*Exports)[i].Index = i;
+  }
   
   EndLoad();
   
@@ -354,7 +355,7 @@ FExport* UPackage::GetExport( size_t Index )
 
 FExport* UPackage::GetExport( const char* ExportName )
 {
-	// Find the name in this package's name table
+  // Find the name in this package's name table
   int NameIndex = -1;
   size_t NameHash = Fnv1aHashString( ExportName );
   for ( int i = 0; i < Names->Size() && i < MAX_SIZE; i++ )
@@ -379,7 +380,7 @@ FExport* UPackage::GetExport( const char* ExportName )
     }
   }
 
-	return Export;
+  return Export;
 }
 
 const char* UPackage::GetFilePath()
@@ -412,16 +413,16 @@ bool UPackage::LoadObject( UObject** Obj, const char* ObjName, FExport* ObjExp )
   if ( Obj == NULL || *Obj == NULL )
     return false;
   
-	FExport* Export = ObjExp;
-	if ( Export == NULL )
-	{
-		Export = GetExport( ObjName );
-		if ( Export == NULL )
-		{
-			Logf( LOG_CRIT, "Failed to find export for object '%s' in package '%s'.", ObjName, Name );
-			return false;
-		}
-	}
+  FExport* Export = ObjExp;
+  if ( Export == NULL )
+  {
+    Export = GetExport( ObjName );
+    if ( Export == NULL )
+    {
+      Logf( LOG_CRIT, "Failed to find export for object '%s' in package '%s'.", ObjName, Name );
+      return false;
+    }
+  }
  
   // If we already loaded the object, return it
   if ( Export->Obj )
@@ -437,13 +438,13 @@ bool UPackage::LoadObject( UObject** Obj, const char* ObjName, FExport* ObjExp )
   // Load
   FPackageFileIn* PackageFile = (FPackageFileIn*)Stream;
 
-	// Set export object properties
-	(*Obj)->ExpIdx = Export->Index;
-	(*Obj)->NameIdx = Export->ObjectName;
-	(*Obj)->Pkg = this;
+  // Set export object properties
+  (*Obj)->ExpIdx = Export->Index;
+  (*Obj)->NameIdx = Export->ObjectName;
+  (*Obj)->Pkg = this;
   (*Obj)->LoadFromPackage( *PackageFile );
 
-	Export->Obj = *Obj;
+  Export->Obj = *Obj;
   
   // Finalize load
   EndLoad();
@@ -492,142 +493,138 @@ UPackage* UPackage::StaticLoadPkg( const char* Filepath )
   return Pkg;
 }
 
-UObject* UPackage::StaticLoadObject( const char* PkgName, const char* ObjName, const char* ClassName, UObject* InOwner )
+UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjClass, UObject* InOuter )
 {
-	UClass*   Cls = NULL;
-  UObject*  Obj = NULL;
-  UPackage* Pkg = NULL;
-  char* RealPkgName;
-  const char* ExtSeperator = strchr( PkgName, '.' );
-  
-  if ( ExtSeperator != NULL )
+  if ( Package == NULL )
   {
-    size_t ExtOffset = (size_t)PtrSubtract( ExtSeperator, PkgName );
-    RealPkgName = strdup( PkgName );
-    RealPkgName[ExtOffset] = '\0';
+    Logf( LOG_CRIT, "StaticLoadObject: NULL argument passed (Pkg=%p | ObjClass=%p)", Package, ObjClass );
+    return NULL;
+  }
+  const char* ObjName = Package->ResolveNameFromObjRef( ObjRef );
+  UPackage* ObjPkg = Package;
+  FExport* Export = NULL;
+
+  // Is our object in this package?
+  if ( ObjRef < 0 )
+  {
+    // Nope, but we can figure out which package it should be in from the one we were given
+    FImport* Import = &(*Package->Imports)[ CalcObjRefValue( ObjRef ) ];
+    
+    // We probably need to get the class too...
+    if ( LIKELY( ObjClass == NULL ) )
+    {
+      const char* ClsName = Package->ResolveNameFromIdx( Import->ClassName );
+      size_t ClsNameHash  = Fnv1aHashString( ClsName );
+      for ( size_t i = 0; i < UObject::ClassPool.Size() && i != MAX_SIZE; i++ )
+      {
+        UClass* ClsIter = UObject::ClassPool[i];
+        if ( ClsIter->Hash == ClsNameHash )
+        {
+          ObjClass = ClsIter;
+          break; // Already loaded the class apparently, great
+        }
+      }
+
+      if ( ObjClass == NULL )
+      {
+        // Alright, it's not loaded at all. Grab it's package and lets load that
+        const char* ClsPkgName = Package->ResolveNameFromIdx( Import->ClassPackage );
+        UPackage* ClsPkg = UPackage::StaticLoadPkg( GSystem->ResolvePath( ClsPkgName ) );
+        if ( Package == NULL )
+        {
+          // We can't find the package we need, bail out
+          Logf( LOG_CRIT, "Can't load class '%s.%s', package is missing", ClsPkgName, ClsName );
+          return NULL;
+        }
+        
+        // Got it, now load the class
+        ObjClass = (UClass*)UPackage::StaticLoadObject( ClsPkg, ClsName, UClass::StaticClass() );
+        if ( UNLIKELY( ObjClass == NULL ) )
+        {
+          // ... but it's not there, bail out
+          Logf( LOG_CRIT, "Can't load class '%s.%s', class does not exist", ClsPkgName, ClsName );
+          return NULL;
+        }
+      }
+    }
+
+    // We have the class, now get the package it belongs in
+    FImport* PkgImport = &(*Package->Imports)[ CalcObjRefValue( Import->Package ) ];
+    const char* ObjPkgName = Package->ResolveNameFromObjRef( Import->Package );
+    ObjPkg = UPackage::StaticLoadPkg( GSystem->ResolvePath( ObjPkgName ) );
+    if ( UNLIKELY( ObjPkg == NULL ) )
+    {
+      Logf( LOG_CRIT, "Can't load object '%s.%s', package is missing", ObjPkgName, ObjName );
+      return NULL;
+    }
+
+    // Grab it's export too
+    Export = ObjPkg->GetExport( ObjName );
+    if ( UNLIKELY( Export == NULL ) )
+    {
+      Logf( LOG_CRIT, "Can't load object '%s.%s', object does not exist", ObjPkgName, ObjName );
+      return NULL;
+    }
   }
   else
   {
-    RealPkgName = (char*)PkgName;
+    Export = &(*Package->Exports)[ CalcObjRefValue( ObjRef ) ];
+ 
+    if ( ObjClass == NULL )
+    {
+      ObjClass = (UClass*)UPackage::StaticLoadObject( Package, Export->Class, UClass::StaticClass() );
+      if ( UNLIKELY( ObjClass == NULL ) )
+      {
+        Logf( LOG_CRIT, "Can't load object '%s.%s', cannot load class", Package->Name, ObjName );
+        return NULL;
+      }
+    }
+
+    ObjPkg = Package;
   }
-  
-  for ( int i = 0; i < Packages->Size(); i++ )
-  {
-    Pkg = Packages->Data()[i];
-    if ( Pkg->GetPackageName() == RealPkgName )
-      break;
-  }
-  
-	// If we didn't find the package, load it
-  if ( Pkg == NULL )
-	{
-		// FIXME: Use <Game>.ini to load packages from paths (../System/, ../Textures/, etc.)
-		Pkg = UPackage::StaticLoadPkg( PkgName );
-		
-		// still didn't find it? error out
-		if ( Pkg == NULL )
-		{
-			Logf( LOG_CRIT, "Failed to load package '%s' for object '%s'.", PkgName, ObjName );
-			return NULL;
-		}
-	}
 
-	// Find the class in order to construct the object (provided we aren't loading a class)
-	FExport* Export = NULL;
-	if ( LIKELY( strncmp( ClassName, "Class", 5 ) != 0 ) )
-	{
-		size_t ClassHash = Fnv1aHashString( ClassName );
-		for ( int i = 0; i < UObject::ClassPool.Size(); i++ )
-		{
-			Cls = UObject::ClassPool[i];
-			if ( Cls->Hash == ClassHash )
-				break;
-		}
-	
-		// If we didn't find the class, we need to load it
-		// For that, we need this object's export info
-		if ( Cls == NULL )
-			Export = Pkg->GetExport( ObjName );
-	}
-	else
-	{
-		Cls = UClass::StaticClass();
-	}
-
-	// Construct the object
-	Obj = UObject::StaticConstructObject( ObjName, Cls, InOwner );
-
-  if ( !Pkg->LoadObject( &Obj, ObjName, Export ) )
+  UObject* Obj = UObject::StaticConstructObject( ObjName, ObjClass, InOuter );
+  if ( Obj == NULL )
     return NULL;
-   
-  if ( RealPkgName != PkgName )
-    Free( RealPkgName );
-  
+
+  if ( !ObjPkg->LoadObject( &Obj, ObjName, Export ) )
+    return NULL;
+
   return Obj;
-}
-
-UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjClass, UObject* InOuter )
-{
-	if ( Package == NULL )
-	{
-		Logf( LOG_CRIT, "StaticLoadObject: NULL argument passed (Pkg=%p | ObjClass=%p)", Package, ObjClass );
-		return NULL;
-	}
-
-	if ( ObjRef < 0 )
-	{
-		Logf( LOG_CRIT, "StaticLoadObject: Invalid object reference value (ObjRef=%i)", ObjRef );
-		return NULL;
-	}
-
-	FExport* Export = &(*Package->Exports)[ CalcObjRefValue( ObjRef ) ];
-	const char* ObjName = Package->ResolveNameFromObjRef( ObjRef );
-
-	if ( ObjClass == NULL )
-		ObjClass = UClass::StaticClass();
-
-	UObject* Obj = UObject::StaticConstructObject( ObjName, ObjClass, InOuter );
-	if ( Obj == NULL )
-		return NULL;
-
-	if ( !Package->LoadObject( &Obj, ObjName, Export ) )
-		return NULL;
-
-	return Obj;
 }
 
 // A partial class is a native class that has been allocated and initialized, but
 // has not had it's UnrealScript counterpart loaded yet. Hence, it is "partially" initialized.
 bool UPackage::StaticLoadPartialClass( const char* PkgName, UClass* NativeClass )
 {
-	UPackage* Package = NULL; 
-	for ( int i = 0; i < Packages->Size(); i++ )
+  UPackage* Package = NULL; 
+  for ( int i = 0; i < Packages->Size(); i++ )
   {
     Package = Packages->Data()[i];
     if ( Package->GetPackageName() == PkgName )
       break;
   }
   
-	// If we didn't find the package, load it
+  // If we didn't find the package, load it
   if ( Package == NULL )
-	{
-		// FIXME: Use <Game>.ini to load packages from paths (../System/, ../Textures/, etc.)
-		Package = UPackage::StaticLoadPkg( PkgName );
+  {
+    // FIXME: Use <Game>.ini to load packages from paths (../System/, ../Textures/, etc.)
+    Package = UPackage::StaticLoadPkg( PkgName );
 
-		// still didn't find it? error out
-		if ( Package == NULL )
-		{
-			Logf( LOG_CRIT, "Failed to load package '%s' for class '%s'.", PkgName, NativeClass->Name );
-			return false;
-		}
-	}
-	
-	// We already have a constructed class object, so just load it from the package
-	UObject* Obj = (UObject*)NativeClass;
-	if ( !Package->LoadObject( &Obj, NativeClass->Name ) )
-		return false;
+    // still didn't find it? error out
+    if ( Package == NULL )
+    {
+      Logf( LOG_CRIT, "Failed to load package '%s' for class '%s'.", PkgName, NativeClass->Name );
+      return false;
+    }
+  }
+  
+  // We already have a constructed class object, so just load it from the package
+  UObject* Obj = (UObject*)NativeClass;
+  if ( !Package->LoadObject( &Obj, NativeClass->Name ) )
+    return false;
 
-	return true;
+  return true;
 }
 
 bool UPackage::BeginLoad( FExport* Export )

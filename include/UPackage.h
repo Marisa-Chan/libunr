@@ -87,7 +87,7 @@ struct DLL_EXPORT FExport
   idx SerialOffset;
   
   UObject* Obj;
-	int Index;
+  int Index;
 
   void Read( FPackageFileIn& Pkg );
 };
@@ -176,7 +176,7 @@ class UPackage : public UObject
   FNameEntry*     GetNameEntry( size_t Index );
   FImport*        GetImport( size_t Index );
   FExport*        GetExport( size_t Index );
-	FExport*        GetExport( const char* ExportName );
+  FExport*        GetExport( const char* ExportName );
   const char*     GetName();
   const char*     GetFilePath();
   const char*     GetFileName();
@@ -197,12 +197,9 @@ class UPackage : public UObject
   static bool StaticInit();
   static int CalcObjRefValue( int ObjRef );
   static UPackage* StaticLoadPkg( const char* Filepath );
-  static UObject* StaticLoadObject( const char* PkgName, const char* ObjName, const char* ClassName, 
-			UObject* InOuter = NULL );
-  static UObject* StaticLoadObject( UPackage* Pkg, const char* ObjName, const char* ClassName, 
-			UObject* InOuter = NULL );
-  static UObject* StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass, UObject* InOuter = NULL );
-	static bool     StaticLoadPartialClass( const char* PkgName, UClass* NativeClass );
+  static UObject* StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass = NULL, UObject* InOuter = NULL );
+  static UObject* StaticLoadObject( UPackage* Pkg, const char* ObjName, UClass* ObjClass = NULL, UObject* InOuter = NULL );
+  static bool     StaticLoadPartialClass( const char* PkgName, UClass* NativeClass );
   
 protected:    
   bool BeginLoad( FExport* Export );

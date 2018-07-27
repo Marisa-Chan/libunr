@@ -135,7 +135,7 @@ void UObject::LoadFromPackage( FPackageFileIn& Ar )
   if ( !ObjectClass->IsA( UClass::StaticClass() ) )
   {
     // Load properties
-    ReadPropertyList( Ar );
+    ReadDefaultProperties( Ar );
   }
   
   return;
@@ -159,8 +159,152 @@ bool UObject::IsA( UClass* ClassType )
   return false;
 }
 
-void UObject::ReadPropertyList( FPackageFileIn& In )
+static int ReadArrayIndex( FPackageFileIn& In )
 {
-  
+  u8 ArrayIdx[4];
+  In >> ArrayIdx[0];
+  if ( ArrayIdx[0] >= 128 )
+  {
+    In >> ArrayIdx[1];
+    if ( (ArrayIdx[1] & 0x80) != 0 && *((u16*)&ArrayIdx[0]) >= 16384 )
+    {
+      In >> ArrayIdx[2];
+      In >> ArrayIdx[3];
+      ArrayIdx[3] &= ~0xC0;
+    }
+    else
+    {
+      ArrayIdx[1] &= ~0x80;
+    }
+  }
+
+  int Idx = *((int*)&ArrayIdx);
+  return Idx;
 }
 
+void UObject::ReadDefaultProperties( FPackageFileIn& In )
+{
+  const char* PropName = NULL;
+  idx PropNameIdx = 0;
+  u8  InfoByte = 0;
+  u8  PropType = 0;
+  u8  SizeByte = 0;
+  u8  IsArray  = 0;
+  int ArrayIdx = 0;
+  int RealSize = 0;
+  
+  while( 1 )
+  {
+    In >> CINDEX( PropName );
+    PropName = Pkg->ResolveNameFromIdx( PropNameIdx );
+    if ( UNLIKELY( strncmp( PropName, "None", 4 ) == 0 ) )
+      break;
+
+    UProperty* Prop = FindProperty( PropName );
+
+    In >> InfoByte;
+    PropType = InfoByte & 0x0F;
+    SizeByte = InfoByte & 0x70;
+    IsArray  = InfoByte & 0x80;
+
+    if ( SizeByte > 4 )
+    {
+      u8 Size8;
+      u16 Size16;
+      switch( SizeByte )
+      {
+        case 5:
+          In >> Size8;
+          RealSize = Size8;
+          break;
+        case 6:
+          In >> Size16;
+          RealSize = Size16;
+          break;
+        case 7:
+          In >> RealSize;
+          break;
+      }
+    }
+    else
+    {
+      RealSize = UProperty::PropertySizes[SizeByte];
+    }
+
+    if ( PropType == PROP_Byte )
+    {
+      UByteProperty* ByteProp = SafeCast<UByteProperty>( Prop );
+      if ( !ByteProp )
+      {
+        Logf( LOG_CRIT, "Default property expected 'ByteProperty', but got '%s'", Prop->Class->Name );
+        return;
+      }
+
+      if ( IsArray )
+        ArrayIdx = ReadArrayIndex( In );
+    
+      u8 Value = 0;
+      In >> Value;
+      SetByteProperty( ByteProp, Value, ArrayIdx ); 
+    }
+    else if ( PropType == PROP_Int )
+    {
+      UIntProperty* IntProp = SafeCast<UIntProperty>( Prop );
+      if ( !IntProp )
+      {
+        Logf( LOG_CRIT, "Default property expected 'IntProperty', but got '%s'", Prop->Class->Name );
+        return;
+      }
+
+      if ( IsArray )
+        ArrayIdx = ReadArrayIndex( In );
+
+      int Value = 0;
+      In >> Value;
+      SetIntProperty( IntProp, Value, ArrayIdx );
+    }
+    else if ( PropType == PROP_Bool )
+    {
+      UBoolProperty* BoolProp = SafeCast<UBoolProperty>( Prop );
+      if ( !BoolProp )
+      {
+        Logf( LOG_CRIT, "Default property expected 'BoolProperty', but got '%s'", Prop->Class->Name );
+        return;
+      }
+
+      SetBoolProperty( BoolProp, IsArray == 1 );
+    }
+    else if ( PropType == PROP_Float )
+    {
+      UFloatProperty* FloatProp = SafeCast<UFloatProperty>( Prop );
+      if ( !FloatProp )
+      {
+        Logf( LOG_CRIT, "Default property expected 'FloatProperty', but got '%s'", Prop->Class->Name );
+        return;
+      }
+
+      if ( IsArray )
+        ArrayIdx = ReadArrayIndex( In );
+
+      float Value = 0;
+      In >> Value;
+      SetFloatProperty( FloatProp, Value, ArrayIdx );
+    }
+    else if ( PropType == PROP_Object )
+    {
+      UObjectProperty* ObjProp = SafeCast<UObjectProperty>( Prop );
+      if ( !ObjProp )
+      {
+        Logf( LOG_CRIT, "Default property expected 'ObjectProperty', but got '%s'", Prop->Class->Name );
+        return;
+      }
+
+      if ( IsArray )
+        ArrayIdx = ReadArrayIndex( In );
+
+      idx ObjRef = 0;
+      In >> CINDEX( ObjRef );
+      SetObjProperty( ObjProp, UPackage::StaticLoadObject( Pkg, ObjRef ), ArrayIdx );
+    }
+  }
+}
