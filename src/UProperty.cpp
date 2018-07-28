@@ -74,7 +74,7 @@ void UProperty::LoadFromPackage( FPackageFileIn& In )
 u32 UProperty::GetNativeOffset( const char* ClassName, const char* PropName )
 {
   FNativePropertyList* NativePropList;
-  size_t ClassHash = Fnv1aHashString( ClassName );
+  FHash ClassHash = FnvHashString( ClassName );
   for ( size_t i = 0; i < NativePropertyLists->Size() && i != MAX_SIZE; i++ )
   {
     NativePropList = &NativePropertyLists->Data()[i]; // Can you take the address of an overloaded operator[] ?
@@ -82,7 +82,7 @@ u32 UProperty::GetNativeOffset( const char* ClassName, const char* PropName )
       break;
   }
   
-  size_t PropHash = Fnv1aHashString( PropName );
+  FHash PropHash = FnvHashString( PropName );
   for ( size_t i = 0; i < NativePropList->Num; i++ )
   {
     if ( NativePropList->Properties[i].Hash == PropHash )

@@ -30,7 +30,7 @@
 #include "UProperty.h"
 #include "UPackage.h"
 
-FNativePropertyList::FNativePropertyList( size_t InHash, size_t InNum )
+FNativePropertyList::FNativePropertyList( FHash InHash, size_t InNum )
 {
   Hash = InHash;
   Num = InNum;
@@ -42,7 +42,7 @@ void FNativePropertyList::AddProperty( const char* Name, u32 Offset )
 {
   if ( LIKELY( Added < Num ) )
   {
-    Properties[Added].Hash = Fnv1aHashString( Name );
+    Properties[Added].Hash = FnvHashString( Name );
     Properties[Added].Offset = Offset;
     Added++;
   }
@@ -69,7 +69,7 @@ UObject* UObject::StaticConstructObject( const char* InName, UClass* InClass, UO
   UObject* Out = InClass->CreateObject();
 
   // Set up object properties
-  Out->Hash = Fnv1aHashString( InName );
+  Out->Hash = FnvHashString( InName );
   Out->Name = InName;
   Out->Index = ObjectPool.Size();
   Out->RefCnt = 1;

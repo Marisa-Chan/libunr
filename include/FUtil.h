@@ -89,33 +89,80 @@ extern DebugPrintFunc DebugPrint;
 
 void Logf( const char* Type, const char* Str, ... );
 
+#define FNV1A_HASH 0
+#define FNV1_HASH  1
+
 #if defined LIBUNR_64BIT
   #define FNV_PRIME 1099511628211ULL
   #define FNV_BASIS 14695981039346656037ULL
+
+  struct FHash
+  {
+    union
+    {
+      u64  FnvHash[2]; 
+      u128 FullHash;
+    };
+  };
+
 #elif defined LIBUNR_32BIT
   #define FNV_PRIME 16777619
   #define FNV_BASIS 2166136261
-#endif 
-static inline size_t Fnv1aHash( const void* Data, size_t Len )
+
+  struct FHash
+  {
+    union
+    {
+      u32 FnvHash[2];
+      u64 FullHash;
+    };
+  };
+
+#endif
+
+static bool operator==( FHash A, FHash B )
 {
-  size_t Hash = FNV_BASIS;
+  return ( A.FullHash == B.FullHash );
+}
+
+static bool operator!=( FHash A, FHash B )
+{
+  return ( A.FullHash != B.FullHash );
+}
+
+static inline FHash FnvHash( const void* Data, size_t Len )
+{
+  FHash Hash;
+  Hash.FnvHash[FNV1A_HASH] = Hash.FnvHash[FNV1_HASH] = FNV_BASIS;
+
   for (int i = 0; i < Len; i++) {
-    Hash ^= ((u8*)Data)[i];
-    Hash *= FNV_PRIME;
+    Hash.FnvHash[FNV1A_HASH] ^= ((u8*)Data)[i];
+    Hash.FnvHash[FNV1A_HASH] *= FNV_PRIME;
+
+    Hash.FnvHash[FNV1_HASH] *= FNV_PRIME;
+    Hash.FnvHash[FNV1_HASH] ^= ((u8*)Data)[i];
   }
   return Hash;
 }
 
-static inline size_t Fnv1aHashString( const char* Data )
+static inline FHash FnvHashString( const char* Data )
 {
-  size_t Hash = FNV_BASIS;
-  while (*Data) {
-    Hash ^= *Data++;
-    Hash *= FNV_PRIME;
+  FHash Hash;
+  Hash.FnvHash[FNV1A_HASH] = Hash.FnvHash[FNV1_HASH] = FNV_BASIS;
+
+  int Len = strlen( Data );
+  for (int i = 0; i < Len; i++) {
+    Hash.FnvHash[FNV1A_HASH] ^= ((u8*)Data)[i];
+    Hash.FnvHash[FNV1A_HASH] *= FNV_PRIME;
+
+    Hash.FnvHash[FNV1_HASH] *= FNV_PRIME;
+    Hash.FnvHash[FNV1_HASH] ^= ((u8*)Data)[i];
   }
   return Hash;
 }
-  
+ 
+#define ZERO_HASH {0, 0}
+
 //========================================================================
 // EOF
 //========================================================================

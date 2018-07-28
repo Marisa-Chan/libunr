@@ -202,7 +202,7 @@ FPackageFileIn& operator>>( FPackageFileIn& In, UPackageHeader& Header )
 FNameEntry::FNameEntry()
 {
   xstl::Set( Data, 0, NAME_LEN );
-  Hash = 0;
+  Hash = ZERO_HASH;
   Flags = 0;
 }
 
@@ -211,7 +211,7 @@ FNameEntry::FNameEntry( const char* InStr )
   strncpy( Data, InStr, NAME_LEN );
   Data[NAME_LEN-1] = '\0';
   Flags = 0;
-  Hash = Fnv1aHashString( Data );;
+  Hash = FnvHashString( Data );;
 }
 
 FNameEntry::~FNameEntry()
@@ -357,7 +357,7 @@ FExport* UPackage::GetExport( const char* ExportName )
 {
   // Find the name in this package's name table
   int NameIndex = -1;
-  size_t NameHash = Fnv1aHashString( ExportName );
+  FHash NameHash = FnvHashString( ExportName );
   for ( int i = 0; i < Names->Size() && i < MAX_SIZE; i++ )
   {
     if ( NameHash == (*Names)[i].Hash )
@@ -495,9 +495,9 @@ UPackage* UPackage::StaticLoadPkg( const char* Filepath )
 
 UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjClass, UObject* InOuter )
 {
-  if ( Package == NULL )
+  if ( UNLIKELY( Package == NULL ) )
   {
-    Logf( LOG_CRIT, "StaticLoadObject: NULL argument passed (Pkg=%p | ObjClass=%p)", Package, ObjClass );
+    Logf( LOG_CRIT, "StaticLoadObject: NULL argument passed (ObjClass='%s')", ObjClass->Name );
     return NULL;
   }
   const char* ObjName = Package->ResolveNameFromObjRef( ObjRef );
@@ -514,7 +514,7 @@ UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjC
     if ( LIKELY( ObjClass == NULL ) )
     {
       const char* ClsName = Package->ResolveNameFromIdx( Import->ClassName );
-      size_t ClsNameHash  = Fnv1aHashString( ClsName );
+      FHash ClsNameHash  = FnvHashString( ClsName );
       for ( size_t i = 0; i < UObject::ClassPool.Size() && i != MAX_SIZE; i++ )
       {
         UClass* ClsIter = UObject::ClassPool[i];
@@ -558,7 +558,7 @@ UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjC
       return NULL;
     }
 
-    // Grab it's export too
+    // Then grab it's export
     Export = ObjPkg->GetExport( ObjName );
     if ( UNLIKELY( Export == NULL ) )
     {
@@ -568,6 +568,7 @@ UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjC
   }
   else
   {
+    // Yup, just grab the export
     Export = &(*Package->Exports)[ CalcObjRefValue( ObjRef ) ];
  
     if ( ObjClass == NULL )
@@ -583,6 +584,7 @@ UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjC
     ObjPkg = Package;
   }
 
+  // We are ready to construct and load the object
   UObject* Obj = UObject::StaticConstructObject( ObjName, ObjClass, InOuter );
   if ( Obj == NULL )
     return NULL;

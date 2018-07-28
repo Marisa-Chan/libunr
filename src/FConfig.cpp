@@ -110,7 +110,7 @@ bool FConfig::Load( const char* Filename )
   char CategoryBuf[128];
   char VariableBuf[128];
   char ValueBuf[512];
-  size_t PreviousHash = 0;
+  FHash PreviousHash = {0, 0};
 
   FileStreamIn IniFile;
   if ( !IniFile.Open( Filename ) )
@@ -169,7 +169,7 @@ bool FConfig::Load( const char* Filename )
 
       Category = new FConfigCategory();
       Category->Name = StringDup( CategoryBuf );
-      Category->Hash = Fnv1aHashString( Category->Name );
+      Category->Hash = FnvHashString( Category->Name );
 
       ReadNewLine( IniFile, Filename );
     }
@@ -209,7 +209,7 @@ bool FConfig::Load( const char* Filename )
       
       // Check to see if we should treat this as an array entry
       char*  ValueStr = NULL;
-      size_t VarHash = Fnv1aHashString( VariableBuf );
+      FHash VarHash = FnvHashString( VariableBuf );
       if ( LIKELY( VarHash != PreviousHash ) )
       {
         char* PosLeftBracket = strchr( VariableBuf, '[' );
@@ -328,13 +328,13 @@ bool FConfig::Save()
 
 char* FConfig::ReadString( const char* Category, const char* Variable, size_t Index )
 {
-  size_t CatHash = Fnv1aHashString( Category ); // meow
+  FHash CatHash = FnvHashString( Category ); // meow
   for ( size_t i = 0; i < Categories.Size() && i != MAX_SIZE; i++ )
   {
     FConfigCategory* CatIter = Categories[i];
     if ( CatIter->Hash == CatHash )
     {
-      size_t VarHash = Fnv1aHashString( Variable );
+      FHash VarHash = FnvHashString( Variable );
       for ( size_t j = 0; j < CatIter->Entries->Size(); j++ )
       {
         FConfigEntry* Entry = (*CatIter->Entries)[j];

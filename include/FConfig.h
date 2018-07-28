@@ -88,7 +88,7 @@ private:
     ~FConfigEntry();
 
     char*  Name;
-    size_t Hash;
+    FHash  Hash;
     Array<char*>* Values;
     bool bWriteIndices;
   };
@@ -99,7 +99,7 @@ private:
     ~FConfigCategory();
 
     char*  Name;
-    size_t Hash;
+    FHash  Hash;
     Array<FConfigEntry*>* Entries;
   };
 

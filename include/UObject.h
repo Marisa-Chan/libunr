@@ -170,16 +170,16 @@ enum EObjectFlags
 
 struct FNativePropertyLink
 {
-  size_t Hash;
+  FHash Hash;
   u32 Offset;
 };
 
 struct FNativePropertyList
 {
-  FNativePropertyList( size_t InHash, size_t InNum );
+  FNativePropertyList( FHash InHash, size_t InNum );
   void AddProperty( const char* Name, u32 InOffset );
   
-  size_t Hash;
+  FHash Hash;
   size_t Added;
   size_t Num;
   FNativePropertyLink* Properties;
@@ -252,7 +252,7 @@ public: \
   { \
     if (!StaticNativePropList) \
     { \
-      StaticNativePropList = new FNativePropertyList( Fnv1aHashString( TEXT(cls) ), NumProperties ); \
+      StaticNativePropList = new FNativePropertyList( FnvHashString( TEXT(cls) ), NumProperties ); \
       return (StaticNativePropList != NULL); \
     } \
     return false; \
@@ -356,7 +356,7 @@ class UObject
   static Array<UObject*> ObjectPool;
   static Array<UClass*>  ClassPool;  //FIXME: Use a more effective hash method to access classes
   
-  size_t      Hash;     // Hash of this object
+  FHash       Hash;     // Hash of this object
   const char* Name;     // Name of this object
   int         Index;    // Index of the object in object pool
   int         ExpIdx;   // Index of this object in the export table

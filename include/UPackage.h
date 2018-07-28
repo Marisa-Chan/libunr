@@ -147,9 +147,8 @@ struct FNameEntry
   
   char Data[NAME_LEN];
   int Flags;
-  size_t Hash;
+  FHash Hash;
 };
-
 
 // Decides how packages are maintained during loading and idle states
 enum EPkgLoadOpts
