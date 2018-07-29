@@ -188,6 +188,7 @@ class UClass : public UState
   UObject* Default;
   UObject* (*Constructor)(size_t);
   UClass*  SuperClass;
+  FConfig* ClassConfig;
   bool     NativeNeedsPkgLoad;
 
 private:

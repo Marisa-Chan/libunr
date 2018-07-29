@@ -408,12 +408,12 @@ const char* UPackage::ResolveNameFromObjRef( int ObjRef )
     return GetNameEntry( GetExport( CalcObjRefValue( ObjRef ) )->ObjectName )->Data;
 }
 
-bool UPackage::LoadObject( UObject** Obj, const char* ObjName, FExport* ObjExp )
+bool UPackage::LoadObject( UObject** Obj, const char* ObjName, idx ObjRef )
 {
   if ( Obj == NULL || *Obj == NULL )
     return false;
   
-  FExport* Export = ObjExp;
+  FExport* Export = Pkg->GetExport( CalcObjRefValue( ObjRef ) );
   if ( Export == NULL )
   {
     Export = GetExport( ObjName );
@@ -589,7 +589,9 @@ UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjC
   if ( Obj == NULL )
     return NULL;
 
-  if ( !ObjPkg->LoadObject( &Obj, ObjName, Export ) )
+  // In case of circular dependencies
+  Export->Obj = Obj;
+  if ( !ObjPkg->LoadObject( &Obj, ObjName, ObjRef ) )
     return NULL;
 
   return Obj;

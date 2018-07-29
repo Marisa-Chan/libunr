@@ -153,6 +153,12 @@ bool UObject::IsA( UClass* ClassType )
 {
   for ( UClass* Cls = Class; Cls != NULL; Cls = Cls->SuperClass )
   {
+    if ( UNLIKELY( Cls->StaticClass() != UClass::StaticClass() ) )
+    {
+      Logf( LOG_CRIT, "CLASS SUPERFIELD IS NOT A UCLASS INSTANCE!!!" );
+      // Add some exit thing here
+    }
+
     if ( Cls == ClassType )
       return true;
   }
@@ -245,6 +251,10 @@ void UObject::ReadDefaultProperties( FPackageFileIn& In )
     
       u8 Value = 0;
       In >> Value;
+      
+      if ( UNLIKELY( Prop->Flags & CPF_Config ) )
+        Value = ReadConfigByte( ByteProp );
+
       SetByteProperty( ByteProp, Value, ArrayIdx ); 
     }
     else if ( PropType == PROP_Int )

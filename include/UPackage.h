@@ -188,7 +188,7 @@ class UPackage : public UObject
   const char* ResolveNameFromObjRef( int ObjRef );
   
   // Object reading
-  bool LoadObject( UObject** Obj, const char* ObjName, FExport* Export = NULL );
+  bool LoadObject( UObject** Obj, const char* ObjName, idx ObjRef );
   
   // Accessors 
   String& GetPackageName();

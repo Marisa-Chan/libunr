@@ -449,7 +449,7 @@ UClass::UClass( const char* ClassName, u32 Flags, UClass* InSuperClass, UObject 
 {
   Name = ClassName;
   ClassFlags = Flags;
-  SuperClass = InSuperClass;
+  SuperField = InSuperClass;
   Constructor = NativeCtor;
   NativeNeedsPkgLoad = true;
 }
