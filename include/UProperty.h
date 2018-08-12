@@ -59,7 +59,8 @@ class UProperty : public UField
   
   // Instance variables
   u32 Offset; // Offset into the owner, giving the location of the value
-  
+  UClass* GlobalClass; // When reading globalconfig vars, use this
+
   // Static variables
   static u8 PropertySizes[8];
   
@@ -95,8 +96,6 @@ class UFloatProperty : public UProperty
 class UObjectProperty : public UProperty
 {
   DECLARE_CLASS( UObjectProperty, UProperty, 0, Core )
-  UObject* GetValue( int Idx = 0 );
-  void SetValue( UObject* NewVal, int Idx = 0 );
   virtual void LoadFromPackage( FPackageFileIn& In );
   UClass* ObjectType;
 };
@@ -104,8 +103,6 @@ class UObjectProperty : public UProperty
 class UNameProperty : public UProperty
 {
   DECLARE_CLASS( UNameProperty, UProperty, 0, Core )
-  const char* GetValue( int Idx = 0 );
-  void SetValue( idx NewVal, int Idx = 0 );
   virtual void LoadFromPackage( FPackageFileIn& In );
 };
 
@@ -113,16 +110,12 @@ class UNameProperty : public UProperty
 class UStringProperty : public UProperty
 {
   DECLARE_CLASS( UStringProperty, UProperty, 0, Core )
-  String* GetValue( int Idx = 0 );
-  void SetValue( u8 NewVal, int Idx = 0 );
   virtual void LoadFromPackage( FPackageFileIn& In );
 };
 
 class UClassProperty : public UObjectProperty
 {
   DECLARE_CLASS( UClassProperty, UProperty, 0, Core )
-  UClass* GetValue( int Idx = 0 );
-  void SetValue( UClass* NewVal, int Idx = 0 );
   virtual void LoadFromPackage( FPackageFileIn& In );
   UClass* Class;
 };
@@ -132,22 +125,19 @@ class UArrayProperty : public UProperty
 {
   DECLARE_CLASS( UArrayProperty, UProperty, 0, Core )
   virtual void LoadFromPackage( FPackageFileIn& In );
+  UProperty* Inner;
 };
 
 class UStructProperty : public UProperty
 {
   DECLARE_CLASS( UStructProperty, UProperty, 0, Core )
-  
-  UStruct* GetValue( int Idx = 0 );
-  void SetValue( UStruct* NewVal, int Idx = 0 );
   virtual void LoadFromPackage( FPackageFileIn& In );
+  UStruct* Struct;
 };
 
 class UStrProperty : public UProperty
 {
   DECLARE_CLASS( UStrProperty, UProperty, 0, Core )
-  const char* GetValue( int Idx = 0 );
-  void SetValue( const char* NewVal, int Idx = 0 );
   virtual void LoadFromPackage( FPackageFileIn& In );
   int Length;
 };
@@ -165,6 +155,5 @@ class UFixedArrayProperty : public UProperty
   DECLARE_CLASS( UFixedArrayProperty, UProperty, 0, Core )
   virtual void LoadFromPackage( FPackageFileIn& In );
 };
-
 
 

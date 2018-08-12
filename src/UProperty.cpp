@@ -117,8 +117,68 @@ void UFloatProperty::LoadFromPackage( FPackageFileIn& In )
   Super::LoadFromPackage( In );
 }
 
+void UNameProperty::LoadFromPackage( FPackageFileIn& In )
+{
+  Super::LoadFromPackage( In );
+}
+
+void UStrProperty::LoadFromPackage( FPackageFileIn& In )
+{
+  Super::LoadFromPackage( In );
+}
+
+void UStringProperty::LoadFromPackage( FPackageFileIn& In )
+{
+  Super::LoadFromPackage( In );
+}
+
 void UObjectProperty::LoadFromPackage( FPackageFileIn& In )
 {
   Super::LoadFromPackage( In );
+
+  idx ObjTypeIdx;
+  In >> CINDEX( ObjTypeIdx );
+  ObjectType = (UClass*)UPackage::StaticLoadObject( Pkg, ObjTypeIdx, UClass::StaticClass() );
+}
+
+void UClassProperty::LoadFromPackage( FPackageFileIn& In )
+{
+  Super::LoadFromPackage( In );
+
+  idx ClassIdx;
+  In >> CINDEX( ClassIdx );
+  Class = (UClass*)UPackage::StaticLoadObject( Pkg, ClassIdx, UClass::StaticClass() );
+}
+
+void UStructProperty::LoadFromPackage( FPackageFileIn& In )
+{
+  Super::LoadFromPackage( In );
+
+  idx StructIdx;
+  In >> CINDEX( StructIdx );
+  Struct = (UStruct*)UPackage::StaticLoadObject( Pkg, StructIdx, UStruct::StaticClass() );
+}
+
+void UArrayProperty::LoadFromPackage( FPackageFileIn& In )
+{
+  Super::LoadFromPackage( In );
+
+  idx InnerIdx;
+  In >> CINDEX( InnerIdx );
+  Inner = (UProperty*)UPackage::StaticLoadObject( Pkg, InnerIdx, NULL );
+}
+
+void UFixedArrayProperty::LoadFromPackage( FPackageFileIn& In )
+{
+  Super::LoadFromPackage( In );
+  Logf( LOG_CRIT, "Go pop '%s' in UTPT and see how to load a FixedArrayProperty", Pkg->Name );
+  exit( -1 ); // <- can we not do this
+}
+
+void UMapProperty::LoadFromPackage( FPackageFileIn& In )
+{
+  Super::LoadFromPackage( In );
+  Logf( LOG_CRIT, "Go pop '%s' in UTPT and see how to load a MapProperty", Pkg->Name );
+  exit( -1 ); // <- can we not do this
 }
 
