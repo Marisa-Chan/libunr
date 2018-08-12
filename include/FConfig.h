@@ -109,4 +109,17 @@ private:
 
 extern FConfig* GUnitechConfig; // Used only before loading any game
 extern FConfig* GGameConfig;    // Used after loading a game
-extern FConfig* GUserConfig;    // User specific config
+
+class FConfigManager
+{
+public:
+  FConfigManager();
+  ~FConfigManager();
+
+  FConfig* GetConfig( const char* Name );
+
+private:
+  Array<FConfig*> Configs;
+};
+
+extern FConfigManager* GConfigManager;

@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include "FConfig.h"
 #include "Array.h"
 #include "String.h"
 #include "UObject.h"

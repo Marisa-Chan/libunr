@@ -130,7 +130,7 @@ void UObject::LoadFromPackage( FPackageFileIn& Ar )
   if ( Flags & RF_HasStack )
   {
     // Load stack info
-  }
+ }
   
   if ( !ObjectClass->IsA( UClass::StaticClass() ) )
   {
@@ -163,6 +163,57 @@ bool UObject::IsA( UClass* ClassType )
       return true;
   }
   return false;
+}
+
+void UObject::ReadConfigProperties()
+{
+  for( UField* FieldIter = Field; FieldIter != NULL; FieldIter = FieldIter->Next )
+  {
+    UProperty* Prop = SafeCast<UProperty>( FieldIter );
+    if ( Prop )
+    {
+      FConfig* Cfg;
+      String* Category = new String();
+      if ( Prop->PropertyFlags & CPF_GlobalConfig )
+      {
+        Cfg = Prop->GlobalClass->ClassConfig;
+        *Category += Prop->GlobalClass->Pkg->Name;
+        *Category += ".";
+        *Category += Prop->GlobalClass->Name;
+      }
+      else if ( Prop->PropertyFlags & CPF_Config )
+      {
+        Cfg = Class->ClassConfig;
+        *Category += Pkg->Name;
+        *Category += ".";
+        *Category += Name;
+      }
+      const char* Variable = Prop->Name;
+
+      
+      for( int i = 0; i < Prop->ArrayDim; i++ )
+      {
+        if ( Prop->Class == UByteProperty::StaticClass() )
+          SetByteProperty( (UByteProperty*)Prop, Cfg->ReadUInt8( Category->Data(), Variable, i ), i );
+
+        else if ( Prop->Class == UIntProperty::StaticClass() )
+          SetIntProperty( (UIntProperty*)Prop, Cfg->ReadInt32( Category->Data(), Variable, i ), i );
+
+        else if ( Prop->Class == UBoolProperty::StaticClass() )
+          SetBoolProperty( (UBoolProperty*)Prop, Cfg->ReadBool( Category->Data(), Variable ) );
+
+        else if ( Prop->Class == UFloatProperty::StaticClass() )
+          SetFloatProperty( (UFloatProperty*)Prop, Cfg->ReadFloat( Category->Data(), Variable, i ), i );
+
+        //else if ( Prop->Class == UObjectProperty::StaticClass() )
+        //  SetObjectProperty( (UObjectProperty*)Prop, Cfg->ReadUInt8( Category->Data(), Variable, i ), i );
+        
+        else if ( Prop->Class == UFloatProperty::StaticClass() )
+          SetFloatProperty( (UFloatProperty*)Prop, Cfg->ReadFloat( Category->Data(), Variable, i ), i );
+
+      }
+    }
+  }
 }
 
 static int ReadArrayIndex( FPackageFileIn& In )
@@ -251,10 +302,6 @@ void UObject::ReadDefaultProperties( FPackageFileIn& In )
     
       u8 Value = 0;
       In >> Value;
-      
-      if ( UNLIKELY( Prop->Flags & CPF_Config ) )
-        Value = ReadConfigByte( ByteProp );
-
       SetByteProperty( ByteProp, Value, ArrayIdx ); 
     }
     else if ( PropType == PROP_Int )

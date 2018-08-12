@@ -27,6 +27,7 @@
 #include "UPackage.h"
 #include "UProperty.h"
 #include "UScript.h"
+#include "USystem.h"
 
 UTextBuffer::UTextBuffer()
 {
@@ -508,7 +509,15 @@ void UClass::LoadFromPackage( FPackageFileIn& In )
     
     ClassWithin = (UClass*)UPackage::StaticLoadObject( Pkg, ClassWithinIdx, UClass::StaticClass() );
     ClassConfigName = Pkg->ResolveNameFromIdx( ClassConfigNameIdx );
+
+    FHash CfgHash = FnvHashString( ClassConfigName );
+    if ( CfgHash == FnvHashString( "System" ) )
+      ClassConfig = GGameConfig;
+    else
+      ClassConfig = GConfigManager->GetConfig( ClassConfigName );
   }
+  else
+    ClassConfig = GGameConfig;
   
   // Construct default object
   if ( Constructor == NULL )
@@ -516,6 +525,14 @@ void UClass::LoadFromPackage( FPackageFileIn& In )
 
   Default = CreateObject();
   Default->Class = this;
+
+  // In Unreal, property lists seem to take precedent over config properties
+  // While we should enforce that a config property is never in the property
+  // list when saving packages, we will read the config property first before
+  // overriding it with the property in the list
+  if ( ( ClassFlags & CLASS_Config ) ) 
+    Default->ReadConfigProperties();
+
   Default->ReadDefaultProperties( In );
 }
 

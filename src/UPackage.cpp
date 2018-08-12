@@ -277,19 +277,20 @@ bool UPackage::Load( const char* File )
 {  
   if ( !File )
     return false;
-  
+ 
   Path.Assign( File );
   Path.ReplaceChars( '\\', '/' );
   
   u64 LastDirSlash = Path.FindLastOf( "/" );
-  
+ 
+  String PkgName;
   if (LastDirSlash != MAX_SIZE)
-    Name = Path.Substr( Path.FindLastOf( "/" ) );
+    PkgName = Path.Substr( Path.FindLastOf( "/" ) );
   else
-    Name = Path;
+    PkgName = Path;
   
   
-  Name.Erase( Name.FindLastOf( "." ) );
+  PkgName.Erase( PkgName.FindLastOf( "." ) );
   
   Stream = new FPackageFileIn();
   if ( !Stream->Open( Path ) )
@@ -340,17 +341,26 @@ UPackageHeader* UPackage::GetHeader()
 
 FNameEntry* UPackage::GetNameEntry( size_t Index )
 {
-  return &(*Names)[Index];
+  if ( LIKELY( Index >= 0 ) )
+    return &(*Names)[Index];
+
+  return NULL;
 }
 
 FImport* UPackage::GetImport( size_t Index )
 {
-  return &(*Imports)[Index];
+  if ( LIKELY( Index >= 0 ) )
+    return &(*Imports)[Index];
+  
+  return NULL;
 }
 
 FExport* UPackage::GetExport( size_t Index )
 {
-  return &(*Exports)[Index];
+  if ( LIKELY( Index >= 0 ) )
+    return &(*Exports)[Index];
+
+  return NULL;
 }
 
 FExport* UPackage::GetExport( const char* ExportName )
@@ -390,7 +400,7 @@ const char* UPackage::GetFilePath()
 
 const char* UPackage::GetFileName()
 {
-  return Name.Data();
+  return Name;
 }
 
 const char* UPackage::ResolveNameFromIdx( idx Index )
@@ -412,8 +422,11 @@ bool UPackage::LoadObject( UObject** Obj, const char* ObjName, idx ObjRef )
 {
   if ( Obj == NULL || *Obj == NULL )
     return false;
-  
-  FExport* Export = Pkg->GetExport( CalcObjRefValue( ObjRef ) );
+ 
+  FExport* Export = NULL;
+  if ( ObjRef >= 0 )
+    GetExport( CalcObjRefValue( ObjRef ) );
+
   if ( Export == NULL )
   {
     Export = GetExport( ObjName );
@@ -450,11 +463,6 @@ bool UPackage::LoadObject( UObject** Obj, const char* ObjName, idx ObjRef )
   EndLoad();
   
   return true;
-}
-
-String& UPackage::GetPackageName()
-{
-  return Name;
 }
 
 bool UPackage::StaticInit()
@@ -625,7 +633,7 @@ bool UPackage::StaticLoadPartialClass( const char* PkgName, UClass* NativeClass 
   
   // We already have a constructed class object, so just load it from the package
   UObject* Obj = (UObject*)NativeClass;
-  if ( !Package->LoadObject( &Obj, NativeClass->Name ) )
+  if ( !Package->LoadObject( &Obj, NativeClass->Name, -1 ) )
     return false;
 
   return true;

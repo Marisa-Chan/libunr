@@ -204,9 +204,7 @@ protected:
   bool BeginLoad( FExport* Export );
   void EndLoad();
   
-  String Name;
   String Path;
-  size_t NameHash;
   FileStream* Stream;
   UPackageHeader Header;
   Array<FNameEntry>* Names;

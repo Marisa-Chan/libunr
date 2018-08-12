@@ -37,7 +37,7 @@ class USystem : public USubsystem
  
   const char* ResolvePath( const char* PkgName );
 
-  // Unitech specific
+  // libunr specific
   String* GamePath;
   String* GameName;
 

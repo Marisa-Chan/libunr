@@ -328,6 +328,7 @@ class UObject
   bool IsA( UClass* ClassType );
   u8* LoadScriptCode( FPackageFileIn& In, size_t Size );
   void ReadDefaultProperties( FPackageFileIn& Ar );  
+  void ReadConfigProperties();
 
   // Property getters
   u8       GetByteProperty  ( UByteProperty* Prop, int Idx = 0 );
