@@ -23,6 +23,7 @@
  *========================================================================
 */
 
+#pragma once
 #include "UClass.h"
 
 enum EPropertyType
@@ -117,7 +118,6 @@ class UClassProperty : public UObjectProperty
 {
   DECLARE_CLASS( UClassProperty, UProperty, 0, Core )
   virtual void LoadFromPackage( FPackageFileIn& In );
-  UClass* Class;
 };
 
 // ?

@@ -331,25 +331,25 @@ class UObject
   void ReadConfigProperties();
 
   // Property getters
-  u8       GetByteProperty  ( UByteProperty* Prop, int Idx = 0 );
-  int      GetIntProperty   ( UIntProperty* Prop, int Idx = 0 );
-  bool     GetBoolProperty  ( UBoolProperty* Prop );
-  float    GetFloatProperty ( UFloatProperty* Prop, int Idx = 0 );
-  UObject* GetObjProperty   ( UObjectProperty* Prop, int Idx = 0 );
-  idx      GetNameProperty  ( UNameProperty* Prop, int Idx = 0 );
-  UClass*  GetClassProperty ( UClassProperty* Prop, int Idx = 0 );
-  UStruct* GetStructProperty( UStructProperty* Prop, int Idx = 0 );
-  const char* GetStrProperty( UStrProperty* Prop, int Idx = 0 );
+  inline u8       GetByteProperty  ( UByteProperty* Prop, int Idx = 0 );
+  inline int      GetIntProperty   ( UIntProperty* Prop, int Idx = 0 );
+  inline bool     GetBoolProperty  ( UBoolProperty* Prop );
+  inline float    GetFloatProperty ( UFloatProperty* Prop, int Idx = 0 );
+  inline UObject* GetObjProperty   ( UObjectProperty* Prop, int Idx = 0 );
+  inline idx      GetNameProperty  ( UNameProperty* Prop, int Idx = 0 );
+  inline UClass*  GetClassProperty ( UClassProperty* Prop, int Idx = 0 );
+  inline void*    GetStructProperty( UStruct* Struct, UStructProperty* Prop, int Idx = 0 );
+  inline const char* GetStrProperty( UStrProperty* Prop, int Idx = 0 );
 
   // Property setters
-  void SetByteProperty  ( UByteProperty* Prop, u8 NewVal, int Idx = 0 );
-  void SetIntProperty   ( UIntProperty* Prop, int NewVal, int Idx = 0 );
-  void SetBoolProperty  ( UBoolProperty* Prop, bool NewVal );
+  void SetByteProperty( UByteProperty* Prop, u8 NewVal, int Idx = 0 );
+  void SetIntProperty( UIntProperty* Prop, int NewVal, int Idx = 0 );
+  void SetBoolProperty( UBoolProperty* Prop, bool NewVal );
   void SetFloatProperty ( UFloatProperty* Prop, float NewVal, int Idx = 0 );
   void SetObjProperty   ( UObjectProperty* Prop, UObject* NewVal, int Idx = 0 );
   void SetNameProperty  ( UNameProperty* Prop, idx NewVal, int Idx = 0 );
   void SetClassProperty ( UClassProperty* Prop, UClass* NewVal, int Idx = 0 );
-  void SetStructProperty( UStructProperty* Prop, UStruct* NewVal, int Idx = 0 );
+  //void SetStructProperty( UStructProperty* Prop, UStruct* NewVal, int Idx = 0 );
   void SetStrProperty   ( UStrProperty* Prop, const char* NewVal, int Idx = 0 );
 
   static UObject* StaticConstructObject( const char* InName, UClass* InClass, UObject* InOuter );

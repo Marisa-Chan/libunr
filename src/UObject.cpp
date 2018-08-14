@@ -26,9 +26,11 @@
 //#include "FLogf.h"
 #include "Memory.h"
 #include "UObject.h"
+#include "UObjGetSet.h"
 #include "UClass.h"
 #include "UProperty.h"
 #include "UPackage.h"
+#include "USystem.h"
 
 FNativePropertyList::FNativePropertyList( FHash InHash, size_t InNum )
 {
@@ -205,12 +207,55 @@ void UObject::ReadConfigProperties()
         else if ( Prop->Class == UFloatProperty::StaticClass() )
           SetFloatProperty( (UFloatProperty*)Prop, Cfg->ReadFloat( Category->Data(), Variable, i ), i );
 
-        //else if ( Prop->Class == UObjectProperty::StaticClass() )
-        //  SetObjectProperty( (UObjectProperty*)Prop, Cfg->ReadUInt8( Category->Data(), Variable, i ), i );
-        
-        else if ( Prop->Class == UFloatProperty::StaticClass() )
-          SetFloatProperty( (UFloatProperty*)Prop, Cfg->ReadFloat( Category->Data(), Variable, i ), i );
+        else if ( Prop->Class == UObjectProperty::StaticClass() )
+        {
+          /*UObject* ObjProp = GetObjProperty( (UObjectProperty*)Prop, i );
+          if ( ObjProp == NULL )
+            ObjProp = StaticConstructObject( 
+          SetObjectProperty( (UObjectProperty*)Prop, Cfg->ReadUInt8( Category->Data(), Variable, i ), i );*/
+          Logf( LOG_WARN, "Found an object property, look at the class in ued/utpt and figure out how to handle this" );
+          GSystem->Exit( -1 );
+        }
 
+        else if ( Prop->Class == UClassProperty::StaticClass() )
+        {
+          Logf( LOG_WARN, "Found a class property, look at the class in ued/utpt and figure out how to handle this" );
+          GSystem->Exit( -1 );
+        }
+
+        else if ( Prop->Class == UArrayProperty::StaticClass() )
+        {
+          Logf( LOG_WARN, "Found an array property, look at the class in ued/utpt and figure out how to handle this" );
+          GSystem->Exit( -1 );
+        }
+
+        else if ( Prop->Class == UStructProperty::StaticClass() )
+        {
+          UStructProperty* StructProp = (UStructProperty*)Prop;
+          Cfg->ReadStruct( Category->Data(), Variable, StructProp->Struct, 
+              GetStructProperty( StructProp->Struct, StructProp, i ), i );
+        }
+
+        else if ( Prop->Class == UStrProperty::StaticClass() )
+          SetStrProperty( (UStrProperty*)Prop, Cfg->ReadString( Category->Data(), Variable, i ), i );
+        
+        else if ( Prop->Class == UMapProperty::StaticClass() )
+        {
+          Logf( LOG_WARN, "Found a map property, look at the class in ued/utpt and figure out how to handle this" );
+          GSystem->Exit( -1 );
+        }
+
+        else if ( Prop->Class == UFixedArrayProperty::StaticClass() )
+        {
+          Logf( LOG_WARN, "Found a fixed array property, look at the class in ued/utpt and figure out how to handle this" );
+          GSystem->Exit( -1 );
+        }
+
+        else if ( Prop->Class == UStringProperty::StaticClass() )
+        {
+          Logf( LOG_WARN, "How is this different from UStrProperty?" );
+          GSystem->Exit( -1 );
+        }
       }
     }
   }

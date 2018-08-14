@@ -29,6 +29,7 @@
 
 using namespace xstl;
 class UObject;
+class UStruct;
 
 class FConfig
 {
@@ -59,6 +60,7 @@ public:
   float  ReadFloat ( const char* Category, const char* Variable, size_t Index = 0 );
   double ReadDouble( const char* Category, const char* Variable, size_t Index = 0 );
 
+  void ReadStruct( const char* Category, const char* Variable, UStruct* Struct, void* StructLoc, size_t Index = 0 );
   void ReadObject( const char* Category, const char* Variable, UObject* Obj, size_t Index = 0 );
 
   // Write functions

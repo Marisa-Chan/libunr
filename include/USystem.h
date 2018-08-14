@@ -23,6 +23,7 @@
  *========================================================================
 */
 
+#pragma once
 #include "UObject.h"
 
 class USubsystem : public UObject
@@ -36,6 +37,7 @@ class USystem : public USubsystem
   DECLARE_CLASS( USystem, USubsystem, 0, Core )
  
   const char* ResolvePath( const char* PkgName );
+  void Exit( int ExitCode );
 
   // libunr specific
   String* GamePath;
