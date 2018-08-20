@@ -39,18 +39,19 @@ at an abstract level, but copying and pasting any code from any other project, o
 outside of abstract concepts is strictly forbidden. It is encouraged to think about the engine in terms of inputs and outputs 
 (if I do <X>, what should the result be?)
 
-It is also encouraged to think about how to reimplement the engine component with ideas from other projects that permit the
+It is also encouraged to think about how to reimplement various components with ideas from other projects that permit the
 use of said ideas outside of that project. An example of this is Unreal Engine 4. While their EULA prohibits copying and pasting
 code into other projects, the use of ideas that UE4 implements in other projects (including competing projects) is permitted.
 
-### Compilation ###
+# Compilation #
 
 Linux:
-	cmake .
-	make
+	cmake . && make
 	
 Windows:
 	TBA
 	
-### Licensing ###
+Other platforms will be listed as they become supported
+	
+# Licensing #
 	GNU General Public License v3
