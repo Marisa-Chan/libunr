@@ -326,7 +326,6 @@ class UObject
  
   void SetPkgProperties( UPackage* InPkg, int InExpIdx, int InNameIdx );
   bool IsA( UClass* ClassType );
-  u8* LoadScriptCode( FPackageFileIn& In, size_t Size );
   void ReadDefaultProperties( FPackageFileIn& Ar );  
   void ReadConfigProperties();
 
@@ -340,17 +339,18 @@ class UObject
   inline UClass*  GetClassProperty ( UClassProperty* Prop, int Idx = 0 );
   inline void*    GetStructProperty( UStruct* Struct, UStructProperty* Prop, int Idx = 0 );
   inline const char* GetStrProperty( UStrProperty* Prop, int Idx = 0 );
+  UProperty* FindProperty( const char* PropName );
 
   // Property setters
-  void SetByteProperty( UByteProperty* Prop, u8 NewVal, int Idx = 0 );
-  void SetIntProperty( UIntProperty* Prop, int NewVal, int Idx = 0 );
-  void SetBoolProperty( UBoolProperty* Prop, bool NewVal );
-  void SetFloatProperty ( UFloatProperty* Prop, float NewVal, int Idx = 0 );
-  void SetObjProperty   ( UObjectProperty* Prop, UObject* NewVal, int Idx = 0 );
-  void SetNameProperty  ( UNameProperty* Prop, idx NewVal, int Idx = 0 );
-  void SetClassProperty ( UClassProperty* Prop, UClass* NewVal, int Idx = 0 );
+  void SetByteProperty ( UByteProperty* Prop, u8 NewVal, int Idx = 0 );
+  void SetIntProperty  ( UIntProperty* Prop, int NewVal, int Idx = 0 );
+  void SetBoolProperty ( UBoolProperty* Prop, bool NewVal );
+  void SetFloatProperty( UFloatProperty* Prop, float NewVal, int Idx = 0 );
+  void SetObjProperty  ( UObjectProperty* Prop, UObject* NewVal, int Idx = 0 );
+  void SetNameProperty ( UNameProperty* Prop, idx NewVal, int Idx = 0 );
+  void SetClassProperty( UClassProperty* Prop, UClass* NewVal, int Idx = 0 );
   //void SetStructProperty( UStructProperty* Prop, UStruct* NewVal, int Idx = 0 );
-  void SetStrProperty   ( UStrProperty* Prop, const char* NewVal, int Idx = 0 );
+  void SetStrProperty  ( UStrProperty* Prop, const char* NewVal, int Idx = 0 );
 
   static UObject* StaticConstructObject( const char* InName, UClass* InClass, UObject* InOuter );
 
@@ -376,8 +376,6 @@ class UObject
   int ObjectInternal[6];
 
 protected:
-  UProperty* FindProperty( const char* PropName );
-
   static UClass* StaticAllocateClass( const char* ClassName, u32 Flags, UClass* SuperClass, 
       UObject *(*NativeCtor)(void) );
 

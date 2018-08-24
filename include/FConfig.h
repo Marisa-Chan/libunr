@@ -92,6 +92,7 @@ private:
     char*  Name;
     FHash  Hash;
     Array<char*>* Values;
+    Array<FConfigEntry*>* StructVars;
     bool bWriteIndices;
   };
 

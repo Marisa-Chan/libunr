@@ -28,9 +28,6 @@
 
 static inline bool IsAcceptedChar( char C, const char* Accepted )
 {
-  if ( isalnum( C ) )
-    return true;
-
   size_t Len = strlen( Accepted );
   for ( size_t i = 0; i < Len; i++ )
   {
@@ -191,7 +188,7 @@ bool FConfig::Load( const char* Filename )
         if ( Probe == '=' )
           break;
 
-        if ( !IsAcceptedChar( Probe, "[]" ) )
+        if ( !isalnum( Probe ) && !IsAcceptedChar( Probe, "[]" ) )
         {
           Set( VariableBuf, 0, sizeof( VariableBuf ) );
           break;
@@ -262,10 +259,19 @@ bool FConfig::Load( const char* Filename )
         if ( IsNextCharSeqNewline( IniFile, Filename ) )
           break;
 
-        if ( !IsAcceptedChar( Probe, "[](),." ) )
+        // Check if its valid (or a struct value)
+        if ( !isalnum( Probe ) )
         {
-          Set( ValueBuf, 0, sizeof( ValueBuf ) );
-          break;
+          if ( LIKELY( !IsAcceptedChar( Probe, "[](),.=" ) ) )
+          {
+            // Not valid
+            Set( ValueBuf, 0, sizeof( ValueBuf ) );
+            break;
+          }
+          else
+          {
+            // Struct value, 
+          }
         }
 
         *ValuePtr++ = Probe;
@@ -457,63 +463,11 @@ double FConfig::ReadDouble( const char* Category, const char* Variable, size_t I
   return Value;
 }
 
+void FConfig::ReadStruct( const char* Category, const char* Variable, UStruct* Struct, void* StructLoc, size_t Index )
+{
+}
+
 void FConfig::ReadObject( const char* Category, const char* Variable, UObject* Obj, size_t Index )
 {
-  char* StrVar = ReadString( Category, Variable, Index );
-  if ( LIKELY( StrVar ) )
-  {
-    bool bGotParenthesis = false;
-    bool bGotVariable = false;
-    char* Probe = StrVar;
-    while ( *Probe )
-    {
-      char C = *Probe;
-      if ( C == '(' )
-      {
-        if ( LIKELY( !bGotParenthesis ) )
-        {
-          bGotParenthesis = true;
-        }
-        else
-        {
-          Logf( LOG_WARN, "Got unexpected left parenthesis in object config variable '%s.%s'", 
-              Category, Variable );
-          break;
-        }
-      }
-      else if ( UNLIKELY( !bGotParenthesis ) )
-      {
-        Logf( LOG_WARN, "Missing expected left parentheis in object config variable '%s.%s'",
-            Category, Variable );
-        break;
-      }
-      else
-      {
-        if ( UNLIKELY( C == ')' ) )
-        {
-          if ( UNLIKELY( !bGotVariable ) )
-            Logf( LOG_WARN, "Got unexpected right parenthesis in object config variable '%s.%s'",
-                Category, Variable );
-          break;
-        }
-
-        else if ( C == '=' )
-        {
-          if ( UNLIKELY( !bGotVariable ) )
-          {
-            Logf( LOG_WARN, "Got unexpected equals sign in object config variable '%s.%s'",
-                Category, Variable );
-            break;
-          }
-
-          bGotVariable = true;
-        }
-      }
-
-      Probe++;
-    }
-
-    Free( StrVar );
-  }
 }
 
