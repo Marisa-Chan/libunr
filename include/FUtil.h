@@ -57,6 +57,7 @@
   
 #endif
 
+// TODO: make type 'idx' cast automatically to FCompactIndex
 typedef i32 idx;
 
 // Package version defs

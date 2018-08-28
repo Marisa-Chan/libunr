@@ -19,6 +19,7 @@ set (SOURCES ${LIBUNR_SRC}/FConfig.cpp
              ${LIBUNR_SRC}/UProperty.cpp
              ${LIBUNR_SRC}/UTexture.cpp
              ${LIBUNR_SRC}/UStaticClassInit.cpp
+             ${LIBUNR_SRC}/USystem.cpp
 )
 
 include_directories (${LIBUNR_INC} ${XSTL_INC} /usr/include)

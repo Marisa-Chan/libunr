@@ -35,13 +35,16 @@ class USubsystem : public UObject
 class USystem : public USubsystem
 {
   DECLARE_CLASS( USystem, USubsystem, 0, Core )
- 
+  USystem();
+
   const char* ResolvePath( const char* PkgName );
   void Exit( int ExitCode );
 
+  static bool StaticInit();
+
   // libunr specific
-  String* GamePath;
-  String* GameName;
+  const char* GamePath;
+  const char* GameName;
 
   // Per game
   int PurgeCacheDays;
@@ -52,3 +55,4 @@ class USystem : public USubsystem
 };
 
 extern USystem* GSystem;
+

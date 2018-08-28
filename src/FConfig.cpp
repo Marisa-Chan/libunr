@@ -346,6 +346,9 @@ char* FConfig::ReadString( const char* Category, const char* Variable, size_t In
         FConfigEntry* Entry = (*CatIter->Entries)[j];
         if ( Entry->Hash == VarHash )
         {
+          if ( UNLIKELY( Index >= Entry->Values->Size() ) )
+            return NULL;
+
           char* Value = (*Entry->Values)[Index];
           return StringDup( Value );
         }
