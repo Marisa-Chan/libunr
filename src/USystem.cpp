@@ -23,6 +23,7 @@
  *========================================================================
 */
 
+#include "FConfig.h"
 #include "USystem.h"
 
 #if defined LIBUNR_LINUX || LIBUNR_BSD
@@ -47,7 +48,23 @@ USystem::USystem()
 
 const char* USystem::ResolvePath( const char* PkgName )
 {
+  const char* GoodPath = NULL;
+  for ( int i = 0; i < Paths.Size(); i++ )
+  {
+    String* PathIter = Paths[i]; 
+    size_t Asterisk = PathIter->FindFirstOf( '*' );
+    String RealPath = PathIter->Substr( 0, Asterisk );
+    RealPath += PkgName;
+    RealPath += PathIter->Substr( Asterisk + 1 );
 
+    if ( access( RealPath.Data(), F_OK ) )
+    {
+      GoodPath = StringDup( RealPath.Data() );
+      break;
+    }
+  }
+
+  return NULL;
 }
 
 void USystem::Exit( int ExitCode )
@@ -67,34 +84,28 @@ bool USystem::StaticInit()
     return false;
   }
 
-  const char* Path = GLibunrConfig->ReadString( "Game", "Path" );
-  const char* Name = GLibunrConfig->ReadString( "Game", "Name" );
-
-  GSystem->GamePath = new String( Path );
-  GSystem->GameName = new String( Name );
-
-  xstl::Free( Path );
-  xstl::Free( Name );
+  GSystem->GamePath = GLibunrConfig->ReadString( "Game", "Path" );
+  GSystem->GameName = GLibunrConfig->ReadString( "Game", "Name" );
 
   // Now read the game ini
   // TODO: Use platform correct slashes for paths
-  FString GameCfgPath = *GSystem->GamePath;
+  String GameCfgPath( GSystem->GamePath );
   GameCfgPath += "System";
   GameCfgPath += *GSystem->GameName;
   GameCfgPath += ".ini";
 
   GGameConfig = new FConfig();
-  if ( !GGameConfig->Load( GameCfgPath ) )
+  if ( !GGameConfig->Load( GameCfgPath.Data() ) )
   {
     Logf( LOG_CRIT, "Can't open or create '%s.ini'", GSystem->GameName );
     return false;
   }
   
-  const char* SavePath  = GGameConfig->ReadString( "Core.System", "SavePath" );
-  const char* CachePath = GGameConfig->ReadString( "Core.System", "CachePath" );
-  const char* CacheExt  = GGameConfig->ReadString( "Core.System", "CacheExt" );
+  char* SavePath  = GGameConfig->ReadString( "Core.System", "SavePath" );
+  char* CachePath = GGameConfig->ReadString( "Core.System", "CachePath" );
+  char* CacheExt  = GGameConfig->ReadString( "Core.System", "CacheExt" );
 
-  GSystem->PurgeCacheDays = GGameConfig->ReadInt( "Core.System", "PurgeCacheDays" );
+  GSystem->PurgeCacheDays = GGameConfig->ReadInt32( "Core.System", "PurgeCacheDays" );
   GSystem->SavePath  = new String( ( SavePath != NULL ) ? SavePath : "" );
   GSystem->CachePath = new String( ( CachePath != NULL ) ? CachePath : "" );
   GSystem->CacheExt  = new String( ( CacheExt != NULL ) ? CacheExt : "" );
@@ -103,7 +114,7 @@ bool USystem::StaticInit()
   xstl::Free( CachePath );
   xstl::Free( CacheExt );
 
-  const char* PkgPath = NULL;
+  char* PkgPath = NULL;
   int i = 0;
   while( 1 )
   {
@@ -112,7 +123,7 @@ bool USystem::StaticInit()
       break;
 
     String* PkgPathString = new String( PkgPath );
-    GSystem->Paths->PushBack( PkgPathString );
+    GSystem->Paths.PushBack( PkgPathString );
     xstl::Free( PkgPath );
   }
 
