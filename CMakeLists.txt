@@ -9,6 +9,14 @@ set (LIBUNR_SRC ${LIBUNR_ROOT}/src)
 set (XSTL_ROOT  ${LIBUNR_ROOT}/../xstl)
 set (XSTL_INC   ${XSTL_ROOT}/include)
 
+option( WindowsBuild "WindowsBuild" OFF )
+
+if ( WindowsBuild )
+  add_definitions("-DLIBUNR_WIN32")
+else()
+  add_definitions("-DLIBUNR_LINUX")
+endif()
+
 set (SOURCES ${LIBUNR_SRC}/FConfig.cpp
 						 ${LIBUNR_SRC}/FUtil.cpp
              ${LIBUNR_SRC}/UClass.cpp
@@ -27,6 +35,6 @@ add_definitions("-std=c++11" "-DXSTL_USE_STL")
 add_definitions ("-Wno-attributes" "-g")
 set_source_files_properties( tags PROPERTIES GENERATED true )
 add_custom_target( tags COMMAND ctags --c++-kinds=+p --fields=+iaS --extra=+q
-	--language-force=C++ --recurse=yes . WORKING_DIRECTORY ${LIBUNR_ROOT} )
+ --language-force=C++ --recurse=yes . WORKING_DIRECTORY ${LIBUNR_ROOT} )
 add_library( libunr SHARED ${SOURCES} tags )
 set_target_properties (libunr PROPERTIES PREFIX "")

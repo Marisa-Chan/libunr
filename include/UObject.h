@@ -393,5 +393,4 @@ template <class T> T* SafeCast( UObject* Obj )
   return (T*)Obj;
 }
 
-
 #endif
