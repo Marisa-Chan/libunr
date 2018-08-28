@@ -25,6 +25,7 @@
 
 #include "FConfig.h"
 #include "USystem.h"
+#include "UPackage.h"
 
 #if defined LIBUNR_LINUX || LIBUNR_BSD
   #define LIBUNR_INI_PATH "~/.config/libunr/libunr.ini"
@@ -69,7 +70,19 @@ const char* USystem::ResolvePath( const char* PkgName )
 
 void USystem::Exit( int ExitCode )
 {
+  // We do not want to save any bad info to any configs, just close them
+  GConfigManager->CloseConfigs();
 
+  // TODO: Kill viewports and free resources they use
+  // TODO: We should reeeeally free object memory too
+
+  // Close down all subsystems
+  UPackage::StaticExit( true );
+
+  // TODO: Print some kind of message box showing an error
+
+  // Exit
+  exit( ExitCode );
 }
 
 bool USystem::StaticInit()

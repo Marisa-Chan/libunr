@@ -119,7 +119,11 @@ public:
   FConfigManager();
   ~FConfigManager();
 
+  void AddConfig( FConfig* Cfg );
   FConfig* GetConfig( const char* Name );
+  void DelConfig( FConfig* Cfg );
+  void SaveAndCloseConfigs();
+  void CloseConfigs();
 
 private:
   Array<FConfig*> Configs;

@@ -194,6 +194,7 @@ class UPackage : public UObject
   String& GetPackageName();
   
   static bool StaticInit();
+  static void StaticExit( bool bCrashExit = false );
   static int CalcObjRefValue( int ObjRef );
   static UPackage* StaticLoadPkg( const char* Filepath );
   static UObject* StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass = NULL, UObject* InOuter = NULL );
