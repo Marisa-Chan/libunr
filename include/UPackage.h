@@ -176,6 +176,8 @@ class UPackage : public UObject
   FImport*        GetImport( size_t Index );
   FExport*        GetExport( size_t Index );
   FExport*        GetExport( const char* ExportName );
+  Array<FExport>* GetExportTable();
+  Array<FImport>* GetImportTable();
   const char*     GetName();
   const char*     GetFilePath();
   const char*     GetFileName();

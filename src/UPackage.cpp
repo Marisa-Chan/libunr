@@ -393,6 +393,16 @@ FExport* UPackage::GetExport( const char* ExportName )
   return Export;
 }
 
+Array<FExport>* UPackage::GetExportTable()
+{
+  return Exports;
+}
+
+Array<FImport>* UPackage::GetImportTable()
+{
+  return Imports;
+}
+
 const char* UPackage::GetFilePath()
 {
   return Path.Data();
