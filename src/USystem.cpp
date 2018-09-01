@@ -93,7 +93,7 @@ bool USystem::StaticInit()
   GLibunrConfig = new FConfig();
   if ( !GLibunrConfig->Load( LIBUNR_INI_PATH ) )
   {
-    Logf( LOG_CRIT, "Can't open or create 'libunr.ini'" );
+    Logf( LOG_CRIT, "Can't open or create '" LIBUNR_INI_PATH "'" );
     return false;
   }
 

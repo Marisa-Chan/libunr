@@ -474,3 +474,70 @@ void FConfig::ReadObject( const char* Category, const char* Variable, UObject* O
 {
 }
 
+const char* FConfig::GetName()
+{
+  return Name;
+}
+
+FConfigManager::FConfigManager()
+{
+}
+
+FConfigManager::~FConfigManager()
+{
+}
+
+void FConfigManager::AddConfig( FConfig* Cfg )
+{
+  Configs.PushBack( Cfg );
+}
+
+FConfig* FConfigManager::GetConfig( const char* Name )
+{
+  size_t NameLen = strlen( Name );
+  for ( int i = 0; i < Configs.Size(); i++ )
+  {
+    if ( strnicmp( Name, Configs[i]->GetName(), NameLen ) == 0 )
+      return Configs[i];
+  }
+
+  return NULL;
+}
+
+void FConfigManager::DelConfig( FConfig* Cfg )
+{
+  for ( int i = 0; i < Configs.Size(); i++ )
+  {
+    if ( Configs[i] == Cfg )
+    {
+      delete Cfg;
+      Configs.Data()[i] = NULL;
+
+      // TODO: See ArrayBase.h and use here
+    }
+  }
+}
+
+void FConfigManager::SaveAndCloseConfigs()
+{
+  for ( int i = 0; i < Configs.Size(); i++ )
+  {
+    if ( !Configs[i]->Save() )
+      Logf( LOG_WARN, "Failed to save config file '%s'", Configs[i]->GetName() );
+    
+    delete Configs[i];
+  }
+
+  Configs.Clear();
+  Configs.Reclaim();
+}
+
+void FConfigManager::CloseConfigs()
+{
+  for ( int i = 0; i < Configs.Size(); i++ )
+    delete Configs[i];
+
+  Configs.Clear();
+  Configs.Reclaim();
+}
+

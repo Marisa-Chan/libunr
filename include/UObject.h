@@ -342,15 +342,15 @@ class UObject
   UProperty* FindProperty( const char* PropName );
 
   // Property setters
-  void SetByteProperty ( UByteProperty* Prop, u8 NewVal, int Idx = 0 );
-  void SetIntProperty  ( UIntProperty* Prop, int NewVal, int Idx = 0 );
-  void SetBoolProperty ( UBoolProperty* Prop, bool NewVal );
-  void SetFloatProperty( UFloatProperty* Prop, float NewVal, int Idx = 0 );
-  void SetObjProperty  ( UObjectProperty* Prop, UObject* NewVal, int Idx = 0 );
-  void SetNameProperty ( UNameProperty* Prop, idx NewVal, int Idx = 0 );
-  void SetClassProperty( UClassProperty* Prop, UClass* NewVal, int Idx = 0 );
+  inline void SetByteProperty ( UByteProperty* Prop, u8 NewVal, int Idx = 0 );
+  inline void SetIntProperty  ( UIntProperty* Prop, int NewVal, int Idx = 0 );
+  inline void SetBoolProperty ( UBoolProperty* Prop, bool NewVal );
+  inline void SetFloatProperty( UFloatProperty* Prop, float NewVal, int Idx = 0 );
+  inline void SetObjProperty  ( UObjectProperty* Prop, UObject* NewVal, int Idx = 0 );
+  inline void SetNameProperty ( UNameProperty* Prop, idx NewVal, int Idx = 0 );
+  inline void SetClassProperty( UClassProperty* Prop, UClass* NewVal, int Idx = 0 );
   //void SetStructProperty( UStructProperty* Prop, UStruct* NewVal, int Idx = 0 );
-  void SetStrProperty  ( UStrProperty* Prop, const char* NewVal, int Idx = 0 );
+  inline void SetStrProperty  ( UStrProperty* Prop, const char* NewVal, int Idx = 0 );
 
   static UObject* StaticConstructObject( const char* InName, UClass* InClass, UObject* InOuter );
 

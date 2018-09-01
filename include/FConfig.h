@@ -83,6 +83,9 @@ public:
 
   void WriteObject( const char* Category, const char* Variable, UObject* Obj, size_t Index = 0 );
 
+  // Accessors
+  const char* GetName();
+
 private:
   struct FConfigEntry
   {

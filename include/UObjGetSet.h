@@ -64,6 +64,7 @@ inline float UObject::GetFloatProperty( UFloatProperty* Prop, int Idx )
   return *GetFloatPropAddr( this, Prop, Idx );
 }
 
+// TODO: Need some better checking here
 inline UObject* UObject::GetObjProperty( UObjectProperty* Prop, int Idx )
 {
   UObject* Out = *GetObjPropAddr( this, Prop, Idx );
@@ -73,6 +74,7 @@ inline UObject* UObject::GetObjProperty( UObjectProperty* Prop, int Idx )
     Logf( LOG_CRIT, "OBJECT PROPERTY DOES NOT POINT TO AN OBJECT!!!" );
     GSystem->Exit( -1 );
   }
+  return Out;
 }
 
 inline idx UObject::GetNameProperty( UNameProperty* Prop, int Idx )
@@ -89,17 +91,72 @@ inline UClass* UObject::GetClassProperty( UClassProperty* Prop, int Idx )
     Logf( LOG_CRIT, "CLASS PROPERTY DOES NOT POINT TO A CLASS!!!" );
     GSystem->Exit( -1 );
   }
+  return Out;
 }
 
-void* UObject::GetStructProperty( UStruct* Struct, UStructProperty* Prop, int Idx )
+inline void* UObject::GetStructProperty( UStruct* Struct, UStructProperty* Prop, int Idx )
 {
   // this one just returns the pointer to where a struct would begin, you still need the struct
   // definition to access anything meaningful here
   return (void*)( (u8*)this + Prop->Offset + ( Idx * Struct->StructSize ) );
 }
 
-const char* UObject::GetStrProperty( UStrProperty* Prop, int Idx )
+inline const char* UObject::GetStrProperty( UStrProperty* Prop, int Idx )
 {
   return *GetStrPropAddr( this, Prop, Idx );
 }
 
+inline void UObject::SetByteProperty( UByteProperty* Prop, u8 NewVal, int Idx )
+{
+  *GetBytePropAddr( this, Prop, Idx ) = NewVal;
+}
+
+inline void UObject::SetIntProperty( UIntProperty* Prop, int NewVal, int Idx )
+{
+  *GetIntPropAddr( this, Prop, Idx ) = NewVal;
+}
+
+inline void UObject::SetBoolProperty( UBoolProperty* Prop, bool NewVal )
+{
+  *GetBoolPropAddr( this, Prop, 0 ) = NewVal;
+}
+
+inline void UObject::SetFloatProperty( UFloatProperty* Prop, float NewVal, int Idx )
+{
+  *GetFloatPropAddr( this, Prop, Idx ) = NewVal;
+}
+
+// TODO: Need some better checking here
+inline void UObject::SetObjProperty( UObjectProperty* Prop, UObject* NewVal, int Idx )
+{
+  UObject** Out = GetObjPropAddr( this, Prop, Idx );
+  if ( !(*Out)->IsA( UObject::StaticClass() ) )
+  {
+    // Maybe make a config way for this check to be optional? Could get very slow
+    Logf( LOG_CRIT, "OBJECT PROPERTY DOES NOT POINT TO AN OBJECT!!!" );
+    GSystem->Exit( -1 );
+  }
+  *Out = NewVal;
+}
+
+inline void UObject::SetNameProperty( UNameProperty* Prop, idx NewVal, int Idx )
+{
+  *GetNamePropAddr( this, Prop, Idx ) = NewVal;
+}
+
+inline void UObject::SetClassProperty( UClassProperty* Prop, UClass* NewVal, int Idx )
+{
+  UClass** Out = GetClassPropAddr( this, Prop, Idx );
+  if ( !(*Out)->IsA( UClass::StaticClass() ) )
+  {
+    // Maybe make a config way for this check to be optional? Could get very slow
+    Logf( LOG_CRIT, "OBJECT PROPERTY DOES NOT POINT TO AN OBJECT!!!" );
+    GSystem->Exit( -1 );
+  }
+  *Out = NewVal;
+}
+
+inline void UObject::SetStrProperty( UStrProperty* Prop, const char* NewVal, int Idx )
+{
+  *GetStrPropAddr( this, Prop, Idx ) = NewVal;
+}
