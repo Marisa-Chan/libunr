@@ -322,8 +322,9 @@ class UObject
   
   virtual void LoadFromPackage( FPackageFileIn& In );
   virtual bool ExportToFile();
-  virtual void LinkNativeProperties();
- 
+  virtual void AddRef();
+  virtual void DelRef();
+
   void SetPkgProperties( UPackage* InPkg, int InExpIdx, int InNameIdx );
   bool IsA( UClass* ClassType );
   void ReadDefaultProperties( FPackageFileIn& Ar );  
@@ -364,10 +365,10 @@ class UObject
   int         NameIdx;  // Index of this object's name in the package's name table
   UObject*    Next;     // The next object in the list
   UPackage*   Pkg;      // Package this object was loaded from
-  int         RefCnt;   // Number of references this object has (-1 = object must be explicitly purged)
   UObject*    Outer;    // Object that this object resides in
   u32         Flags;    // Object flags
   UClass*     Class;    // Class of this object
+  UField*     Field;
 
   // I think this was originally here to "hide" sensitive info for objects.
   // This was due to the fact that C++ property offsets *HAVE* to match up
@@ -379,9 +380,7 @@ protected:
   static UClass* StaticAllocateClass( const char* ClassName, u32 Flags, UClass* SuperClass, 
       UObject *(*NativeCtor)(void) );
 
-  // UStruct kind of already has something like this
-  // This will always point to it's classes Children list 
-  UField* Field;
+  int RefCnt;
 };
 
 bool InitNativeClasses(void);

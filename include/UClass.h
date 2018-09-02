@@ -46,9 +46,10 @@ class UTextBuffer : public UObject
 class UField : public UObject
 {
   DECLARE_ABSTRACT_CLASS( UField, UObject, 0, Core )
-  
+ 
+  UField();
   virtual void LoadFromPackage( FPackageFileIn& In );
-  
+
   UField* SuperField; // Parent object
   UField* Next;       // Next object in list
 };
@@ -59,7 +60,7 @@ class UConst : public UField
 
   UConst();
   virtual void LoadFromPackage( FPackageFileIn& In );
-  
+
   String* Value;
 };
 
@@ -69,7 +70,7 @@ class UEnum : public UField
   
   UEnum();
   virtual void LoadFromPackage( FPackageFileIn& In );
-  
+
   Array<const char*> Names;
 };
 
@@ -86,7 +87,7 @@ class UStruct : public UField
   UStruct();
   UStruct( size_t InNativeSize );
   virtual void LoadFromPackage( FPackageFileIn& In );
- 
+
   UTextBuffer* ScriptText;
   UField* Children;
   const char* FriendlyName;
@@ -147,9 +148,10 @@ class UFunction : public UStruct
 class UState : public UStruct
 {
   DECLARE_CLASS( UState, UStruct, 0, Core )
-  
+
+  UState();
   virtual void LoadFromPackage( FPackageFileIn& In );
-  
+ 
   u64 ProbeMask;
   u64 IgnoreMask;
   u16 LabelTableOffset;
@@ -173,7 +175,7 @@ class UClass : public UState
   UClass( const char* ClassName, u32 Flags, UClass* SuperClass, UObject *(*NativeCtor)(size_t) );
   
   virtual void LoadFromPackage( FPackageFileIn& In );
-  
+
   bool IsNative();
   UObject* CreateObject();
 

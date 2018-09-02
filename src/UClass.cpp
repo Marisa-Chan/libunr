@@ -30,6 +30,7 @@
 #include "USystem.h"
 
 UTextBuffer::UTextBuffer()
+  : UObject()
 {
   Text = NULL;
 }
@@ -58,10 +59,17 @@ void UTextBuffer::LoadFromPackage( FPackageFileIn& In )
 }
 
 // UField
+UField::UField()
+  : UObject()
+{
+  SuperField = NULL;
+  Next = NULL;
+}
+
 UField::~UField()
 {
-  SuperField->RefCnt--;
-  Next->RefCnt--;
+  SuperField->DelRef();
+  Next->DelRef();
 }
 
 void UField::LoadFromPackage( FPackageFileIn& In )
@@ -82,6 +90,7 @@ void UField::LoadFromPackage( FPackageFileIn& In )
 }
 
 UConst::UConst()
+  : UField()
 {
   Value = NULL;
 }
@@ -107,6 +116,7 @@ void UConst::LoadFromPackage( FPackageFileIn& In )
 }
 
 UEnum::UEnum()
+  : UField()
 {
 }
 
@@ -132,6 +142,7 @@ void UEnum::LoadFromPackage( FPackageFileIn& In )
 }
 
 UStruct::UStruct()
+  : UField()
 {
   ScriptText = NULL;
   Children   = NULL;
@@ -145,6 +156,7 @@ UStruct::UStruct()
 }
 
 UStruct::UStruct( size_t InNativeSize )
+  : UField()
 {
   ScriptText = NULL;
   Children   = NULL;
@@ -160,6 +172,8 @@ UStruct::UStruct( size_t InNativeSize )
 // UStruct
 UStruct::~UStruct()
 {
+  ScriptText->DelRef();
+  Children->DelRef();
 }
 
 // Script loading
@@ -400,6 +414,18 @@ void UStruct::LoadFromPackage( FPackageFileIn& In )
 }
 
 UFunction::UFunction()
+  : UStruct()
+{
+  ParmsSize = 0;
+  iNative = 0;
+  NumParms = 0;
+  OperatorPrecedence = 0;
+  ReturnValueOffset = 0;
+  FunctionFlags = 0;
+  ReplicationOffset = 0;
+}
+
+UFunction::~UFunction()
 {
 }
 
@@ -426,6 +452,11 @@ void UFunction::LoadFromPackage( FPackageFileIn& In )
 }
 
 // UState
+UState::UState()
+  : UStruct()
+{
+}
+
 UState::~UState()
 {
 }
@@ -457,8 +488,8 @@ UClass::UClass( const char* ClassName, u32 Flags, UClass* InSuperClass, UObject 
 
 UClass::~UClass()
 {
-  Default->RefCnt--;
-  delete Default;
+  SuperClass->DelRef();
+  Default->DelRef();
 }
 
 void UClass::LoadFromPackage( FPackageFileIn& In )
@@ -523,8 +554,27 @@ void UClass::LoadFromPackage( FPackageFileIn& In )
   if ( Constructor == NULL )
     Constructor = SuperClass->Constructor;
 
+  SuperClass = SafeCast<UClass>( SuperField );
+  if ( SuperClass == NULL )
+  {
+    Logf( LOG_CRIT, "SUPERFIELD OF CLASS IS NOT A CLASS!!!" );
+    GSystem->Exit( -1 );
+  }
+  SuperClass->AddRef();
+  
+  // Get last child
+  UField* Iter;
+  if ( Children != NULL )
+    for ( Iter = Children; Iter->Next != NULL; Iter = Iter->Next );
+  Iter->Next = SuperClass->Children;
+  SuperClass->Children->AddRef();
+
   Default = CreateObject();
   Default->Class = this;
+  Default->Field = Children;
+
+  AddRef();
+  Children->AddRef();
 
   // In Unreal, property lists seem to take precedent over config properties
   // While we should enforce that a config property is never in the property

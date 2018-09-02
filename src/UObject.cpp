@@ -78,6 +78,7 @@ UObject* UObject::StaticConstructObject( const char* InName, UClass* InClass, UO
   Out->Outer = InOuter;
   Out->Flags = 0;
   Out->Class = InClass;
+  Out->Field = InClass->Default->Field;
 
   // Add to object
   ObjectPool.PushBack( Out );
@@ -132,7 +133,7 @@ void UObject::LoadFromPackage( FPackageFileIn& Ar )
   if ( Flags & RF_HasStack )
   {
     // Load stack info
- }
+  }
   
   if ( !ObjectClass->IsA( UClass::StaticClass() ) )
   {
@@ -141,6 +142,24 @@ void UObject::LoadFromPackage( FPackageFileIn& Ar )
   }
   
   return;
+}
+
+void UObject::AddRef()
+{
+  RefCnt++;
+}
+
+void UObject::DelRef()
+{
+  if ( UNLIKELY( RefCnt == 0 ) )
+  {
+    Logf( LOG_WARN, "Reference count decrement on irrelevant object '%s'", Name );
+    return;
+  }
+
+  RefCnt--;
+  if ( RefCnt == 0 && GSystem->bLogRefCntZero )
+    Logf( LOG_INFO, "Reference count is zero for '%s'", Name );
 }
 
 void UObject::SetPkgProperties( UPackage* InPkg, int InExpIdx, int InNameIdx )
@@ -410,3 +429,10 @@ void UObject::ReadConfigProperties()
     }
   }
 }
+
+UProperty* UObject::FindProperty( const char* PropName )
+{
+  FHash PropHash = FnvHashString( PropName );
+
+}
+

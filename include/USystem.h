@@ -45,6 +45,7 @@ class USystem : public USubsystem
   // libunr specific
   const char* GamePath;
   const char* GameName;
+  bool bLogRefCntZero;
 
   // Per game
   int PurgeCacheDays;
