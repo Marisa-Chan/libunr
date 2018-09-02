@@ -32,10 +32,11 @@
 
 #define INIT_CLASS(cls) cls::StaticInitializeClass();
 
-bool InitNativeClasses()
+bool UObject::StaticInit()
 {
   bool Result = true;
   Result &= UObject::StaticClassInit();
+    Result &= UTextBuffer::StaticClassInit();
     Result &= UField::StaticClassInit();
       Result &= UConst::StaticClassInit();
       Result &= UEnum::StaticClassInit();
@@ -65,6 +66,7 @@ bool InitNativeClasses()
 }
 
 IMPLEMENT_CLASS( UObject );
+  IMPLEMENT_CLASS( UTextBuffer );
   IMPLEMENT_CLASS( UField );
     IMPLEMENT_CLASS( UConst );
     IMPLEMENT_CLASS( UEnum );

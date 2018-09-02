@@ -353,6 +353,8 @@ class UObject
   //void SetStructProperty( UStructProperty* Prop, UStruct* NewVal, int Idx = 0 );
   inline void SetStrProperty  ( UStrProperty* Prop, const char* NewVal, int Idx = 0 );
 
+  static bool StaticInit();
+  static bool StaticExit();
   static UObject* StaticConstructObject( const char* InName, UClass* InClass, UObject* InOuter );
 
   static Array<UObject*> ObjectPool;
@@ -383,7 +385,6 @@ protected:
   int RefCnt;
 };
 
-bool InitNativeClasses(void);
 template <class T> T* SafeCast( UObject* Obj )
 {
   if ( !Obj->IsA( T::StaticClass() ) )
