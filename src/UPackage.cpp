@@ -511,6 +511,18 @@ UPackage* UPackage::StaticLoadPkg( const char* Filepath )
   return Pkg;
 }
 
+UObject* UPackage::StaticLoadObject( UPackage* Package, const char* ObjName, UClass* ObjClass, UObject* InOuter )
+{
+  FExport* Export = Package->GetExport( ObjName );
+  if ( UNLIKELY( Export == NULL ) )
+  {
+     Logf( LOG_CRIT, "Can't load object '%s.%s', object does not exist", Package->Name, ObjName );
+     return NULL;
+  }
+
+  return UPackage::StaticLoadObject( Package, Export->Index, ObjClass, InOuter );
+}
+
 UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjClass, UObject* InOuter )
 {
   if ( UNLIKELY( Package == NULL ) )
