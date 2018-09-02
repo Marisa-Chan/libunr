@@ -433,6 +433,12 @@ void UObject::ReadConfigProperties()
 UProperty* UObject::FindProperty( const char* PropName )
 {
   FHash PropHash = FnvHashString( PropName );
+  for ( UField* Iter = Field; Iter != NULL; Iter = Iter->Next )
+  {
+    if ( Iter->IsA( UProperty::StaticClass() ) && Iter->Hash == PropHash )
+      return (UProperty*)Iter;
+  }
 
+  return NULL;
 }
 
