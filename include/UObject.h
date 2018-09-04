@@ -370,7 +370,7 @@ class UObject
   UObject*    Outer;    // Object that this object resides in
   u32         Flags;    // Object flags
   UClass*     Class;    // Class of this object
-  UField*     Field;
+  UField*     Field;    // All fields relevant to this object (points to Class->Children)
 
   // I think this was originally here to "hide" sensitive info for objects.
   // This was due to the fact that C++ property offsets *HAVE* to match up
