@@ -23,6 +23,8 @@
  *========================================================================
 */
 
+#pragma once
+
 #include "FUtil.h"
 #include "Array.h"
 #include "FileStream.h"

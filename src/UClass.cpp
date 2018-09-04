@@ -471,13 +471,23 @@ void UState::LoadFromPackage( FPackageFileIn& In )
   In >> StateFlags;
 }
 
+// FDependency
+FDependency::FDependency()
+{
+  Class = NULL;
+  Deep = 0;
+  ScriptTextCRC = 0;
+}
+
 // UClass
 UClass::UClass()
+  : UState()
 {
   
 }
 
 UClass::UClass( const char* ClassName, u32 Flags, UClass* InSuperClass, UObject *(*NativeCtor)(size_t) )
+  : UState()
 {
   Name = ClassName;
   ClassFlags = Flags;

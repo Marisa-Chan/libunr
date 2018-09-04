@@ -229,9 +229,13 @@ public: \
   } \
   void* operator new( size_t sz, size_t ObjSize ) \
   { \
-    void* Mem = Malloc( ObjSize ); \
-    Set( Mem, 0, ObjSize ); \
+    void* Mem = xstl::Malloc( ObjSize ); \
+    xstl::Set( Mem, 0, ObjSize ); \
     return Mem; \
+  } \
+  void operator delete( void* Obj ) \
+  { \
+    xstl::Free( Obj );  \
   } \
   static UClass* StaticClass() \
   { return ObjectClass; } \
@@ -257,23 +261,27 @@ public: \
     } \
     return false; \
   } \
-  static bool StaticLinkNativeProperties(); \
+  static bool StaticLoadNativeClass(); \
   static bool StaticClassInit() \
   { \
     if ( !StaticInitializeClass() ) \
     { \
-      Logf( LOG_CRIT, "%s::StaticInitializeClass() failed!\n", TEXT(s) ); \
+      Logf( LOG_CRIT, "%s::StaticInitializeClass() failed!", TEXT(s) ); \
       return false; \
     } \
     if ( !StaticLinkNativeProperties() ) \
     { \
-      Logf( LOG_CRIT, "%s::StaticLinkNativeProperties() failed!\n", TEXT(s) ); \
+      Logf( LOG_CRIT, "%s::StaticLinkNativeProperties() failed!", TEXT(s) ); \
       return false; \
     } \
     StaticLinkNativeProperties(); \
+    if ( !StaticLoadNativeClass() ) \
+    { \
+      Logf( LOG_CRIT, "%s::StaticLoadNativeClasS() failed!", TEXT(s) ); \
+      return false; \
+    } \
     return true; \
   } \
-  static bool StaticLoadNativeClass(); \
   virtual size_t GetNativeSize() \
   { \
     return NativeSize; \
@@ -284,7 +292,7 @@ public: \
   DECLARE_BASE_CLASS(cls, supcls, flags, pkg) \
 
 #define DECLARE_ABSTRACT_CLASS(cls, supcls, flags, pkg) \
-  DECLARE_BASE_CLASS(cls, supcls, flags | CLASS_Abstract, pkg) 
+  DECLARE_BASE_CLASS(cls, supcls, flags | CLASS_Abstract, pkg) \
   
 #define IMPLEMENT_CLASS(cls) \
   UClass* cls::ObjectClass = NULL; \
@@ -294,22 +302,18 @@ public: \
   { \
     return UPackage::StaticLoadPartialClass( NativePkgName, ObjectClass );  \
   }
-
-#define DEFINE_PROP_OFFSET(cls, var, off) \
-  static const size_t cls##var##Offset = off
-
-#define DECLARE_USCRIPT_VAR(cls, type, var) \
-  DEFINE_PROP_OFFSET(cls, var, OFFSET_OF(cls, var) ); \
-  type var
-  
+ 
 #define LINK_NATIVE_PROPERTY(cls, var) \
   StaticNativePropList->AddProperty( #var, OFFSET_OF( cls, var ) );
   
 #define LINK_NATIVE_ARRAY(cls, var) \
   StaticNativePropList->AddProperty( #var, OFFSET_OF( cls, var[0] ) );
 
-#define USCRIPT_PROPERTY_BEGIN(obj) \
-  PtrAdd(obj, sizeof(*obj))
+#define EXPOSE_TO_USCRIPT() \
+  static bool StaticLinkNativeProperties(); 
+
+#define EXPORTABLE() \
+  virtual bool ExportToFile();
 
 /*-----------------------------------------------------------------------------
  * UObject
@@ -318,12 +322,13 @@ public: \
 class UObject
 {
   DECLARE_BASE_CLASS( UObject, UObject, CLASS_Abstract, Core )
+  EXPOSE_TO_USCRIPT()
+  EXPORTABLE() // not really exportable, but just so all subclasses can have export called generically
   UObject();
   
   virtual void LoadFromPackage( FPackageFileIn& In );
-  virtual bool ExportToFile();
-  virtual void AddRef();
-  virtual void DelRef();
+  void AddRef();
+  void DelRef();
 
   void SetPkgProperties( UPackage* InPkg, int InExpIdx, int InNameIdx );
   bool IsA( UClass* ClassType );
@@ -357,8 +362,8 @@ class UObject
   static bool StaticExit();
   static UObject* StaticConstructObject( const char* InName, UClass* InClass, UObject* InOuter );
 
-  static Array<UObject*> ObjectPool;
-  static Array<UClass*>  ClassPool;  //FIXME: Use a more effective hash method to access classes
+  static Array<UObject*>* ObjectPool;
+  static Array<UClass*>*  ClassPool; 
   
   FHash       Hash;     // Hash of this object
   const char* Name;     // Name of this object

@@ -258,6 +258,8 @@ FPackageFileOut& operator<<( FPackageFileOut& Out, FNameEntry& Name )
 /*-----------------------------------------------------------------------------
  * UPackage
 -----------------------------------------------------------------------------*/
+Array<UPackage*>* UPackage::Packages = NULL;
+
 UPackage::UPackage()
 {
   xstl::Set( &Header, 0, sizeof ( UPackageHeader ) );
@@ -268,9 +270,14 @@ UPackage::UPackage()
 
 UPackage::~UPackage()
 {
-  delete Names;
-  delete Exports;
-  delete Imports;
+  if ( Names != NULL )
+    delete Names;
+
+  if ( Exports != NULL )
+    delete Exports;
+
+  if ( Imports != NULL )
+    delete Imports;
 }
 
 bool UPackage::Load( const char* File )
@@ -475,6 +482,11 @@ bool UPackage::LoadObject( UObject** Obj, const char* ObjName, idx ObjRef )
   return true;
 }
 
+String UPackage::GetPackageName()
+{
+  return Path.Substr( Path.FindLastOf( '/' ) );
+}
+
 bool UPackage::StaticInit()
 {
   if ( !Packages )
@@ -482,6 +494,13 @@ bool UPackage::StaticInit()
     LoadOpts = PO_OpenOnLoad;
     Packages = new Array<UPackage*>( 8 );
   }
+  return true;
+}
+
+void UPackage::StaticExit( bool bCrashExit )
+{
+  if ( UPackage::Packages == NULL )
+    delete Packages;
 }
 
 int UPackage::CalcObjRefValue( int ObjRef )
@@ -497,8 +516,11 @@ int UPackage::CalcObjRefValue( int ObjRef )
 
 UPackage* UPackage::StaticLoadPkg( const char* Filepath )
 {
+  if ( Filepath == NULL )
+    return NULL;
+
   UPackage* Pkg = new UPackage();
-  if (!Pkg)
+  if ( Pkg == NULL )
     return NULL;
   
   if ( !Pkg->Load( Filepath ) )
@@ -545,9 +567,9 @@ UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjC
     {
       const char* ClsName = Package->ResolveNameFromIdx( Import->ClassName );
       FHash ClsNameHash  = FnvHashString( ClsName );
-      for ( size_t i = 0; i < UObject::ClassPool.Size() && i != MAX_SIZE; i++ )
+      for ( size_t i = 0; i < UObject::ClassPool->Size() && i != MAX_SIZE; i++ )
       {
-        UClass* ClsIter = UObject::ClassPool[i];
+        UClass* ClsIter = (*UObject::ClassPool)[i];
         if ( ClsIter->Hash == ClsNameHash )
         {
           ObjClass = ClsIter;
@@ -643,7 +665,7 @@ bool UPackage::StaticLoadPartialClass( const char* PkgName, UClass* NativeClass 
   if ( Package == NULL )
   {
     // FIXME: Use <Game>.ini to load packages from paths (../System/, ../Textures/, etc.)
-    Package = UPackage::StaticLoadPkg( PkgName );
+    Package = UPackage::StaticLoadPkg( GSystem->ResolvePath( PkgName ) );
 
     // still didn't find it? error out
     if ( Package == NULL )

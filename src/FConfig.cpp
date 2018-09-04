@@ -26,6 +26,10 @@
 #include "FConfig.h"
 #include "Memory.h"
 
+FConfigManager* GConfigManager = NULL;
+FConfig* GLibunrConfig = NULL;
+FConfig* GGameConfig = NULL;
+
 static inline bool IsAcceptedChar( char C, const char* Accepted )
 {
   size_t Len = strlen( Accepted );
@@ -477,6 +481,47 @@ void FConfig::ReadObject( const char* Category, const char* Variable, UObject* O
 const char* FConfig::GetName()
 {
   return Name;
+}
+
+FConfig::FConfigEntry::FConfigEntry()
+{
+  Name = NULL;
+  Hash = ZERO_HASH;
+  Values = new Array<char*>();
+  StructVars = NULL;
+  bWriteIndices = true; // TODO: Make libunr.ini option
+}
+
+FConfig::FConfigEntry::~FConfigEntry()
+{
+  if ( Name != NULL )
+    delete Name;
+
+  if ( Values != NULL )
+    for ( int i = 0; i < Values->Size(); i++ )
+      delete (*Values)[i];
+  
+  if ( StructVars != NULL )
+  {
+    // TODO:
+  }
+}
+
+FConfig::FConfigCategory::FConfigCategory()
+{
+  Name = NULL;
+  Hash = ZERO_HASH;
+  Entries = new Array<FConfigEntry*>( 4 );
+}
+
+FConfig::FConfigCategory::~FConfigCategory()
+{
+  if ( Name != NULL )
+    delete Name;
+
+  if ( Entries != NULL )
+    for ( int i = 0; i < Entries->Size(); i++ )
+      delete (*Entries)[i];
 }
 
 FConfigManager::FConfigManager()

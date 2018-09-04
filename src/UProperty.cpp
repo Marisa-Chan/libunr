@@ -30,6 +30,7 @@ u8 UProperty::PropertySizes[8] = { 1, 2, 4, 12, 16, 1, 2, 4 };
 
 // TODO: Create variable in Object to check for uninitialized properties?
 UProperty::UProperty()
+  : UField()
 {
   ArrayDim = 0;
   ElementSize = 0;
@@ -39,6 +40,7 @@ UProperty::UProperty()
 }
 
 UProperty::UProperty( int InNameIdx )
+  : UField()
 {
   NameIdx = InNameIdx;
   ArrayDim = 0;
@@ -182,3 +184,50 @@ void UMapProperty::LoadFromPackage( FPackageFileIn& In )
   exit( -1 ); // <- can we not do this
 }
 
+UByteProperty::~UByteProperty()
+{}
+
+UIntProperty::~UIntProperty()
+{}
+
+UBoolProperty::~UBoolProperty()
+{}
+
+UFloatProperty::~UFloatProperty()
+{}
+
+UObjectProperty::~UObjectProperty()
+{
+  if ( ObjectType != NULL )
+    ObjectType->DelRef();
+}
+
+UNameProperty::~UNameProperty()
+{}
+
+UStringProperty::~UStringProperty()
+{}
+
+UClassProperty::~UClassProperty()
+{}
+
+UArrayProperty::~UArrayProperty()
+{
+  if ( Inner != NULL )
+    Inner->DelRef();
+}
+
+UStructProperty::~UStructProperty()
+{
+  if ( Struct != NULL )
+    Struct->DelRef();
+}
+
+UStrProperty::~UStrProperty()
+{}
+
+UMapProperty::~UMapProperty()
+{}
+
+UFixedArrayProperty::~UFixedArrayProperty()
+{}

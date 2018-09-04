@@ -31,6 +31,11 @@
 #include "UTexture.h"
 
 UPalette::UPalette()
+  : UObject()
+{
+}
+
+UPalette::~UPalette()
 {
 }
 
@@ -53,6 +58,7 @@ void UPalette::LoadFromPackage( FPackageFileIn& Ar )
 }
 
 UBitmap::UBitmap()
+  : UObject()
 {
   Format = TEXF_P8;
   UBits = 0;
@@ -66,6 +72,10 @@ UBitmap::UBitmap()
 }
 
 UBitmap::~UBitmap()
+{
+}
+
+void UBitmap::LoadFromPackage()
 {
 }
 

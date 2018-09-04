@@ -100,7 +100,8 @@ class UPalette : public UObject
 class UBitmap : public UObject
 {
   DECLARE_CLASS( UBitmap, UObject, CLASS_SafeReplace, Engine )
-  
+  UBitmap(); 
+
   ETextureFormat Format;
   u8  UBits,  VBits;
   u32 USize,  VSize;
@@ -108,13 +109,14 @@ class UBitmap : public UObject
   FColor MipZero;
   FColor MaxColor;
   int InternalTime[2];
-  
-  UBitmap();
+
+  virtual void LoadFromPackage();
 };
 
 class UTexture : public UBitmap
 {
   DECLARE_CLASS( UTexture, UBitmap, CLASS_SafeReplace, Engine )
+  EXPORTABLE()
   UTexture();
 
   UTexture* BumpMap;
@@ -151,7 +153,6 @@ class UTexture : public UBitmap
   Array<FMipmap> CompMips;
   ETextureFormat CompFormat;
   
-  virtual bool ExportToFile();
   virtual void LoadFromPackage( FPackageFileIn& Ar );
 };
 

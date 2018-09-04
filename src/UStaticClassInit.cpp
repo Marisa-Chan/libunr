@@ -28,6 +28,7 @@
 #include "UMusic.h"
 #include "UProperty.h"
 #include "USound.h"
+#include "USystem.h"
 #include "UTexture.h"
 
 #define INIT_CLASS(cls) cls::StaticInitializeClass();
@@ -35,6 +36,13 @@
 bool UObject::StaticInit()
 {
   bool Result = true;
+
+  ObjectPool = new Array<UObject*>( 64 );
+  ClassPool  = new Array<UClass*> ( 64 );
+
+  Result &= ( ObjectPool != NULL );
+  Result &= ( ClassPool  != NULL );
+
   Result &= UObject::StaticClassInit();
     Result &= UTextBuffer::StaticClassInit();
     Result &= UField::StaticClassInit();
@@ -59,9 +67,12 @@ bool UObject::StaticInit()
         Result &= UState::StaticClassInit();
           Result &= UClass::StaticClassInit();
     Result &= UMusic::StaticClassInit();
-    Result &= UTexture::StaticClassInit();
+    Result &= UBitmap::StaticClassInit();
+      Result &= UTexture::StaticClassInit();
     Result &= USound::StaticClassInit();
     Result &= UPackage::StaticClassInit();
+    Result &= UPalette::StaticClassInit();
+
   return Result;
 }
 
@@ -89,8 +100,11 @@ IMPLEMENT_CLASS( UObject );
       IMPLEMENT_CLASS( UState );
         IMPLEMENT_CLASS( UClass );
   IMPLEMENT_CLASS( UMusic );
-  IMPLEMENT_CLASS( UTexture );
   IMPLEMENT_CLASS( USound );
+  IMPLEMENT_CLASS( UPalette );
   IMPLEMENT_CLASS( UPackage );
-
+  IMPLEMENT_CLASS( USubsystem );
+    IMPLEMENT_CLASS( USystem );
+  IMPLEMENT_CLASS( UBitmap );
+    IMPLEMENT_CLASS( UTexture );
 

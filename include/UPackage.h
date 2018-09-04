@@ -193,7 +193,7 @@ class UPackage : public UObject
   bool LoadObject( UObject** Obj, const char* ObjName, idx ObjRef );
   
   // Accessors 
-  String& GetPackageName();
+  String GetPackageName();
   
   static bool StaticInit();
   static void StaticExit( bool bCrashExit = false );

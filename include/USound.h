@@ -41,9 +41,9 @@ enum ESoundSlot
 class USound : public UObject
 {
   DECLARE_CLASS( USound, UObject, CLASS_SafeReplace, Engine )
-  
+  EXPORTABLE()
   USound();
-  virtual bool ExportToFile();
+
   virtual void LoadFromPackage( FPackageFileIn& Ar );
   
   int SoundFormat;

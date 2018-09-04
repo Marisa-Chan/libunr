@@ -32,6 +32,8 @@
 #include "UPackage.h"
 #include "USystem.h"
 
+Array<FNativePropertyList>* NativePropertyLists = NULL;
+
 FNativePropertyList::FNativePropertyList( FHash InHash, size_t InNum )
 {
   Hash = InHash;
@@ -49,6 +51,9 @@ void FNativePropertyList::AddProperty( const char* Name, u32 Offset )
     Added++;
   }
 }
+
+Array<UObject*>* UObject::ObjectPool = NULL;
+Array<UClass*>*  UObject::ClassPool = NULL;
 
 bool UObject::StaticLinkNativeProperties()
 {
@@ -73,7 +78,7 @@ UObject* UObject::StaticConstructObject( const char* InName, UClass* InClass, UO
   // Set up object properties
   Out->Hash = FnvHashString( InName );
   Out->Name = InName;
-  Out->Index = ObjectPool.Size();
+  Out->Index = ObjectPool->Size();
   Out->RefCnt = 1;
   Out->Outer = InOuter;
   Out->Flags = 0;
@@ -81,7 +86,7 @@ UObject* UObject::StaticConstructObject( const char* InName, UClass* InClass, UO
   Out->Field = InClass->Default->Field;
 
   // Add to object
-  ObjectPool.PushBack( Out );
+  ObjectPool->PushBack( Out );
 
   // Script init (TODO)
   

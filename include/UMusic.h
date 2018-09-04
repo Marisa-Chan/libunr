@@ -39,9 +39,9 @@ enum EMusicTransition
 class UMusic : public UObject
 {
   DECLARE_CLASS( UMusic, UObject, CLASS_SafeReplace, Core )
-  
+  EXPORTABLE() 
   UMusic();
-  virtual bool ExportToFile();
+
   virtual void LoadFromPackage( FPackageFileIn& Ar );
   
   u16 ChunkCount; //?

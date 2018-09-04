@@ -46,7 +46,7 @@ class UTextBuffer : public UObject
 class UField : public UObject
 {
   DECLARE_ABSTRACT_CLASS( UField, UObject, 0, Core )
- 
+
   UField();
   virtual void LoadFromPackage( FPackageFileIn& In );
 
@@ -67,7 +67,7 @@ class UConst : public UField
 class UEnum : public UField
 {
   DECLARE_CLASS( UEnum, UField, 0, Core )
-  
+
   UEnum();
   virtual void LoadFromPackage( FPackageFileIn& In );
 
@@ -83,7 +83,7 @@ struct FScriptLabel
 class UStruct : public UField
 {
   DECLARE_CLASS( UStruct, UField, 0, Core )
- 
+
   UStruct();
   UStruct( size_t InNativeSize );
   virtual void LoadFromPackage( FPackageFileIn& In );

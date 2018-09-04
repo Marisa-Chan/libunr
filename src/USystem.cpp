@@ -33,7 +33,13 @@
   #define LIBUNR_INI_PATH "libunr.ini"
 #endif
 
+USystem* GSystem = NULL;
+
 USubsystem::USubsystem()
+{
+}
+
+USubsystem::~USubsystem()
 {
 }
 
@@ -45,6 +51,23 @@ USystem::USystem()
   SavePath = NULL;
   CachePath = NULL;
   CacheExt = new String(".uxx");
+}
+
+USystem::~USystem()
+{
+  if ( GamePath != NULL )
+    delete GamePath;
+
+  if ( GameName != NULL )
+    delete GameName;
+
+  if ( SavePath != NULL )
+    delete SavePath;
+
+  if ( CachePath != NULL )
+    delete CachePath;
+
+  delete CacheExt;
 }
 
 const char* USystem::ResolvePath( const char* PkgName )
@@ -99,6 +122,7 @@ bool USystem::StaticInit()
 
   GSystem->GamePath = GLibunrConfig->ReadString( "Game", "Path" );
   GSystem->GameName = GLibunrConfig->ReadString( "Game", "Name" );
+  GSystem->bLogRefCntZero = GLibunrConfig->ReadBool( "libunr", "bLogRefCntZero" );
 
   // Now read the game ini
   // TODO: Use platform correct slashes for paths
@@ -140,6 +164,21 @@ bool USystem::StaticInit()
     xstl::Free( PkgPath );
   }
 
+  // Load important packages
+  UPackage* CorePkg   = UPackage::StaticLoadPkg( GSystem->ResolvePath( "Core" ) );
+  if ( CorePkg == NULL )
+  {
+    Logf( LOG_CRIT, "Cannot load Core.u!" );
+    exit( -1 );
+  }
+
+  UPackage* EnginePkg = UPackage::StaticLoadPkg( GSystem->ResolvePath( "Engine" ) );
+  if ( EnginePkg == NULL )
+  {
+    Logf( LOG_CRIT, "Cannot load Engine.u!" );
+    exit( -1 );
+  }
+  
   return true;
 }
 
