@@ -35,7 +35,13 @@
 
 #include "Types.h"
 #include "Stream.h"
-  
+
+#if defined LIBUNR_LINUX
+  #include <sys/types.h>
+  #include <pwd.h>
+#elif defined LIBUNR_WIN32
+#endif
+
 // TODO: architecture defines for non-x86 platforms
 #if defined __GNUG__
   
@@ -103,7 +109,6 @@ void Logf( const char* Type, const char* Str, ... );
     union
     {
       u64  FnvHash[2]; 
-      u128 FullHash;
     };
   };
 
@@ -116,7 +121,6 @@ void Logf( const char* Type, const char* Str, ... );
     union
     {
       u32 FnvHash[2];
-      u64 FullHash;
     };
   };
 
@@ -124,12 +128,14 @@ void Logf( const char* Type, const char* Str, ... );
 
 static bool operator==( FHash A, FHash B )
 {
-  return ( A.FullHash == B.FullHash );
+  return ( A.FnvHash[0] == B.FnvHash[0] &&
+           A.FnvHash[1] == B.FnvHash[1] );
 }
 
 static bool operator!=( FHash A, FHash B )
 {
-  return ( A.FullHash != B.FullHash );
+  return ( A.FnvHash[0] != B.FnvHash[0] || 
+           A.FnvHash[1] != B.FnvHash[1] );
 }
 
 static inline FHash FnvHash( const void* Data, size_t Len )

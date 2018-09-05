@@ -68,11 +68,11 @@ static inline void ReadNewLine( FileStreamIn& In, const char* Filename )
 
 static inline bool IsNextCharSeqNewline( FileStreamIn& In, const char* Filename )
 {
-  char C = '\0';
-  In.Read( &C, 1 );
+  char C = In.Peek();
   if ( C == '\r' )
   {
     In.Read( &C, 1 );
+    C = In.Peek();
     if ( UNLIKELY ( C != '\n' ) )
     {
       Logf( LOG_WARN, "Unpaired carriage return in config file '%s' (Pos = %llu, C = %c)", 
@@ -80,6 +80,7 @@ static inline bool IsNextCharSeqNewline( FileStreamIn& In, const char* Filename 
       In.Close();
       return false;
     }
+    return true;
   }
   else if ( C == '\n' )
   {
@@ -126,15 +127,24 @@ bool FConfig::Load( const char* Filename )
   Set( CategoryBuf, 0, sizeof( CategoryBuf ) );
   Set( VariableBuf, 0, sizeof( VariableBuf ) );
   Set( ValueBuf, 0, sizeof( ValueBuf ) );
-  while ( !IniFile.Eof() )
-  {
-    char Probe = '\0';
-    IniFile.Read( &Probe, 1 );
 
+  char Probe = '\0';
+  while ( IniFile.Read( &Probe, 1 ) ) // why doesn't Eof() work??
+  {
     if ( Probe == ';' )
     {
       // Read characters till we hit a newline
       while ( !IsNextCharSeqNewline( IniFile, Filename ) );
+    }
+    else if ( Probe == '\r' )
+    {
+      IniFile.Read( &Probe, 1 );
+      if ( Probe == '\n' )
+        Category = NULL; 
+    }
+    else if ( Probe == '\n' )
+    {
+      Category = NULL;
     }
     else if ( Probe == '[' )
     {
@@ -146,6 +156,7 @@ bool FConfig::Load( const char* Filename )
       }
 
       char* CategoryPtr = CategoryBuf;
+      xstl::Set( CategoryBuf, 0, sizeof( CategoryBuf ) );
       while ( PtrDistance( CategoryPtr, CategoryBuf ) < sizeof( CategoryBuf ) )
       {
         IniFile.Read( &Probe, 1 );
@@ -171,6 +182,7 @@ bool FConfig::Load( const char* Filename )
       Category = new FConfigCategory();
       Category->Name = StringDup( CategoryBuf );
       Category->Hash = FnvHashString( Category->Name );
+      Categories.PushBack( Category );
 
       ReadNewLine( IniFile, Filename );
     }
@@ -186,8 +198,13 @@ bool FConfig::Load( const char* Filename )
       }
       // Read the variable name
       char* VariablePtr = VariableBuf;
+      xstl::Set( VariableBuf, 0, sizeof( VariableBuf ) );
       while ( PtrDistance( VariablePtr, VariableBuf ) < sizeof( VariableBuf ) )
       {
+        // Put the character we just read first
+        *VariablePtr++ = Probe;
+
+        // Then get a new one
         IniFile.Read( &Probe, 1 );
         if ( Probe == '=' )
           break;
@@ -196,9 +213,7 @@ bool FConfig::Load( const char* Filename )
         {
           Set( VariableBuf, 0, sizeof( VariableBuf ) );
           break;
-        }
-
-        *VariablePtr++ = Probe;
+        }        
       }
 
       if ( VariableBuf[0] == '\0' )
@@ -217,6 +232,7 @@ bool FConfig::Load( const char* Filename )
         if ( LIKELY( PosLeftBracket == NULL ) )
         {
           Entry = new FConfigEntry();
+          Category->Entries->PushBack( Entry );
         }
       
         // Handle explicitly indexed variables
@@ -224,6 +240,13 @@ bool FConfig::Load( const char* Filename )
         {
           char IndexBuf[6];
           char* IndexPtr = IndexBuf;
+
+          if ( Entry == NULL )
+          {
+            Entry = new FConfigEntry();
+            Category->Entries->PushBack( Entry );
+          }
+
           ValueStr = (char*)Malloc( sizeof( ValueBuf ) );
           while ( PtrDistance( IndexPtr, IndexBuf ) < sizeof( IndexBuf ) )
           {
@@ -240,15 +263,8 @@ bool FConfig::Load( const char* Filename )
           }
 
           int Index = strtoul( IndexBuf, 0, 10 );
-          if ( IndexBuf[0] == '0' && Index != 0 )
-          {
-            Logf( LOG_WARN, "Invalid index conversion in config file '%s' (Pos = %llu)", 
-                Filename, IniFile.Tell() );
-            IniFile.Close();
-            return false;
-          }
-          Entry->Values->Reserve( Index );
-          Entry->Values->Assign( Index-1, ValueStr );
+          Entry->Values->Reserve( Index + 1 );
+          Entry->Values->Assign( Index, ValueStr );
         }
       }
       Entry->Name = StringDup( VariableBuf );
@@ -256,17 +272,18 @@ bool FConfig::Load( const char* Filename )
 
       // Read the value
       char* ValuePtr = ValueBuf;
+      xstl::Set( ValueBuf, 0, sizeof( ValueBuf ) );
       while ( PtrDistance( ValuePtr, ValueBuf ) < sizeof( ValueBuf ) )
       {
-        IniFile.Read( &Probe, 1 );
-        
         if ( IsNextCharSeqNewline( IniFile, Filename ) )
           break;
 
+        IniFile.Read( &Probe, 1 );
+        
         // Check if its valid (or a struct value)
         if ( !isalnum( Probe ) )
         {
-          if ( LIKELY( !IsAcceptedChar( Probe, "[](),.=" ) ) )
+          if ( LIKELY( !IsAcceptedChar( Probe, "\\/[](),.=" ) ) )
           {
             // Not valid
             Set( ValueBuf, 0, sizeof( ValueBuf ) );
@@ -282,9 +299,14 @@ bool FConfig::Load( const char* Filename )
       }
 
       if ( LIKELY( ValueStr == NULL ) )
+      {
         Entry->Values->PushBack( ValueBuf );
+        Category->Entries->PushBack( Entry );
+      }
       else
         Copy( ValueStr, sizeof( ValueBuf ), ValueBuf, sizeof( ValueBuf ) );
+
+      ReadNewLine( IniFile, Filename );
     }
   }
   Logf( LOG_INFO, "Successfully read config file '%s'", Filename );
@@ -511,7 +533,7 @@ FConfig::FConfigCategory::FConfigCategory()
 {
   Name = NULL;
   Hash = ZERO_HASH;
-  Entries = new Array<FConfigEntry*>( 4 );
+  Entries = new Array<FConfigEntry*>();
 }
 
 FConfig::FConfigCategory::~FConfigCategory()
