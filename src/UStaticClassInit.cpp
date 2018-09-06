@@ -37,14 +37,18 @@ bool UObject::StaticInit()
 {
   bool Result = true;
 
-  ObjectPool = new Array<UObject*>( 64 );
-  ClassPool  = new Array<UClass*> ( 64 );
+  ObjectPool = new Array<UObject*>();
+  ClassPool  = new Array<UClass*> ();
 
-  Result &= ( ObjectPool != NULL );
-  Result &= ( ClassPool  != NULL );
+  if ( ObjectPool == NULL || ClassPool == NULL ) 
+    return false;
 
-  Result &= UObject::StaticClassInit();
-    Result &= UTextBuffer::StaticClassInit();
+  ObjectPool->Reserve( 64 );
+  ClassPool->Reserve( 64 );
+
+  // Register low level classes for Core.u
+  Result &= UPackage::StaticClassInit(); 
+  Result &= UTextBuffer::StaticClassInit();
     Result &= UField::StaticClassInit();
       Result &= UConst::StaticClassInit();
       Result &= UEnum::StaticClassInit();
@@ -66,13 +70,21 @@ bool UObject::StaticInit()
         Result &= UFunction::StaticClassInit();
         Result &= UState::StaticClassInit();
           Result &= UClass::StaticClassInit();
-    Result &= UMusic::StaticClassInit();
-    Result &= UBitmap::StaticClassInit();
-      Result &= UTexture::StaticClassInit();
-    Result &= USound::StaticClassInit();
-    Result &= UPackage::StaticClassInit();
-    Result &= UPalette::StaticClassInit();
 
+  Result &= UObject::StaticClassInit();
+  Result &= USubsystem::StaticClassInit();
+
+  // Register System, which also does not have a class
+  Result &= USystem::StaticClassInit();
+
+  // At this point, order shouldn't matter much
+  // Register Engine.u classes
+  Result &= UMusic::StaticClassInit();
+  Result &= UPalette::StaticClassInit();
+  Result &= UBitmap::StaticClassInit();
+    Result &= UTexture::StaticClassInit();
+  Result &= USound::StaticClassInit();
+  
   return Result;
 }
 

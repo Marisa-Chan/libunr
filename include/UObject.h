@@ -75,7 +75,7 @@ enum EClassFlags
   CLASS_Localized         = 0x00020, // Class contains localized text.
   CLASS_SafeReplace       = 0x00040, // Objects of this class can be safely replaced with default or NULL.
   CLASS_RuntimeStatic     = 0x00080, // Objects of this class are static during gameplay.
-  CLASS_NoExport          = 0x00100, // no longer needed
+  CLASS_NoExport          = 0x00100, // Does not have an export in script package
   CLASS_NoUserCreate      = 0x00200, // Don't allow users to create in the editor.
   CLASS_PerObjectConfig   = 0x00400, // Handle object configuration on a per-object basis, rather than per-class.
   CLASS_NativeReplication = 0x00800, // Replication handled in C++.
@@ -266,18 +266,18 @@ public: \
   { \
     if ( !StaticInitializeClass() ) \
     { \
-      Logf( LOG_CRIT, "%s::StaticInitializeClass() failed!", TEXT(s) ); \
+      Logf( LOG_CRIT, "%s::StaticInitializeClass() failed!", TEXT(cls) ); \
       return false; \
     } \
     if ( !StaticLinkNativeProperties() ) \
     { \
-      Logf( LOG_CRIT, "%s::StaticLinkNativeProperties() failed!", TEXT(s) ); \
+      Logf( LOG_CRIT, "%s::StaticLinkNativeProperties() failed!", TEXT(cls) ); \
       return false; \
     } \
     StaticLinkNativeProperties(); \
     if ( !StaticLoadNativeClass() ) \
     { \
-      Logf( LOG_CRIT, "%s::StaticLoadNativeClasS() failed!", TEXT(s) ); \
+      Logf( LOG_CRIT, "%s::StaticLoadNativeClass() failed!", TEXT(cls) ); \
       return false; \
     } \
     return true; \
@@ -300,7 +300,10 @@ public: \
   FNativePropertyList* cls::StaticNativePropList = NULL; \
   bool cls::StaticLoadNativeClass() \
   { \
-    return UPackage::StaticLoadPartialClass( NativePkgName, ObjectClass );  \
+    if ( !( ObjectClass->ClassFlags & CLASS_NoExport ) ) \
+      return UPackage::StaticLoadPartialClass( NativePkgName, ObjectClass );  \
+    else \
+      return true; \
   }
  
 #define LINK_NATIVE_PROPERTY(cls, var) \
@@ -370,7 +373,7 @@ class UObject
   int         Index;    // Index of the object in object pool
   int         ExpIdx;   // Index of this object in the export table
   int         NameIdx;  // Index of this object's name in the package's name table
-  UObject*    Next;     // The next object in the list
+  UObject*    NextObj;  // The next object in the list
   UPackage*   Pkg;      // Package this object was loaded from
   UObject*    Outer;    // Object that this object resides in
   u32         Flags;    // Object flags

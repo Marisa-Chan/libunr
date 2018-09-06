@@ -489,7 +489,7 @@ UClass::UClass()
 UClass::UClass( const char* ClassName, u32 Flags, UClass* InSuperClass, UObject *(*NativeCtor)(size_t) )
   : UState()
 {
-  Name = ClassName;
+  Name = StringDup( ClassName );
   ClassFlags = Flags;
   SuperField = InSuperClass;
   Constructor = NativeCtor;

@@ -82,7 +82,7 @@ const char* USystem::ResolvePath( const char* PkgName )
     }
   }
 
-  return NULL;
+  return GoodPath;
 }
 
 void USystem::Exit( int ExitCode )
@@ -130,7 +130,10 @@ bool USystem::StaticInit()
     Logf( LOG_CRIT, "Can't open or create '%s.ini'", GSystem->GameName );
     return false;
   }
-  
+ 
+  // Change directory to the game's system folder
+  chdir( GSystem->GamePath );
+
   char* SavePath  = GGameConfig->ReadString( "Core.System", "SavePath" );
   char* CachePath = GGameConfig->ReadString( "Core.System", "CachePath" );
   char* CacheExt  = GGameConfig->ReadString( "Core.System", "CacheExt" );

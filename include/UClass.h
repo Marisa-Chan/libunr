@@ -34,7 +34,7 @@ using namespace xstl;
 
 class UTextBuffer : public UObject
 {
-  DECLARE_ABSTRACT_CLASS( UTextBuffer, UObject, 0, Core )
+  DECLARE_ABSTRACT_CLASS( UTextBuffer, UObject, CLASS_NoExport, Core )
 
   UTextBuffer();
   virtual void LoadFromPackage( FPackageFileIn& In );
@@ -45,7 +45,7 @@ class UTextBuffer : public UObject
 
 class UField : public UObject
 {
-  DECLARE_ABSTRACT_CLASS( UField, UObject, 0, Core )
+  DECLARE_ABSTRACT_CLASS( UField, UObject, CLASS_NoExport, Core )
 
   UField();
   virtual void LoadFromPackage( FPackageFileIn& In );
@@ -56,7 +56,7 @@ class UField : public UObject
 
 class UConst : public UField
 {
-  DECLARE_CLASS( UConst, UField, 0, Core )
+  DECLARE_CLASS( UConst, UField, CLASS_NoExport, Core )
 
   UConst();
   virtual void LoadFromPackage( FPackageFileIn& In );
@@ -66,7 +66,7 @@ class UConst : public UField
 
 class UEnum : public UField
 {
-  DECLARE_CLASS( UEnum, UField, 0, Core )
+  DECLARE_CLASS( UEnum, UField, CLASS_NoExport, Core )
 
   UEnum();
   virtual void LoadFromPackage( FPackageFileIn& In );
@@ -82,7 +82,7 @@ struct FScriptLabel
 
 class UStruct : public UField
 {
-  DECLARE_CLASS( UStruct, UField, 0, Core )
+  DECLARE_CLASS( UStruct, UField, CLASS_NoExport, Core )
 
   UStruct();
   UStruct( size_t InNativeSize );
@@ -131,7 +131,7 @@ enum EFunctionFlags
 
 class UFunction : public UStruct
 {
-  DECLARE_CLASS( UFunction, UStruct, 0, Core )
+  DECLARE_CLASS( UFunction, UStruct, CLASS_NoExport, Core )
 
   UFunction();
   virtual void LoadFromPackage( FPackageFileIn& In );
@@ -147,7 +147,7 @@ class UFunction : public UStruct
 
 class UState : public UStruct
 {
-  DECLARE_CLASS( UState, UStruct, 0, Core )
+  DECLARE_CLASS( UState, UStruct, CLASS_NoExport, Core )
 
   UState();
   virtual void LoadFromPackage( FPackageFileIn& In );
@@ -169,7 +169,7 @@ struct FDependency
 
 class UClass : public UState
 {
-  DECLARE_CLASS( UClass, UState, 0, Core )
+  DECLARE_CLASS( UClass, UState, CLASS_NoExport, Core )
   
   UClass();
   UClass( const char* ClassName, u32 Flags, UClass* SuperClass, UObject *(*NativeCtor)(size_t) );

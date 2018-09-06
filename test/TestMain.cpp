@@ -39,6 +39,12 @@ int main( int argc, char** argv )
     return -1;
   }
 
+  if ( UNLIKELY( !UObject::StaticInit() ) )
+  {
+    Logf( LOG_CRIT, "UObject::StaticInit() failed!" );
+    return -1;
+  }
+
   Logf( LOG_INFO, "Test succeeded" );
   return 0;
 }

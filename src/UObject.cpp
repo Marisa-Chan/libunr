@@ -116,6 +116,7 @@ UObject::UObject()
   Index = -1;
   ExpIdx = -1;
   NameIdx = -1;
+  NextObj = NULL;
   Flags = 0;
   Outer = NULL;
   Class = NULL;

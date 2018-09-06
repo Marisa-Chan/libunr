@@ -240,6 +240,7 @@ FPackageFileIn& operator>>( FPackageFileIn& In, FNameEntry& Name )
       In.Read( Name.Data, len );
   }
   In >> Name.Flags;
+  Name.Hash = FnvHashString( Name.Data );
 }
 
 FPackageFileOut& operator<<( FPackageFileOut& Out, FNameEntry& Name )
@@ -514,21 +515,22 @@ int UPackage::CalcObjRefValue( int ObjRef )
   return ObjRef - 1;
 }
 
-UPackage* UPackage::StaticLoadPkg( const char* Filepath )
+UPackage* UPackage::StaticLoadPkg( const char* PkgName )
 {
-  if ( Filepath == NULL )
+  if ( PkgName == NULL )
     return NULL;
 
   UPackage* Pkg = new UPackage();
   if ( Pkg == NULL )
     return NULL;
   
-  if ( !Pkg->Load( Filepath ) )
+  if ( !Pkg->Load( GSystem->ResolvePath( PkgName ) ) )
   {
     delete Pkg;
     return NULL;
   }
-  
+ 
+  Pkg->Name = StringDup( PkgName );
   Packages->PushBack( Pkg );
   return Pkg;
 }
@@ -581,7 +583,7 @@ UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjC
       {
         // Alright, it's not loaded at all. Grab it's package and lets load that
         const char* ClsPkgName = Package->ResolveNameFromIdx( Import->ClassPackage );
-        UPackage* ClsPkg = UPackage::StaticLoadPkg( GSystem->ResolvePath( ClsPkgName ) );
+        UPackage* ClsPkg = UPackage::StaticLoadPkg( ClsPkgName );
         if ( Package == NULL )
         {
           // We can't find the package we need, bail out
@@ -603,7 +605,7 @@ UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjC
     // We have the class, now get the package it belongs in
     FImport* PkgImport = &(*Package->Imports)[ CalcObjRefValue( Import->Package ) ];
     const char* ObjPkgName = Package->ResolveNameFromObjRef( Import->Package );
-    ObjPkg = UPackage::StaticLoadPkg( GSystem->ResolvePath( ObjPkgName ) );
+    ObjPkg = UPackage::StaticLoadPkg( ObjPkgName );
     if ( UNLIKELY( ObjPkg == NULL ) )
     {
       Logf( LOG_CRIT, "Can't load object '%s.%s', package is missing", ObjPkgName, ObjName );
@@ -657,7 +659,10 @@ bool UPackage::StaticLoadPartialClass( const char* PkgName, UClass* NativeClass 
   for ( int i = 0; i < Packages->Size(); i++ )
   {
     Package = Packages->Data()[i];
-    if ( Package->GetPackageName() == PkgName )
+    if ( Package == NULL )
+      break;
+
+    else if ( Package->GetPackageName() == PkgName )
       break;
   }
   
@@ -665,7 +670,7 @@ bool UPackage::StaticLoadPartialClass( const char* PkgName, UClass* NativeClass 
   if ( Package == NULL )
   {
     // FIXME: Use <Game>.ini to load packages from paths (../System/, ../Textures/, etc.)
-    Package = UPackage::StaticLoadPkg( GSystem->ResolvePath( PkgName ) );
+    Package = UPackage::StaticLoadPkg( PkgName );
 
     // still didn't find it? error out
     if ( Package == NULL )

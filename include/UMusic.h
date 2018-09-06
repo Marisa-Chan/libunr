@@ -38,7 +38,7 @@ enum EMusicTransition
 
 class UMusic : public UObject
 {
-  DECLARE_CLASS( UMusic, UObject, CLASS_SafeReplace, Core )
+  DECLARE_CLASS( UMusic, UObject, CLASS_NoExport | CLASS_SafeReplace, Core )
   EXPORTABLE() 
   UMusic();
 

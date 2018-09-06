@@ -34,7 +34,7 @@ class USubsystem : public UObject
 
 class USystem : public USubsystem
 {
-  DECLARE_CLASS( USystem, USubsystem, 0, Core )
+  DECLARE_CLASS( USystem, USubsystem, CLASS_NoExport, Core )
   USystem();
 
   const char* ResolvePath( const char* PkgName );
