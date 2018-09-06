@@ -11,3 +11,4 @@ Makefile
 *.cmake
 tags
 libunr-test
+.gdb_history
