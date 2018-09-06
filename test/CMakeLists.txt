@@ -14,4 +14,4 @@ link_directories(${LIBUNR_ROOT} ../)
 add_executable (libunr-test ${SOURCES})
 target_link_libraries(libunr-test "xstl" "unr") # kind of a hack but w/e
 
-add_definitions ("-Wno-attributes" "-DXSTL_USE_STL")
+add_definitions ("-Wno-attributes" "-DXSTL_USE_STL" "-g")

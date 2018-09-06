@@ -80,6 +80,7 @@ static inline bool IsNextCharSeqNewline( FileStreamIn& In, const char* Filename 
       In.Close();
       return false;
     }
+    In.Seek( -1, Cur );
     return true;
   }
   else if ( C == '\n' )
@@ -112,6 +113,8 @@ bool FConfig::Load( const char* Filename )
   char CategoryBuf[128];
   char VariableBuf[128];
   char ValueBuf[512];
+  bool bIndexed = false;
+  u32  Index = 0;
   FHash PreviousHash = {0, 0};
 
   FileStreamIn IniFile;
@@ -134,7 +137,18 @@ bool FConfig::Load( const char* Filename )
     if ( Probe == ';' )
     {
       // Read characters till we hit a newline
-      while ( !IsNextCharSeqNewline( IniFile, Filename ) );
+      while ( 1 )
+      {
+        if ( IniFile.Read( &Probe, 1 ) == 0 )
+          break;
+
+        if ( Probe == '\n' )
+          break;
+
+        if ( Probe == '\r' )
+          if ( IniFile.Read( &Probe, 1 ) != 0 && Probe == '\n' )
+            break;
+      }   
     }
     else if ( Probe == '\r' )
     {
@@ -163,7 +177,7 @@ bool FConfig::Load( const char* Filename )
         if ( Probe == ']' )
           break;
 
-        if ( !isalnum( Probe ) )
+        if ( !isalnum( Probe ) && !IsAcceptedChar( Probe, "." ) )
         {
           Set( CategoryBuf, 0, sizeof( CategoryBuf ) );
           break;
@@ -174,7 +188,7 @@ bool FConfig::Load( const char* Filename )
 
       if ( CategoryBuf[0] == '\0' )
       {
-        Logf( LOG_WARN, "Malformed or corrupted config file '%s' (Pos = %llu)", Filename, IniFile.Tell() );
+        Logf( LOG_WARN, "Malformed or corrupted category in file '%s' (Pos = %llu)", Filename, IniFile.Tell() );
         IniFile.Close();
         return false;
       }
@@ -209,7 +223,13 @@ bool FConfig::Load( const char* Filename )
         if ( Probe == '=' )
           break;
 
-        if ( !isalnum( Probe ) && !IsAcceptedChar( Probe, "[]" ) )
+        else if ( Probe == '[' )
+        {
+          bIndexed = true;
+          break;
+        }
+
+        if ( !isalnum( Probe ) && !IsAcceptedChar( Probe, "/_ " ) )
         {
           Set( VariableBuf, 0, sizeof( VariableBuf ) );
           break;
@@ -218,57 +238,45 @@ bool FConfig::Load( const char* Filename )
 
       if ( VariableBuf[0] == '\0' )
       {
-        Logf( LOG_WARN, "Malformed or corrupted config file '%s' (Pos = %llu)", Filename, IniFile.Tell() );
+        Logf( LOG_WARN, "Malformed or corrupted variable in file '%s' (Pos = %llu)", Filename, IniFile.Tell() );
         IniFile.Close();
         return false;
       }
+
+      if ( bIndexed )
+      {
+        char IndexBuf[8];
+        char* IndexPtr = IndexBuf;
+        while( 1 )
+        {
+          IniFile.Read( &Probe, 1 );
+          if ( Probe == ']' )
+            break;
+
+           *IndexPtr++ = Probe;
+        }
+
+        if ( IndexBuf[0] == '\0' )
+        {
+          Logf( LOG_WARN, "Array indexed variable, but no index found in file '%s' (Pos = %llu, C = '%c')", 
+              Filename, IniFile.Tell(), Probe );
+          IniFile.Close();
+          return false;
+        }
+
+        Index = strtol( IndexBuf, NULL, 10 );
+        Entry->Values->Resize( Index );
+        xstl::Set( IndexBuf, 0, sizeof( IndexBuf ) );
+      }
       
-      // Check to see if we should treat this as an array entry
-      char*  ValueStr = NULL;
       FHash VarHash = FnvHashString( VariableBuf );
       if ( LIKELY( VarHash != PreviousHash ) )
       {
-        char* PosLeftBracket = strchr( VariableBuf, '[' );
-        if ( LIKELY( PosLeftBracket == NULL ) )
-        {
-          Entry = new FConfigEntry();
-          Category->Entries->PushBack( Entry );
-        }
-      
-        // Handle explicitly indexed variables
-        else
-        {
-          char IndexBuf[6];
-          char* IndexPtr = IndexBuf;
-
-          if ( Entry == NULL )
-          {
-            Entry = new FConfigEntry();
-            Category->Entries->PushBack( Entry );
-          }
-
-          ValueStr = (char*)Malloc( sizeof( ValueBuf ) );
-          while ( PtrDistance( IndexPtr, IndexBuf ) < sizeof( IndexBuf ) )
-          {
-            IniFile.Read( &Probe, 1 );
-            if ( !isdigit( Probe ) )
-            {
-              Logf( LOG_WARN, "Non decimal index character in config file '%s' (Pos = %llu)", 
-                  Filename, IniFile.Tell() );
-              IniFile.Close();
-              return false;
-            }
-
-            *IndexPtr++ = Probe;
-          }
-
-          int Index = strtoul( IndexBuf, 0, 10 );
-          Entry->Values->Reserve( Index + 1 );
-          Entry->Values->Assign( Index, ValueStr );
-        }
+        Entry = new FConfigEntry();
+        Category->Entries->PushBack( Entry );
+        Entry->Name = StringDup( VariableBuf );
+        Entry->Hash = VarHash;
       }
-      Entry->Name = StringDup( VariableBuf );
-      Entry->Hash = VarHash;
 
       // Read the value
       char* ValuePtr = ValueBuf;
@@ -279,34 +287,16 @@ bool FConfig::Load( const char* Filename )
           break;
 
         IniFile.Read( &Probe, 1 );
-        
-        // Check if its valid (or a struct value)
-        if ( !isalnum( Probe ) )
-        {
-          if ( LIKELY( !IsAcceptedChar( Probe, "\\/[](),.=" ) ) )
-          {
-            // Not valid
-            Set( ValueBuf, 0, sizeof( ValueBuf ) );
-            break;
-          }
-          else
-          {
-            // Struct value, 
-          }
-        }
-
         *ValuePtr++ = Probe;
       }
 
-      if ( LIKELY( ValueStr == NULL ) )
-      {
-        Entry->Values->PushBack( ValueBuf );
-        Category->Entries->PushBack( Entry );
-      }
+      if ( LIKELY( !bIndexed ) )
+        Entry->Values->PushBack( xstl::StringDup( ValueBuf ) );
       else
-        Copy( ValueStr, sizeof( ValueBuf ), ValueBuf, sizeof( ValueBuf ) );
+        Entry->Values->Assign( Index, xstl::StringDup( ValueBuf ) );
 
       ReadNewLine( IniFile, Filename );
+      bIndexed = false;
     }
   }
   Logf( LOG_INFO, "Successfully read config file '%s'", Filename );
@@ -534,6 +524,7 @@ FConfig::FConfigCategory::FConfigCategory()
   Name = NULL;
   Hash = ZERO_HASH;
   Entries = new Array<FConfigEntry*>();
+  Entries->Reserve( 4 );
 }
 
 FConfig::FConfigCategory::~FConfigCategory()

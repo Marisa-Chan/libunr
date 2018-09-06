@@ -41,6 +41,7 @@ class USystem : public USubsystem
   void Exit( int ExitCode );
 
   static bool StaticInit();
+  static const char* GetLibunrIniPath();
 
   // libunr specific
   const char* GamePath;

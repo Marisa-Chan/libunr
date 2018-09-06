@@ -27,12 +27,6 @@
 #include "USystem.h"
 #include "UPackage.h"
 
-#if defined LIBUNR_LINUX || LIBUNR_BSD
-  #define LIBUNR_INI_PATH "~/.config/libunr/libunr.ini"
-#elif defined LIBUNR_WIN32
-  #define LIBUNR_INI_PATH "libunr.ini"
-#endif
-
 USystem* GSystem = NULL;
 
 USubsystem::USubsystem()
@@ -114,9 +108,10 @@ bool USystem::StaticInit()
   
   // Read libunr ini and get game specific details
   GLibunrConfig = new FConfig();
-  if ( !GLibunrConfig->Load( LIBUNR_INI_PATH ) )
+  const char* LibunrIniPath = GetLibunrIniPath();
+  if ( !GLibunrConfig->Load( LibunrIniPath ) )
   {
-    Logf( LOG_CRIT, "Can't open or create '" LIBUNR_INI_PATH "'" );
+    Logf( LOG_CRIT, "Can't open or create '%s'", LibunrIniPath );
     return false;
   }
 
@@ -125,10 +120,8 @@ bool USystem::StaticInit()
   GSystem->bLogRefCntZero = GLibunrConfig->ReadBool( "libunr", "bLogRefCntZero" );
 
   // Now read the game ini
-  // TODO: Use platform correct slashes for paths
   String GameCfgPath( GSystem->GamePath );
-  GameCfgPath += "System";
-  GameCfgPath += *GSystem->GameName;
+  GameCfgPath += GSystem->GameName;
   GameCfgPath += ".ini";
 
   GGameConfig = new FConfig();
@@ -155,7 +148,7 @@ bool USystem::StaticInit()
   int i = 0;
   while( 1 )
   {
-    PkgPath = GGameConfig->ReadString( "Core.System", "Paths", i );
+    PkgPath = GGameConfig->ReadString( "Core.System", "Paths", i++ );
     if ( PkgPath == NULL )
       break;
 
@@ -164,21 +157,22 @@ bool USystem::StaticInit()
     xstl::Free( PkgPath );
   }
 
-  // Load important packages
-  UPackage* CorePkg   = UPackage::StaticLoadPkg( GSystem->ResolvePath( "Core" ) );
-  if ( CorePkg == NULL )
-  {
-    Logf( LOG_CRIT, "Cannot load Core.u!" );
-    exit( -1 );
-  }
-
-  UPackage* EnginePkg = UPackage::StaticLoadPkg( GSystem->ResolvePath( "Engine" ) );
-  if ( EnginePkg == NULL )
-  {
-    Logf( LOG_CRIT, "Cannot load Engine.u!" );
-    exit( -1 );
-  }
-  
   return true;
+}
+
+const char* USystem::GetLibunrIniPath()
+{
+#if defined LIBUNR_LINUX || LIBUNR_BSD
+  struct ::passwd* pw = getpwuid( getuid() );
+  static char LibUnrPath[1024];
+  strcpy( LibUnrPath, pw->pw_dir );
+  strcat( LibUnrPath, "/.config/libunr/libunr.ini" ); 
+  return LibUnrPath;
+#elif defined LIBUNR_WIN32
+  return "libunr.ini";
+#else
+  Logf( LOG_CRIT, "Unknown operating system! Please add a section to USystem::GetLibunrIniPath()" );
+  exit( -1 );
+#endif
 }
 

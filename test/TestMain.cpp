@@ -27,15 +27,15 @@
 
 int main( int argc, char** argv )
 {
-  if ( UNLIKELY( !UPackage::StaticInit() ) )
-  {
-    Logf( LOG_CRIT, "UPackage::StaticInit() failed!" );
-    return -1;
-  }
-
   if ( UNLIKELY( !USystem::StaticInit() ) )
   {
     Logf( LOG_CRIT, "USystem::StaticInit() failed!" );
+    return -1;
+  }
+
+  if ( UNLIKELY( !UPackage::StaticInit() ) )
+  {
+    Logf( LOG_CRIT, "UPackage::StaticInit() failed!" );
     return -1;
   }
 
