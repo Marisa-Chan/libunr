@@ -294,13 +294,14 @@ bool FConfig::Load( const char* Filename )
         *ValuePtr++ = Probe;
       }
 
-      if ( LIKELY( !bIndexed ) )
+      if ( LIKELY( !bIndexed || VarHash == PreviousHash ) )
         Entry->Values->PushBack( xstl::StringDup( ValueBuf ) );
       else
         Entry->Values->Assign( Index, xstl::StringDup( ValueBuf ) );
 
       ReadNewLine( IniFile, Filename );
       bIndexed = false;
+      PreviousHash = VarHash;
     }
   }
   Logf( LOG_INFO, "Successfully read config file '%s'", Filename );

@@ -45,6 +45,10 @@ int main( int argc, char** argv )
     return -1;
   }
 
+  UPackage* TarwelUmx = UPackage::StaticLoadPkg( "UnrealI" );
+  USound* TitanSound = (USound*)UPackage::StaticLoadObject( TarwelUmx, "yell1t", USound::StaticClass() );
+  TitanSound->ExportToFile();
+
   Logf( LOG_INFO, "Test succeeded" );
   return 0;
 }

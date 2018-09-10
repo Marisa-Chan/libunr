@@ -581,7 +581,7 @@ UObject* UPackage::StaticLoadObject( UPackage* Package, const char* ObjName, UCl
      return NULL;
   }
 
-  return UPackage::StaticLoadObject( Package, Export->Index, ObjClass, InOuter );
+  return UPackage::StaticLoadObject( Package, Export->Index + 1, ObjClass, InOuter );
 }
 
 UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjClass, UObject* InOuter )

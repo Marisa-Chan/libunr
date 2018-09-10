@@ -38,6 +38,7 @@
 
 #if defined LIBUNR_LINUX
   #include <sys/types.h>
+  #include <sys/stat.h>
   #include <pwd.h>
 #elif defined LIBUNR_WIN32
 #endif

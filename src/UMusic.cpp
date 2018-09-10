@@ -56,7 +56,7 @@ void UMusic::LoadFromPackage( FPackageFileIn* In )
 bool UMusic::ExportToFile()
 {
   // Set up filename
-  String* Filename = new String( Pkg->ResolveNameFromIdx( NameIdx ) );
+  String* Filename = new String( Name );
   const char* Ext = Pkg->ResolveNameFromIdx( MusicType );
   Filename->Append( "." );
   Filename->Append( Ext );

@@ -75,13 +75,16 @@ const char* USystem::ResolvePath( const char* PkgName )
     RealPath += PkgName;
     RealPath += PathIter->Substr( Asterisk + 1 );
 
-    if ( access( RealPath.Data(), F_OK ) )
+    struct stat useless; // lol
+    if ( stat( RealPath.Data(), &useless ) == 0 )
     {
       GoodPath = StringDup( RealPath.Data() );
       break;
     }
   }
 
+  if ( !GoodPath )
+    perror("stat");
   return GoodPath;
 }
 
@@ -156,6 +159,9 @@ bool USystem::StaticInit()
       break;
 
     String* PkgPathString = new String( PkgPath );
+#ifndef LIBUNR_WIN32
+    PkgPathString->ReplaceChars( '\\', '/' );
+#endif
     GSystem->Paths.PushBack( PkgPathString );
     xstl::Free( PkgPath );
   }
