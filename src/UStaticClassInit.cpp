@@ -87,7 +87,6 @@ bool UObject::StaticInit()
   // Register System, which also does not have a class
   Result &= USystem::StaticClassInit();
 
-  // At this point, order shouldn't matter much
   // Register Engine.u classes
   Result &= USound::StaticClassInit();
   Result &= UMusic::StaticClassInit();

@@ -52,9 +52,10 @@ void UTextBuffer::LoadFromPackage( FPackageFileIn* In )
   *In >> CINDEX( TextSize );
   if ( TextSize > 0 )
   {
-    char* TextBuf = (char*)Malloc( TextSize + 1 );
+    char* TextBuf = (char*)xstl::Malloc( TextSize + 1 );
     In->Read( TextBuf, TextSize + 1 );
     Text = new String( TextBuf );
+    xstl::Free( TextBuf );
   }
 }
 
@@ -109,10 +110,11 @@ void UConst::LoadFromPackage( FPackageFileIn* In )
   *In >> CINDEX( Size );
 
   // Size includes null terminator
-  char* Str = (char*)Malloc( Size ); 
+  char* Str = (char*)xstl::Malloc( Size ); 
   In->Read( Str, Size );
 
   Value = new String( Str );
+  xstl::Free( Str );
 }
 
 UEnum::UEnum()
