@@ -40,20 +40,20 @@ USound::~USound()
     delete SoundData;
 }
 
-void USound::LoadFromPackage( FPackageFileIn& Ar )
+void USound::LoadFromPackage( FPackageFileIn* In )
 {
   // Read the properties, but since it always starts with None, just eat it
   idx NoneProp = 0;
-  Ar >> CINDEX( NoneProp );
+  *In >> CINDEX( NoneProp );
   
-  Ar >> CINDEX( SoundFormat );
-  if (Ar.Ver >= PKG_VER_UN_220)
-    Ar >> OffsetNext;
+  *In >> CINDEX( SoundFormat );
+  if (In->Ver >= PKG_VER_UN_220)
+    *In >> OffsetNext;
   
-  Ar >> CINDEX( SoundSize );
+  *In >> CINDEX( SoundSize );
   
   SoundData = new u8[SoundSize];
-  Ar.Read( SoundData, SoundSize );
+  In->Read( SoundData, SoundSize );
 }
 
 bool USound::ExportToFile()

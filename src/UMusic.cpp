@@ -40,17 +40,17 @@ UMusic::~UMusic()
     delete ChunkData;
 }
 
-void UMusic::LoadFromPackage( FPackageFileIn& Ar )
+void UMusic::LoadFromPackage( FPackageFileIn* In )
 {
-  Ar >> ChunkCount;
+  *In >> ChunkCount;
   
-  if ( Ar.Ver > PKG_VER_UN_200 )
-    Ar >> _unknown0;
+  if ( In->Ver > PKG_VER_UN_200 )
+    *In >> _unknown0;
   
-  Ar >> CINDEX( ChunkSize );
+  *In >> CINDEX( ChunkSize );
   
   ChunkData = new u8[ChunkSize];
-  Ar.Read( ChunkData, ChunkSize );
+  In->Read( ChunkData, ChunkSize );
 }
 
 bool UMusic::ExportToFile()

@@ -44,11 +44,16 @@ using namespace xstl;
 DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FCompactIndex& Index )
 {
   bool negate = false;
-  
+ 
+  Index.Value = 0;
   for (int i = 0; i < 5; i++)
   {
     u8 x = 0;
-    In.Read ((char*)&x, 1);
+    if ( In.Read ((char*)&x, 1) == 0 )
+    {
+      Logf( LOG_WARN, "Failed to read byte for FCompactIndex" );
+      return In;    
+    }
     
     // First byte
     if (i == 0)
@@ -306,7 +311,14 @@ bool UPackage::Load( const char* File )
   
   // read in the header
   *((FPackageFileIn*)Stream) >> Header;
-  
+
+  if ( Header.Signature != UE1_PKG_SIG )
+  {
+    Logf( LOG_WARN, "File '%s' has a bad package signature", File );
+    Stream->Close();
+    return false;
+  }
+
   // read in the name table
   Names->Resize( Header.NameCount );
   Stream->Seek( Header.NameOffset, ESeekBase::Begin );
@@ -327,9 +339,9 @@ bool UPackage::Load( const char* File )
     *((FPackageFileIn*)Stream) >> (*Exports)[i];
     (*Exports)[i].Index = i;
   }
-  
-  EndLoad();
-  
+
+  Stream->Seek( 0, ESeekBase::Begin );
+
   return true;
 }
 
@@ -441,9 +453,16 @@ bool UPackage::LoadObject( UObject** Obj, const char* ObjName, idx ObjRef )
   if ( Obj == NULL || *Obj == NULL )
     return false;
  
+  if ( strnicmp( ObjName, "None", 4 ) == 0 )
+  {
+    // 'None' means NULL, don't load anything
+    *Obj = NULL;
+    return true;
+  }
+
   FExport* Export = NULL;
   if ( ObjRef >= 0 )
-    GetExport( CalcObjRefValue( ObjRef ) );
+    Export = GetExport( CalcObjRefValue( ObjRef ) );
 
   if ( Export == NULL )
   {
@@ -454,32 +473,28 @@ bool UPackage::LoadObject( UObject** Obj, const char* ObjName, idx ObjRef )
       return false;
     }
   }
- 
-  // If we already loaded the object, return it
-  if ( Export->Obj )
-  {
-    *Obj = Export->Obj;
-    return true;
-  }
 
   // Otherwise, prepare the package to load an object
-  if ( !BeginLoad( Export ) )
-    return false;
-  
-  // Load
+  ((FPackageFileIn*)Stream)->Ver = Header.PackageVersion;
+
+  // Save current position
+  size_t OldPos = Stream->Tell();
+  Stream->Seek( Export->SerialOffset, Begin );
+
   FPackageFileIn* PackageFile = (FPackageFileIn*)Stream;
 
   // Set export object properties
   (*Obj)->ExpIdx = Export->Index;
   (*Obj)->NameIdx = Export->ObjectName;
   (*Obj)->Pkg = this;
-  (*Obj)->LoadFromPackage( *PackageFile );
 
+  // Load
+  (*Obj)->LoadFromPackage( PackageFile );
   Export->Obj = *Obj;
   
-  // Finalize load
-  EndLoad();
-  
+  // Restore stream position
+  Stream->Seek( OldPos, Begin );
+
   return true;
 }
 
@@ -493,7 +508,10 @@ bool UPackage::StaticInit()
   if ( !Packages )
   {
     LoadOpts = PO_OpenOnLoad;
-    Packages = new Array<UPackage*>( 8 );
+    Packages = new Array<UPackage*>();
+    if ( Packages == NULL )
+      return false;
+    Packages->Reserve( 8 );
   }
   return true;
 }
@@ -520,18 +538,37 @@ UPackage* UPackage::StaticLoadPkg( const char* PkgName )
   if ( PkgName == NULL )
     return NULL;
 
-  UPackage* Pkg = new UPackage();
-  if ( Pkg == NULL )
-    return NULL;
-  
-  if ( !Pkg->Load( GSystem->ResolvePath( PkgName ) ) )
+  // See if the package has been loaded before
+  UPackage* Pkg = NULL;
+  for ( int i = 0; i < Packages->Size(); i++ )
   {
-    delete Pkg;
-    return NULL;
+    UPackage* Iter = Packages->Data()[i];
+    if ( Iter == NULL )
+      break;
+
+    if ( strnicmp( Iter->Name, PkgName, strlen( Iter->Name ) ) == 0 )
+    {
+      Pkg = Iter;
+      break;
+    }
   }
+
+  if ( Pkg == NULL )
+  {
+    Pkg = new UPackage();
+    if ( Pkg == NULL )
+      return NULL;
+
+    if ( !Pkg->Load( GSystem->ResolvePath( PkgName ) ) )
+    {
+      delete Pkg;
+      return NULL;
+    }
  
-  Pkg->Name = StringDup( PkgName );
-  Packages->PushBack( Pkg );
+    Pkg->Name = StringDup( PkgName );
+    Packages->PushBack( Pkg );
+  }
+
   return Pkg;
 }
 
@@ -561,7 +598,20 @@ UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjC
   // Is our object in this package?
   if ( ObjRef < 0 )
   {
-    // Nope, but we can figure out which package it should be in from the one we were given
+    // No, but check to see if we're trying to load some intrinsic class
+    if ( ObjClass == UClass::StaticClass() && ObjClass->ClassFlags & CLASS_NoExport )
+    {
+      // Go find it in the UObject class pool
+      FHash ObjNameHash = FnvHashString( ObjName );
+      for ( size_t i = 0; i < UObject::ClassPool->Size() && i != MAX_SIZE; i++ )
+      {
+        UClass* ClsIter = (*UObject::ClassPool)[i];
+        if ( ClsIter->Hash == ObjNameHash )
+          return ClsIter;
+      }
+    }
+
+    // We can figure out which package it should be in from the one we were given
     FImport* Import = &(*Package->Imports)[ CalcObjRefValue( ObjRef ) ];
     
     // We probably need to get the class too...
@@ -602,9 +652,20 @@ UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjC
       }
     }
 
-    // We have the class, now get the package it belongs in
-    FImport* PkgImport = &(*Package->Imports)[ CalcObjRefValue( Import->Package ) ];
-    const char* ObjPkgName = Package->ResolveNameFromObjRef( Import->Package );
+    // We have the class, now get the package the object belongs in
+    FImport* PkgImport = Import;
+    do
+    {
+      // The 'Package' field for FImport does not actually tell what package it is in,
+      // but what 'Group' it belongs to (which may be the package it belongs to)
+      // i.e., "Core.Object" -> Package points to the import for the 'Core' package
+      // "Core.Object.Color" -> Package points to the import for 'Object'
+      // to get around this, we keep going back and getting the package until Import->Class points
+      // to "Package"
+       PkgImport = &(*Package->Imports)[ CalcObjRefValue( PkgImport->Package ) ];
+    } while ( strnicmp( Package->ResolveNameFromIdx( PkgImport->ClassName ), "Package", 7 ) != 0 );
+
+    const char* ObjPkgName = Package->ResolveNameFromIdx( PkgImport->ObjectName );
     ObjPkg = UPackage::StaticLoadPkg( ObjPkgName );
     if ( UNLIKELY( ObjPkg == NULL ) )
     {
@@ -614,6 +675,11 @@ UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjC
 
     // Then grab it's export
     Export = ObjPkg->GetExport( ObjName );
+
+    // Return if it's already loaded
+    if ( Export->Obj != NULL )
+      return Export->Obj;
+
     if ( UNLIKELY( Export == NULL ) )
     {
       Logf( LOG_CRIT, "Can't load object '%s.%s', object does not exist", ObjPkgName, ObjName );
@@ -625,28 +691,53 @@ UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjC
     // Yup, just grab the export
     Export = &(*Package->Exports)[ CalcObjRefValue( ObjRef ) ];
  
+    // If it's already loaded, return it
+    if ( Export->Obj != NULL )
+      return Export->Obj;
+
     if ( ObjClass == NULL )
     {
-      ObjClass = (UClass*)UPackage::StaticLoadObject( Package, Export->Class, UClass::StaticClass() );
+      // See if the class is already loaded
+      const char* ClsName = Package->ResolveNameFromObjRef( Export->Class );
+      FHash ClsNameHash  = FnvHashString( ClsName );
+      for ( size_t i = 0; i < UObject::ClassPool->Size() && i != MAX_SIZE; i++ )
+      {
+        UClass* ClsIter = (*UObject::ClassPool)[i];
+        if ( ClsIter->Hash == ClsNameHash )
+        {
+          ObjClass = ClsIter;
+          break; // Already loaded the class apparently, great
+        }
+      }
+
+      // If not, then we need to load it
       if ( UNLIKELY( ObjClass == NULL ) )
       {
-        Logf( LOG_CRIT, "Can't load object '%s.%s', cannot load class", Package->Name, ObjName );
-        return NULL;
+        ObjClass = (UClass*)UPackage::StaticLoadObject( Package, Export->Class, UClass::StaticClass() );
+        if ( UNLIKELY( ObjClass == NULL ) )
+        {
+          Logf( LOG_CRIT, "Can't load object '%s.%s', cannot load class", Package->Name, ObjName );
+          return NULL;
+        }
       }
     }
 
     ObjPkg = Package;
   }
 
-  // We are ready to construct and load the object
+  // Construct the object
   UObject* Obj = UObject::StaticConstructObject( ObjName, ObjClass, InOuter );
   if ( Obj == NULL )
     return NULL;
 
   // In case of circular dependencies
-  Export->Obj = Obj;
+  if ( Export != NULL )
+    Export->Obj = Obj;
+
+  // Load
   if ( !ObjPkg->LoadObject( &Obj, ObjName, ObjRef ) )
     return NULL;
+
 
   return Obj;
 }
@@ -655,33 +746,23 @@ UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjC
 // has not had it's UnrealScript counterpart loaded yet. Hence, it is "partially" initialized.
 bool UPackage::StaticLoadPartialClass( const char* PkgName, UClass* NativeClass )
 {
-  UPackage* Package = NULL; 
-  for ( int i = 0; i < Packages->Size(); i++ )
-  {
-    Package = Packages->Data()[i];
-    if ( Package == NULL )
-      break;
+  UPackage* Package = UPackage::StaticLoadPkg( PkgName );
 
-    else if ( Package->GetPackageName() == PkgName )
-      break;
-  }
-  
-  // If we didn't find the package, load it
+  // Didn't find it? error out
   if ( Package == NULL )
   {
-    // FIXME: Use <Game>.ini to load packages from paths (../System/, ../Textures/, etc.)
-    Package = UPackage::StaticLoadPkg( PkgName );
-
-    // still didn't find it? error out
-    if ( Package == NULL )
-    {
-      Logf( LOG_CRIT, "Failed to load package '%s' for class '%s'.", PkgName, NativeClass->Name );
-      return false;
-    }
+    Logf( LOG_CRIT, "Failed to load package '%s' for class '%s'.", PkgName, NativeClass->Name );
+    return false;
   }
   
-  // We already have a constructed class object, so just load it from the package
+  // Set object's package relevant properties
   UObject* Obj = (UObject*)NativeClass;
+  FExport* Export = Package->GetExport( Obj->Name );
+  Export->Obj = Obj;
+  Obj->ExpIdx = Export->Index;
+
+  // We already have a constructed class object, so just load it from the package
+   
   if ( !Package->LoadObject( &Obj, NativeClass->Name, -1 ) )
     return false;
 
@@ -693,19 +774,6 @@ bool UPackage::BeginLoad( FExport* Export )
   if ( Export == NULL )
     return false;
   
-  if ( LoadOpts == PO_OpenOnLoad && Stream == NULL )
-  {
-    Stream = new FPackageFileIn();
-    
-    if ( Stream == NULL )
-      return false;
-    if ( !Stream->Open( Path ) )
-      return false;
-  }
-
-  ((FPackageFileIn*)Stream)->Ver = Header.PackageVersion;
-  Stream->Seek( Export->SerialOffset, Begin );
-  return true;
 }
 
 void UPackage::EndLoad()

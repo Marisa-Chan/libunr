@@ -27,6 +27,7 @@
 
 #include "Array.h"
 #include "FileStream.h"
+#include "Stack.h"
 #include "String.h"
 
 #include "UObject.h"
@@ -213,6 +214,8 @@ protected:
   Array<FNameEntry>* Names;
   Array<FExport>*    Exports;
   Array<FImport>*    Imports;
+  Stack<u32>*        LinkStack;
+  u32 LinkLevel;
 
   // Global package variables
   static EPkgLoadOpts LoadOpts;

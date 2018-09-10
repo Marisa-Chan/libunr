@@ -55,14 +55,12 @@ static inline void ReadNewLine( FileStreamIn& In, const char* Filename )
     {
       Logf( LOG_WARN, "Unpaired carriage return in config file '%s' (Pos = %llu, C = %c)", 
           Filename, In.Tell(), C );
-      In.Close();
     }
   }
   else if ( C != '\n' )
   {
     Logf( LOG_WARN, "Expected newline in config file '%s' (Pos = %llu, C = %c)",
         Filename, In.Tell(), C );
-    In.Close();
   }
 }
 
@@ -132,8 +130,14 @@ bool FConfig::Load( const char* Filename )
   Set( ValueBuf, 0, sizeof( ValueBuf ) );
 
   char Probe = '\0';
-  while ( IniFile.Read( &Probe, 1 ) ) // why doesn't Eof() work??
+  while ( !IniFile.Eof() ) // why doesn't Eof() work??
   {
+    if ( IniFile.Read( &Probe, 1 ) == MAX_UINT64 )
+    {
+      Logf( LOG_WARN, "Failed to read from INI file '%s'", Filename );
+      IniFile.Close();
+    }
+
     if ( Probe == ';' )
     {
       // Read characters till we hit a newline

@@ -44,7 +44,7 @@ class USound : public UObject
   EXPORTABLE()
   USound();
 
-  virtual void LoadFromPackage( FPackageFileIn& Ar );
+  virtual void LoadFromPackage( FPackageFileIn* In );
   
   int SoundFormat;
   u32 OffsetNext;  // PackageVersion >= 63

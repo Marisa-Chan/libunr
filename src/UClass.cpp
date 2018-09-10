@@ -41,19 +41,19 @@ UTextBuffer::~UTextBuffer()
     delete Text;
 }
 
-void UTextBuffer::LoadFromPackage( FPackageFileIn& In )
+void UTextBuffer::LoadFromPackage( FPackageFileIn* In )
 {
   Super::LoadFromPackage( In );
   
-  In >> Pos;
-  In >> Top;
+  *In >> Pos;
+  *In >> Top;
 
   idx TextSize;
-  In >> CINDEX( TextSize );
+  *In >> CINDEX( TextSize );
   if ( TextSize > 0 )
   {
     char* TextBuf = (char*)Malloc( TextSize + 1 );
-    In.Read( TextBuf, TextSize + 1 );
+    In->Read( TextBuf, TextSize + 1 );
     Text = new String( TextBuf );
   }
 }
@@ -72,15 +72,15 @@ UField::~UField()
   Next->DelRef();
 }
 
-void UField::LoadFromPackage( FPackageFileIn& In )
+void UField::LoadFromPackage( FPackageFileIn* In )
 {
   Super::LoadFromPackage( In );
   
-  idx SuperIdx;
-  idx NextIdx;
+  idx SuperIdx = MAX_UINT32;
+  idx NextIdx = MAX_UINT32;
   
-  In >> CINDEX( SuperIdx );
-  In >> CINDEX( NextIdx );
+  *In >> CINDEX( SuperIdx );
+  *In >> CINDEX( NextIdx );
   
   if ( SuperIdx )
     SuperField = (UField*)UPackage::StaticLoadObject( Pkg, SuperIdx, NULL, Outer );
@@ -101,16 +101,16 @@ UConst::~UConst()
     delete Value;
 }
 
-void UConst::LoadFromPackage( FPackageFileIn& In )
+void UConst::LoadFromPackage( FPackageFileIn* In )
 {
   Super::LoadFromPackage( In );
 
   idx Size;
-  In >> CINDEX( Size );
+  *In >> CINDEX( Size );
 
   // Size includes null terminator
   char* Str = (char*)Malloc( Size ); 
-  In.Read( Str, Size );
+  In->Read( Str, Size );
 
   Value = new String( Str );
 }
@@ -125,18 +125,18 @@ UEnum::~UEnum()
   Names.Clear();
 }
 
-void UEnum::LoadFromPackage( FPackageFileIn& In )
+void UEnum::LoadFromPackage( FPackageFileIn* In )
 {
   Super::LoadFromPackage( In );
 
   idx ArraySize;
-  In >> CINDEX( ArraySize );
+  *In >> CINDEX( ArraySize );
   Names.Reserve( ArraySize );
 
   for( int i = 0; i < ArraySize; i++ )
   {
     idx ElementIdx;
-    In >> CINDEX( ElementIdx );
+    *In >> CINDEX( ElementIdx );
     Names.PushBack( Pkg->ResolveNameFromIdx( ElementIdx ) );
   }
 }
@@ -180,47 +180,53 @@ UStruct::~UStruct()
 #define LOAD_CODE( strct, var, type ) \
   *(strct->ScriptCode)++ = var
 
-static inline void LoadScriptByte( UStruct* Struct, FPackageFileIn& In )
+static inline void LoadScriptByte( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize )
 {
   u8 Byte;
-  In >> Byte;
+  *In >> Byte;
+  *ParsedSize += 1;
   LOAD_CODE( Struct, Byte, u8 );
 }
 
-static inline void LoadScriptWord( UStruct* Struct, FPackageFileIn& In )
+static inline void LoadScriptWord( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize )
 {
   u16 Word;
-  In >> Word;
+  *In >> Word;
+  *ParsedSize += 2;
   LOAD_CODE( Struct, Word, u16 );
 }
 
-static inline void LoadScriptDword( UStruct* Struct, FPackageFileIn& In )
+static inline void LoadScriptDword( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize )
 {
   u32 Dword;
-  In >> Dword;
+  *In >> Dword;
+  *ParsedSize += 4;
   LOAD_CODE( Struct, Dword, u32 );
 }
 
-static inline void LoadScriptIndex( UStruct* Struct, FPackageFileIn& In )
+static inline void LoadScriptIndex( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize )
 {
   idx Index;
-  In >> CINDEX( Index );
+  *In >> CINDEX( Index );
+  *ParsedSize += 4;
   LOAD_CODE( Struct, Index, idx );
 }
 
-static inline void LoadScriptFloat( UStruct* Struct, FPackageFileIn& In )
+static inline void LoadScriptFloat( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize )
 {
   float Float;
-  In >> Float;
+  *In >> Float;
+  *ParsedSize += 4;
   LOAD_CODE( Struct, Float, float );
 }
 
-static inline void LoadScriptString( UStruct* Struct, FPackageFileIn& In )
+static inline void LoadScriptString( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize )
 {
   u8 Char = 0;
   do
   {
-    In >> Char;
+    *In >> Char;
+    *ParsedSize += 1;
     LOAD_CODE( Struct, Char, u8 );
     
   } while ( Char != 0 );
@@ -228,18 +234,19 @@ static inline void LoadScriptString( UStruct* Struct, FPackageFileIn& In )
 
 // FIXME: We don't actually deal with unicode strings because we should be using
 // UTF-8 instead, should we convert the characters later?
-static inline void LoadScriptUnicodeString( UStruct* Struct, FPackageFileIn& In )
+static inline void LoadScriptUnicodeString( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize )
 {
   u16 Wchar = 0;
   do
   {
-    In >> Wchar;
+    *In >> Wchar;
+    *ParsedSize += 2;
     LOAD_CODE( Struct, Wchar, u16 );
 
   } while ( Wchar != 0 ); 
 }
 
-static inline void LoadScriptLabelTable( UStruct* Struct, FPackageFileIn& In )
+static inline void LoadScriptLabelTable( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize )
 {
   FScriptLabel Label;
   Label.Index = 0;
@@ -247,8 +254,9 @@ static inline void LoadScriptLabelTable( UStruct* Struct, FPackageFileIn& In )
 
   while ( 1 )
   {
-    In >> CINDEX( Label.Index );
-    In >> Label.Offset;
+    *In >> CINDEX( Label.Index );
+    *In >> Label.Offset;
+    *ParsedSize += 8;
 
     LOAD_CODE( Struct, Label.Index, idx );
     LOAD_CODE( Struct, Label.Offset, u32 );
@@ -262,21 +270,23 @@ static inline void LoadScriptLabelTable( UStruct* Struct, FPackageFileIn& In )
 
 // Helper function to load script code
 // Does not care about type resolution whatsoever
-static inline void LoadScriptCode( UStruct* Struct, FPackageFileIn& In )
+static inline void LoadScriptCode( UStruct* Struct, FPackageFileIn* In )
 {
   u8 Token = -1;
+  u32 ParsedSize = 0;
   bool bQueueReadIteratorWord = false;
   bool bReadIteratorWord = false;
-  while ( Token != EX_LabelTable || Token != EX_Return )
+  while ( ParsedSize < Struct->ScriptSize )
   {
-    In >> Token;
+    *In >> Token;
+    ParsedSize += 1;
     LOAD_CODE( Struct, Token, u8 );
 
     // Handle extended native case up here since switch statements
     // can't really handle this type of comparison
     if ( UNLIKELY( (Token && 0xF0) == EX_ExtendedNative ) )
     {
-      LoadScriptByte( Struct, In );
+      LoadScriptByte( Struct, In, &ParsedSize );
       continue;
     }
 
@@ -296,52 +306,52 @@ static inline void LoadScriptCode( UStruct* Struct, FPackageFileIn& In )
       case EX_StructCmpNe:
       case EX_StructMember:
       case EX_GlobalFunction:
-        LoadScriptIndex( Struct, In );
+        LoadScriptIndex( Struct, In, &ParsedSize );
         break;
       case EX_Switch:
-        LoadScriptByte( Struct, In );
+        LoadScriptByte( Struct, In, &ParsedSize );
         break;
       case EX_Jump:
       case EX_JumpIfNot:
       case EX_Assert:
       case EX_Case:
       case EX_Skip:
-        LoadScriptWord( Struct, In );
+        LoadScriptWord( Struct, In, &ParsedSize );
         break;
       case EX_LabelTable:
-        LoadScriptLabelTable( Struct, In );
+        LoadScriptLabelTable( Struct, In, &ParsedSize );
         break;
       case EX_ClassContext:
-        LoadScriptIndex( Struct, In );
-        LoadScriptWord( Struct, In );
-        LoadScriptByte( Struct, In );
-        LoadScriptIndex( Struct, In );
+        LoadScriptIndex( Struct, In, &ParsedSize );
+        LoadScriptWord( Struct, In, &ParsedSize );
+        LoadScriptByte( Struct, In, &ParsedSize );
+        LoadScriptIndex( Struct, In, &ParsedSize );
         break;
       case EX_IntConst:
-        LoadScriptDword( Struct, In );
+        LoadScriptDword( Struct, In, &ParsedSize );
         break;
       case EX_FloatConst:
-        LoadScriptFloat( Struct, In );
+        LoadScriptFloat( Struct, In, &ParsedSize );
         break;
       case EX_StringConst:
-        LoadScriptString( Struct, In );
+        LoadScriptString( Struct, In, &ParsedSize );
         break;
       case EX_RotationConst:
-        LoadScriptDword( Struct, In );
-        LoadScriptDword( Struct, In );
-        LoadScriptDword( Struct, In );
+        LoadScriptDword( Struct, In, &ParsedSize );
+        LoadScriptDword( Struct, In, &ParsedSize );
+        LoadScriptDword( Struct, In, &ParsedSize );
         break;
       case EX_VectorConst:
-        LoadScriptFloat( Struct, In );
-        LoadScriptFloat( Struct, In );
-        LoadScriptFloat( Struct, In );
+        LoadScriptFloat( Struct, In, &ParsedSize );
+        LoadScriptFloat( Struct, In, &ParsedSize );
+        LoadScriptFloat( Struct, In, &ParsedSize );
         break;
       case EX_Iterator:
         // stupid edge cases... see below
         bReadIteratorWord = true;
         break;
       case EX_UnicodeStringConst:
-        LoadScriptUnicodeString( Struct, In );
+        LoadScriptUnicodeString( Struct, In, &ParsedSize );
         break;
       case EX_Unk03:
       case EX_Unk15:
@@ -371,33 +381,36 @@ static inline void LoadScriptCode( UStruct* Struct, FPackageFileIn& In )
     }
     else if ( bReadIteratorWord )
     {
-      LoadScriptWord( Struct, In );
+      LoadScriptWord( Struct, In, &ParsedSize );
       bReadIteratorWord = false;
     }
   }
 }
 
-void UStruct::LoadFromPackage( FPackageFileIn& In )
+void UStruct::LoadFromPackage( FPackageFileIn* In )
 {
   Super::LoadFromPackage( In );
   
-  idx ScriptTextIdx;
-  idx ChildIdx;
-  idx FriendlyNameIdx;
+  idx ScriptTextIdx = MAX_UINT32;
+  idx ChildIdx = MAX_UINT32;
+  idx FriendlyNameIdx = MAX_UINT32;
   
-  In >> CINDEX( ScriptTextIdx );
-  In >> CINDEX( ChildIdx );
-  In >> CINDEX( FriendlyNameIdx );
+  *In >> CINDEX( ScriptTextIdx );
+  *In >> CINDEX( ChildIdx );
+  *In >> CINDEX( FriendlyNameIdx );
   
   ScriptText = (UTextBuffer*)UPackage::StaticLoadObject( Pkg, ScriptTextIdx, UTextBuffer::StaticClass(), this );
   Children = (UField*)UPackage::StaticLoadObject( Pkg, ChildIdx, NULL, this );
   FriendlyName = Pkg->ResolveNameFromIdx( FriendlyNameIdx );
-  In >> Line;
-  In >> TextPos;
-  In >> ScriptSize;
+  *In >> Line;
+  *In >> TextPos;
+  *In >> ScriptSize;
   
-  ScriptCode = new u8[ ScriptSize ];
-  ::LoadScriptCode( this, In );
+  if ( ScriptSize > 0 )
+  {
+    ScriptCode = new u8[ ScriptSize ];
+    ::LoadScriptCode( this, In );
+  }
 
   // Calculate struct size
   StructSize += NativeSize;
@@ -429,26 +442,26 @@ UFunction::~UFunction()
 {
 }
 
-void UFunction::LoadFromPackage( FPackageFileIn& In )
+void UFunction::LoadFromPackage( FPackageFileIn* In )
 {
   Super::LoadFromPackage( In );
 
-  if ( In.Ver <= PKG_VER_UN_220 )
-    In >> CINDEX( ParmsSize );
+  if ( In->Ver <= PKG_VER_UN_220 )
+    *In >> CINDEX( ParmsSize );
 
-  In >> iNative;
+  *In >> iNative;
 
-  if ( In.Ver <= PKG_VER_UN_220 )
-    In >> CINDEX( NumParms );
+  if ( In->Ver <= PKG_VER_UN_220 )
+    *In >> CINDEX( NumParms );
 
-  In >> OperatorPrecedence;
+  *In >> OperatorPrecedence;
 
-  if ( In.Ver <= PKG_VER_UN_220 )
-    In >> CINDEX( ReturnValueOffset );
+  if ( In->Ver <= PKG_VER_UN_220 )
+    *In >> CINDEX( ReturnValueOffset );
 
-  In >> FunctionFlags;
+  *In >> FunctionFlags;
   if ( FunctionFlags & FUNC_Net )
-    In >> ReplicationOffset;
+    *In >> ReplicationOffset;
 }
 
 // UState
@@ -461,14 +474,14 @@ UState::~UState()
 {
 }
 
-void UState::LoadFromPackage( FPackageFileIn& In )
+void UState::LoadFromPackage( FPackageFileIn* In )
 {
   Super::LoadFromPackage( In );
   
-  In >> ProbeMask;
-  In >> IgnoreMask;
-  In >> LabelTableOffset;
-  In >> StateFlags;
+  *In >> ProbeMask;
+  *In >> IgnoreMask;
+  *In >> LabelTableOffset;
+  *In >> StateFlags;
 }
 
 // FDependency
@@ -483,16 +496,18 @@ FDependency::FDependency()
 UClass::UClass()
   : UState()
 {
-  
 }
 
 UClass::UClass( const char* ClassName, u32 Flags, UClass* InSuperClass, UObject *(*NativeCtor)(size_t) )
   : UState()
 {
   Name = StringDup( ClassName );
+  Hash = FnvHashString( Name );
   ClassFlags = Flags;
+  SuperClass = InSuperClass;
   SuperField = InSuperClass;
   Constructor = NativeCtor;
+  Default = NULL;
   NativeNeedsPkgLoad = true;
 }
 
@@ -502,51 +517,51 @@ UClass::~UClass()
   Default->DelRef();
 }
 
-void UClass::LoadFromPackage( FPackageFileIn& In )
+void UClass::LoadFromPackage( FPackageFileIn* In )
 {
   Super::LoadFromPackage( In );
 
-  In >> ClassFlags;
-  In.Read( ClassGuid, sizeof( ClassGuid ) );
+  *In >> ClassFlags;
+  In->Read( ClassGuid, sizeof( ClassGuid ) );
   
-  idx DepCount;
-  In >> CINDEX( DepCount );
+  idx DepCount = 0;
+  *In >> CINDEX( DepCount );
   Dependencies.Reserve( DepCount );
   
   FDependency Dep;
   for ( int i = 0; i < DepCount; i++ )
   {
     idx DepObjRef;
-    In >> CINDEX( DepObjRef );
+    *In >> CINDEX( DepObjRef );
     
     if ( stricmp( Pkg->ResolveNameFromObjRef( DepObjRef ), FriendlyName ) )
       Dep.Class = (UClass*)UPackage::StaticLoadObject( Pkg, DepObjRef, UClass::StaticClass() );
     
-    In >> Dep.Deep;
-    In >> Dep.ScriptTextCRC;
+    *In >> Dep.Deep;
+    *In >> Dep.ScriptTextCRC;
     
     Dependencies.PushBack( Dep );
   }
   
   // I don't actually know what these are for
-  idx NumPkgImports;
-  In >> CINDEX( NumPkgImports );
+  idx NumPkgImports = 0;
+  *In >> CINDEX( NumPkgImports );
   PackageImports.Reserve( NumPkgImports );
   
   for ( int i = 0; i < NumPkgImports; i++ )
   {
-    idx PkgImport;
-    In >> CINDEX( PkgImport );
+    idx PkgImport = 0;
+    *In >> CINDEX( PkgImport );
     PackageImports.PushBack( PkgImport );
   }
   
-  if ( In.Ver >= PKG_VER_UN_220 - 1 ) // package version 62 ??
+  if ( In->Ver >= PKG_VER_UN_220 - 1 ) // package version 62 ??
   {
-    idx ClassWithinIdx;
-    idx ClassConfigNameIdx;
+    idx ClassWithinIdx = 0;
+    idx ClassConfigNameIdx = 0;
     
-    In >> CINDEX( ClassWithinIdx );
-    In >> CINDEX( ClassConfigNameIdx );
+    *In >> CINDEX( ClassWithinIdx );
+    *In >> CINDEX( ClassConfigNameIdx );
     
     ClassWithin = (UClass*)UPackage::StaticLoadObject( Pkg, ClassWithinIdx, UClass::StaticClass() );
     ClassConfigName = Pkg->ResolveNameFromIdx( ClassConfigNameIdx );
@@ -565,21 +580,20 @@ void UClass::LoadFromPackage( FPackageFileIn& In )
     Constructor = SuperClass->Constructor;
 
   SuperClass = SafeCast<UClass>( SuperField );
-  if ( SuperClass == NULL )
+  if ( SuperClass != NULL )
   {
-    Logf( LOG_CRIT, "SUPERFIELD OF CLASS IS NOT A CLASS!!!" );
-    GSystem->Exit( -1 );
-  }
-  SuperClass->AddRef();
+    SuperClass->AddRef();
   
-  // Get last child
-  UField* Iter;
-  if ( Children != NULL )
-    for ( Iter = Children; Iter->Next != NULL; Iter = Iter->Next );
-  Iter->Next = SuperClass->Children;
-  SuperClass->Children->AddRef();
+    // Get last child
+    UField* Iter;
+    if ( Children != NULL )
+      for ( Iter = Children; Iter->Next != NULL; Iter = Iter->Next );
+    Iter->Next = SuperClass->Children;
+    SuperClass->Children->AddRef();
+  }
 
   Default = CreateObject();
+  Default->Pkg   = Pkg;
   Default->Class = this;
   Default->Field = Children;
 

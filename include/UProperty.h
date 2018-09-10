@@ -65,80 +65,80 @@ class UProperty : public UField
   // Static variables
   static u8 PropertySizes[8];
   
-  virtual void LoadFromPackage( FPackageFileIn& In );
+  virtual void LoadFromPackage( FPackageFileIn* In );
   u32 GetNativeOffset( const char* ClassName, const char* PropName );
 };
 
 class UByteProperty : public UProperty
 {
   DECLARE_CLASS( UByteProperty, UProperty, CLASS_NoExport, Core )
-  virtual void LoadFromPackage( FPackageFileIn& In );
+  virtual void LoadFromPackage( FPackageFileIn* In );
   UEnum* Enum;
 };
 
 class UIntProperty : public UProperty
 {
   DECLARE_CLASS( UIntProperty, UProperty, CLASS_NoExport, Core )
-  virtual void LoadFromPackage( FPackageFileIn& In );
+  virtual void LoadFromPackage( FPackageFileIn* In );
 };
 
 class UBoolProperty : public UProperty
 {
   DECLARE_CLASS( UBoolProperty, UProperty, CLASS_NoExport, Core )
-  virtual void LoadFromPackage( FPackageFileIn& In );
+  virtual void LoadFromPackage( FPackageFileIn* In );
 };
 
 class UFloatProperty : public UProperty
 {
   DECLARE_CLASS( UFloatProperty, UProperty, CLASS_NoExport, Core )
-  virtual void LoadFromPackage( FPackageFileIn& In );
+  virtual void LoadFromPackage( FPackageFileIn* In );
 };
 
 class UObjectProperty : public UProperty
 {
   DECLARE_CLASS( UObjectProperty, UProperty, CLASS_NoExport, Core )
-  virtual void LoadFromPackage( FPackageFileIn& In );
+  virtual void LoadFromPackage( FPackageFileIn* In );
   UClass* ObjectType;
 };
 
 class UNameProperty : public UProperty
 {
   DECLARE_CLASS( UNameProperty, UProperty, CLASS_NoExport, Core )
-  virtual void LoadFromPackage( FPackageFileIn& In );
+  virtual void LoadFromPackage( FPackageFileIn* In );
 };
 
 // ?
 class UStringProperty : public UProperty
 {
   DECLARE_CLASS( UStringProperty, UProperty, CLASS_NoExport, Core )
-  virtual void LoadFromPackage( FPackageFileIn& In );
+  virtual void LoadFromPackage( FPackageFileIn* In );
 };
 
 class UClassProperty : public UObjectProperty
 {
   DECLARE_CLASS( UClassProperty, UProperty, CLASS_NoExport, Core )
-  virtual void LoadFromPackage( FPackageFileIn& In );
+  virtual void LoadFromPackage( FPackageFileIn* In );
 };
 
 // ?
 class UArrayProperty : public UProperty
 {
   DECLARE_CLASS( UArrayProperty, UProperty, CLASS_NoExport, Core )
-  virtual void LoadFromPackage( FPackageFileIn& In );
+  virtual void LoadFromPackage( FPackageFileIn* In );
   UProperty* Inner;
 };
 
 class UStructProperty : public UProperty
 {
   DECLARE_CLASS( UStructProperty, UProperty, CLASS_NoExport, Core )
-  virtual void LoadFromPackage( FPackageFileIn& In );
+  virtual void LoadFromPackage( FPackageFileIn* In );
   UStruct* Struct;
 };
 
 class UStrProperty : public UProperty
 {
   DECLARE_CLASS( UStrProperty, UProperty, CLASS_NoExport, Core )
-  virtual void LoadFromPackage( FPackageFileIn& In );
+  virtual void LoadFromPackage( FPackageFileIn* In );
   int Length;
 };
 
@@ -146,14 +146,14 @@ class UStrProperty : public UProperty
 class UMapProperty : public UProperty
 {
   DECLARE_CLASS( UMapProperty, UProperty, CLASS_NoExport, Core )
-  virtual void LoadFromPackage( FPackageFileIn& In );
+  virtual void LoadFromPackage( FPackageFileIn* In );
 };
 
 // ?
 class UFixedArrayProperty : public UProperty
 {
   DECLARE_CLASS( UFixedArrayProperty, UProperty, CLASS_NoExport, Core )
-  virtual void LoadFromPackage( FPackageFileIn& In );
+  virtual void LoadFromPackage( FPackageFileIn* In );
 };
 
 

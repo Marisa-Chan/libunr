@@ -37,7 +37,7 @@ class UTextBuffer : public UObject
   DECLARE_ABSTRACT_CLASS( UTextBuffer, UObject, CLASS_NoExport, Core )
 
   UTextBuffer();
-  virtual void LoadFromPackage( FPackageFileIn& In );
+  virtual void LoadFromPackage( FPackageFileIn* In );
 
   u32 Pos, Top;
   String* Text;
@@ -48,7 +48,7 @@ class UField : public UObject
   DECLARE_ABSTRACT_CLASS( UField, UObject, CLASS_NoExport, Core )
 
   UField();
-  virtual void LoadFromPackage( FPackageFileIn& In );
+  virtual void LoadFromPackage( FPackageFileIn* In );
 
   UField* SuperField; // Parent object
   UField* Next;       // Next object in list
@@ -59,7 +59,7 @@ class UConst : public UField
   DECLARE_CLASS( UConst, UField, CLASS_NoExport, Core )
 
   UConst();
-  virtual void LoadFromPackage( FPackageFileIn& In );
+  virtual void LoadFromPackage( FPackageFileIn* In );
 
   String* Value;
 };
@@ -69,7 +69,7 @@ class UEnum : public UField
   DECLARE_CLASS( UEnum, UField, CLASS_NoExport, Core )
 
   UEnum();
-  virtual void LoadFromPackage( FPackageFileIn& In );
+  virtual void LoadFromPackage( FPackageFileIn* In );
 
   Array<const char*> Names;
 };
@@ -86,7 +86,7 @@ class UStruct : public UField
 
   UStruct();
   UStruct( size_t InNativeSize );
-  virtual void LoadFromPackage( FPackageFileIn& In );
+  virtual void LoadFromPackage( FPackageFileIn* In );
 
   UTextBuffer* ScriptText;
   UField* Children;
@@ -134,7 +134,7 @@ class UFunction : public UStruct
   DECLARE_CLASS( UFunction, UStruct, CLASS_NoExport, Core )
 
   UFunction();
-  virtual void LoadFromPackage( FPackageFileIn& In );
+  virtual void LoadFromPackage( FPackageFileIn* In );
 
   idx ParmsSize; // PackageVersion <= 63
   u16 iNative;   // Native function index
@@ -150,7 +150,7 @@ class UState : public UStruct
   DECLARE_CLASS( UState, UStruct, CLASS_NoExport, Core )
 
   UState();
-  virtual void LoadFromPackage( FPackageFileIn& In );
+  virtual void LoadFromPackage( FPackageFileIn* In );
  
   u64 ProbeMask;
   u64 IgnoreMask;
@@ -174,7 +174,7 @@ class UClass : public UState
   UClass();
   UClass( const char* ClassName, u32 Flags, UClass* SuperClass, UObject *(*NativeCtor)(size_t) );
   
-  virtual void LoadFromPackage( FPackageFileIn& In );
+  virtual void LoadFromPackage( FPackageFileIn* In );
 
   bool IsNative();
   UObject* CreateObject();

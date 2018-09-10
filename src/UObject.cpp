@@ -32,14 +32,18 @@
 #include "UPackage.h"
 #include "USystem.h"
 
-Array<FNativePropertyList>* NativePropertyLists = NULL;
-
 FNativePropertyList::FNativePropertyList( FHash InHash, size_t InNum )
 {
   Hash = InHash;
   Num = InNum;
   Added = 0;
   Properties = new FNativePropertyLink[Num];
+}
+
+FNativePropertyList::~FNativePropertyList()
+{
+  if ( Properties )
+    delete Properties;
 }
 
 void FNativePropertyList::AddProperty( const char* Name, u32 Offset )
@@ -54,6 +58,7 @@ void FNativePropertyList::AddProperty( const char* Name, u32 Offset )
 
 Array<UObject*>* UObject::ObjectPool = NULL;
 Array<UClass*>*  UObject::ClassPool = NULL;
+Array<FNativePropertyList*>* UObject::NativePropertyLists = NULL;
 
 bool UObject::StaticLinkNativeProperties()
 {
@@ -83,7 +88,7 @@ UObject* UObject::StaticConstructObject( const char* InName, UClass* InClass, UO
   Out->Outer = InOuter;
   Out->Flags = 0;
   Out->Class = InClass;
-  Out->Field = InClass->Default->Field;
+  Out->Field = InClass->Default == NULL ? NULL : InClass->Default->Field;
 
   // Add to object
   ObjectPool->PushBack( Out );
@@ -93,17 +98,18 @@ UObject* UObject::StaticConstructObject( const char* InName, UClass* InClass, UO
   return Out;
 }
 
-UClass* AllocateClass( const char* ClassName, u32 Flags, UClass* SuperClass, 
+UClass* UObject::GetUClassClass()
+{
+  return UClass::StaticClass();
+}
+
+UClass* UObject::StaticAllocateClass( const char* ClassName, u32 Flags, UClass* SuperClass, 
     UObject *(*NativeCtor)(size_t) )
 {
   ClassName++; // We don't want the prefix indicating object type in the name of the class
-  return new UClass( ClassName, Flags, SuperClass, NativeCtor );
-}
-
-FPackageFileIn& operator>>( FPackageFileIn& Ar, UObject& Obj )
-{
-  Obj.LoadFromPackage( Ar );
-  return Ar;
+  UClass* Out = new UClass( ClassName, Flags, SuperClass, NativeCtor );
+  Out->Class = UClass::StaticClass();
+  return Out;
 }
 
 FPackageFileOut& operator<<( FPackageFileOut& Ar, UObject& Obj )
@@ -134,17 +140,17 @@ bool UObject::ExportToFile()
   return false;
 }
 
-void UObject::LoadFromPackage( FPackageFileIn& Ar )
+void UObject::LoadFromPackage( FPackageFileIn* In )
 {
   if ( Flags & RF_HasStack )
   {
     // Load stack info
   }
   
-  if ( !ObjectClass->IsA( UClass::StaticClass() ) )
+  if ( Class != UClass::StaticClass() )
   {
     // Load properties
-    ReadDefaultProperties( Ar );
+    ReadDefaultProperties( In );
   }
   
   return;
@@ -192,17 +198,17 @@ bool UObject::IsA( UClass* ClassType )
   return false;
 }
 
-static int ReadArrayIndex( FPackageFileIn& In )
+static int ReadArrayIndex( FPackageFileIn* In )
 {
   u8 ArrayIdx[4];
-  In >> ArrayIdx[0];
+  *In >> ArrayIdx[0];
   if ( ArrayIdx[0] >= 128 )
   {
-    In >> ArrayIdx[1];
+    *In >> ArrayIdx[1];
     if ( (ArrayIdx[1] & 0x80) != 0 && *((u16*)&ArrayIdx[0]) >= 16384 )
     {
-      In >> ArrayIdx[2];
-      In >> ArrayIdx[3];
+      *In >> ArrayIdx[2];
+      *In >> ArrayIdx[3];
       ArrayIdx[3] &= ~0xC0;
     }
     else
@@ -215,7 +221,7 @@ static int ReadArrayIndex( FPackageFileIn& In )
   return Idx;
 }
 
-void UObject::ReadDefaultProperties( FPackageFileIn& In )
+void UObject::ReadDefaultProperties( FPackageFileIn* In )
 {
   const char* PropName = NULL;
   idx PropNameIdx = 0;
@@ -228,14 +234,14 @@ void UObject::ReadDefaultProperties( FPackageFileIn& In )
   
   while( 1 )
   {
-    In >> CINDEX( PropName );
+    *In >> CINDEX( PropName );
     PropName = Pkg->ResolveNameFromIdx( PropNameIdx );
     if ( UNLIKELY( strncmp( PropName, "None", 4 ) == 0 ) )
       break;
 
     UProperty* Prop = FindProperty( PropName );
 
-    In >> InfoByte;
+    *In >> InfoByte;
     PropType = InfoByte & 0x0F;
     SizeByte = InfoByte & 0x70;
     IsArray  = InfoByte & 0x80;
@@ -247,15 +253,15 @@ void UObject::ReadDefaultProperties( FPackageFileIn& In )
       switch( SizeByte )
       {
         case 5:
-          In >> Size8;
+          *In >> Size8;
           RealSize = Size8;
           break;
         case 6:
-          In >> Size16;
+          *In >> Size16;
           RealSize = Size16;
           break;
         case 7:
-          In >> RealSize;
+          *In >> RealSize;
           break;
       }
     }
@@ -277,7 +283,7 @@ void UObject::ReadDefaultProperties( FPackageFileIn& In )
         ArrayIdx = ReadArrayIndex( In );
     
       u8 Value = 0;
-      In >> Value;
+      *In >> Value;
       SetByteProperty( ByteProp, Value, ArrayIdx ); 
     }
     else if ( PropType == PROP_Int )
@@ -293,7 +299,7 @@ void UObject::ReadDefaultProperties( FPackageFileIn& In )
         ArrayIdx = ReadArrayIndex( In );
 
       int Value = 0;
-      In >> Value;
+      *In >> Value;
       SetIntProperty( IntProp, Value, ArrayIdx );
     }
     else if ( PropType == PROP_Bool )
@@ -320,7 +326,7 @@ void UObject::ReadDefaultProperties( FPackageFileIn& In )
         ArrayIdx = ReadArrayIndex( In );
 
       float Value = 0;
-      In >> Value;
+      *In >> Value;
       SetFloatProperty( FloatProp, Value, ArrayIdx );
     }
     else if ( PropType == PROP_Object )
@@ -336,7 +342,7 @@ void UObject::ReadDefaultProperties( FPackageFileIn& In )
         ArrayIdx = ReadArrayIndex( In );
 
       idx ObjRef = 0;
-      In >> CINDEX( ObjRef );
+      *In >> CINDEX( ObjRef );
       SetObjProperty( ObjProp, UPackage::StaticLoadObject( Pkg, ObjRef ), ArrayIdx );
     }
   }

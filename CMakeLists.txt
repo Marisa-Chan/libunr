@@ -31,7 +31,8 @@ set (SOURCES ${LIBUNR_SRC}/FConfig.cpp
 )
 
 include_directories (${LIBUNR_INC} ${XSTL_INC} /usr/include)
-add_definitions("-std=c++11" "-DXSTL_USE_STL")
+add_definitions("-std=c++11" "-DXSTL_ARRAY_STD" "-DXSTL_STRING_STD"
+  "-DXSTL_FILESTREAM_STD" "-DXSTL_STACK_STD")
 add_definitions ("-Wno-attributes" "-g")
 set_source_files_properties( tags PROPERTIES GENERATED true )
 add_custom_target( tags COMMAND ctags --c++-kinds=+p --fields=+iaS --extra=+q

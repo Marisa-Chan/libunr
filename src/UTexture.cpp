@@ -39,21 +39,21 @@ UPalette::~UPalette()
 {
 }
 
-void UPalette::LoadFromPackage( FPackageFileIn& Ar )
+void UPalette::LoadFromPackage( FPackageFileIn* In )
 {
   // Read the none property (this will never have any other property types)
   idx None;
-  Ar >> CINDEX( None );
+  *In >> CINDEX( None );
   
   idx PaletteSize;
-  Ar >> CINDEX( PaletteSize );
+  *In >> CINDEX( PaletteSize );
   
   if ( PaletteSize != 256 )
     Logf( LOG_WARN, "Palette does not have 256 entries!" );
   
   // Load colors
   for (int i = 0; i < PaletteSize; i++) {
-    Ar >> Colors[i];
+    *In >> Colors[i];
   }
 }
 
@@ -75,7 +75,7 @@ UBitmap::~UBitmap()
 {
 }
 
-void UBitmap::LoadFromPackage()
+void UBitmap::LoadFromPackage( FPackageFileIn* In )
 {
 }
 
@@ -119,7 +119,7 @@ UTexture::~UTexture()
 {
 }
 
-void UTexture::LoadFromPackage( FPackageFileIn& Ar )
+void UTexture::LoadFromPackage( FPackageFileIn* In )
 {
   // load properties
 }

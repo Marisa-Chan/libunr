@@ -177,14 +177,15 @@ struct FNativePropertyLink
 struct FNativePropertyList
 {
   FNativePropertyList( FHash InHash, size_t InNum );
+  ~FNativePropertyList();
   void AddProperty( const char* Name, u32 InOffset );
-  
+ 
+  bool bInitialized;
   FHash Hash;
   size_t Added;
   size_t Num;
   FNativePropertyLink* Properties;
 };
-extern Array<FNativePropertyList>* NativePropertyLists;
 
 // FIXME: Forward declarations are gross
 class UObject;
@@ -207,10 +208,6 @@ class UClass;
 class UPackage;
 struct FPropertyRecord;
 
-UClass* AllocateClass( const char* ClassName, u32 Flags, UClass* SuperClass, UObject *(*NativeCtor)(size_t) );
-//const char* Core = "Core";
-//const char* Engine = "Engine";
-
 #define TEXT(s) #s
 
 #define DECLARE_BASE_CLASS(cls, supcls, clsflags, pkg) \
@@ -229,7 +226,7 @@ public: \
   } \
   void* operator new( size_t sz, size_t ObjSize ) \
   { \
-    void* Mem = xstl::Malloc( ObjSize ); \
+    void* Mem = xstl::Malloc( sz + ObjSize ); \
     xstl::Set( Mem, 0, ObjSize ); \
     return Mem; \
   } \
@@ -239,16 +236,23 @@ public: \
   } \
   static UClass* StaticClass() \
   { return ObjectClass; } \
+  static UClass* GetUClassClass(); \
+  static bool BootstrapUClass(); \
   static UObject* NativeConstructor( size_t ObjSize ) \
   { \
     return new(ObjSize) cls(); \
   } \
-  static bool StaticInitializeClass() \
+  static bool StaticCreateClass() \
   { \
     if (!ObjectClass) \
     { \
-      ObjectClass = AllocateClass( TEXT(cls), clsflags, Super::ObjectClass, NativeConstructor ); \
-      return ( ObjectClass != NULL ); \
+      ObjectClass = UObject::StaticAllocateClass( TEXT(cls), clsflags, Super::ObjectClass, NativeConstructor ); \
+      if ( ObjectClass != NULL ) \
+      { \
+        ClassPool->PushBack( ObjectClass ); \
+        return true; \
+      } \
+      return false; \
     } \
     return true; \
   } \
@@ -257,28 +261,35 @@ public: \
     if (!StaticNativePropList) \
     { \
       StaticNativePropList = new FNativePropertyList( FnvHashString( TEXT(cls) ), NumProperties ); \
-      return (StaticNativePropList != NULL); \
+      if ( StaticNativePropList != NULL ) \
+      { \
+        NativePropertyLists->PushBack( StaticNativePropList ); \
+        return true; \
+      } \
+      return false; \
     } \
-    return false; \
+    return true; \
   } \
   static bool StaticLoadNativeClass(); \
   static bool StaticClassInit() \
   { \
-    if ( !StaticInitializeClass() ) \
+    if ( !StaticCreateClass() ) \
     { \
-      Logf( LOG_CRIT, "%s::StaticInitializeClass() failed!", TEXT(cls) ); \
+      Logf( LOG_CRIT, "%s::StaticCreateClass() failed!", TEXT(cls) ); \
       return false; \
     } \
-    if ( !StaticLinkNativeProperties() ) \
+    if ( !( clsflags & CLASS_NoExport ) ) \
     { \
-      Logf( LOG_CRIT, "%s::StaticLinkNativeProperties() failed!", TEXT(cls) ); \
-      return false; \
-    } \
-    StaticLinkNativeProperties(); \
-    if ( !StaticLoadNativeClass() ) \
-    { \
-      Logf( LOG_CRIT, "%s::StaticLoadNativeClass() failed!", TEXT(cls) ); \
-      return false; \
+      if ( !StaticLinkNativeProperties() ) \
+      { \
+        Logf( LOG_CRIT, "%s::StaticLinkNativeProperties() failed!", TEXT(cls) ); \
+        return false; \
+      } \
+      if ( !StaticLoadNativeClass() ) \
+      { \
+        Logf( LOG_CRIT, "%s::StaticLoadNativeClass() failed!", TEXT(cls) ); \
+        return false; \
+      } \
     } \
     return true; \
   } \
@@ -300,10 +311,7 @@ public: \
   FNativePropertyList* cls::StaticNativePropList = NULL; \
   bool cls::StaticLoadNativeClass() \
   { \
-    if ( !( ObjectClass->ClassFlags & CLASS_NoExport ) ) \
-      return UPackage::StaticLoadPartialClass( NativePkgName, ObjectClass );  \
-    else \
-      return true; \
+    return UPackage::StaticLoadPartialClass( NativePkgName, ObjectClass );  \
   }
  
 #define LINK_NATIVE_PROPERTY(cls, var) \
@@ -329,13 +337,13 @@ class UObject
   EXPORTABLE() // not really exportable, but just so all subclasses can have export called generically
   UObject();
   
-  virtual void LoadFromPackage( FPackageFileIn& In );
+  virtual void LoadFromPackage( FPackageFileIn* In );
   void AddRef();
   void DelRef();
 
   void SetPkgProperties( UPackage* InPkg, int InExpIdx, int InNameIdx );
   bool IsA( UClass* ClassType );
-  void ReadDefaultProperties( FPackageFileIn& Ar );  
+  void ReadDefaultProperties( FPackageFileIn* In );  
   void ReadConfigProperties();
 
   // Property getters
@@ -364,10 +372,12 @@ class UObject
   static bool StaticInit();
   static bool StaticExit();
   static UObject* StaticConstructObject( const char* InName, UClass* InClass, UObject* InOuter );
+  static UClass* StaticAllocateClass( const char* ClassName, u32 Flags, UClass* SuperClass, UObject *(*NativeCtor)(size_t) );
 
   static Array<UObject*>* ObjectPool;
   static Array<UClass*>*  ClassPool; 
-  
+  static Array<FNativePropertyList*>* NativePropertyLists;
+
   FHash       Hash;     // Hash of this object
   const char* Name;     // Name of this object
   int         Index;    // Index of the object in object pool
@@ -395,7 +405,7 @@ protected:
 
 template <class T> T* SafeCast( UObject* Obj )
 {
-  if ( !Obj->IsA( T::StaticClass() ) )
+  if ( !Obj || !Obj->IsA( T::StaticClass() ) )
     return NULL;
 
   return (T*)Obj;

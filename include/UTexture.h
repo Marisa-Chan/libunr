@@ -92,7 +92,7 @@ class UPalette : public UObject
   DECLARE_CLASS( UPalette, UObject, CLASS_SafeReplace, Engine )
   
   UPalette();
-  virtual void LoadFromPackage( FPackageFileIn& Ar );
+  virtual void LoadFromPackage( FPackageFileIn* In );
   
   FColor Colors[256];
 };
@@ -110,7 +110,7 @@ class UBitmap : public UObject
   FColor MaxColor;
   int InternalTime[2];
 
-  virtual void LoadFromPackage();
+  virtual void LoadFromPackage( FPackageFileIn* In );
 };
 
 class UTexture : public UBitmap
@@ -153,7 +153,7 @@ class UTexture : public UBitmap
   Array<FMipmap> CompMips;
   ETextureFormat CompFormat;
   
-  virtual void LoadFromPackage( FPackageFileIn& Ar );
+  virtual void LoadFromPackage( FPackageFileIn* In );
 };
 
 #endif 

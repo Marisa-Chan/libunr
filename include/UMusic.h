@@ -42,7 +42,7 @@ class UMusic : public UObject
   EXPORTABLE() 
   UMusic();
 
-  virtual void LoadFromPackage( FPackageFileIn& Ar );
+  virtual void LoadFromPackage( FPackageFileIn* In );
   
   u16 ChunkCount; //?
   u32 _unknown0; // PackageVerison > 61

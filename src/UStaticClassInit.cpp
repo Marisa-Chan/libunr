@@ -31,7 +31,7 @@
 #include "USystem.h"
 #include "UTexture.h"
 
-#define INIT_CLASS(cls) cls::StaticInitializeClass();
+#define INIT_CLASS(cls) cls::StaticCreateClass();
 
 bool UObject::StaticInit()
 {
@@ -39,12 +39,21 @@ bool UObject::StaticInit()
 
   ObjectPool = new Array<UObject*>();
   ClassPool  = new Array<UClass*> ();
+  NativePropertyLists = new Array<FNativePropertyList*>();
 
-  if ( ObjectPool == NULL || ClassPool == NULL ) 
+  if ( ObjectPool == NULL || ClassPool == NULL || NativePropertyLists == NULL ) 
     return false;
 
   ObjectPool->Reserve( 64 );
   ClassPool->Reserve( 64 );
+  NativePropertyLists->Reserve( 64 );
+
+  // Create the "class" class first, everything else depends on it
+  if ( !UClass::StaticCreateClass() )
+    return false;
+
+  // Create UObject class so child classes have a parent
+  Result &= UObject::StaticCreateClass();
 
   // Register low level classes for Core.u
   Result &= UPackage::StaticClassInit(); 
@@ -71,6 +80,7 @@ bool UObject::StaticInit()
         Result &= UState::StaticClassInit();
           Result &= UClass::StaticClassInit();
 
+  // Now initialize all of UObject
   Result &= UObject::StaticClassInit();
   Result &= USubsystem::StaticClassInit();
 
@@ -79,12 +89,12 @@ bool UObject::StaticInit()
 
   // At this point, order shouldn't matter much
   // Register Engine.u classes
+  Result &= USound::StaticClassInit();
   Result &= UMusic::StaticClassInit();
   Result &= UPalette::StaticClassInit();
   Result &= UBitmap::StaticClassInit();
     Result &= UTexture::StaticClassInit();
-  Result &= USound::StaticClassInit();
-  
+    
   return Result;
 }
 
