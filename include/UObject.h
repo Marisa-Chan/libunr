@@ -214,8 +214,8 @@ struct FPropertyRecord;
 protected: \
   static UClass* ConstructNativeClass( u32 Flags ); \
   static UClass* ObjectClass; \
-private: \
   static FNativePropertyList* StaticNativePropList; \
+private: \
   static constexpr const char* NativePkgName = TEXT(pkg); \
   static size_t NativeSize; \
 public: \

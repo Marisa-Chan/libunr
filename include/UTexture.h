@@ -32,10 +32,14 @@
 #include "UPackage.h"
 #include "USound.h"
 
+// Order is dictated by Engine.Bitmap.ETextureFormat
+// if this order is broken for some reason, that game
+// will probably have strange texture format issues
 enum ETextureFormat
 {
   TEXF_P8,
   TEXF_RGB32,
+  TEXF_RGB64,
   TEXF_DXT1,
   TEXF_RGB24,
   TEXF_RGBA8,
@@ -90,7 +94,8 @@ public:
 class UPalette : public UObject
 {
   DECLARE_CLASS( UPalette, UObject, CLASS_SafeReplace, Engine )
-  
+  EXPOSE_TO_USCRIPT()
+
   UPalette();
   virtual void LoadFromPackage( FPackageFileIn* In );
   
@@ -100,9 +105,11 @@ class UPalette : public UObject
 class UBitmap : public UObject
 {
   DECLARE_CLASS( UBitmap, UObject, CLASS_SafeReplace, Engine )
+  EXPOSE_TO_USCRIPT()
   UBitmap(); 
 
   ETextureFormat Format;
+  UPalette* Palette;
   u8  UBits,  VBits;
   u32 USize,  VSize;
   u32 UClamp, VClamp;
@@ -113,16 +120,62 @@ class UBitmap : public UObject
   virtual void LoadFromPackage( FPackageFileIn* In );
 };
 
+enum ELODSet
+{
+  LODSET_None,
+  LODSET_World,
+  LODSET_Skin,
+};
+
+enum ESurfaceType
+{
+  EST_Default,
+  EST_Rock,
+  EST_Dirt, // Footprints
+  EST_Metal,
+  EST_Wood,
+  EST_Plant,
+  EST_Flesh,
+  EST_Ice,
+  EST_Snow, // Footprints
+  EST_Water,
+  EST_Glass,
+  EST_Carpet,
+  EST_Custom00,
+  EST_Custom01,
+  EST_Custom02,
+  EST_Custom03,
+  EST_Custom04,
+  EST_Custom05,
+  EST_Custom06, // Footprints
+  EST_Custom07, // Footprints
+  EST_Custom08, // Footprints
+  EST_Custom09, // Footprints
+  EST_Custom10 // Footprints
+};
+
+enum EUClampMode
+{
+  UWrap,
+  UClamp,
+};
+
+enum EVClampMode
+{
+  VWrap,
+  VClamp,
+};
+
 class UTexture : public UBitmap
 {
   DECLARE_CLASS( UTexture, UBitmap, CLASS_SafeReplace, Engine )
+  EXPOSE_TO_USCRIPT()
   EXPORTABLE()
   UTexture();
 
   UTexture* BumpMap;
   UTexture* DetailTexture;
   UTexture* MacroTexture;
-  UPalette* Palette;
   
   float Diffuse;
   float Specular;
@@ -141,7 +194,8 @@ class UTexture : public UBitmap
   bool bRealtimeChanged;
   bool bHasComp;
   bool bFractical;
-  
+
+  ELODSet LODSet;
   UTexture* AnimNext;
   UTexture* AnimCurrent;
   u8 PrimeCount;
@@ -152,6 +206,12 @@ class UTexture : public UBitmap
   Array<FMipmap> Mips;
   Array<FMipmap> CompMips;
   ETextureFormat CompFormat;
+
+  ESurfaceType SurfaceType;
+  EUClampMode  UClampMode;
+  EVClampMode  VClampMode;
+
+  FColor PaletteTransform;
   
   virtual void LoadFromPackage( FPackageFileIn* In );
 };

@@ -45,9 +45,8 @@ int main( int argc, char** argv )
     return -1;
   }
 
-  UPackage* TarwelUmx = UPackage::StaticLoadPkg( "UnrealI" );
-  USound* TitanSound = (USound*)UPackage::StaticLoadObject( TarwelUmx, "yell1t", USound::StaticClass() );
-  TitanSound->ExportToFile();
+  UPackage* EnginePkg = UPackage::StaticLoadPkg( "Engine" );
+  UTexture* DefaultTexture = (UTexture*)UPackage::StaticLoadObject( EnginePkg, "DefaultTexture", UTexture::StaticClass() );
 
   Logf( LOG_INFO, "Test succeeded" );
   return 0;

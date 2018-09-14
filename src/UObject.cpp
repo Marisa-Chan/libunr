@@ -234,7 +234,7 @@ void UObject::ReadDefaultProperties( FPackageFileIn* In )
   
   while( 1 )
   {
-    *In >> CINDEX( PropName );
+    *In >> CINDEX( PropNameIdx );
     PropName = Pkg->ResolveNameFromIdx( PropNameIdx );
     if ( UNLIKELY( strncmp( PropName, "None", 4 ) == 0 ) )
       break;
@@ -344,6 +344,22 @@ void UObject::ReadDefaultProperties( FPackageFileIn* In )
       idx ObjRef = 0;
       *In >> CINDEX( ObjRef );
       SetObjProperty( ObjProp, UPackage::StaticLoadObject( Pkg, ObjRef ), ArrayIdx );
+    }
+    else if ( PropType == PROP_Class )
+    {
+      UClassProperty* ClassProp = SafeCast<UClassProperty>( Prop );
+      if ( !ClassProp )
+      {
+        Logf( LOG_CRIT, "Default property expected 'ClassProperty', but got '%s'", Prop->Class->Name );
+        return;
+      }
+
+      if ( IsArray )
+        ArrayIdx = ReadArrayIndex( In );
+
+      idx ObjRef = 0;
+      *In >> CINDEX( ObjRef );
+      SetObjProperty( ClassProp, UPackage::StaticLoadObject( Pkg, ObjRef, UClass::StaticClass() ), ArrayIdx );
     }
   }
 }
