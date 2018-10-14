@@ -260,7 +260,8 @@ public: \
   { \
     if (!StaticNativePropList) \
     { \
-      StaticNativePropList = new FNativePropertyList( FnvHashString( TEXT(cls) ), NumProperties ); \
+      const char* ClsName = TEXT(cls); \
+      StaticNativePropList = new FNativePropertyList( FnvHashString( ClsName + 1 ), NumProperties ); \
       if ( StaticNativePropList != NULL ) \
       { \
         NativePropertyLists->PushBack( StaticNativePropList ); \
@@ -354,7 +355,7 @@ class UObject
   inline UObject* GetObjProperty   ( UObjectProperty* Prop, int Idx = 0 );
   inline idx      GetNameProperty  ( UNameProperty* Prop, int Idx = 0 );
   inline UClass*  GetClassProperty ( UClassProperty* Prop, int Idx = 0 );
-  inline void*    GetStructProperty( UStruct* Struct, UStructProperty* Prop, int Idx = 0 );
+  inline void*    GetStructProperty( UStructProperty* Prop, int Idx = 0 );
   inline const char* GetStrProperty( UStrProperty* Prop, int Idx = 0 );
   UProperty* FindProperty( const char* PropName );
 
@@ -366,7 +367,7 @@ class UObject
   inline void SetObjProperty  ( UObjectProperty* Prop, UObject* NewVal, int Idx = 0 );
   inline void SetNameProperty ( UNameProperty* Prop, idx NewVal, int Idx = 0 );
   inline void SetClassProperty( UClassProperty* Prop, UClass* NewVal, int Idx = 0 );
-  //void SetStructProperty( UStructProperty* Prop, UStruct* NewVal, int Idx = 0 );
+  inline void SetStructProperty( UStructProperty* Prop, FPackageFileIn* In, int Idx = 0 );
   inline void SetStrProperty  ( UStrProperty* Prop, const char* NewVal, int Idx = 0 );
 
   static bool StaticInit();

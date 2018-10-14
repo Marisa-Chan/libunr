@@ -1,0 +1,17 @@
+Some notes;
+	If the property size says it is 5 (a byte follows with the real size), the size byte is AFTER the name index
+
+StructProperty loading from defaultproperties:
+	Var name (name index)
+	Info byte (0x#A)
+	Struct name (name index)
+	Struct size (byte)
+	Member variables:
+		Byte = read 1 byte
+		Int = read 1 int
+		float = read 1 float
+		Name = read index?
+		Class = read object reference
+		Object = read obejct reference
+		String = read string (read index for size, read <size> number of characters (bytes))
+		Array  = ?????

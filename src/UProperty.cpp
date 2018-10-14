@@ -66,11 +66,8 @@ void UProperty::LoadFromPackage( FPackageFileIn* In )
   if ( PropertyFlags & CPF_Net )
     *In >> ReplicationOffset;
   
-  if ( PropertyFlags & CPF_Native )
+  if ( Outer->Flags & RF_Native )
     Offset = GetNativeOffset( Outer->Name, Name );
-  // else
-    // no idea how thats gonna work yet
-    // probably have a pool of UScript properties for one object and just grab the next free object there
 }
 
 u32 UProperty::GetNativeOffset( const char* ClassName, const char* PropName )
@@ -102,31 +99,38 @@ void UByteProperty::LoadFromPackage( FPackageFileIn* In )
   *In >> CINDEX( EnumType );
   if ( EnumType )
     Enum = (UEnum*)UPackage::StaticLoadObject( Pkg, EnumType, UEnum::StaticClass() );
+
+  ElementSize = 1;
 }
 
 void UIntProperty::LoadFromPackage( FPackageFileIn* In )
 {
   Super::LoadFromPackage( In );
+  ElementSize = 4;
 }
 
 void UBoolProperty::LoadFromPackage( FPackageFileIn* In )
 {
   Super::LoadFromPackage( In );
+  ElementSize = sizeof( bool );
 }
 
 void UFloatProperty::LoadFromPackage( FPackageFileIn* In )
 {
   Super::LoadFromPackage( In );
+  ElementSize = 4;
 }
 
 void UNameProperty::LoadFromPackage( FPackageFileIn* In )
 {
   Super::LoadFromPackage( In );
+  ElementSize = 4;
 }
 
 void UStrProperty::LoadFromPackage( FPackageFileIn* In )
 {
   Super::LoadFromPackage( In );
+  ElementSize = sizeof( char* );
 }
 
 void UStringProperty::LoadFromPackage( FPackageFileIn* In )
@@ -137,6 +141,7 @@ void UStringProperty::LoadFromPackage( FPackageFileIn* In )
 void UObjectProperty::LoadFromPackage( FPackageFileIn* In )
 {
   Super::LoadFromPackage( In );
+  ElementSize = sizeof( UObject* );
 
   idx ObjTypeIdx = 0;
   *In >> CINDEX( ObjTypeIdx );
@@ -146,6 +151,7 @@ void UObjectProperty::LoadFromPackage( FPackageFileIn* In )
 void UClassProperty::LoadFromPackage( FPackageFileIn* In )
 {
   Super::LoadFromPackage( In );
+  ElementSize = sizeof( UClass* );
 
   idx ClassIdx = 0;
   *In >> CINDEX( ClassIdx );

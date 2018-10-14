@@ -415,16 +415,26 @@ void UStruct::LoadFromPackage( FPackageFileIn* In )
   }
 
   // Calculate struct size
-  StructSize += NativeSize;
-  u32 InfoSize = 0;
-  for ( UField* ChildIter = Children; ChildIter != NULL; ChildIter = ChildIter->Next )
+  if ( UNLIKELY( Flags & RF_Native ) )
   {
-    if ( ChildIter->IsA( UProperty::StaticClass() ) )
+    StructSize = NativeSize;
+  }
+  else
+  {
+    if ( SuperField != NULL && SuperField->IsA( UStruct::StaticClass() ) )
+      StructSize = ((UStruct*)SuperField)->StructSize;
+
+    for ( UField* ChildIter = Children; ChildIter != NULL; ChildIter = ChildIter->Next )
     {
-      UProperty* Prop = (UProperty*)ChildIter;
-      StructSize += Prop->ElementSize;
+      if ( ChildIter->IsA( UProperty::StaticClass() ) )
+      {
+        UProperty* Prop = (UProperty*)ChildIter;
+        if ( !(Prop->PropertyFlags & CPF_Native) )
+          Prop->Offset = StructSize;
+
+        StructSize += Prop->ElementSize;
+      }
     }
-    InfoSize += ChildIter->GetNativeSize();
   }
 }
 
@@ -590,6 +600,8 @@ void UClass::LoadFromPackage( FPackageFileIn* In )
     UField* Iter;
     if ( Children != NULL )
       for ( Iter = Children; Iter->Next != NULL; Iter = Iter->Next );
+
+    // Link super class children to ours
     Iter->Next = SuperClass->Children;
     SuperClass->Children->AddRef();
   }

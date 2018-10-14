@@ -57,16 +57,7 @@ void UPalette::LoadFromPackage( FPackageFileIn* In )
   }
 }
 
-bool UPalette::StaticLinkNativeProperties()
-{
-  if ( StaticInitNativePropList( 1 ) )
-  {
-    LINK_NATIVE_ARRAY( UPalette, Colors ); 
-    return true;
-  }
 
-  return false;
-}
 
 UBitmap::UBitmap()
   : UObject()
@@ -88,29 +79,6 @@ UBitmap::~UBitmap()
 
 void UBitmap::LoadFromPackage( FPackageFileIn* In )
 {
-}
-
-bool UBitmap::StaticLinkNativeProperties()
-{
-  FNativeProp
-
-  if ( StaticInitNativePropList( 11 ) )
-  {
-    LINK_NATIVE_PROPERTY( UBitmap, Format );
-    LINK_NATIVE_PROPERTY( UBitmap, Palette );
-    LINK_NATIVE_PROPERTY( UBitmap, UBits );
-    LINK_NATIVE_PROPERTY( UBitmap, VBits );
-    LINK_NATIVE_PROPERTY( UBitmap, USize );
-    LINK_NATIVE_PROPERTY( UBitmap, VSize );
-    LINK_NATIVE_PROPERTY( UBitmap, UClamp );
-    LINK_NATIVE_PROPERTY( UBitmap, VClamp );
-    LINK_NATIVE_PROPERTY( UBitmap, MipZero );
-    LINK_NATIVE_PROPERTY( UBitmap, MaxColor );
-    LINK_NATIVE_ARRAY( UBitmap, InternalTime );
-    return true;
-  }
-
-  return false;
 }
 
 UTexture::UTexture()
@@ -223,57 +191,5 @@ bool UTexture::ExportToFile()
     return true;
 //	}
 
-}
-
-bool UTexture::StaticLinkNativeProperties()
-{
-  FNativePropertyList* SuperPropList = UBitmap::StaticNativePropList;
-  if ( SuperPropList == NULL )
-    return false;
-
-  // Double check this
-  // this is gonna get REAL out of hand with Engine.Actor...
-  if ( StaticInitNativePropList( 32 + SuperPropList->Num ) )
-  {
-    xstl::Copy( StaticNativePropList->Properties, 
-                SuperPropList->Properties,
-                sizeof( FNativePropertyLink ) * SuperPropList->Num );
-    StaticNativePropList->Added = SuperPropList->Added;
-         
-    LINK_NATIVE_PROPERTY( UTexture, BumpMap );
-    LINK_NATIVE_PROPERTY( UTexture, DetailTexture );
-    LINK_NATIVE_PROPERTY( UTexture, MacroTexture );
-    LINK_NATIVE_PROPERTY( UTexture, Diffuse );
-    LINK_NATIVE_PROPERTY( UTexture, Specular );
-    LINK_NATIVE_PROPERTY( UTexture, Alpha );
-    LINK_NATIVE_PROPERTY( UTexture, DrawScale );
-    LINK_NATIVE_PROPERTY( UTexture, Friction );
-    LINK_NATIVE_PROPERTY( UTexture, MipMult );
-    LINK_NATIVE_ARRAY   ( UTexture, FootstepSound );
-    LINK_NATIVE_PROPERTY( UTexture, HitSound );
-    LINK_NATIVE_PROPERTY( UTexture, bHighColorQuality );
-    LINK_NATIVE_PROPERTY( UTexture, bHighTextureQuality );
-    LINK_NATIVE_PROPERTY( UTexture, bRealtime );
-    LINK_NATIVE_PROPERTY( UTexture, bParametric );
-    LINK_NATIVE_PROPERTY( UTexture, bRealtimeChanged );
-    LINK_NATIVE_PROPERTY( UTexture, bHasComp );
-    LINK_NATIVE_PROPERTY( UTexture, bFractical );
-    LINK_NATIVE_PROPERTY( UTexture, AnimNext );
-    LINK_NATIVE_PROPERTY( UTexture, AnimCurrent );
-    LINK_NATIVE_PROPERTY( UTexture, PrimeCount );
-    LINK_NATIVE_PROPERTY( UTexture, PrimeCurrent );
-    LINK_NATIVE_PROPERTY( UTexture, MinFrameRate );
-    LINK_NATIVE_PROPERTY( UTexture, MaxFrameRate );
-    LINK_NATIVE_PROPERTY( UTexture, Accumulator );
-    LINK_NATIVE_PROPERTY( UTexture, Mips );
-    LINK_NATIVE_PROPERTY( UTexture, CompMips );
-    LINK_NATIVE_PROPERTY( UTexture, CompFormat );
-    LINK_NATIVE_PROPERTY( UTexture, SurfaceType );
-    LINK_NATIVE_PROPERTY( UTexture, UClampMode );
-    LINK_NATIVE_PROPERTY( UTexture, VClampMode );
-    LINK_NATIVE_PROPERTY( UTexture, PaletteTransform );
-    return true;
-  }
-  return false;
 }
 

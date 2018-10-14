@@ -486,6 +486,7 @@ bool UPackage::LoadObject( UObject** Obj, const char* ObjName, idx ObjRef )
   // Set export object properties
   (*Obj)->ExpIdx = Export->Index;
   (*Obj)->NameIdx = Export->ObjectName;
+  (*Obj)->Flags = Export->ObjectFlags;
   (*Obj)->Pkg = this;
 
   // Load
@@ -767,20 +768,4 @@ bool UPackage::StaticLoadPartialClass( const char* PkgName, UClass* NativeClass 
     return false;
 
   return true;
-}
-
-bool UPackage::BeginLoad( FExport* Export )
-{
-  if ( Export == NULL )
-    return false;
-  
-}
-
-void UPackage::EndLoad()
-{
-  if ( LoadOpts == PO_OpenOnLoad )
-  {
-    delete Stream;
-    Stream = NULL;
-  }
 }

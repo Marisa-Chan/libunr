@@ -205,9 +205,6 @@ class UPackage : public UObject
   static bool     StaticLoadPartialClass( const char* PkgName, UClass* NativeClass );
   
 protected:    
-  bool BeginLoad( FExport* Export );
-  void EndLoad();
-  
   String Path;
   FileStream* Stream;
   UPackageHeader Header;

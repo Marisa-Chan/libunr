@@ -38,8 +38,8 @@ enum EPropertyType
   PROP_Class   = 0x8,
   PROP_Array   = 0x9,
   PROP_Struct  = 0xa,
-  PROP_Vector  = 0xb,
-  PROP_Rotator = 0xc,
+  PROP_Vector  = 0xb, // Vector and Rotator properties are not distinct property types
+  PROP_Rotator = 0xc, // They use the StructProperty type
   PROP_Ascii   = 0xd,
   PROP_Map     = 0xe,
   PROP_FixArr  = 0xf,

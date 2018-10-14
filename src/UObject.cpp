@@ -60,21 +60,6 @@ Array<UObject*>* UObject::ObjectPool = NULL;
 Array<UClass*>*  UObject::ClassPool = NULL;
 Array<FNativePropertyList*>* UObject::NativePropertyLists = NULL;
 
-bool UObject::StaticLinkNativeProperties()
-{
-  if ( StaticInitNativePropList( 5 ) )
-  {
-    LINK_NATIVE_ARRAY( UObject, ObjectInternal );
-    LINK_NATIVE_PROPERTY( UObject, Outer );
-    LINK_NATIVE_PROPERTY( UObject, Flags );
-    LINK_NATIVE_PROPERTY( UObject, Name );
-    LINK_NATIVE_PROPERTY( UObject, Class );
-    return true;
-  }
-
-  return false;
-}
-
 UObject* UObject::StaticConstructObject( const char* InName, UClass* InClass, UObject* InOuter )
 {
   // Construct object with the class constructor
@@ -243,10 +228,10 @@ void UObject::ReadDefaultProperties( FPackageFileIn* In )
 
     *In >> InfoByte;
     PropType = InfoByte & 0x0F;
-    SizeByte = InfoByte & 0x70;
+    SizeByte = (InfoByte & 0x70) >> 4;
     IsArray  = InfoByte & 0x80;
 
-    if ( SizeByte > 4 )
+    if ( SizeByte > 4 && PropType != PROP_Struct )
     {
       u8 Size8;
       u16 Size16;
@@ -345,6 +330,28 @@ void UObject::ReadDefaultProperties( FPackageFileIn* In )
       *In >> CINDEX( ObjRef );
       SetObjProperty( ObjProp, UPackage::StaticLoadObject( Pkg, ObjRef ), ArrayIdx );
     }
+    else if ( PropType == PROP_Name )
+    {
+      UNameProperty* NameProp = SafeCast<UNameProperty>( Prop );
+      if ( !NameProp )
+      {
+        Logf( LOG_CRIT, "Default property expected 'NameProperty', but got '%s'", Prop->Class->Name );
+        return;
+      }
+
+      if ( IsArray )
+        ArrayIdx = ReadArrayIndex( In );
+
+      idx Name = 0;
+      *In >> CINDEX( Name );
+      SetNameProperty( NameProp, Name, ArrayIdx );
+    }
+    else if ( PropType == PROP_String )
+    {
+      Logf( LOG_WARN, "StringProperty loading in UObject::ReadDefaultProperties() is stubbed" );
+      Logf( LOG_WARN, "  Info: (Package = '%s', Class = '%s', Object = '%s', Property = '%s')",
+            Pkg->Name, Class->Name, Name, Prop->Name );
+    }
     else if ( PropType == PROP_Class )
     {
       UClassProperty* ClassProp = SafeCast<UClassProperty>( Prop );
@@ -360,6 +367,94 @@ void UObject::ReadDefaultProperties( FPackageFileIn* In )
       idx ObjRef = 0;
       *In >> CINDEX( ObjRef );
       SetObjProperty( ClassProp, UPackage::StaticLoadObject( Pkg, ObjRef, UClass::StaticClass() ), ArrayIdx );
+    }
+    else if ( PropType == PROP_Array )
+    {
+      Logf( LOG_WARN, "ArrayProperty loading in UObject::ReadDefaultProperties() is stubbed" );
+      Logf( LOG_WARN, "  Info: (Package = '%s', Class = '%s', Object = '%s', Property = '%s')",
+            Pkg->Name, Class->Name, Name, Prop->Name );
+    }
+    else if ( PropType == PROP_Struct )
+    {
+      UStructProperty* StructProp = SafeCast<UStructProperty>( Prop );
+      if ( !StructProp )
+      {
+        Logf( LOG_CRIT, "Default property expected 'StructProperty', but got '%s'", Prop->Class->Name );
+        return;
+      }
+
+      if ( IsArray )
+        ArrayIdx = ReadArrayIndex( In );
+
+      // Verify struct name
+      idx StructName = 0;
+      *In >> CINDEX( StructName );
+      
+      if ( StructName < 0 )
+      {
+        Logf( LOG_CRIT, "Bad struct name index for StructProperty '%s'", Prop->Name );
+        return;
+      }
+
+      FHash StructHash = Pkg->GetNameEntry( StructName )->Hash;
+      if ( StructProp->Struct->Hash != StructHash )
+      {
+        Logf( LOG_CRIT, "Default property expected struct type '%s', but got '%s'",
+              Prop->Class->Name, Pkg->ResolveNameFromIdx( StructName ) );
+        return;
+      }
+
+      // Verify struct size
+      int StructSize = 0;
+      if ( SizeByte > 4 )
+      {
+        switch( SizeByte )
+        {
+          case 5:
+            *In >> *(u8*)&StructSize;
+            break;
+          case 6:
+            *In >> *(u16*)&StructSize;
+            break;
+          case 7:
+            *In >> StructSize;
+            break;
+        }
+      }
+      else
+      {
+        StructSize = UProperty::PropertySizes[SizeByte];
+      }
+
+      if ( StructSize != StructProp->Struct->StructSize )
+      {
+        Logf( LOG_CRIT, "Struct size of default property '%i' does not match actual size '%i'", 
+            StructSize, StructProp->Struct->StructSize );
+        return;
+      }
+
+      // Read in the struct's properties
+      SetStructProperty( StructProp, In, ArrayIdx );
+    }
+    else if ( PropType == PROP_Ascii )
+    {
+      UStrProperty* StrProp = SafeCast<UStrProperty>( Prop );
+      if ( !StrProp )
+      {
+        Logf( LOG_CRIT, "Default property expected 'StrProperty', but got '%s'", Prop->Class->Name );
+        return;
+      }
+
+      if ( IsArray )
+        ArrayIdx = ReadArrayIndex( In );
+
+      idx StrLength = 0;
+      *In >> CINDEX( StrLength );
+
+      char* NewStr = new char[StrLength]; // Serialized length includes null terminator
+      In->Read( NewStr, StrLength );
+
+      SetStrProperty( StrProp, NewStr, ArrayIdx );
     }
   }
 }
@@ -430,7 +525,7 @@ void UObject::ReadConfigProperties()
         {
           UStructProperty* StructProp = (UStructProperty*)Prop;
           Cfg->ReadStruct( Category->Data(), Variable, StructProp->Struct, 
-              GetStructProperty( StructProp->Struct, StructProp, i ), i );
+              GetStructProperty( StructProp, i ), i );
         }
 
         else if ( Prop->Class == UStrProperty::StaticClass() )

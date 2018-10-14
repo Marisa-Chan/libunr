@@ -23,9 +23,11 @@
  *========================================================================
 */
 
+#include "Memory.h"
 #include "UClass.h"
 #include "UObject.h"
 #include "UProperty.h"
+#include "UPackage.h"
 #include "USystem.h"
 
 #define DEFINE_GET_PROPERTY_ADDRESS(name, type, proptype) \
@@ -94,11 +96,11 @@ inline UClass* UObject::GetClassProperty( UClassProperty* Prop, int Idx )
   return Out;
 }
 
-inline void* UObject::GetStructProperty( UStruct* Struct, UStructProperty* Prop, int Idx )
+inline void* UObject::GetStructProperty( UStructProperty* Prop, int Idx )
 {
   // this one just returns the pointer to where a struct would begin, you still need the struct
   // definition to access anything meaningful here
-  return (void*)( (u8*)this + Prop->Offset + ( Idx * Struct->StructSize ) );
+  return (void*)( (u8*)this + Prop->Offset + ( Idx * Prop->Struct->StructSize ) );
 }
 
 inline const char* UObject::GetStrProperty( UStrProperty* Prop, int Idx )
@@ -130,12 +132,12 @@ inline void UObject::SetFloatProperty( UFloatProperty* Prop, float NewVal, int I
 inline void UObject::SetObjProperty( UObjectProperty* Prop, UObject* NewVal, int Idx )
 {
   UObject** Out = GetObjPropAddr( this, Prop, Idx );
-  if ( !(*Out)->IsA( UObject::StaticClass() ) )
-  {
-    // Maybe make a config way for this check to be optional? Could get very slow
-    Logf( LOG_CRIT, "OBJECT PROPERTY DOES NOT POINT TO AN OBJECT!!!" );
-    GSystem->Exit( -1 );
-  }
+  //if ( !(*Out)->IsA( UObject::StaticClass() ) )
+  //{
+  //  // Maybe make a config way for this check to be optional? Could get very slow
+  //  Logf( LOG_CRIT, "OBJECT PROPERTY DOES NOT POINT TO AN OBJECT!!!" );
+  //  GSystem->Exit( -1 );
+  //}
   *Out = NewVal;
 }
 
@@ -159,4 +161,117 @@ inline void UObject::SetClassProperty( UClassProperty* Prop, UClass* NewVal, int
 inline void UObject::SetStrProperty( UStrProperty* Prop, const char* NewVal, int Idx )
 {
   *GetStrPropAddr( this, Prop, Idx ) = NewVal;
+}
+
+inline void UObject::SetStructProperty( UStructProperty* Prop, FPackageFileIn* In, int Idx )
+{
+  void* StructAddr = GetStructProperty( Prop, Idx );
+  for ( UField* Child = Prop->Struct->Children; Child != NULL; Child = Child->Next )
+  {
+    // Pure structs should not have anything besides property types
+    if ( !Child->IsA( UProperty::StaticClass() ) )
+    {
+      Logf( LOG_CRIT, "Pure struct type has child that is not a Property type!" );
+      return;
+    }
+    
+    // Determine property type and set property
+    int i = 0;
+    UProperty* ChildProp = (UProperty*)Child;
+    if ( ChildProp->Class == UByteProperty::StaticClass() )
+    {
+      do
+      {
+        u8 Byte = 0;
+        *In >> Byte;
+        *GetBytePropAddr( (UObject*)StructAddr, (UByteProperty*)ChildProp, i++ ) = Byte;
+      } while ( i < ChildProp->ArrayDim );
+    }
+
+    else if ( ChildProp->Class == UIntProperty::StaticClass() )
+    {
+      do
+      {
+        int Int = 0;
+        *In >> Int;
+        *GetIntPropAddr( (UObject*)StructAddr, (UIntProperty*)ChildProp, i++ ) = Int;
+      } while ( i < ChildProp->ArrayDim );
+    }
+
+    else if ( ChildProp->Class == UBoolProperty::StaticClass() )
+    {
+      u8 Bool = 0;
+      *In >> Bool;
+      *GetBoolPropAddr( (UObject*)StructAddr, (UBoolProperty*)ChildProp, 0 ) = (Bool == 1);
+    }
+
+    else if ( ChildProp->Class == UNameProperty::StaticClass() )
+    {
+      do
+      {
+        idx Name = 0;
+        *In >> CINDEX( Name );
+        *GetNamePropAddr( (UObject*)StructAddr, (UNameProperty*)ChildProp, i++ ) = Name;
+      } while ( i < ChildProp->ArrayDim );
+    }
+
+    else if ( ChildProp->Class == UObjectProperty::StaticClass() )
+    {
+      do
+      {
+        idx ObjRef = 0;
+        *In >> CINDEX( ObjRef );
+        UObject* Obj = (UObject*)UPackage::StaticLoadObject( Prop->Pkg, ObjRef, 
+            ((UObjectProperty*)ChildProp)->ObjectType );
+
+        if ( Obj == NULL )
+        {
+          Logf( LOG_CRIT, "Can't load object '%s' for struct property '%s' in defaultproperty list for object '%s'", 
+                Prop->Pkg->ResolveNameFromObjRef( ObjRef ), Prop->Name, Prop->Outer );
+          return;
+        }
+
+        *GetObjPropAddr( (UObject*)StructAddr, (UObjectProperty*)ChildProp, i++ ) = Obj;
+      } while ( i < ChildProp->ArrayDim );
+    }
+
+    else if ( ChildProp->Class == UClassProperty::StaticClass() )
+    {
+      do
+      {
+        idx ObjRef = 0;
+        *In >> CINDEX( ObjRef );
+        UClass* Cls = (UClass*)UPackage::StaticLoadObject( Prop->Pkg, ObjRef, 
+            UClassProperty::StaticClass() );
+
+        if ( Cls == NULL )
+        {
+          Logf( LOG_CRIT, "Can't load class '%s' for struct property '%s' in defaultproperty list for object '%s'", 
+                Prop->Pkg->ResolveNameFromObjRef( ObjRef ), Prop->Name, Prop->Outer );
+          return;
+        }
+
+        *GetClassPropAddr( (UObject*)StructAddr, (UClassProperty*)ChildProp, i++ ) = Cls;
+      } while ( i < ChildProp->ArrayDim );
+    }
+
+    else if ( ChildProp->Class == UStrProperty::StaticClass() )
+    {
+      do
+      {
+        idx StringLength = 0;
+        *In >> CINDEX( StringLength );
+
+        char* String = new char[StringLength];
+        In->Read( String, StringLength );
+
+        *GetStrPropAddr( (UObject*)StructAddr, (UStrProperty*)ChildProp, i++ ) = String;
+      } while ( i < ChildProp->ArrayDim );
+    }
+
+    else
+    {
+      Logf( LOG_WARN, "Unhandled case for StructProperty loading (Class = '%s')", ChildProp->Class->Name );
+    }
+  }
 }
