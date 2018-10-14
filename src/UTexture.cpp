@@ -41,10 +41,8 @@ UPalette::~UPalette()
 
 void UPalette::LoadFromPackage( FPackageFileIn* In )
 {
-  // Read the none property (this will never have any other property types)
-  idx None;
-  *In >> CINDEX( None );
-  
+  ReadDefaultProperties( In );
+
   idx PaletteSize;
   *In >> CINDEX( PaletteSize );
   
@@ -56,8 +54,6 @@ void UPalette::LoadFromPackage( FPackageFileIn* In )
     *In >> Colors[i];
   }
 }
-
-
 
 UBitmap::UBitmap()
   : UObject()
@@ -124,49 +120,87 @@ UTexture::~UTexture()
 void UTexture::LoadFromPackage( FPackageFileIn* In )
 {
   ReadDefaultProperties( In );
+
+  u8 MipCount = 0;
+  *In >> MipCount;
+  Mips.Resize( MipCount );
+
+  for ( int i = 0; i < MipCount; i++ )
+  {
+    u32 WidthOffset = 0;
+    idx MipMapSize;
+
+    // Get the width offset if we need it (but I never see it used?)
+    if ( In->Ver >= PKG_VER_UN_220 )
+      *In >> WidthOffset;
+
+    // Read mip map data
+    *In >> CINDEX( MipMapSize );
+    Mips[i].DataArray.Resize( MipMapSize );
+    In->Read( Mips[i].DataArray.Data(), MipMapSize );
+
+    // Read in width and height data
+    *In >> Mips[i].USize;
+    *In >> Mips[i].VSize;
+
+    // Unused width and height in bits
+    u8 Unused[2];
+    *In >> Unused[0];
+    *In >> Unused[1];
+  }
 }
 
 // TODO: Export textures besides TEXF_P8
+// TODO: Export to formats besides .bmp
 bool UTexture::ExportToFile()
 {
-/*
   String* Filename = new String( Pkg->ResolveNameFromIdx( NameIdx ) );
   Filename->Append( ".bmp" );
   
   FileStreamOut* Out = new FileStreamOut();
-  Out->Open( *Filename );
+  if ( !Out->Open( *Filename ) )
+  {
+    Logf( LOG_WARN, "Failed to export texture to bitmap file '%s'", Filename->Data() );
+    return false;
+  }
   
+  u32 Zero32 = 0; 
   u32 bfSize = 0;
   u32 bfOffBits = 0;
-  
+
   // Write BMP header
   Out->Write( (char*)"BM", 2 ); // magic number
-  *Out << (u32)0;        // come back to write the file size later
-  *Out << (u32)0;        // reserved
-  *Out << (u32)0;        // come back to write the pixel data
+  *Out << Zero32;        // come back to write the file size later
+  *Out << Zero32;        // reserved
+  *Out << Zero32;        // come back to write the pixel data
   
   // 8-bit paletted textures (standard format for UE1 games)
   if ( Format == TEXF_P8 )
   {
-    *Out << (u32)40; // biSize
-    *Out << USize;   // biWidth
-    *Out << VSize;   // biHeight
-    *Out << (u16)1;  // biPlanes
-    *Out << (u16)8;  // biBitCount
-    *Out << (u32)0;  // biCompression
-    *Out << (u32)0;  // biSizeImage
-    *Out << (u32)0;  // biXPelsPerMeter
-    *Out << (u32)0;  // biYPelsPerMeter
-    *Out << (u32)0;  // biClrUsed
-    *Out << (u32)0;  // biClrImportant
+    u32 biSize = 40;
+    u16 biPlanes = 1;
+    u16 biBitCount = 8;
+
+    *Out << biSize;     // biSize
+    *Out << USize;      // biWidth
+    *Out << VSize;      // biHeight
+    *Out << biPlanes;   // biPlanes
+    *Out << biBitCount; // biBitCount
+    *Out << Zero32;     // biCompression
+    *Out << Zero32;     // biSizeImage
+    *Out << Zero32;     // biXPelsPerMeter
+    *Out << Zero32;     // biYPelsPerMeter
+    *Out << Zero32;     // biClrUsed
+    *Out << Zero32;     // biClrImportant
     
     // Write color table
-    for (int i = 0; i < 256; i++)
+    u8 Alpha = 0;
+    for ( int i = 0; i < 256; i++ )
     {
       *Out << Palette->Colors[i].B;
       *Out << Palette->Colors[i].G;
       *Out << Palette->Colors[i].R;
-      *Out << (u8)0;
+      *Out << Alpha;
     }
     
     bfOffBits = Out->Tell();
@@ -174,8 +208,11 @@ bool UTexture::ExportToFile()
     // Just export the first mipmap since that's probably what the user is going to want anyway
     // if there's some need for exporting choice mipmaps, implement it later
     u8* Bitmap = Mips[0].DataArray.Data();
-    for (int i = 0; i < Mips[0].DataArray.Size(); i++)
-      *Out << Bitmap[i];
+
+    // We need to write each row from bottom to top
+    for ( int i = VSize; i >= 0; i-- )
+      for ( int j = 0; j < USize; j++ ) 
+        *Out << Bitmap[(i*USize) + j];
     
     bfSize = Out->Tell();
     
@@ -183,13 +220,11 @@ bool UTexture::ExportToFile()
     Out->Seek( 2, Begin );
     *Out << bfSize;
     
-    Out->Seek( 8, Begin );
+    Out->Seek( 10, Begin );
     *Out << bfOffBits;
     
-    Out->Close();
-*/  
+    Out->Close();  
     return true;
-//	}
-
+  }
 }
 

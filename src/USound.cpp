@@ -42,10 +42,8 @@ USound::~USound()
 
 void USound::LoadFromPackage( FPackageFileIn* In )
 {
-  // Read the properties, but since it always starts with None, just eat it
-  idx NoneProp = 0;
-  *In >> CINDEX( NoneProp );
-  
+  ReadDefaultProperties( In );
+
   *In >> CINDEX( SoundFormat );
   if (In->Ver >= PKG_VER_UN_220)
     *In >> OffsetNext;

@@ -47,6 +47,7 @@ int main( int argc, char** argv )
 
   UPackage* EnginePkg = UPackage::StaticLoadPkg( "Engine" );
   UTexture* DefaultTexture = (UTexture*)UPackage::StaticLoadObject( EnginePkg, "DefaultTexture", UTexture::StaticClass() );
+  DefaultTexture->ExportToFile();
 
   Logf( LOG_INFO, "Test succeeded" );
   return 0;
