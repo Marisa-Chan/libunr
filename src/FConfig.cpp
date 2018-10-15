@@ -46,6 +46,9 @@ static inline bool IsAcceptedChar( char C, const char* Accepted )
 
 static inline void ReadNewLine( FileStreamIn& In, const char* Filename )
 {
+  if ( In.Eof() )
+    return;
+
   char C = '\0';
   In.Read( &C, 1 );
   if ( C == '\r' )
@@ -304,6 +307,7 @@ bool FConfig::Load( const char* Filename )
       PreviousHash = VarHash;
     }
   }
+  perror("FConfig");
   Logf( LOG_INFO, "Successfully read config file '%s'", Filename );
   Name = StringDup( Filename );
   IniFile.Close();

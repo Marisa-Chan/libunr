@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 3.7)
 project (libunr-test)
 
+option (Build32 "Build32" OFF)
+
 set (SOURCES TestMain.cpp)
 
 set (XSTL_ROOT   ${CMAKE_CURRENT_SOURCE_DIR}/../../xstl)
@@ -16,3 +18,8 @@ target_link_libraries(libunr-test "xstl" "unr") # kind of a hack but w/e
 
 add_definitions ("-Wno-attributes" "-DXSTL_ARRAY_STD" "-DXSTL_STRING_STD"
   "-DXSTL_FILESTREAM_STD" "-DXSTL_STACK_STD" "-g")
+
+if ( Build32 )
+  add_definitions ("-m32")
+  set_target_properties (libunr-test PROPERTIES LINK_FLAGS "-m32")
+endif()

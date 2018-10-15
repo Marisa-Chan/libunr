@@ -10,11 +10,16 @@ set (XSTL_ROOT  ${LIBUNR_ROOT}/../xstl)
 set (XSTL_INC   ${XSTL_ROOT}/include)
 
 option( WindowsBuild "WindowsBuild" OFF )
+option( Build32 "Build32" OFF )
 
 if ( WindowsBuild )
   add_definitions("-DLIBUNR_WIN32")
 else()
   add_definitions("-DLIBUNR_LINUX")
+endif()
+
+if ( Build32 )
+  add_definitions("-m32")
 endif()
 
 set (SOURCES ${LIBUNR_SRC}/FConfig.cpp
@@ -39,3 +44,7 @@ add_custom_target( tags COMMAND ctags --c++-kinds=+p --fields=+iaS --extra=+q
  --language-force=C++ --recurse=yes . WORKING_DIRECTORY ${LIBUNR_ROOT} )
 add_library( libunr SHARED ${SOURCES} tags )
 set_target_properties (libunr PROPERTIES PREFIX "")
+
+if ( Build32 )
+  set_target_properties (libunr PROPERTIES LINK_FLAGS "-m32")
+endif()
