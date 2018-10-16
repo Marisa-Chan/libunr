@@ -32,21 +32,35 @@ class USubsystem : public UObject
   USubsystem();
 };
 
+// Prompt callback for if the game has not been picked 
+typedef void(*GamePromptCallback)(const char*, const char*);
+
+// Prompt callback for if audio/render devices have not been picked
+typedef void(*DevicePromptCallback)(const char*, const char*);
+
 class USystem : public USubsystem
 {
   DECLARE_CLASS( USystem, USubsystem, CLASS_NoExport, Core )
   USystem();
 
+  // Per instance method
   const char* ResolvePath( const char* PkgName );
   void Exit( int ExitCode );
 
-  static bool StaticInit();
+  void PromptForGameInfo();
+  void PromptForDeviceInfo();
+
+  // Global methods
+  static bool StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC );
   static const char* GetLibunrIniPath();
+  static void CopyFile( const char* OrigFile, const char* NewFile );
 
   // libunr specific
+  bool bLogRefCntZero;
+  const char* RenderDevice;
+  const char* AudioDevice;
   const char* GamePath;
   const char* GameName;
-  bool bLogRefCntZero;
 
   // Per game
   int PurgeCacheDays;
@@ -54,6 +68,10 @@ class USystem : public USubsystem
   String* CachePath;
   String* CacheExt;
   Array<String*> Paths;
+
+protected:
+  GamePromptCallback DoGamePrompt;
+  DevicePromptCallback DoDevicePrompt;
 };
 
 extern USystem* GSystem;
