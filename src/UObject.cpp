@@ -185,7 +185,7 @@ bool UObject::IsA( UClass* ClassType )
 
 static int ReadArrayIndex( FPackageFileIn* In )
 {
-  u8 ArrayIdx[4];
+  u8 ArrayIdx[4] = { 0, 0 ,0 ,0 };
   *In >> ArrayIdx[0];
   if ( ArrayIdx[0] >= 128 )
   {
@@ -206,6 +206,7 @@ static int ReadArrayIndex( FPackageFileIn* In )
   return Idx;
 }
 
+// TODO: Print out full names of objects for when properties don't exist
 void UObject::ReadDefaultProperties( FPackageFileIn* In )
 {
   const char* PropName = NULL;
@@ -225,6 +226,13 @@ void UObject::ReadDefaultProperties( FPackageFileIn* In )
       break;
 
     UProperty* Prop = FindProperty( PropName );
+
+    // Read the actual value of the properties even if they don't exist
+    // We don't want to totally fail if some property just doesn't exist
+    // Instead, the value will just go unused (because nothing is there to use it)
+    if ( !Prop )
+        Logf( LOG_CRIT, "Property '%s' in '%s.%s.%s' does not exist",
+            PropName, Pkg->Name, Outer->Name, Name );
 
     *In >> InfoByte;
     PropType = InfoByte & 0x0F;
@@ -254,153 +262,155 @@ void UObject::ReadDefaultProperties( FPackageFileIn* In )
     {
       RealSize = UProperty::PropertySizes[SizeByte];
     }
+    
+    if ( IsArray && PropType != PROP_Bool )
+      ArrayIdx = ReadArrayIndex( In );
 
     if ( PropType == PROP_Byte )
     {
-      UByteProperty* ByteProp = SafeCast<UByteProperty>( Prop );
-      if ( !ByteProp )
-      {
-        Logf( LOG_CRIT, "Default property expected 'ByteProperty', but got '%s'", Prop->Class->Name );
-        return;
-      }
-
-      if ( IsArray )
-        ArrayIdx = ReadArrayIndex( In );
-    
       u8 Value = 0;
       *In >> Value;
-      SetByteProperty( ByteProp, Value, ArrayIdx ); 
+
+      if ( Prop )
+      {
+        UByteProperty* ByteProp = SafeCast<UByteProperty>( Prop );
+        if ( !ByteProp )
+          Logf( LOG_CRIT, "Default property expected 'ByteProperty', but got '%s'", Prop->Class->Name );
+        else
+          SetByteProperty( ByteProp, Value, ArrayIdx );
+      }
     }
     else if ( PropType == PROP_Int )
     {
-      UIntProperty* IntProp = SafeCast<UIntProperty>( Prop );
-      if ( !IntProp )
-      {
-        Logf( LOG_CRIT, "Default property expected 'IntProperty', but got '%s'", Prop->Class->Name );
-        return;
-      }
-
-      if ( IsArray )
-        ArrayIdx = ReadArrayIndex( In );
-
       int Value = 0;
       *In >> Value;
-      SetIntProperty( IntProp, Value, ArrayIdx );
+     
+      if ( Prop )
+      {
+        UIntProperty* IntProp = SafeCast<UIntProperty>( Prop );
+        if ( !IntProp )
+          Logf( LOG_CRIT, "Default property expected 'IntProperty', but got '%s'", Prop->Class->Name );
+        else
+          SetIntProperty( IntProp, Value, ArrayIdx );
+      }
     }
     else if ( PropType == PROP_Bool )
     {
-      UBoolProperty* BoolProp = SafeCast<UBoolProperty>( Prop );
-      if ( !BoolProp )
+      if ( Prop )
       {
-        Logf( LOG_CRIT, "Default property expected 'BoolProperty', but got '%s'", Prop->Class->Name );
-        return;
+        UBoolProperty* BoolProp = SafeCast<UBoolProperty>( Prop );
+        if ( !BoolProp )
+          Logf( LOG_CRIT, "Default property expected 'BoolProperty', but got '%s'", Prop->Class->Name );
+        else
+          SetBoolProperty( BoolProp, IsArray == 1 );
       }
-
-      SetBoolProperty( BoolProp, IsArray == 1 );
     }
     else if ( PropType == PROP_Float )
     {
-      UFloatProperty* FloatProp = SafeCast<UFloatProperty>( Prop );
-      if ( !FloatProp )
-      {
-        Logf( LOG_CRIT, "Default property expected 'FloatProperty', but got '%s'", Prop->Class->Name );
-        return;
-      }
-
-      if ( IsArray )
-        ArrayIdx = ReadArrayIndex( In );
-
       float Value = 0;
       *In >> Value;
-      SetFloatProperty( FloatProp, Value, ArrayIdx );
+
+      if ( Prop )
+      {
+        UFloatProperty* FloatProp = SafeCast<UFloatProperty>( Prop );
+        if ( !FloatProp )
+          Logf( LOG_CRIT, "Default property expected 'FloatProperty', but got '%s'", Prop->Class->Name );
+        else
+          SetFloatProperty( FloatProp, Value, ArrayIdx );
+      }
     }
     else if ( PropType == PROP_Object )
     {
-      UObjectProperty* ObjProp = SafeCast<UObjectProperty>( Prop );
-      if ( !ObjProp )
-      {
-        Logf( LOG_CRIT, "Default property expected 'ObjectProperty', but got '%s'", Prop->Class->Name );
-        return;
-      }
-
-      if ( IsArray )
-        ArrayIdx = ReadArrayIndex( In );
-
       idx ObjRef = 0;
       *In >> CINDEX( ObjRef );
-      SetObjProperty( ObjProp, UPackage::StaticLoadObject( Pkg, ObjRef ), ArrayIdx );
+ 
+      if ( Prop )
+      {
+        UObjectProperty* ObjProp = SafeCast<UObjectProperty>( Prop );
+        if ( !ObjProp )
+          Logf( LOG_CRIT, "Default property expected 'ObjectProperty', but got '%s'", Prop->Class->Name );
+        else
+          SetObjProperty( ObjProp, UPackage::StaticLoadObject( Pkg, ObjRef ), ArrayIdx );
+      }
     }
     else if ( PropType == PROP_Name )
     {
-      UNameProperty* NameProp = SafeCast<UNameProperty>( Prop );
-      if ( !NameProp )
-      {
-        Logf( LOG_CRIT, "Default property expected 'NameProperty', but got '%s'", Prop->Class->Name );
-        return;
-      }
-
-      if ( IsArray )
-        ArrayIdx = ReadArrayIndex( In );
-
       idx Name = 0;
       *In >> CINDEX( Name );
-      SetNameProperty( NameProp, Name, ArrayIdx );
+
+      if ( Prop )
+      {
+        UNameProperty* NameProp = SafeCast<UNameProperty>( Prop );
+        if ( !NameProp )
+          Logf( LOG_CRIT, "Default property expected 'NameProperty', but got '%s'", Prop->Class->Name );
+        else    
+          SetNameProperty( NameProp, Name, ArrayIdx );
+      }
     }
     else if ( PropType == PROP_String )
     {
+      // TODO: Crash here
       Logf( LOG_WARN, "StringProperty loading in UObject::ReadDefaultProperties() is stubbed" );
       Logf( LOG_WARN, "  Info: (Package = '%s', Class = '%s', Object = '%s', Property = '%s')",
             Pkg->Name, Class->Name, Name, Prop->Name );
     }
     else if ( PropType == PROP_Class )
     {
-      UClassProperty* ClassProp = SafeCast<UClassProperty>( Prop );
-      if ( !ClassProp )
-      {
-        Logf( LOG_CRIT, "Default property expected 'ClassProperty', but got '%s'", Prop->Class->Name );
-        return;
-      }
-
-      if ( IsArray )
-        ArrayIdx = ReadArrayIndex( In );
-
       idx ObjRef = 0;
       *In >> CINDEX( ObjRef );
-      SetObjProperty( ClassProp, UPackage::StaticLoadObject( Pkg, ObjRef, UClass::StaticClass() ), ArrayIdx );
+
+      if ( Prop )
+      {
+        UClassProperty* ClassProp = SafeCast<UClassProperty>( Prop );
+        if ( !ClassProp )
+          Logf( LOG_CRIT, "Default property expected 'ClassProperty', but got '%s'", Prop->Class->Name );
+        else
+          SetObjProperty( ClassProp, UPackage::StaticLoadObject( Pkg, ObjRef, UClass::StaticClass() ), ArrayIdx );
+      }
     }
     else if ( PropType == PROP_Array )
     {
+      // TODO: Crash here
       Logf( LOG_WARN, "ArrayProperty loading in UObject::ReadDefaultProperties() is stubbed" );
       Logf( LOG_WARN, "  Info: (Package = '%s', Class = '%s', Object = '%s', Property = '%s')",
             Pkg->Name, Class->Name, Name, Prop->Name );
     }
     else if ( PropType == PROP_Struct )
     {
+      // TODO: Any way to get around this?
+      //
+      // If we don't have a StructProperty, then we're really screwed since
+      // structs can hold any amount of data and we won't know how much to seek
+      // ahead. We can't use the size reported by the list entry because
+      // that only accounts for final size, not the number of bytes to read
+      if ( !Prop )
+      {
+        Logf( LOG_CRIT, "Property does not exist, but property type is a struct." );
+        Logf( LOG_CRIT, "Cannot continue parsing defaultproperty list.");
+        return;
+      }
+
       UStructProperty* StructProp = SafeCast<UStructProperty>( Prop );
       if ( !StructProp )
       {
         Logf( LOG_CRIT, "Default property expected 'StructProperty', but got '%s'", Prop->Class->Name );
+        Logf( LOG_CRIT, "Cannot continue parsing defaultproperty list.");
         return;
       }
-
-      if ( IsArray )
-        ArrayIdx = ReadArrayIndex( In );
 
       // Verify struct name
       idx StructName = 0;
       *In >> CINDEX( StructName );
       
       if ( StructName < 0 )
-      {
         Logf( LOG_CRIT, "Bad struct name index for StructProperty '%s'", Prop->Name );
-        return;
-      }
 
       FHash StructHash = Pkg->GetNameEntry( StructName )->Hash;
-      if ( StructProp->Struct->Hash != StructHash )
+      if ( StructProp && StructProp->Struct->Hash != StructHash )
       {
         Logf( LOG_CRIT, "Default property expected struct type '%s', but got '%s'",
               Prop->Class->Name, Pkg->ResolveNameFromIdx( StructName ) );
+        Logf( LOG_CRIT, "Cannot continue parsing defaultproperty list.");
         return;
       }
 
@@ -426,35 +436,38 @@ void UObject::ReadDefaultProperties( FPackageFileIn* In )
         StructSize = UProperty::PropertySizes[SizeByte];
       }
 
-      if ( StructSize != StructProp->Struct->StructSize )
+      if ( Prop && StructProp )
       {
-        Logf( LOG_CRIT, "Struct size of default property '%i' does not match actual size '%i'", 
-            StructSize, StructProp->Struct->StructSize );
-        return;
+        if ( StructSize != StructProp->Struct->StructSize )
+        {
+          Logf( LOG_CRIT, "Struct size of default property '%i' does not match actual size '%i'", 
+              StructSize, StructProp->Struct->StructSize );
+          Logf( LOG_CRIT, "Cannot continue parsing defaultproperty list.");
+          return;
+        }
+        else
+        {
+          // Read in struct properties based on our definition that we have loaded
+          SetStructProperty( StructProp, In, ArrayIdx );
+        }
       }
-
-      // Read in the struct's properties
-      SetStructProperty( StructProp, In, ArrayIdx );
     }
     else if ( PropType == PROP_Ascii )
     {
-      UStrProperty* StrProp = SafeCast<UStrProperty>( Prop );
-      if ( !StrProp )
-      {
-        Logf( LOG_CRIT, "Default property expected 'StrProperty', but got '%s'", Prop->Class->Name );
-        return;
-      }
-
-      if ( IsArray )
-        ArrayIdx = ReadArrayIndex( In );
-
       idx StrLength = 0;
       *In >> CINDEX( StrLength );
 
       char* NewStr = new char[StrLength]; // Serialized length includes null terminator
       In->Read( NewStr, StrLength );
 
-      SetStrProperty( StrProp, NewStr, ArrayIdx );
+      if ( Prop )
+      {
+        UStrProperty* StrProp = SafeCast<UStrProperty>( Prop );
+        if ( !StrProp )
+          Logf( LOG_CRIT, "Default property expected 'StrProperty', but got '%s'", Prop->Class->Name );
+        else
+          SetStrProperty( StrProp, NewStr, ArrayIdx );
+      }
     }
   }
 }
