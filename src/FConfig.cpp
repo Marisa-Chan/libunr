@@ -184,7 +184,7 @@ bool FConfig::Load( const char* Filename )
         if ( Probe == ']' )
           break;
 
-        if ( !isalnum( Probe ) && !IsAcceptedChar( Probe, "." ) )
+        if ( !isalnum( Probe ) && !IsAcceptedChar( Probe, ". " ) )
         {
           Set( CategoryBuf, 0, sizeof( CategoryBuf ) );
           break;
