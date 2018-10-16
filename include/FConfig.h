@@ -40,8 +40,8 @@ public:
   FConfig( const char* Filename );
   ~FConfig();
 
-  bool Load( const char* Filename );
-  bool Save();
+  int Load( const char* Filename );
+  int Save();
 
   // Read functions
   // These functions will try to read the requested variable
@@ -116,7 +116,8 @@ private:
 };
 
 extern FConfig* GLibunrConfig; // Used only before loading any game
-extern FConfig* GGameConfig;    // Used after loading a game
+extern FConfig* GGameConfig;   // Used when a game is picked
+extern FConfig* GUserConfig;   // Used when a game is picked
 
 class FConfigManager
 {
