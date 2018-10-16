@@ -109,7 +109,7 @@ FConfig::~FConfig()
   Categories.Clear();
 }
 
-bool FConfig::Load( const char* Filename )
+int FConfig::Load( const char* Filename )
 {
   char CategoryBuf[128];
   char VariableBuf[128];
@@ -122,7 +122,7 @@ bool FConfig::Load( const char* Filename )
   if ( !IniFile.Open( Filename ) )
   {
     Logf( LOG_WARN, "Can't open or create INI file '%s'", Filename );
-    return false;
+    return ERR_FILE_NOT_EXIST;
   }
 
   // Read until the end of the file
@@ -173,7 +173,7 @@ bool FConfig::Load( const char* Filename )
       {
         Logf( LOG_WARN, "Got unexpected '[' in '%s' (Pos = %llu)", Filename, IniFile.Tell() );
         IniFile.Close();
-        return false;
+        return ERR_BAD_DATA;
       }
 
       char* CategoryPtr = CategoryBuf;
@@ -195,9 +195,11 @@ bool FConfig::Load( const char* Filename )
 
       if ( CategoryBuf[0] == '\0' )
       {
-        Logf( LOG_WARN, "Malformed or corrupted category in file '%s' (Pos = %llu)", Filename, IniFile.Tell() );
+        Logf( LOG_WARN, 
+            "Malformed or corrupted category in file '%s' (Pos = %llu)", 
+            Filename, IniFile.Tell() );
         IniFile.Close();
-        return false;
+        return ERR_BAD_DATA;
       }
 
       Category = new FConfigCategory();
@@ -212,10 +214,11 @@ bool FConfig::Load( const char* Filename )
     {
       if ( Category == NULL )
       {
-        Logf( LOG_WARN, "Got non-category character, but no category in config file '%s' (Pos = %llu)",
+        Logf( LOG_WARN, 
+            "Got non-category character, but no category in config file '%s' (Pos = %llu)",
             Filename, IniFile.Tell() );
         IniFile.Close();
-        return false;
+        return ERR_BAD_DATA;
       }
       // Read the variable name
       char* VariablePtr = VariableBuf;
@@ -245,9 +248,11 @@ bool FConfig::Load( const char* Filename )
 
       if ( VariableBuf[0] == '\0' )
       {
-        Logf( LOG_WARN, "Malformed or corrupted variable in file '%s' (Pos = %llu)", Filename, IniFile.Tell() );
+        Logf( LOG_WARN, 
+            "Malformed or corrupted variable in file '%s' (Pos = %llu)", 
+            Filename, IniFile.Tell() );
         IniFile.Close();
-        return false;
+        return ERR_BAD_DATA;
       }
 
       if ( bIndexed )
@@ -265,10 +270,11 @@ bool FConfig::Load( const char* Filename )
 
         if ( IndexBuf[0] == '\0' )
         {
-          Logf( LOG_WARN, "Array indexed variable, but no index found in file '%s' (Pos = %llu, C = '%c')", 
+          Logf( LOG_WARN, 
+              "Array indexed variable, but no index found in file '%s' (Pos = %llu, C = '%c')", 
               Filename, IniFile.Tell(), Probe );
           IniFile.Close();
-          return false;
+          return ERR_BAD_DATA;
         }
 
         Index = strtol( IndexBuf, NULL, 10 );
@@ -311,11 +317,11 @@ bool FConfig::Load( const char* Filename )
   Logf( LOG_INFO, "Successfully read config file '%s'", Filename );
   Name = StringDup( Filename );
   IniFile.Close();
-  return true;
+  return 0;
 }
 
 // TODO: Write failure cases
-bool FConfig::Save()
+int FConfig::Save()
 {
   FileStreamOut IniFile;
   IniFile.Open( Name );
@@ -354,7 +360,7 @@ bool FConfig::Save()
   }
 
   IniFile.Close();
-  return true;
+  return 0;
 }
 
 char* FConfig::ReadString( const char* Category, const char* Variable, size_t Index )

@@ -88,10 +88,15 @@ typedef i32 idx;
 #define PKG_VER_UT_400 68
 #define PKG_VER_UT_432 69
 
+// Log levels
 #define LOG_INFO "I"
 #define LOG_WARN "W"
 #define LOG_ERR  "E"
 #define LOG_CRIT "!"
+
+// Error codes
+#define ERR_FILE_NOT_EXIST 1
+#define ERR_BAD_DATA       2
 
 typedef void(*DebugPrintFunc)( const char* Str, size_t Len );
 extern DebugPrintFunc DebugPrint;
