@@ -1,7 +1,12 @@
 cmake_minimum_required (VERSION 3.7)
 project (libunr-test)
 
-option (Build32 "Build32" OFF)
+# Build options
+# Choose: Debug Release RelWithDebInfo
+if( NOT CMAKE_BUILD_TYPE )
+  set( CMAKE_BUILD_TYPE Release )
+endif()
+option (BUILD32 "BUILD32" OFF)
 
 set (SOURCES TestMain.cpp)
 
@@ -17,9 +22,20 @@ add_executable (libunr-test ${SOURCES})
 target_link_libraries(libunr-test "xstl" "unr") # kind of a hack but w/e
 
 add_definitions ("-Wno-attributes" "-DXSTL_ARRAY_STD" "-DXSTL_STRING_STD"
-  "-DXSTL_FILESTREAM_STD" "-DXSTL_STACK_STD" "-g")
+  "-DXSTL_FILESTREAM_STD" "-DXSTL_STACK_STD")
 
-if ( Build32 )
+# Debug symbols & optimization levels
+if ( CMAKE_BUILD_TYPE STREQUAL "Debug" )
+  add_definitions("-O1" "-g")
+elseif ( CMAKE_BUILD_TYPE STREQUAL "Release" )
+  add_definitions("-O2")
+elseif ( CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo" )
+  add_definitions("-O2" "-g")
+else()
+  message(FATAL_ERROR "Unknown build type: " ${CMAKE_BUILD_TYPE})
+endif()
+
+if ( BUILD32 )
   add_definitions ("-m32")
   set_target_properties (libunr-test PROPERTIES LINK_FLAGS "-m32")
 endif()
