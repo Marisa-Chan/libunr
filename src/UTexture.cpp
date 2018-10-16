@@ -210,7 +210,7 @@ bool UTexture::ExportToFile()
     u8* Bitmap = Mips[0].DataArray.Data();
 
     // We need to write each row from bottom to top
-    for ( int i = VSize; i >= 0; i-- )
+    for ( int i = VSize-1; i >= 0; i-- )
       for ( int j = 0; j < USize; j++ ) 
         *Out << Bitmap[(i*USize) + j];
     
