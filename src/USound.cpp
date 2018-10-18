@@ -64,8 +64,12 @@ bool USound::ExportToFile()
   
   // Open file
   FileStreamOut* Out = new FileStreamOut();
-  Out->Open( *Filename );
-  
+  if ( Out->Open( *Filename ) != 0 )
+  {
+    Logf( LOG_WARN, "Failed to export sound to wav file '%s'", Filename->Data() );
+    return false;
+  }
+
   // Write
   Out->Write( SoundData, SoundSize );
   

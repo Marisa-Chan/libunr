@@ -97,6 +97,7 @@ typedef i32 idx;
 // Error codes
 #define ERR_FILE_NOT_EXIST 1
 #define ERR_BAD_DATA       2
+#define ERR_FILE_CREATE    3
 
 typedef void(*DebugPrintFunc)( const char* Str, size_t Len );
 extern DebugPrintFunc DebugPrint;

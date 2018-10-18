@@ -63,7 +63,11 @@ bool UMusic::ExportToFile()
   
   // Open file
   FileStreamOut* Out = new FileStreamOut();
-  Out->Open( *Filename );
+  if ( Out->Open( *Filename ) != 0 )
+  {
+    Logf( LOG_WARN, "Failed to export music to file '%s'", Filename );
+    return false;
+  }
   
   // Write
   Out->Write( ChunkData, ChunkSize );

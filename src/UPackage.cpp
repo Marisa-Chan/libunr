@@ -306,7 +306,7 @@ bool UPackage::Load( const char* File )
   PkgName.Erase( PkgName.FindLastOf( "." ) );
   
   Stream = new FPackageFileIn();
-  if ( !Stream->Open( Path ) )
+  if ( Stream->Open( Path ) != 0 )
     return false;
   
   // read in the header

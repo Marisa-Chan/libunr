@@ -158,7 +158,7 @@ bool UTexture::ExportToFile()
   Filename->Append( ".bmp" );
   
   FileStreamOut* Out = new FileStreamOut();
-  if ( !Out->Open( *Filename ) )
+  if ( Out->Open( *Filename ) != 0 )
   {
     Logf( LOG_WARN, "Failed to export texture to bitmap file '%s'", Filename->Data() );
     return false;
