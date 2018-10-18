@@ -33,10 +33,12 @@ class USubsystem : public UObject
 };
 
 // Prompt callback for if the game has not been picked 
-typedef void(*GamePromptCallback)(const char*, const char*);
+typedef void(*GamePromptCallback)(char*, char*); // PathBuf, NameBuf
+#define GPC_NAME_BUF_LEN 32
+#define GPC_PATH_BUF_LEN 4096
 
 // Prompt callback for if audio/render devices have not been picked
-typedef void(*DevicePromptCallback)(const char*, const char*);
+typedef void(*DevicePromptCallback)(char*, char*); // RenderBuf, AudioBuf
 
 class USystem : public USubsystem
 {
@@ -47,13 +49,15 @@ class USystem : public USubsystem
   const char* ResolvePath( const char* PkgName );
   void Exit( int ExitCode );
 
-  void PromptForGameInfo();
-  void PromptForDeviceInfo();
+  bool PromptForGameInfo();
+  bool PromptForDeviceInfo();
 
   // Global methods
   static bool StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC );
   static const char* GetLibunrIniPath();
-  static void CopyFile( const char* OrigFile, const char* NewFile );
+  static const char* GetDefaultLibunrIniPath();
+  static bool CopyFile( const char* OrigFile, const char* NewFile );
+  static bool FileExists( const char* Filename );
 
   // libunr specific
   bool bLogRefCntZero;

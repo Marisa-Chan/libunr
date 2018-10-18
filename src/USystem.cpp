@@ -104,16 +104,40 @@ void USystem::Exit( int ExitCode )
   exit( ExitCode );
 }
 
+bool USystem::PromptForGameInfo()
+{
+  if ( DoGamePrompt == NULL )
+    return false;
+
+  // Create buffers for callback to use
+  char* PathBuf = new char[GPC_PATH_BUF_LEN];
+  char* NameBuf = new char[GPC_NAME_BUF_LEN];
+
+  // Run callback
+  DoGamePrompt( PathBuf, NameBuf );
+
+  // Update game variables
+  GamePath = PathBuf;
+  GameName = NameBuf;
+
+  // Write to config and save
+  GLibunrConfig->WriteString( "Game", "Path", GamePath );
+  GLibunrConfig->WriteString( "Game", "Name", GameName );
+  GLibunrConfig->Save();
+
+  return true;
+}
+
 bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC )
 {
-  // (?) Should we check the function addresses to make sure its in text section?
-  // Set callbacks
-  DoGamePrompt = GPC;
-  DoDevicePrompt = DPC;
-
   // Create global system
   GSystem = new USystem();
   
+  // (?) Should we check the function addresses to make sure its in text section?
+  // Set callbacks
+  GSystem->DoGamePrompt = GPC;
+  GSystem->DoDevicePrompt = DPC;
+
   // Read libunr ini and get game specific details
   GLibunrConfig = new FConfig();
   const char* LibunrIniPath = GetLibunrIniPath();
@@ -139,7 +163,7 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC )
       return false;
     }
   }
-  else
+  else if ( IniStatus != 0 )
   {
     // Something else went wrong with the ini file that already exists
     Logf( LOG_CRIT, "Error parsing main ini file '%s'; aborting",
@@ -154,22 +178,34 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC )
   // if ( strnicmp( GSystem->RenderDevice, None ) == 0 ||
   //      strnicmp( GSystem->AudioDevice, None ) == 0 )
   // {
-  //   PromptForDeviceInfo();
+  //   if ( !GSystem->PromptForDeviceInfo() )
+  //   {
+  //     Logf( LOG_CRT, "DoDevicePrompt() callback is not set; aborting" );
+  //     return false;
+  //   }
   // }
 
   // Get game info
   GSystem->GamePath = GLibunrConfig->ReadString( "Game", "Path" );
   GSystem->GameName = GLibunrConfig->ReadString( "Game", "Name" );
-  if ( strnicmp( GSystem->GamePath, "None" ) == 0 ||
-       strnicmp( GSystem->GameName, "None" ) == 0 )
+  if ( strnicmp( GSystem->GamePath, "None", 4 ) == 0 ||
+       strnicmp( GSystem->GameName, "None", 4 ) == 0 )
   {
-    PromptForGameInfo();
+    if ( !GSystem->PromptForGameInfo() )
+    {
+      Logf( LOG_CRIT, "DoGamePrompt() callback is not set; aborting" );
+      return false;
+    }
   }
 
   // Change directory to the game's system folder
   String GameSysPath( GSystem->GamePath );
   GameSysPath += "/System/";
-  chdir( GameSysPath.Data() );
+  if ( chdir( GameSysPath.Data() ) < 0 )
+  {
+    Logf( LOG_WARN, "Game directory system folder '%s' does not exist; aborting (errno = %s)", GameSysPath.Data(), strerror( errno ) );
+    return false;
+  }
 
   // Read the game ini
   String GameCfgPath( GSystem->GameName );
@@ -177,7 +213,7 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC )
 
   GGameConfig = new FConfig();
   IniStatus = GGameConfig->Load( GameCfgPath.Data() );
-  if ( IniFile == ERR_FILE_NOT_EXIST )
+  if ( IniStatus == ERR_FILE_NOT_EXIST )
   {
     Logf( LOG_WARN, "Game ini file '%s' does not exist; creating one", GameCfgPath.Data() );
 
@@ -195,7 +231,7 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC )
       return false;
     }
   }
-  else
+  else if ( IniStatus != 0 )
   {
     // Something else went wrong with the ini file that already exists
     Logf( LOG_CRIT, "Error parsing game ini '%s'; aborting", GameCfgPath.Data() );
@@ -242,6 +278,7 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC )
       // There isn't one at all for this game, use the game config instead
       GUserConfig = GGameConfig;
     }
+
     else if ( !CopyFile( "DefUser.ini", "User.ini" ) )
     {
       Logf( LOG_CRIT, "Could not create new User.ini; aborting" );
@@ -262,15 +299,30 @@ const char* USystem::GetLibunrIniPath()
 {
 #if defined LIBUNR_LINUX || LIBUNR_BSD
   struct ::passwd* pw = getpwuid( getuid() );
-  static char LibUnrPath[1024];
+  static char LibUnrPath[1024] = { 0 };
   strcpy( LibUnrPath, pw->pw_dir );
   strcat( LibUnrPath, "/.config/libunr/libunr.ini" ); 
   return LibUnrPath;
 #elif defined LIBUNR_WIN32
   return "libunr.ini";
 #else
-  Logf( LOG_CRIT, "Unknown operating system! Please add a section to USystem::GetLibunrIniPath()" );
-  exit( -1 );
+  #error "Unknown operating system! Please add a section to USystem::GetLibunrIniPath()"
+  return -1;
+#endif
+}
+
+const char* USystem::GetDefaultLibunrIniPath()
+{
+#if defined LIBUNR_LINUX || LIBUNR_BSD
+  static char DefLibUnrPath[1024] = { 0 };
+  strcpy( DefLibUnrPath, INSTALL_PREFIX );
+  strcat( DefLibUnrPath, "/share/libunr/DefaultLibunr.ini" );
+  return DefLibUnrPath;
+#elif defined LIBUNR_WIN32
+  return "DefaultLibunr.ini";
+#else
+  #error "Unknown operating system! Please add a section to USystem::GetLibunrIniPath()"
+  return -1;
 #endif
 }
 
@@ -279,19 +331,22 @@ bool USystem::CopyFile( const char* OrigFile, const char* NewFile )
   FileStreamIn Orig;
   FileStreamOut New;
 
-  if ( !Orig.Open( OrigFile ) )
+  int Status = Orig.Open( OrigFile );
+  if ( Status != 0 )
   {
-    Logf( LOG_WARN, "Copy operation failed: can't open original file '%s'", OrigFile );
+    Logf( LOG_WARN, "Copy operation failed: can't open original file '%s' (errno = %s)", OrigFile, strerror( Status ) );
     return false;
   }
 
-  if ( !New.Open( NewFile ) )
+  Status = New.Open( NewFile );
+  if ( Status != 0 )
   {
-    Logf( LOG_WARN, "Copy operation failed: can't create new file '%s'", NewFile );
+    Logf( LOG_WARN, "Copy operation failed: can't create new file '%s' (errno = %s)", NewFile, strerror( Status ) );
     return false;
   }
 
   size_t OrigSize = Orig.Seek( 0, End );
+  Orig.Seek( 0, Begin );
   u8* Buffer = new u8[OrigSize];
 
   Orig.Read( Buffer, OrigSize );
@@ -300,5 +355,16 @@ bool USystem::CopyFile( const char* OrigFile, const char* NewFile )
   Orig.Close();
   New.Close();
 
-  return false;
+  return true;
 }
+
+bool USystem::FileExists( const char* Filename )
+{
+  FileStreamIn File;
+  
+  int Status = File.Open( Filename );
+  File.Close();
+
+  return (Status != ENOENT) ? true : false;
+}
+

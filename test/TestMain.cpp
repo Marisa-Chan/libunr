@@ -25,9 +25,36 @@
 
 #include "libunr.h"
 
+void GamePromptHandler( char* PathOut, char* NameOut )
+{
+  // Get game name
+  char* Result = NULL;
+  while ( Result == NULL )
+  {
+    printf( "Enter the name of the game executable (i.e.; Unreal or DeusEx): " );
+    Result = fgets( NameOut, GPC_NAME_BUF_LEN, stdin );
+  }
+  
+  char* RemoveNewline = strchr( NameOut, '\n' );
+  if ( RemoveNewline )
+    *RemoveNewline = '\0';
+
+  // Get path name
+  Result = NULL;
+  while ( Result == NULL )
+  {
+    printf( "Enter the absolute path of the game: " );
+    Result = fgets( PathOut, GPC_PATH_BUF_LEN, stdin );
+  }
+
+  RemoveNewline = strchr( PathOut, '\n' );
+  if ( RemoveNewline )
+    *RemoveNewline = '\0';
+}
+
 int main( int argc, char** argv )
 {
-  if ( UNLIKELY( !USystem::StaticInit() ) )
+  if ( UNLIKELY( !USystem::StaticInit( &GamePromptHandler, NULL ) ) )
   {
     Logf( LOG_CRIT, "USystem::StaticInit() failed!" );
     return -1;

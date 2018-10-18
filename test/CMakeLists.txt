@@ -22,7 +22,7 @@ add_executable (libunr-test ${SOURCES})
 target_link_libraries(libunr-test "xstl" "unr") # kind of a hack but w/e
 
 add_definitions ("-Wno-attributes" "-DXSTL_ARRAY_STD" "-DXSTL_STRING_STD"
-  "-DXSTL_FILESTREAM_STD" "-DXSTL_STACK_STD")
+  "-DXSTL_FILESTREAM_STD" "-DXSTL_STACK_STD" )
 
 # Debug symbols & optimization levels
 if ( CMAKE_BUILD_TYPE STREQUAL "Debug" )
