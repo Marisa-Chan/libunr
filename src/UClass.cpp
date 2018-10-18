@@ -377,12 +377,7 @@ static inline void LoadScriptCode( UStruct* Struct, FPackageFileIn* In )
 
     // Iterator is the only opcode that has a word after a token
     // Normally we just loop around, but that doesn't work here
-    if ( bQueueReadIteratorWord )
-    {
-      bReadIteratorWord = true;
-      bQueueReadIteratorWord = false;
-    }
-    else if ( bReadIteratorWord )
+    if ( bReadIteratorWord )
     {
       LoadScriptWord( Struct, In, &ParsedSize );
       bReadIteratorWord = false;
