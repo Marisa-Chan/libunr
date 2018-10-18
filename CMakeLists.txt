@@ -22,12 +22,11 @@ if ( TARGET_PLATFORM STREQUAL "Windows" )
   add_definitions("-DLIBUNR_WIN32")
 elseif ( TARGET_PLATFORM STREQUAL "Linux" )
   add_definitions("-DLIBUNR_LINUX")
+  install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/share/libunr)
+  install(FILES ${LIBUNR_ROOT}/res/DefaultLibunr.ini DESTINATION
+    ${CMAKE_INSTALL_PREFIX}/share/libunr)
 else()
   message( FATAL_ERROR, "Unknown target platform: " ${TARGET_PLATFORM} )
-endif()
-
-if ( Build32 )
-  add_definitions("-m32")
 endif()
 
 set (SOURCES ${LIBUNR_SRC}/FConfig.cpp
@@ -45,7 +44,9 @@ set (SOURCES ${LIBUNR_SRC}/FConfig.cpp
 
 include_directories (${LIBUNR_INC} ${XSTL_INC} /usr/include)
 add_definitions("-std=c++11" "-DXSTL_ARRAY_STD" "-DXSTL_STRING_STD"
-  "-DXSTL_FILESTREAM_STD" "-DXSTL_STACK_STD")
+  "-DXSTL_FILESTREAM_STD" "-DXSTL_STACK_STD" 
+  "-DINSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"" )
+message(STATUS "Install prefix: " ${CMAKE_INSTALL_PREFIX})
 add_definitions ("-Wno-attributes")
 set_source_files_properties( tags PROPERTIES GENERATED true )
 add_custom_target( tags COMMAND ctags --c++-kinds=+p --fields=+iaS --extra=+q
@@ -64,12 +65,16 @@ else()
   message(FATAL_ERROR "Unknown build type: " ${CMAKE_BUILD_TYPE})
 endif()
 
-# 32 bit support
+# 32 bit support + install targets
 if ( BUILD32 )
   add_definitions("-m32")
   set_target_properties (libunr PROPERTIES LINK_FLAGS "-m32")
-  install(TARGETS libunr DESTINATION lib32)
+  if ( TARGET_PLATFORM STREQUAL "Linux" )
+    install(TARGETS libunr DESTINATION lib32)
+  endif()
 else()
-  install(TARGETS libunr DESTINATION lib)
+  if ( TARGET_PLATFORM STREQUAL "Linux" )
+    install(TARGETS libunr DESTINATION lib)
+  endif()
 endif()
 
