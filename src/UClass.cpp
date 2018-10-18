@@ -310,6 +310,7 @@ static inline void LoadScriptCode( UStruct* Struct, FPackageFileIn* In )
       case EX_GlobalFunction:
         LoadScriptIndex( Struct, In, &ParsedSize );
         break;
+      case EX_IntConstByte:
       case EX_Switch:
         LoadScriptByte( Struct, In, &ParsedSize );
         break;
