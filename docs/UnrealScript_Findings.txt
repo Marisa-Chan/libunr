@@ -1,0 +1,31 @@
+This is a document detailing any findings regarding unknown UnrealScript
+opcode definitions and quirks with our current method of serializing
+bytecode. Many opcode definitions can be found in the UT-Package-File-Format
+pdf, but not all are defined. It is important to understand all of them 
+so as to properly load all Unreal Engine 1 content.
+
+---------------------------------------------------------------------
+Bugs/Misunderstandings
+---------------------------------------------------------------------
+- EX_ArrayVariable inconsistency with documentation
+  Seen in: Deus Ex Core::Object::Sprintf
+  Description:
+    The statement 'S[3] = s3' makes use of an EX_ArrayVariable token, which 
+    the package file format describes as having two tokens following it. 
+    Namely, the index and the array itself. For the index field, a token does
+    not follow but the actual byte index into the array itself.
+  Solution:
+    A dummy UnrealScript file will have to be compiled that demonstrates the
+    use of ArrayVariables as lvalues for arrays of varying sizes.
+    - If arrays cannot be bigger than 256, then it follows that a single byte
+      contains the index of the array
+    - Otherwise, it may follow that an actual token is seen when the array
+      index is big enough. This would require a special case to handle loading
+      EX_ArrayVariable properly
+  Findings:
+    - N/A
+
+---------------------------------------------------------------------
+Unknown Opcodes
+---------------------------------------------------------------------
+N/A
