@@ -29,6 +29,7 @@
 FConfigManager* GConfigManager = NULL;
 FConfig* GLibunrConfig = NULL;
 FConfig* GGameConfig = NULL;
+FConfig* GUserConfig = NULL;
 
 static inline bool IsAcceptedChar( char C, const char* Accepted )
 {
@@ -119,9 +120,10 @@ int FConfig::Load( const char* Filename )
   FHash PreviousHash = {0, 0};
 
   FileStreamIn IniFile;
-  if ( !IniFile.Open( Filename ) )
+  int Status = IniFile.Open( Filename );
+  if ( Status != 0 )
   {
-    Logf( LOG_WARN, "Can't open or create INI file '%s'", Filename );
+    Logf( LOG_WARN, "Can't open INI file '%s' (errno = %s)", Filename, strerror( Status ) );
     return ERR_FILE_NOT_EXIST;
   }
 
@@ -135,13 +137,19 @@ int FConfig::Load( const char* Filename )
   char Probe = '\0';
   while ( !IniFile.Eof() ) // why doesn't Eof() work??
   {
-    if ( IniFile.Read( &Probe, 1 ) == MAX_UINT64 )
+    Status = IniFile.Read( &Probe, 1 );
+    if ( Status == MAX_UINT64 )
     {
       Logf( LOG_WARN, "Failed to read from INI file '%s'", Filename );
       IniFile.Close();
+      return ERR_BAD_DATA;
+    }
+    else if ( Status == 0 )
+    {
+      break;
     }
 
-    if ( Probe == ';' )
+    if ( Probe == ';' || Probe == '\'' )
     {
       // Read characters till we hit a newline
       while ( 1 )
@@ -157,7 +165,7 @@ int FConfig::Load( const char* Filename )
             break;
       }   
     }
-    else if ( Probe == '\r' )
+    /*else if ( Probe == '\r' )
     {
       IniFile.Read( &Probe, 1 );
       if ( Probe == '\n' )
@@ -166,16 +174,9 @@ int FConfig::Load( const char* Filename )
     else if ( Probe == '\n' )
     {
       Category = NULL;
-    }
+    }*/
     else if ( Probe == '[' )
     {
-      if ( Category != NULL )
-      {
-        Logf( LOG_WARN, "Got unexpected '[' in '%s' (Pos = %llu)", Filename, IniFile.Tell() );
-        IniFile.Close();
-        return ERR_BAD_DATA;
-      }
-
       char* CategoryPtr = CategoryBuf;
       xstl::Set( CategoryBuf, 0, sizeof( CategoryBuf ) );
       while ( PtrDistance( CategoryPtr, CategoryBuf ) < sizeof( CategoryBuf ) )
@@ -210,7 +211,7 @@ int FConfig::Load( const char* Filename )
       ReadNewLine( IniFile, Filename );
     }
     // We're in a category, read a full line
-    else
+    else if ( Probe != '\n' && Probe != '\r' )
     {
       if ( Category == NULL )
       {
@@ -296,7 +297,7 @@ int FConfig::Load( const char* Filename )
       xstl::Set( ValueBuf, 0, sizeof( ValueBuf ) );
       while ( PtrDistance( ValuePtr, ValueBuf ) < sizeof( ValueBuf ) )
       {
-        if ( IsNextCharSeqNewline( IniFile, Filename ) )
+        if ( IsNextCharSeqNewline( IniFile, Filename ) || IniFile.Eof() )
           break;
 
         IniFile.Read( &Probe, 1 );
@@ -323,13 +324,19 @@ int FConfig::Load( const char* Filename )
 int FConfig::Save()
 {
   FileStreamOut IniFile;
-  IniFile.Open( Name );
+  int Status = IniFile.Open( Name );
+  if ( Status != 0 )
+  {
+    Logf( LOG_WARN, "Failed to open ini file '%s' for saving (errno = %s)", strerror( Status ) );
+    return ERR_FILE_CREATE;
+  }
 
   int WriteLen = 0;
   char WriteBuf[512];
   char NewLine[] = "\r\n";
   for( size_t i = 0; i < Categories.Size() && i != MAX_SIZE; i++ )
   {
+    Set( WriteBuf, 0, sizeof( WriteBuf ) );
     FConfigCategory* Category = Categories[i];
     WriteLen = snprintf( WriteBuf, sizeof( WriteBuf ), "[%s]\r\n", Category->Name );
     IniFile.Write( WriteBuf, MIN( WriteLen, sizeof( WriteBuf ) ) );
@@ -340,6 +347,7 @@ int FConfig::Save()
       for ( size_t k = 0; k < Entry->Values->Size() && k != MAX_SIZE; k++ )
       {
         char* Value = (*Entry->Values)[k];
+        Set( WriteBuf, 0, sizeof( WriteBuf ) );
         if ( UNLIKELY( Entry->bWriteIndices ) )
         {
           WriteLen = snprintf( WriteBuf, sizeof( WriteBuf ), "%s[%lu]=%s\r\n", 
@@ -355,7 +363,7 @@ int FConfig::Save()
       }
     }
 
-    IniFile.Write( NewLine, sizeof( NewLine ) );
+    IniFile.Write( NewLine, 2 );
   }
 
   IniFile.Close();
@@ -504,6 +512,57 @@ void FConfig::ReadObject( const char* Category, const char* Variable, UObject* O
 {
 }
 
+void FConfig::WriteString( const char* Category, const char* Variable, const char* Value, size_t Index )
+{
+  FConfigCategory* Cat = NULL; // meow
+  FConfigEntry* Entry = NULL;
+  FHash CatHash = FnvHashString( Category );
+  for ( size_t i = 0; i < Categories.Size() && i != MAX_SIZE; i++ )
+  {
+    FConfigCategory* CatIter = Categories[i];
+    if ( CatIter->Hash == CatHash )
+    {
+      Cat = CatIter;
+      break;
+    }
+  }
+
+  if ( Cat == NULL )
+  {
+    Cat = new FConfigCategory();
+    Cat->Name = StringDup( Category );
+    Cat->Hash = CatHash;
+  }
+
+  FHash VarHash = FnvHashString( Variable );
+  for ( size_t j = 0; j < Cat->Entries->Size(); j++ )
+  {
+    FConfigEntry* EntryIter = (*Cat->Entries)[j];
+    if ( EntryIter->Hash == VarHash )
+    {
+      Entry = EntryIter;
+      break;
+    }
+  }
+
+  if ( Entry == NULL )
+  {
+    Entry = new FConfigEntry();
+    Entry->Name = StringDup( Variable );
+    Entry->Hash = VarHash;
+    Cat->Entries->PushBack( Entry );
+  }
+
+  if ( Index >= Entry->Values->Size() )
+  {
+    const char* Empty = "";
+    Entry->Values->Resize( Index+1, (char*)Empty );
+  }
+     
+  char** Val = &Entry->Values->Data()[ Index ];
+  *Val = (char*)Value;
+}
+
 const char* FConfig::GetName()
 {
   return Name;
@@ -515,7 +574,7 @@ FConfig::FConfigEntry::FConfigEntry()
   Hash = ZERO_HASH;
   Values = new Array<char*>();
   StructVars = NULL;
-  bWriteIndices = true; // TODO: Make libunr.ini option
+  bWriteIndices = false; // TODO: Make libunr.ini option
 }
 
 FConfig::FConfigEntry::~FConfigEntry()
@@ -538,7 +597,7 @@ FConfig::FConfigCategory::FConfigCategory()
   Name = NULL;
   Hash = ZERO_HASH;
   Entries = new Array<FConfigEntry*>();
-  Entries->Reserve( 4 );
+  //Entries->Reserve( 4 );
 }
 
 FConfig::FConfigCategory::~FConfigCategory()
