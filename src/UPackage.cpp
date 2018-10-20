@@ -23,7 +23,7 @@
  *========================================================================
 */
 
-#include "Memory.h"
+#include "XMemory.h"
 #include "UClass.h"
 #include "UPackage.h"
 #include "USystem.h"

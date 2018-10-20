@@ -36,7 +36,7 @@ enum EMusicTransition
 	MTRAN_SlowFade,
 };
 
-class UMusic : public UObject
+class DLL_EXPORT UMusic : public UObject
 {
   DECLARE_CLASS( UMusic, UObject, CLASS_NoExport | CLASS_SafeReplace, Core )
   EXPORTABLE() 

@@ -27,9 +27,9 @@
 #ifndef __UOBJECT__
 #define __UOBJECT__
 
-#include "Array.h"
-#include "Memory.h"
-#include "Stream.h"
+#include "XArray.h"
+#include "XMemory.h"
+#include "XStream.h"
 #include "FUtil.h"
 
 using namespace xstl;
@@ -331,7 +331,7 @@ public: \
  * UObject
  * The base class of all Unreal objects
 -----------------------------------------------------------------------------*/
-class UObject
+class DLL_EXPORT UObject
 {
   DECLARE_BASE_CLASS( UObject, UObject, CLASS_Abstract, Core )
   EXPOSE_TO_USCRIPT()

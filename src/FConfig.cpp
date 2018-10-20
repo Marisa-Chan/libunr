@@ -24,7 +24,7 @@
 */
 
 #include "FConfig.h"
-#include "Memory.h"
+#include "XMemory.h"
 
 FConfigManager* GConfigManager = NULL;
 FConfig* GLibunrConfig = NULL;
@@ -130,9 +130,9 @@ int FConfig::Load( const char* Filename )
   // Read until the end of the file
   FConfigCategory* Category = NULL;
   FConfigEntry* Entry = NULL;
-  Set( CategoryBuf, 0, sizeof( CategoryBuf ) );
-  Set( VariableBuf, 0, sizeof( VariableBuf ) );
-  Set( ValueBuf, 0, sizeof( ValueBuf ) );
+  xstl::Set( CategoryBuf, 0, sizeof( CategoryBuf ) );
+  xstl::Set( VariableBuf, 0, sizeof( VariableBuf ) );
+  xstl::Set( ValueBuf, 0, sizeof( ValueBuf ) );
 
   char Probe = '\0';
   while ( !IniFile.Eof() ) // why doesn't Eof() work??

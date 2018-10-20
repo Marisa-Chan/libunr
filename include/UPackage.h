@@ -25,10 +25,10 @@
 
 #pragma once
 
-#include "Array.h"
-#include "FileStream.h"
-#include "Stack.h"
-#include "String.h"
+#include "XArray.h"
+#include "XFileStream.h"
+#include "XStack.h"
+#include "XString.h"
 
 #include "UObject.h"
 
@@ -40,7 +40,7 @@ using namespace xstl;
  * FPackageFileIn
  * Keeps track of package specifics when reading a package from a file
 -----------------------------------------------------------------------------*/
-class FPackageFileIn : public FileStreamIn
+class DLL_EXPORT FPackageFileIn : public FileStreamIn
 {
 public:
   int Ver;
@@ -51,7 +51,7 @@ public:
  * FPackageFileOut
  * Keeps track of package specifics when writing a package to a file
 -----------------------------------------------------------------------------*/
-class FPackageFileOut : public FileStreamOut
+class DLL_EXPORT FPackageFileOut : public FileStreamOut
 {
 public:
   int Ver;
@@ -137,7 +137,7 @@ struct DLL_EXPORT UPackageHeader
  * A entry into a package's name table
 -----------------------------------------------------------------------------*/
 #define NAME_LEN 64
-struct FNameEntry
+struct DLL_EXPORT FNameEntry
 {
    FNameEntry();
    FNameEntry( const char* InStr );
@@ -163,7 +163,7 @@ enum EPkgLoadOpts
  * UPackage
  * A container for default object types
 -----------------------------------------------------------------------------*/
-class UPackage : public UObject
+class DLL_EXPORT UPackage : public UObject
 {
   DECLARE_CLASS( UPackage, UObject, CLASS_NoExport, Core )
   UPackage();

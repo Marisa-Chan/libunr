@@ -26,7 +26,7 @@
 #pragma once
 #include "UObject.h"
 
-class USubsystem : public UObject
+class DLL_EXPORT USubsystem : public UObject
 {
   DECLARE_ABSTRACT_CLASS( USubsystem, UObject, 0, Core )
   USubsystem();
@@ -40,7 +40,7 @@ typedef void(*GamePromptCallback)(char*, char*); // PathBuf, NameBuf
 // Prompt callback for if audio/render devices have not been picked
 typedef void(*DevicePromptCallback)(char*, char*); // RenderBuf, AudioBuf
 
-class USystem : public USubsystem
+class DLL_EXPORT USystem : public USubsystem
 {
   DECLARE_CLASS( USystem, USubsystem, CLASS_NoExport, Core )
   USystem();

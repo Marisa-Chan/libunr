@@ -26,14 +26,14 @@
 #pragma once
 
 #include "FUtil.h"
-#include "Array.h"
-#include "FileStream.h"
+#include "XArray.h"
+#include "XFileStream.h"
 
 using namespace xstl;
 class UObject;
 class UStruct;
 
-class FConfig
+class DLL_EXPORT FConfig
 {
 public:
   FConfig();
@@ -119,7 +119,7 @@ extern FConfig* GLibunrConfig; // Used only before loading any game
 extern FConfig* GGameConfig;   // Used when a game is picked
 extern FConfig* GUserConfig;   // Used when a game is picked
 
-class FConfigManager
+class DLL_EXPORT FConfigManager
 {
 public:
   FConfigManager();

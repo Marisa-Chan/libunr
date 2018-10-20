@@ -26,13 +26,13 @@
 #pragma once
 
 #include "FConfig.h"
-#include "Array.h"
-#include "String.h"
+#include "XArray.h"
+#include "XString.h"
 #include "UObject.h"
 
 using namespace xstl;
 
-class UTextBuffer : public UObject
+class DLL_EXPORT UTextBuffer : public UObject
 {
   DECLARE_ABSTRACT_CLASS( UTextBuffer, UObject, CLASS_NoExport, Core )
 
@@ -43,7 +43,7 @@ class UTextBuffer : public UObject
   String* Text;
 };
 
-class UField : public UObject
+class DLL_EXPORT UField : public UObject
 {
   DECLARE_ABSTRACT_CLASS( UField, UObject, CLASS_NoExport, Core )
 
@@ -54,7 +54,7 @@ class UField : public UObject
   UField* Next;       // Next object in list
 };
 
-class UConst : public UField
+class DLL_EXPORT UConst : public UField
 {
   DECLARE_CLASS( UConst, UField, CLASS_NoExport, Core )
 
@@ -64,7 +64,7 @@ class UConst : public UField
   String* Value;
 };
 
-class UEnum : public UField
+class DLL_EXPORT UEnum : public UField
 {
   DECLARE_CLASS( UEnum, UField, CLASS_NoExport, Core )
 
@@ -80,7 +80,7 @@ struct FScriptLabel
   u32 Offset;
 };
 
-class UStruct : public UField
+class DLL_EXPORT UStruct : public UField
 {
   DECLARE_CLASS( UStruct, UField, CLASS_NoExport, Core )
 
@@ -129,7 +129,7 @@ enum EFunctionFlags
   FUNC_NetFuncFlags       = FUNC_Net  | FUNC_NetReliable,
 };
 
-class UFunction : public UStruct
+class DLL_EXPORT UFunction : public UStruct
 {
   DECLARE_CLASS( UFunction, UStruct, CLASS_NoExport, Core )
 
@@ -145,7 +145,7 @@ class UFunction : public UStruct
   u16 ReplicationOffset; // will be entirely unused
 };
 
-class UState : public UStruct
+class DLL_EXPORT UState : public UStruct
 {
   DECLARE_CLASS( UState, UStruct, CLASS_NoExport, Core )
 
@@ -158,7 +158,7 @@ class UState : public UStruct
   u32 StateFlags;
 };
 
-struct FDependency
+struct DLL_EXPORT FDependency
 {
   FDependency();
   
@@ -167,7 +167,7 @@ struct FDependency
   u32 ScriptTextCRC;
 };
 
-class UClass : public UState
+class DLL_EXPORT UClass : public UState
 {
   DECLARE_CLASS( UClass, UState, CLASS_NoExport, Core )
   EXPORTABLE();

@@ -38,7 +38,7 @@ enum ESoundSlot
 	SLOT_Interface,
 };
 
-class USound : public UObject
+class DLL_EXPORT USound : public UObject
 {
   DECLARE_CLASS( USound, UObject, CLASS_NoExport | CLASS_SafeReplace, Engine )
   EXPORTABLE()

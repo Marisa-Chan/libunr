@@ -33,8 +33,8 @@
 #include <unistd.h>
 #include <string.h>
 
-#include "Types.h"
-#include "Stream.h"
+#include "XTypes.h"
+#include "XStream.h"
 
 #if defined LIBUNR_LINUX
   #include <sys/types.h>
@@ -103,7 +103,7 @@ typedef i32 idx;
 typedef void(*DebugPrintFunc)( const char* Str, size_t Len );
 extern DebugPrintFunc DebugPrint;
 
-void Logf( const char* Type, const char* Str, ... );
+DLL_EXPORT void Logf( const char* Type, const char* Str, ... );
 
 #define FNV1A_HASH 0
 #define FNV1_HASH  1

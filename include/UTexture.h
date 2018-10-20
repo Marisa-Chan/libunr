@@ -24,10 +24,9 @@
  *========================================================================
 */
 
-#ifndef __UTEXTURE_H__
-#define __UTEXTURE_H__
+#pragma once
 
-#include "Memory.h"
+#include "XMemory.h"
 #include "UObject.h"
 #include "UPackage.h"
 #include "USound.h"
@@ -47,7 +46,7 @@ enum ETextureFormat
   TEXF_DXT5,
 };
 
-class FColor
+class DLL_EXPORT FColor
 {
 public:
   union 
@@ -71,7 +70,7 @@ public:
   }
 };
 
-class FMipmap
+class DLL_EXPORT FMipmap
 {
 public:  
   FMipmap() 
@@ -91,7 +90,7 @@ public:
   Array<u8> DataArray;
 };
 
-class UPalette : public UObject
+class DLL_EXPORT UPalette : public UObject
 {
   DECLARE_CLASS( UPalette, UObject, CLASS_SafeReplace, Engine )
   EXPOSE_TO_USCRIPT()
@@ -102,7 +101,7 @@ class UPalette : public UObject
   FColor Colors[256];
 };
 
-class UBitmap : public UObject
+class DLL_EXPORT UBitmap : public UObject
 {
   DECLARE_CLASS( UBitmap, UObject, CLASS_SafeReplace, Engine )
   EXPOSE_TO_USCRIPT()
@@ -166,7 +165,7 @@ enum EVClampMode
   VClamp,
 };
 
-class UTexture : public UBitmap
+class DLL_EXPORT UTexture : public UBitmap
 {
   DECLARE_CLASS( UTexture, UBitmap, CLASS_SafeReplace, Engine )
   EXPOSE_TO_USCRIPT()
@@ -215,6 +214,4 @@ class UTexture : public UBitmap
   
   virtual void LoadFromPackage( FPackageFileIn* In );
 };
-
-#endif 
 
