@@ -75,6 +75,20 @@ int main( int argc, char** argv )
     return -1;
   }
 
+  // Export Object.uc
+  UPackage* CorePkg = UPackage::StaticLoadPkg( "Core" );
+  UClass* ObjClass = UObject::StaticClass();
+  ObjClass->ExportToFile( wd, NULL );
+
+  // Export Bitmap.uc
+  UClass* BitmapClass = UBitmap::StaticClass();
+  BitmapClass->ExportToFile( wd, NULL );
+
+  // Export Texture.uc
+  UClass* TexClass = UTexture::StaticClass();
+  TexClass->ExportToFile( wd, NULL );
+
+  // Export default texture
   UPackage* EnginePkg = UPackage::StaticLoadPkg( "Engine" );
   UTexture* DefaultTexture = (UTexture*)UPackage::StaticLoadObject( EnginePkg, "DefaultTexture", UTexture::StaticClass() );
   DefaultTexture->ExportToFile( wd, "bmp" );

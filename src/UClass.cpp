@@ -525,6 +525,31 @@ UClass::~UClass()
   Default->DelRef();
 }
 
+bool UClass::ExportToFile( const char* Dir, const char* Type )
+{
+  String* Filename = new String( Dir );
+#if defined LIBUNR_WIN32
+  Filename->ReplaceChars( '\\', '/' );
+#endif
+  if ( Filename->Back() != '/' )
+    Filename->Append( "/" );
+
+  Filename->Append( Pkg->ResolveNameFromIdx( NameIdx ) );
+  Filename->Append( ".uc" ); // Scripts won't get exported to any other type
+ 
+  FileStreamOut* Out = new FileStreamOut();
+  if ( Out->Open( *Filename ) != 0 )
+  {
+    Logf( LOG_WARN, "Failed to export script to file '%s'", Filename->Data() );
+    return false;
+  }
+  Out->Write( ScriptText->Text->Data(), ScriptText->Text->Size() );
+  Out->Close();
+  delete Out;
+  delete Filename;
+  return true;
+}
+
 void UClass::LoadFromPackage( FPackageFileIn* In )
 {
   Super::LoadFromPackage( In );

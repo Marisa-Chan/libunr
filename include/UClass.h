@@ -170,7 +170,8 @@ struct FDependency
 class UClass : public UState
 {
   DECLARE_CLASS( UClass, UState, CLASS_NoExport, Core )
-  
+  EXPORTABLE();
+
   UClass();
   UClass( const char* ClassName, u32 Flags, UClass* SuperClass, UObject *(*NativeCtor)(size_t) );
   
