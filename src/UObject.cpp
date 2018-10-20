@@ -120,7 +120,7 @@ UObject::~UObject()
 {
 }
 
-bool UObject::ExportToFile()
+bool UObject::ExportToFile( const char* Dir, const char* Type )
 {
   return false;
 }

@@ -54,13 +54,20 @@ void USound::LoadFromPackage( FPackageFileIn* In )
   In->Read( SoundData, SoundSize );
 }
 
-bool USound::ExportToFile()
+// TODO: Support exporting to a number of different formats
+bool USound::ExportToFile( const char* Dir, const char* Type )
 {
   // Set up filename
-  String* Filename = new String( Pkg->ResolveNameFromIdx( NameIdx ) );
-  const char* Ext = Pkg->ResolveNameFromIdx( SoundFormat );
+  String* Filename = new String( Dir );
+#if defined LIBUNR_WIN32
+  Filename->ReplaceChars( '\\', '/' );
+#endif
+  if ( Filename->Back() != '/' )
+    Filename->Append( "/" );
+
+  Filename->Append( Pkg->ResolveNameFromIdx( NameIdx ) );
   Filename->Append( "." );
-  Filename->Append( Ext );
+  Filename->Append( Pkg->ResolveNameFromIdx( SoundFormat ) );
   
   // Open file
   FileStreamOut* Out = new FileStreamOut();

@@ -53,14 +53,20 @@ void UMusic::LoadFromPackage( FPackageFileIn* In )
   In->Read( ChunkData, ChunkSize );
 }
 
-bool UMusic::ExportToFile()
+bool UMusic::ExportToFile( const char* Dir, const char* Type )
 {
   // Set up filename
-  String* Filename = new String( Name );
-  const char* Ext = Pkg->ResolveNameFromIdx( MusicType );
+  String* Filename = new String( Dir );
+#if defined LIBUNR_WIN32
+  Filename->ReplaceChars( '\\', '/' );
+#endif
+  if ( Filename->Back() != '/' )
+    Filename->Append( "/" );
+
+  Filename->Append( Pkg->ResolveNameFromIdx( NameIdx ) );
   Filename->Append( "." );
-  Filename->Append( Ext );
-  
+  Filename->Append( Pkg->ResolveNameFromIdx( MusicType ) );
+
   // Open file
   FileStreamOut* Out = new FileStreamOut();
   if ( Out->Open( *Filename ) != 0 )

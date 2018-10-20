@@ -325,7 +325,7 @@ public: \
   static bool StaticLinkNativeProperties(); 
 
 #define EXPORTABLE() \
-  virtual bool ExportToFile();
+  virtual bool ExportToFile( const char* Dir, const char* Type );
 
 /*-----------------------------------------------------------------------------
  * UObject

@@ -152,10 +152,23 @@ void UTexture::LoadFromPackage( FPackageFileIn* In )
 
 // TODO: Export textures besides TEXF_P8
 // TODO: Export to formats besides .bmp
-bool UTexture::ExportToFile()
+bool UTexture::ExportToFile( const char* Dir, const char* Type )
 {
-  String* Filename = new String( Pkg->ResolveNameFromIdx( NameIdx ) );
-  Filename->Append( ".bmp" );
+  String* Filename = new String( Dir );
+#if defined LIBUNR_WIN32
+  Filename->ReplaceChars( '\\', '/' );
+#endif
+  if ( Filename->Back() != '/' )
+    Filename->Append( "/" );
+
+  Filename->Append( Pkg->ResolveNameFromIdx( NameIdx ) );
+  Filename->Append( "." );
+  if ( strnicmp( Type, "bmp", 3 ) != 0 )
+  {
+    Logf( LOG_WARN, "Can't export texture to file type '%s'", Type );
+    return false;
+  }
+  Filename->Append( Type );
   
   FileStreamOut* Out = new FileStreamOut();
   if ( Out->Open( *Filename ) != 0 )
