@@ -54,6 +54,9 @@ void GamePromptHandler( char* PathOut, char* NameOut )
 
 int main( int argc, char** argv )
 {
+  static char wd[4096];
+  getcwd( wd, sizeof( wd ) );
+
   if ( UNLIKELY( !USystem::StaticInit( &GamePromptHandler, NULL ) ) )
   {
     Logf( LOG_CRIT, "USystem::StaticInit() failed!" );
@@ -74,7 +77,7 @@ int main( int argc, char** argv )
 
   UPackage* EnginePkg = UPackage::StaticLoadPkg( "Engine" );
   UTexture* DefaultTexture = (UTexture*)UPackage::StaticLoadObject( EnginePkg, "DefaultTexture", UTexture::StaticClass() );
-  DefaultTexture->ExportToFile();
+  DefaultTexture->ExportToFile( wd, "bmp" );
 
   Logf( LOG_INFO, "Test succeeded" );
   return 0;

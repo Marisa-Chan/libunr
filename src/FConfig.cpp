@@ -123,7 +123,7 @@ int FConfig::Load( const char* Filename )
   int Status = IniFile.Open( Filename );
   if ( Status != 0 )
   {
-    Logf( LOG_WARN, "Can't open INI file '%s' (errno = %s)", Filename, strerror( Status ) );
+    Logf( LOG_WARN, "Can't open ini file '%s' (errno = %s)", Filename, strerror( Status ) );
     return ERR_FILE_NOT_EXIST;
   }
 
@@ -327,7 +327,7 @@ int FConfig::Save()
   int Status = IniFile.Open( Name );
   if ( Status != 0 )
   {
-    Logf( LOG_WARN, "Failed to open ini file '%s' for saving (errno = %s)", strerror( Status ) );
+    Logf( LOG_WARN, "Failed to open ini file '%s' for saving (errno = %s)", Name, strerror( Status ) );
     return ERR_FILE_CREATE;
   }
 

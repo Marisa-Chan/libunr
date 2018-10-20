@@ -146,6 +146,13 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC )
   {
     // Create an ini if its missing
     Logf( LOG_WARN, "Main ini file '%s' does not exist; creating one", LibunrIniPath );
+#if defined LIBUNR_LINUX || LIBUNR_BSD
+    String* ConfigLibunr = new String( GetHomeDir() );
+    ConfigLibunr->Append( "/.config/libunr/" );
+    DIR* ConfigLibunrDir = opendir( ConfigLibunr->Data() );
+    if ( ConfigLibunrDir == NULL )
+      mkdir( ConfigLibunr->Data(), S_IRWXU | S_IRGRP | S_IROTH );
+#endif
 
     const char* DefaultLibunrIniPath = GetDefaultLibunrIniPath();
     if ( !CopyFile( DefaultLibunrIniPath, LibunrIniPath ) )
@@ -298,9 +305,8 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC )
 const char* USystem::GetLibunrIniPath()
 {
 #if defined LIBUNR_LINUX || LIBUNR_BSD
-  struct ::passwd* pw = getpwuid( getuid() );
   static char LibUnrPath[1024] = { 0 };
-  strcpy( LibUnrPath, pw->pw_dir );
+  strcpy( LibUnrPath, GetHomeDir() );
   strcat( LibUnrPath, "/.config/libunr/libunr.ini" ); 
   return LibUnrPath;
 #elif defined LIBUNR_WIN32
@@ -367,4 +373,12 @@ bool USystem::FileExists( const char* Filename )
 
   return (Status != ENOENT) ? true : false;
 }
+
+#if defined LIBUNR_LINUX || LIBUNR_BSD
+const char* USystem::GetHomeDir()
+{
+  struct ::passwd* pw = getpwuid( getuid() );
+  return pw->pw_dir;
+}
+#endif
 

@@ -58,6 +58,9 @@ class USystem : public USubsystem
   static const char* GetDefaultLibunrIniPath();
   static bool CopyFile( const char* OrigFile, const char* NewFile );
   static bool FileExists( const char* Filename );
+#if defined LIBUNR_LINUX || LIBUNR_BSD
+  static const char* GetHomeDir();
+#endif
 
   // libunr specific
   bool bLogRefCntZero;
