@@ -30,7 +30,7 @@ else()
 endif()
 
 set (SOURCES ${UNR_SRC}/FConfig.cpp
-			 ${UNR_SRC}/FUtil.cpp
+             ${UNR_SRC}/FUtil.cpp
              ${UNR_SRC}/UClass.cpp
              ${UNR_SRC}/UMusic.cpp
              ${UNR_SRC}/USound.cpp
@@ -43,7 +43,7 @@ set (SOURCES ${UNR_SRC}/FConfig.cpp
 )
 
 include_directories (${UNR_INC} ${XSTL_INC} /usr/include)
-add_definitions("-std=c++0x" "-DXSTL_ARRAY_STD" "-DXSTL_STRING_STD"
+add_definitions("-std=c++11" "-DXSTL_ARRAY_STD" "-DXSTL_STRING_STD"
   "-DXSTL_FILESTREAM_STD" "-DXSTL_STACK_STD" 
   "-DINSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"" )
 message(STATUS "Install prefix: " ${CMAKE_INSTALL_PREFIX})
@@ -52,10 +52,7 @@ set_source_files_properties( tags PROPERTIES GENERATED true )
 add_custom_target( tags COMMAND ctags --c++-kinds=+p --fields=+iaS --extra=+q
  --language-force=C++ --recurse=yes . WORKING_DIRECTORY ${UNR_ROOT} )
 add_library( unr SHARED ${SOURCES} tags )
-
-if ( TARGET_PLATFORM STREQUAL "Windows" )
-  target_link_libraries(unr "xstl")
-endif()
+target_link_libraries(unr "xstl")
 
 # Debug symbols & optimization levels
 if ( CMAKE_BUILD_TYPE STREQUAL "Debug" )

@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.7)
-project (libunr-test)
+project (libunr-test CXX)
 
 # Build options
 # Choose: Debug Release RelWithDebInfo
@@ -19,7 +19,10 @@ include_directories (${XSTL_INC} ${LIBUNR_INC} /usr/include)
 link_directories(${LIBUNR_ROOT} ../)
 
 add_executable (libunr-test ${SOURCES})
-target_link_libraries(libunr-test "xstl" "unr") # kind of a hack but w/e
+find_library(LIBUNR unr)
+find_library(XSTL  xstl)
+target_link_libraries(libunr-test ${XSTL})
+target_link_libraries(libunr-test ${LIBUNR})
 
 add_definitions ("-Wno-attributes" "-DXSTL_ARRAY_STD" "-DXSTL_STRING_STD"
   "-DXSTL_FILESTREAM_STD" "-DXSTL_STACK_STD" )
