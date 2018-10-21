@@ -19,12 +19,21 @@ include_directories (${XSTL_INC} ${LIBUNR_INC} /usr/include)
 link_directories(${LIBUNR_ROOT} ../)
 
 add_executable (libunr-test ${SOURCES})
-find_library(LIBUNR unr)
-find_library(XSTL  xstl)
+
+find_library(LIBUNR 
+  NAMES unr
+  HINTS ${LIBUNR_ROOT}
+)
+
+find_library(XSTL  
+  NAMES xstl
+  HINTS ${XSTL_ROOT}
+)
+
 target_link_libraries(libunr-test ${XSTL})
 target_link_libraries(libunr-test ${LIBUNR})
 
-add_definitions ("-Wno-attributes" "-DXSTL_ARRAY_STD" "-DXSTL_STRING_STD"
+add_definitions ("-std=c++11" "-Wno-attributes" "-DXSTL_ARRAY_STD" "-DXSTL_STRING_STD"
   "-DXSTL_FILESTREAM_STD" "-DXSTL_STACK_STD" )
 
 # Debug symbols & optimization levels

@@ -19,7 +19,7 @@ set (TARGET_PLATFORM "Linux" CACHE STRING "The target platform that is being bui
 option( BUILD32 "Build32" OFF )
 
 if ( TARGET_PLATFORM STREQUAL "Windows" )
-  add_definitions("-DLIBUNR_WIN32")
+  add_definitions("-DLIBUNR_WIN32" "-Wno-invalid-offsetof")
 elseif ( TARGET_PLATFORM STREQUAL "Linux" )
   add_definitions("-DLIBUNR_LINUX")
   install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/share/libunr)
