@@ -24,7 +24,7 @@
 */
 
 //#include "FLogf.h"
-#include "Memory.h"
+#include "XMemory.h"
 #include "UObject.h"
 #include "UObjGetSet.h"
 #include "UClass.h"
