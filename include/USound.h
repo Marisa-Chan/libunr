@@ -40,7 +40,7 @@ enum ESoundSlot
 
 class DLL_EXPORT USound : public UObject
 {
-  DECLARE_CLASS( USound, UObject, CLASS_NoExport | CLASS_SafeReplace, Engine )
+  DECLARE_NATIVE_CLASS( USound, UObject, CLASS_NoExport | CLASS_SafeReplace, Engine )
   EXPORTABLE()
   USound();
 

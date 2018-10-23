@@ -165,7 +165,7 @@ enum EPkgLoadOpts
 -----------------------------------------------------------------------------*/
 class DLL_EXPORT UPackage : public UObject
 {
-  DECLARE_CLASS( UPackage, UObject, CLASS_NoExport, Core )
+  DECLARE_NATIVE_CLASS( UPackage, UObject, CLASS_NoExport, Core )
   UPackage();
   
   virtual bool Load( const char* File );

@@ -210,7 +210,7 @@ struct FPropertyRecord;
 
 #define TEXT(s) #s
 
-#define DECLARE_BASE_CLASS(cls, supcls, clsflags, pkg) \
+#define DECLARE_NATIVE_CLASS_BASE(cls, supcls, clsflags, pkg) \
 protected: \
   static UClass* ConstructNativeClass( u32 Flags ); \
   static UClass* ObjectClass; \
@@ -300,13 +300,13 @@ public: \
   } \
   virtual ~cls(); 
 
-#define DECLARE_CLASS(cls, supcls, flags, pkg) \
-  DECLARE_BASE_CLASS(cls, supcls, flags, pkg) \
+#define DECLARE_NATIVE_CLASS(cls, supcls, flags, pkg) \
+  DECLARE_NATIVE_CLASS_BASE(cls, supcls, flags, pkg) \
 
-#define DECLARE_ABSTRACT_CLASS(cls, supcls, flags, pkg) \
-  DECLARE_BASE_CLASS(cls, supcls, flags | CLASS_Abstract, pkg) \
+#define DECLARE_NATIVE_ABSTRACT_CLASS(cls, supcls, flags, pkg) \
+  DECLARE_NATIVE_CLASS_BASE(cls, supcls, flags | CLASS_Abstract, pkg) \
   
-#define IMPLEMENT_CLASS(cls) \
+#define IMPLEMENT_NATIVE_CLASS(cls) \
   UClass* cls::ObjectClass = NULL; \
   size_t  cls::NativeSize  = sizeof( cls ); \
   FNativePropertyList* cls::StaticNativePropList = NULL; \
@@ -333,7 +333,7 @@ public: \
 -----------------------------------------------------------------------------*/
 class DLL_EXPORT UObject
 {
-  DECLARE_BASE_CLASS( UObject, UObject, CLASS_Abstract, Core )
+  DECLARE_NATIVE_CLASS_BASE( UObject, UObject, CLASS_Abstract, Core )
   EXPOSE_TO_USCRIPT()
   EXPORTABLE() // not really exportable, but just so all subclasses can have export called generically
   UObject();

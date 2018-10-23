@@ -34,7 +34,7 @@ using namespace xstl;
 
 class DLL_EXPORT UTextBuffer : public UObject
 {
-  DECLARE_ABSTRACT_CLASS( UTextBuffer, UObject, CLASS_NoExport, Core )
+  DECLARE_NATIVE_ABSTRACT_CLASS( UTextBuffer, UObject, CLASS_NoExport, Core )
 
   UTextBuffer();
   virtual void LoadFromPackage( FPackageFileIn* In );
@@ -45,7 +45,7 @@ class DLL_EXPORT UTextBuffer : public UObject
 
 class DLL_EXPORT UField : public UObject
 {
-  DECLARE_ABSTRACT_CLASS( UField, UObject, CLASS_NoExport, Core )
+  DECLARE_NATIVE_ABSTRACT_CLASS( UField, UObject, CLASS_NoExport, Core )
 
   UField();
   virtual void LoadFromPackage( FPackageFileIn* In );
@@ -56,7 +56,7 @@ class DLL_EXPORT UField : public UObject
 
 class DLL_EXPORT UConst : public UField
 {
-  DECLARE_CLASS( UConst, UField, CLASS_NoExport, Core )
+  DECLARE_NATIVE_CLASS( UConst, UField, CLASS_NoExport, Core )
 
   UConst();
   virtual void LoadFromPackage( FPackageFileIn* In );
@@ -66,7 +66,7 @@ class DLL_EXPORT UConst : public UField
 
 class DLL_EXPORT UEnum : public UField
 {
-  DECLARE_CLASS( UEnum, UField, CLASS_NoExport, Core )
+  DECLARE_NATIVE_CLASS( UEnum, UField, CLASS_NoExport, Core )
 
   UEnum();
   virtual void LoadFromPackage( FPackageFileIn* In );
@@ -82,7 +82,7 @@ struct FScriptLabel
 
 class DLL_EXPORT UStruct : public UField
 {
-  DECLARE_CLASS( UStruct, UField, CLASS_NoExport, Core )
+  DECLARE_NATIVE_CLASS( UStruct, UField, CLASS_NoExport, Core )
 
   UStruct();
   UStruct( size_t InNativeSize );
@@ -131,7 +131,7 @@ enum EFunctionFlags
 
 class DLL_EXPORT UFunction : public UStruct
 {
-  DECLARE_CLASS( UFunction, UStruct, CLASS_NoExport, Core )
+  DECLARE_NATIVE_CLASS( UFunction, UStruct, CLASS_NoExport, Core )
 
   UFunction();
   virtual void LoadFromPackage( FPackageFileIn* In );
@@ -147,7 +147,7 @@ class DLL_EXPORT UFunction : public UStruct
 
 class DLL_EXPORT UState : public UStruct
 {
-  DECLARE_CLASS( UState, UStruct, CLASS_NoExport, Core )
+  DECLARE_NATIVE_CLASS( UState, UStruct, CLASS_NoExport, Core )
 
   UState();
   virtual void LoadFromPackage( FPackageFileIn* In );
@@ -169,7 +169,7 @@ struct DLL_EXPORT FDependency
 
 class DLL_EXPORT UClass : public UState
 {
-  DECLARE_CLASS( UClass, UState, CLASS_NoExport, Core )
+  DECLARE_NATIVE_CLASS( UClass, UState, CLASS_NoExport, Core )
   EXPORTABLE();
 
   UClass();

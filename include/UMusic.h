@@ -38,7 +38,7 @@ enum EMusicTransition
 
 class DLL_EXPORT UMusic : public UObject
 {
-  DECLARE_CLASS( UMusic, UObject, CLASS_NoExport | CLASS_SafeReplace, Core )
+  DECLARE_NATIVE_CLASS( UMusic, UObject, CLASS_NoExport | CLASS_SafeReplace, Core )
   EXPORTABLE() 
   UMusic();
 

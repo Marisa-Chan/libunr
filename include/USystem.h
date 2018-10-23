@@ -28,7 +28,7 @@
 
 class DLL_EXPORT USubsystem : public UObject
 {
-  DECLARE_ABSTRACT_CLASS( USubsystem, UObject, 0, Core )
+  DECLARE_NATIVE_ABSTRACT_CLASS( USubsystem, UObject, 0, Core )
   USubsystem();
 };
 
@@ -42,7 +42,7 @@ typedef void(*DevicePromptCallback)(char*, char*); // RenderBuf, AudioBuf
 
 class DLL_EXPORT USystem : public USubsystem
 {
-  DECLARE_CLASS( USystem, USubsystem, CLASS_NoExport, Core )
+  DECLARE_NATIVE_CLASS( USystem, USubsystem, CLASS_NoExport, Core )
   USystem();
 
   // Per instance method

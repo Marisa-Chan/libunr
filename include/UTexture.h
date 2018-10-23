@@ -92,7 +92,7 @@ public:
 
 class DLL_EXPORT UPalette : public UObject
 {
-  DECLARE_CLASS( UPalette, UObject, CLASS_SafeReplace, Engine )
+  DECLARE_NATIVE_CLASS( UPalette, UObject, CLASS_SafeReplace, Engine )
   EXPOSE_TO_USCRIPT()
 
   UPalette();
@@ -103,7 +103,7 @@ class DLL_EXPORT UPalette : public UObject
 
 class DLL_EXPORT UBitmap : public UObject
 {
-  DECLARE_CLASS( UBitmap, UObject, CLASS_SafeReplace, Engine )
+  DECLARE_NATIVE_CLASS( UBitmap, UObject, CLASS_SafeReplace, Engine )
   EXPOSE_TO_USCRIPT()
   UBitmap(); 
 
@@ -167,7 +167,7 @@ enum EVClampMode
 
 class DLL_EXPORT UTexture : public UBitmap
 {
-  DECLARE_CLASS( UTexture, UBitmap, CLASS_SafeReplace, Engine )
+  DECLARE_NATIVE_CLASS( UTexture, UBitmap, CLASS_SafeReplace, Engine )
   EXPOSE_TO_USCRIPT()
   EXPORTABLE()
   UTexture();
