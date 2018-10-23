@@ -8,7 +8,7 @@ if( NOT CMAKE_BUILD_TYPE )
 endif()
 
 set (UNR_VER_MAJOR 0)
-set (UNR_VER_MINOR 1)
+set (UNR_VER_MINOR 2)
 set (UNR_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 set (UNR_INC ${UNR_ROOT}/include)
 set (UNR_SRC ${UNR_ROOT}/src)
