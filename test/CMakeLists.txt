@@ -16,8 +16,6 @@ set (LIBUNR_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../libunr)
 set (LIBUNR_INC  ${LIBUNR_ROOT}/include)
 
 include_directories (${XSTL_INC} ${LIBUNR_INC} /usr/include)
-link_directories(${LIBUNR_ROOT} ../)
-
 add_executable (libunr-test ${SOURCES})
 
 find_library(LIBUNR 
