@@ -327,7 +327,7 @@ const char* USystem::GetDefaultLibunrIniPath()
 #elif defined LIBUNR_WIN32
   return "DefaultLibunr.ini";
 #else
-  #error "Unknown operating system! Please add a section to USystem::GetLibunrIniPath()"
+  #error "Unknown operating system! Please add a section to USystem::GetDefaultLibunrIniPath()"
   return -1;
 #endif
 }
