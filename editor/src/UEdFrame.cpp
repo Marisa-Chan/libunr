@@ -35,6 +35,11 @@ UEdFrame::UEdFrame( const wxString& Title, const wxPoint& Pos, const wxSize& Siz
 void UEdFrame::DrawFrame()
 {
   DrawMenuBar();
+
+  // Prepare main sizer
+  MainSizer = new wxBoxSizer( wxVERTICAL );
+  SetSizerAndFit(MainSizer);
+
   DrawButtonBar();
 }
 
@@ -46,10 +51,21 @@ void UEdFrame::DrawMenuBar()
 
 void UEdFrame::DrawButtonBar()
 {
-  u32 ButtonDim = MIN( 64, 64 * Editor->GetUiScale() );
+  u32 ButtonDim = MAX( 24, 24 * Editor->GetUiScale() );
   ButtonSize.Set( ButtonDim, ButtonDim );
 
-  ButtonSizer = new wxBoxSizer( wxHORIZONTAL );
-  ButtonSizer->SetMinSize( ButtonSize );
-  ButtonSizer->SetContainingWindow( this );
+  ButtonSizer = new wxGridSizer( 0, 0, 0 );
+  MainSizer->Add( ButtonSizer );
 }
+
+void UEdFrame::AddButtonToBar( wxStandardID Id, const wxString& Label )
+{
+  ButtonSizer->Add( new wxButton( this, Id, Label, wxDefaultPosition, ButtonSize ),
+      0, wxLEFT, 1 );
+}
+
+void UEdFrame::AddSpacerToBar()
+{
+  ButtonSizer->AddSpacer( ButtonSize.GetWidth() / 4 );
+}
+

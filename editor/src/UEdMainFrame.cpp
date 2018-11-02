@@ -79,12 +79,33 @@ void UEdMainFrame::DrawMenuBar()
 void UEdMainFrame::DrawButtonBar()
 {
   UEdFrame::DrawButtonBar();
+  int SpaceWidth = ButtonSize.GetWidth() / 4;
 
   // TODO: Get button images
-  // New map button
-  wxButton* NewMapButton = new wxButton( this, wxID_ANY, wxEmptyString, 
-      wxDefaultPosition, ButtonSize );
+  
+  // New/Open/Save Map
+  AddButtonToBar( wxID_ANY, wxEmptyString );
+  AddButtonToBar( wxID_ANY, wxEmptyString );
+  AddButtonToBar( wxID_ANY, wxEmptyString );
+  AddSpacerToBar();
 
-  ButtonSizer->Add( NewMapButton, 0, wxLEFT, 1 );
+  // Undo/Redo
+  AddButtonToBar( wxID_ANY, wxEmptyString );
+  AddButtonToBar( wxID_ANY, wxEmptyString );
+  AddSpacerToBar();
+
+  // Search Actors
+  AddButtonToBar( wxID_ANY, wxEmptyString );
+  AddSpacerToBar();
+
+  // Content Browsers
+  AddButtonToBar( wxID_ANY, "P" );
+  AddButtonToBar( wxID_ANY, wxEmptyString );
+  AddButtonToBar( wxID_ANY, wxEmptyString );
+  AddButtonToBar( wxID_ANY, wxEmptyString );
+  AddButtonToBar( wxID_ANY, wxEmptyString );
+  AddButtonToBar( wxID_ANY, wxEmptyString );
+  AddButtonToBar( wxID_ANY, wxEmptyString );
+  AddSpacerToBar();
 }
 

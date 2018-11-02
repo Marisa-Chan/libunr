@@ -38,11 +38,16 @@ protected:
   virtual void DrawMenuBar();
   virtual void DrawButtonBar();
 
+  // TODO: Add icon argument
+  virtual void AddButtonToBar( wxStandardID Id, const wxString& Label );
+  virtual void AddSpacerToBar();
+
   u32 MenuFontSize;
   wxSize ButtonSize;
 
   wxMenuBar* MenuBar;
-  wxBoxSizer* ButtonSizer;
+  wxBoxSizer* MainSizer;
+  wxGridSizer* ButtonSizer;
 };
 
 
