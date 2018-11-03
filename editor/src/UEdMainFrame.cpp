@@ -79,7 +79,6 @@ void UEdMainFrame::DrawMenuBar()
 void UEdMainFrame::DrawButtonBar()
 {
   UEdFrame::DrawButtonBar();
-  int SpaceWidth = ButtonSize.GetWidth() / 4;
 
   // TODO: Get button images
   

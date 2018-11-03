@@ -17,31 +17,13 @@
 \*========================================================================*/
 
 /*========================================================================
- * UEdMainFrame.h - Main editor frame class
+ * UEdEvents.h - Enum declaring all event IDs
  * 
- * written by Adam 'Xaleros' Smith
+ * written by Adam 'Xaleros' Smith 
  *========================================================================
 */
 
-#pragma once
-
-#include "UEdFrame.h"
-
-class UEdMainFrame : public UEdFrame
+enum
 {
-public:
-  UEdMainFrame( const wxString& Title, const wxPoint& Pos, const wxSize& Size );
-
-protected:
-  // UEdMainFrame functions
-  virtual void DrawFrame();
-  virtual void DrawMenuBar();
-  virtual void DrawButtonBar();
-
-  // Event handlers
-  virtual void OnPkgBrowser( wxCommandEvent& Event );
-  virtual void OnExit( wxCommandEvent& Event );
-
-  wxDECLARE_EVENT_TABLE();
-};
-
+  ID_PkgBrowser,
+}
