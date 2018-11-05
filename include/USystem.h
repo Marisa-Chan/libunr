@@ -82,4 +82,6 @@ protected:
 };
 
 extern USystem* GSystem;
+DLL_EXPORT bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC );
+
 

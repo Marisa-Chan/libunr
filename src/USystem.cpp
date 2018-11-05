@@ -196,7 +196,8 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC )
   GSystem->GamePath = GLibunrConfig->ReadString( "Game", "Path" );
   GSystem->GameName = GLibunrConfig->ReadString( "Game", "Name" );
   if ( strnicmp( GSystem->GamePath, "None", 4 ) == 0 ||
-       strnicmp( GSystem->GameName, "None", 4 ) == 0 )
+       strnicmp( GSystem->GameName, "None", 4 ) == 0 ||
+       bForceGamePrompt )
   {
     if ( !GSystem->PromptForGameInfo() )
     {
@@ -382,3 +383,25 @@ const char* USystem::GetHomeDir()
 }
 #endif
 
+bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC )
+{
+  if ( UNLIKELY( !USystem::StaticInit( GPC, DPC ) ) )
+  {
+    Logf( LOG_CRIT, "USystem::StaticInit() failed!" );
+    return false;
+  }
+
+  if ( UNLIKELY( !UPackage::StaticInit() ) )
+  {
+    Logf( LOG_CRIT, "UPackage::StaticInit() failed!" );
+    return false;
+  }
+
+  if ( UNLIKELY( !UObject::StaticInit() ) )
+  {
+    Logf( LOG_CRIT, "UObject::StaticInit() failed!" );
+    return false;
+  }
+
+  return true;
+}
