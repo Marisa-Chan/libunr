@@ -26,6 +26,7 @@
 #pragma once
 
 #include "UEdFrame.h"
+#include "UEdEvents.h"
 
 class UEdMainFrame : public UEdFrame
 {
