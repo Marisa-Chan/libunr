@@ -108,3 +108,16 @@ void UEdMainFrame::DrawButtonBar()
   AddSpacerToBar();
 }
 
+void UEdMainFrame::OnPkgBrowser( wxCommandEvent& Event )
+{
+  
+}
+
+void UEdMainFrame::OnExit( wxCommandEvent& Event )
+{
+
+}
+
+wxBEGIN_EVENT_TABLE(UEdMainFrame, wxFrame)
+  EVT_MENU(ID_PkgBrowser, UEdMainFrame::OnPkgBrowser)
+wxEND_EVENT_TABLE()

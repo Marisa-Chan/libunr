@@ -392,7 +392,7 @@ const char* USystem::GetHomeDir()
 
 bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC )
 {
-  if ( UNLIKELY( !USystem::StaticInit( GPC, NULL ) ) )
+  if ( UNLIKELY( !USystem::StaticInit( GPC, DPC ) ) )
   {
     Logf( LOG_CRIT, "USystem::StaticInit() failed!" );
     return false;
@@ -412,4 +412,3 @@ bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC )
 
   return true;
 }
-

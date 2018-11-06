@@ -1,0 +1,18 @@
+This is a document detailing any findings regarding Brushes and BSP info
+in Unreal Engine 1. As far as I know, there is no info online that describes
+any of these formats in detail. 
+
+UShock is a level viewer that has had RE work done on the level format, 
+but the methods of RE are questionable and the code is not very clean.
+
+---------------------------------------------------------------------
+Brush
+---------------------------------------------------------------------
+All brushes seem to contain property lists that describe their information
+in well enough detail. This could be used for exporting to T3D and the like.
+
+---------------------------------------------------------------------
+BspSurfs
+---------------------------------------------------------------------
+Might store the Surface properties?? Needs more investigation
+
