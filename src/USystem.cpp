@@ -109,21 +109,38 @@ bool USystem::PromptForGameInfo()
   if ( DoGamePrompt == NULL )
     return false;
 
-  // Create buffers for callback to use
-  char* PathBuf = new char[GPC_PATH_BUF_LEN];
-  char* NameBuf = new char[GPC_NAME_BUF_LEN];
+  Array<char*> Names;
+  int i = 0;
+  char* NameBuf = GLibunrConfig->ReadString( "Game", "Name", i );
+  char* PathBuf = NULL;
+  
+  // Create array of possible names
+  while ( NameBuf != NULL || strnicmp( NameBuf, "None", 4 ) )
+  {
+    Names.PushBack( NameBuf );
+    NameBuf = GLibunrConfig->ReadString( "Game", "Name", ++i );
+  }
 
   // Run callback
-  DoGamePrompt( PathBuf, NameBuf );
+  i = DoGamePrompt( &Names );
 
-  // Update game variables
-  GamePath = PathBuf;
+  // Get name and set
+  NameBuf = Names[i];
+  PathBuf = GLibunrConfig->ReadString( "Game", "Path", i );
   GameName = NameBuf;
 
-  // Write to config and save
-  GLibunrConfig->WriteString( "Game", "Path", GamePath );
-  GLibunrConfig->WriteString( "Game", "Name", GameName );
-  GLibunrConfig->Save();
+  // Get real path 
+  GamePath = (char*)xstl::Malloc( 4096 );
+  realpath( PathBuf, (char*)GamePath );
+
+  // Free retrieved name values
+  for ( i = 0; i < Names.Size(); i++ )
+  {
+    if ( Names[i] != NameBuf )
+      xstl::Free( Names[i] );
+  }
+
+  xstl::Free( PathBuf );
 
   return true;
 }
@@ -186,25 +203,16 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC )
   //      strnicmp( GSystem->AudioDevice, None ) == 0 )
   // {
   //   if ( !GSystem->PromptForDeviceInfo() )
-  //   {
-  //     Logf( LOG_CRT, "DoDevicePrompt() callback is not set; aborting" );
-  //     return false;
-  //   }
+  //     Logf( LOG_WARN, "DoDevicePrompt() callback is not set" );
   // }
 
   // Get game info
-  GSystem->GamePath = GLibunrConfig->ReadString( "Game", "Path" );
-  GSystem->GameName = GLibunrConfig->ReadString( "Game", "Name" );
-  if ( strnicmp( GSystem->GamePath, "None", 4 ) == 0 ||
-       strnicmp( GSystem->GameName, "None", 4 ) == 0 )
+  if ( !GSystem->PromptForGameInfo() )
   {
-    if ( !GSystem->PromptForGameInfo() )
-    {
-      Logf( LOG_CRIT, "DoGamePrompt() callback is not set; aborting" );
-      return false;
-    }
+    Logf( LOG_CRIT, "DoGamePrompt() callback is not set; aborting" );
+    return false;
   }
-
+  
   // Change directory to the game's system folder
   String GameSysPath( GSystem->GamePath );
   GameSysPath += "/System/";
@@ -381,4 +389,27 @@ const char* USystem::GetHomeDir()
   return pw->pw_dir;
 }
 #endif
+
+bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC )
+{
+  if ( UNLIKELY( !USystem::StaticInit( GPC, NULL ) ) )
+  {
+    Logf( LOG_CRIT, "USystem::StaticInit() failed!" );
+    return false;
+  }
+
+  if ( UNLIKELY( !UPackage::StaticInit() ) )
+  {
+    Logf( LOG_CRIT, "UPackage::StaticInit() failed!" );
+    return false;
+  }
+
+  if ( UNLIKELY( !UObject::StaticInit() ) )
+  {
+    Logf( LOG_CRIT, "UObject::StaticInit() failed!" );
+    return false;
+  } 
+
+  return true;
+}
 

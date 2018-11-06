@@ -31,8 +31,6 @@
 #include "USystem.h"
 #include "UTexture.h"
 
-#define INIT_CLASS(cls) cls::StaticCreateClass();
-
 bool UObject::StaticInit()
 {
   bool Result = true;
@@ -83,6 +81,7 @@ bool UObject::StaticInit()
   // Now initialize all of UObject
   Result &= UObject::StaticClassInit();
   Result &= USubsystem::StaticClassInit();
+  Result &= UCommandlet::StaticClassInit();
 
   // Register System, which also does not have a class
   Result &= USystem::StaticClassInit();
@@ -108,116 +107,82 @@ bool UObject::StaticLinkNativeProperties()
     LINK_NATIVE_PROPERTY( UObject, Class );
     return true;
   }
-
   return false;
 }
 
-bool UPalette::StaticLinkNativeProperties()
-{
-  FNativePropertyList* SuperPropList = Super::StaticNativePropList;
-  if ( SuperPropList == NULL )
-    return false;
+BEGIN_PROPERTY_LINK( UCommandlet, 14 )
+  LINK_NATIVE_PROPERTY( UCommandlet, HelpCmd );
+  LINK_NATIVE_PROPERTY( UCommandlet, HelpOneLiner );
+  LINK_NATIVE_PROPERTY( UCommandlet, HelpUsage );
+  LINK_NATIVE_PROPERTY( UCommandlet, HelpWebLink );
+  LINK_NATIVE_ARRAY   ( UCommandlet, HelpParm );
+  LINK_NATIVE_ARRAY   ( UCommandlet, HelpDesc );
+  LINK_NATIVE_PROPERTY( UCommandlet, LogToStdout );
+  LINK_NATIVE_PROPERTY( UCommandlet, IsServer );
+  LINK_NATIVE_PROPERTY( UCommandlet, IsClient );
+  LINK_NATIVE_PROPERTY( UCommandlet, IsEditor );
+  LINK_NATIVE_PROPERTY( UCommandlet, LazyLoad );
+  LINK_NATIVE_PROPERTY( UCommandlet, ShowErrorCount );
+  LINK_NATIVE_PROPERTY( UCommandlet, ShowBanner );
+  LINK_NATIVE_PROPERTY( UCommandlet, ForceInt );
+END_PROPERTY_LINK()
 
-  if ( StaticInitNativePropList( 1 + SuperPropList->Num ) )
-  {
-    xstl::Copy( StaticNativePropList->Properties,
-                sizeof( FNativePropertyLink ) * SuperPropList->Num,
-                SuperPropList->Properties,
-                sizeof( FNativePropertyLink ) * SuperPropList->Num );
-    StaticNativePropList->Added = SuperPropList->Added;
+BEGIN_PROPERTY_LINK( UPalette, 1 )
+  LINK_NATIVE_ARRAY( UPalette, Colors ); 
+END_PROPERTY_LINK()
 
-    LINK_NATIVE_ARRAY( UPalette, Colors ); 
-    return true;
-  }
-  return false;
-}
+BEGIN_PROPERTY_LINK( UBitmap, 11 )
+  LINK_NATIVE_PROPERTY( UBitmap, Format );
+  LINK_NATIVE_PROPERTY( UBitmap, Palette );
+  LINK_NATIVE_PROPERTY( UBitmap, UBits );
+  LINK_NATIVE_PROPERTY( UBitmap, VBits );
+  LINK_NATIVE_PROPERTY( UBitmap, USize );
+  LINK_NATIVE_PROPERTY( UBitmap, VSize );
+  LINK_NATIVE_PROPERTY( UBitmap, UClamp );
+  LINK_NATIVE_PROPERTY( UBitmap, VClamp );
+  LINK_NATIVE_PROPERTY( UBitmap, MipZero );
+  LINK_NATIVE_PROPERTY( UBitmap, MaxColor );
+  LINK_NATIVE_ARRAY( UBitmap, InternalTime );
+END_PROPERTY_LINK()
 
-bool UBitmap::StaticLinkNativeProperties()
-{
-  FNativePropertyList* SuperPropList = Super::StaticNativePropList;
-  if ( SuperPropList == NULL )
-    return false;
-
-  if ( StaticInitNativePropList( 11 + SuperPropList->Num ) )
-  {
-    xstl::Copy( StaticNativePropList->Properties,
-                sizeof( FNativePropertyLink ) * SuperPropList->Num,
-                SuperPropList->Properties,
-                sizeof( FNativePropertyLink ) * SuperPropList->Num );
-    StaticNativePropList->Added = SuperPropList->Added;
-
-    LINK_NATIVE_PROPERTY( UBitmap, Format );
-    LINK_NATIVE_PROPERTY( UBitmap, Palette );
-    LINK_NATIVE_PROPERTY( UBitmap, UBits );
-    LINK_NATIVE_PROPERTY( UBitmap, VBits );
-    LINK_NATIVE_PROPERTY( UBitmap, USize );
-    LINK_NATIVE_PROPERTY( UBitmap, VSize );
-    LINK_NATIVE_PROPERTY( UBitmap, UClamp );
-    LINK_NATIVE_PROPERTY( UBitmap, VClamp );
-    LINK_NATIVE_PROPERTY( UBitmap, MipZero );
-    LINK_NATIVE_PROPERTY( UBitmap, MaxColor );
-    LINK_NATIVE_ARRAY( UBitmap, InternalTime );
-    return true;
-  }
-
-  return false;
-}
-
-bool UTexture::StaticLinkNativeProperties()
-{
-  FNativePropertyList* SuperPropList = Super::StaticNativePropList;
-  if ( SuperPropList == NULL )
-    return false;
-
-  // Double check this
-  // this is gonna get REAL out of hand with Engine.Actor...
-  if ( StaticInitNativePropList( 32 + SuperPropList->Num ) )
-  {
-    xstl::Copy( StaticNativePropList->Properties,
-                sizeof( FNativePropertyLink ) * SuperPropList->Num,
-                SuperPropList->Properties,
-                sizeof( FNativePropertyLink ) * SuperPropList->Num );
-    StaticNativePropList->Added = SuperPropList->Added;
-         
-    LINK_NATIVE_PROPERTY( UTexture, BumpMap );
-    LINK_NATIVE_PROPERTY( UTexture, DetailTexture );
-    LINK_NATIVE_PROPERTY( UTexture, MacroTexture );
-    LINK_NATIVE_PROPERTY( UTexture, Diffuse );
-    LINK_NATIVE_PROPERTY( UTexture, Specular );
-    LINK_NATIVE_PROPERTY( UTexture, Alpha );
-    LINK_NATIVE_PROPERTY( UTexture, DrawScale );
-    LINK_NATIVE_PROPERTY( UTexture, Friction );
-    LINK_NATIVE_PROPERTY( UTexture, MipMult );
-    LINK_NATIVE_ARRAY   ( UTexture, FootstepSound );
-    LINK_NATIVE_PROPERTY( UTexture, HitSound );
-    LINK_NATIVE_PROPERTY( UTexture, bHighColorQuality );
-    LINK_NATIVE_PROPERTY( UTexture, bHighTextureQuality );
-    LINK_NATIVE_PROPERTY( UTexture, bRealtime );
-    LINK_NATIVE_PROPERTY( UTexture, bParametric );
-    LINK_NATIVE_PROPERTY( UTexture, bRealtimeChanged );
-    LINK_NATIVE_PROPERTY( UTexture, bHasComp );
-    LINK_NATIVE_PROPERTY( UTexture, bFractical );
-    LINK_NATIVE_PROPERTY( UTexture, LODSet );
-    LINK_NATIVE_PROPERTY( UTexture, AnimNext );
-    LINK_NATIVE_PROPERTY( UTexture, AnimCurrent );
-    LINK_NATIVE_PROPERTY( UTexture, PrimeCount );
-    LINK_NATIVE_PROPERTY( UTexture, PrimeCurrent );
-    LINK_NATIVE_PROPERTY( UTexture, MinFrameRate );
-    LINK_NATIVE_PROPERTY( UTexture, MaxFrameRate );
-    LINK_NATIVE_PROPERTY( UTexture, Accumulator );
-    LINK_NATIVE_PROPERTY( UTexture, Mips );
-    LINK_NATIVE_PROPERTY( UTexture, CompMips );
-    LINK_NATIVE_PROPERTY( UTexture, CompFormat );
-    LINK_NATIVE_PROPERTY( UTexture, SurfaceType );
-    LINK_NATIVE_PROPERTY( UTexture, UClampMode );
-    LINK_NATIVE_PROPERTY( UTexture, VClampMode );
-    LINK_NATIVE_PROPERTY( UTexture, PaletteTransform );
-    return true;
-  }
-  return false;
-}
+BEGIN_PROPERTY_LINK( UTexture, 32 )
+  LINK_NATIVE_PROPERTY( UTexture, BumpMap );
+  LINK_NATIVE_PROPERTY( UTexture, DetailTexture );
+  LINK_NATIVE_PROPERTY( UTexture, MacroTexture );
+  LINK_NATIVE_PROPERTY( UTexture, Diffuse );
+  LINK_NATIVE_PROPERTY( UTexture, Specular );
+  LINK_NATIVE_PROPERTY( UTexture, Alpha );
+  LINK_NATIVE_PROPERTY( UTexture, DrawScale );
+  LINK_NATIVE_PROPERTY( UTexture, Friction );
+  LINK_NATIVE_PROPERTY( UTexture, MipMult );
+  LINK_NATIVE_ARRAY   ( UTexture, FootstepSound );
+  LINK_NATIVE_PROPERTY( UTexture, HitSound );
+  LINK_NATIVE_PROPERTY( UTexture, bHighColorQuality );
+  LINK_NATIVE_PROPERTY( UTexture, bHighTextureQuality );
+  LINK_NATIVE_PROPERTY( UTexture, bRealtime );
+  LINK_NATIVE_PROPERTY( UTexture, bParametric );
+  LINK_NATIVE_PROPERTY( UTexture, bRealtimeChanged );
+  LINK_NATIVE_PROPERTY( UTexture, bHasComp );
+  LINK_NATIVE_PROPERTY( UTexture, bFractical );
+  LINK_NATIVE_PROPERTY( UTexture, LODSet );
+  LINK_NATIVE_PROPERTY( UTexture, AnimNext );
+  LINK_NATIVE_PROPERTY( UTexture, AnimCurrent );
+  LINK_NATIVE_PROPERTY( UTexture, PrimeCount );
+  LINK_NATIVE_PROPERTY( UTexture, PrimeCurrent );
+  LINK_NATIVE_PROPERTY( UTexture, MinFrameRate );
+  LINK_NATIVE_PROPERTY( UTexture, MaxFrameRate );
+  LINK_NATIVE_PROPERTY( UTexture, Accumulator );
+  LINK_NATIVE_PROPERTY( UTexture, Mips );
+  LINK_NATIVE_PROPERTY( UTexture, CompMips );
+  LINK_NATIVE_PROPERTY( UTexture, CompFormat );
+  LINK_NATIVE_PROPERTY( UTexture, SurfaceType );
+  LINK_NATIVE_PROPERTY( UTexture, UClampMode );
+  LINK_NATIVE_PROPERTY( UTexture, VClampMode );
+  LINK_NATIVE_PROPERTY( UTexture, PaletteTransform );
+END_PROPERTY_LINK()
 
 IMPLEMENT_NATIVE_CLASS( UObject );
+  IMPLEMENT_NATIVE_CLASS( UCommandlet );
   IMPLEMENT_NATIVE_CLASS( UTextBuffer );
   IMPLEMENT_NATIVE_CLASS( UField );
     IMPLEMENT_NATIVE_CLASS( UConst );
@@ -248,4 +213,4 @@ IMPLEMENT_NATIVE_CLASS( UObject );
     IMPLEMENT_NATIVE_CLASS( USystem );
   IMPLEMENT_NATIVE_CLASS( UBitmap );
     IMPLEMENT_NATIVE_CLASS( UTexture );
-
+  

@@ -578,3 +578,18 @@ UProperty* UObject::FindProperty( const char* PropName )
   return NULL;
 }
 
+UCommandlet::UCommandlet()
+  : UObject()
+{
+}
+
+UCommandlet::~UCommandlet()
+{
+  // TODO:
+}
+
+int UCommandlet::Main( String* Parms )
+{
+  return 0;
+}
+

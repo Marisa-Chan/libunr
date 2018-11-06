@@ -33,9 +33,7 @@ class DLL_EXPORT USubsystem : public UObject
 };
 
 // Prompt callback for if the game has not been picked 
-typedef void(*GamePromptCallback)(char*, char*); // PathBuf, NameBuf
-#define GPC_NAME_BUF_LEN 32
-#define GPC_PATH_BUF_LEN 4096
+typedef int(*GamePromptCallback)(Array<char*>*); // Names
 
 // Prompt callback for if audio/render devices have not been picked
 typedef void(*DevicePromptCallback)(char*, char*); // RenderBuf, AudioBuf
@@ -82,4 +80,5 @@ protected:
 };
 
 extern USystem* GSystem;
+DLL_EXPORT bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC );
 

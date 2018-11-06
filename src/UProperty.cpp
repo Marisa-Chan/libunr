@@ -76,7 +76,8 @@ u32 UProperty::GetNativeOffset( const char* ClassName, const char* PropName )
   FHash ClassHash = FnvHashString( ClassName );
   for ( size_t i = 0; i < NativePropertyLists->Size() && i != MAX_SIZE; i++ )
   {
-    NativePropList = NativePropertyLists->Data()[i]; // Can you take the address of an overloaded operator[] ?
+    // Can you take the address of an overloaded operator[] ?
+    NativePropList = NativePropertyLists->Data()[i];    
     if ( ClassHash == NativePropList->Hash )
       break;
   }

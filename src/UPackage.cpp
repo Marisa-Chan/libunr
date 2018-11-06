@@ -573,19 +573,26 @@ UPackage* UPackage::StaticLoadPkg( const char* PkgName )
   return Pkg;
 }
 
-UObject* UPackage::StaticLoadObject( UPackage* Package, const char* ObjName, UClass* ObjClass, UObject* InOuter )
+UObject* UPackage::StaticLoadObject( UPackage* Package, const char* ObjName, UClass* ObjClass, 
+  UObject* InOuter )
 {
   FExport* Export = Package->GetExport( ObjName );
   if ( UNLIKELY( Export == NULL ) )
   {
-     Logf( LOG_CRIT, "Can't load object '%s.%s', object does not exist", Package->Name, ObjName );
+     Logf( LOG_CRIT, "Can't load object '%s.%s', object does not exist", Package->Name, 
+       ObjName );
      return NULL;
   }
+
+  // Is it already loaded?
+  if ( Export->Obj != NULL )
+    return Export->Obj;
 
   return UPackage::StaticLoadObject( Package, Export->Index + 1, ObjClass, InOuter );
 }
 
-UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjClass, UObject* InOuter )
+UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjClass, 
+  UObject* InOuter )
 {
   if ( UNLIKELY( Package == NULL ) )
   {
@@ -643,11 +650,13 @@ UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjC
         }
         
         // Got it, now load the class
-        ObjClass = (UClass*)UPackage::StaticLoadObject( ClsPkg, ClsName, UClass::StaticClass() );
+        ObjClass = (UClass*)UPackage::StaticLoadObject( ClsPkg, ClsName, 
+          UClass::StaticClass() );
         if ( UNLIKELY( ObjClass == NULL ) )
         {
           // ... but it's not there, bail out
-          Logf( LOG_CRIT, "Can't load class '%s.%s', class does not exist", ClsPkgName, ClsName );
+          Logf( LOG_CRIT, "Can't load class '%s.%s', class does not exist", 
+            ClsPkgName, ClsName );
           return NULL;
         }
       }
@@ -661,10 +670,11 @@ UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjC
       // but what 'Group' it belongs to (which may be the package it belongs to)
       // i.e., "Core.Object" -> Package points to the import for the 'Core' package
       // "Core.Object.Color" -> Package points to the import for 'Object'
-      // to get around this, we keep going back and getting the package until Import->Class points
-      // to "Package"
+      // to get around this, we keep going back and getting the package until Import->Class 
+      // points to "Package"
        PkgImport = &(*Package->Imports)[ CalcObjRefValue( PkgImport->Package ) ];
-    } while ( strnicmp( Package->ResolveNameFromIdx( PkgImport->ClassName ), "Package", 7 ) != 0 );
+    } while ( strnicmp( Package->ResolveNameFromIdx( PkgImport->ClassName ), 
+        "Package", 7 ) != 0 );
 
     const char* ObjPkgName = Package->ResolveNameFromIdx( PkgImport->ObjectName );
     ObjPkg = UPackage::StaticLoadPkg( ObjPkgName );
@@ -683,7 +693,8 @@ UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjC
 
     if ( UNLIKELY( Export == NULL ) )
     {
-      Logf( LOG_CRIT, "Can't load object '%s.%s', object does not exist", ObjPkgName, ObjName );
+      Logf( LOG_CRIT, "Can't load object '%s.%s', object does not exist", 
+        ObjPkgName, ObjName );
       return NULL;
     }
   }
@@ -714,10 +725,12 @@ UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjC
       // If not, then we need to load it
       if ( UNLIKELY( ObjClass == NULL ) )
       {
-        ObjClass = (UClass*)UPackage::StaticLoadObject( Package, Export->Class, UClass::StaticClass() );
+        ObjClass = (UClass*)UPackage::StaticLoadObject( Package, Export->Class, 
+          UClass::StaticClass() );
         if ( UNLIKELY( ObjClass == NULL ) )
         {
-          Logf( LOG_CRIT, "Can't load object '%s.%s', cannot load class", Package->Name, ObjName );
+          Logf( LOG_CRIT, "Can't load object '%s.%s', cannot load class", 
+            Package->Name, ObjName );
           return NULL;
         }
       }

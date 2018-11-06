@@ -397,7 +397,8 @@ void UStruct::LoadFromPackage( FPackageFileIn* In )
   *In >> CINDEX( ChildIdx );
   *In >> CINDEX( FriendlyNameIdx );
   
-  ScriptText = (UTextBuffer*)UPackage::StaticLoadObject( Pkg, ScriptTextIdx, UTextBuffer::StaticClass(), this );
+  ScriptText = (UTextBuffer*)UPackage::StaticLoadObject( Pkg, ScriptTextIdx, 
+    UTextBuffer::StaticClass(), this );
   Children = (UField*)UPackage::StaticLoadObject( Pkg, ChildIdx, NULL, this );
   FriendlyName = Pkg->ResolveNameFromIdx( FriendlyNameIdx );
   *In >> Line;
@@ -504,9 +505,11 @@ FDependency::FDependency()
 UClass::UClass()
   : UState()
 {
+  Constructor = NULL;
 }
 
-UClass::UClass( const char* ClassName, u32 Flags, UClass* InSuperClass, UObject *(*NativeCtor)(size_t) )
+UClass::UClass( const char* ClassName, u32 Flags, UClass* InSuperClass, 
+    UObject *(*NativeCtor)(size_t) )
   : UState()
 {
   Name = StringDup( ClassName );
@@ -596,7 +599,8 @@ void UClass::LoadFromPackage( FPackageFileIn* In )
     *In >> CINDEX( ClassWithinIdx );
     *In >> CINDEX( ClassConfigNameIdx );
     
-    ClassWithin = (UClass*)UPackage::StaticLoadObject( Pkg, ClassWithinIdx, UClass::StaticClass() );
+    ClassWithin = (UClass*)UPackage::StaticLoadObject( Pkg, ClassWithinIdx, 
+      UClass::StaticClass() );
     ClassConfigName = Pkg->ResolveNameFromIdx( ClassConfigNameIdx );
 
     FHash CfgHash = FnvHashString( ClassConfigName );
@@ -608,10 +612,6 @@ void UClass::LoadFromPackage( FPackageFileIn* In )
   else
     ClassConfig = GGameConfig;
   
-  // Construct default object
-  if ( Constructor == NULL )
-    Constructor = SuperClass->Constructor;
-
   SuperClass = SafeCast<UClass>( SuperField );
   if ( SuperClass != NULL )
   {
@@ -626,6 +626,10 @@ void UClass::LoadFromPackage( FPackageFileIn* In )
     Iter->Next = SuperClass->Children;
     SuperClass->Children->AddRef();
   }
+
+  // Construct default object
+  if ( Constructor == NULL )
+    Constructor = SuperClass->Constructor;
 
   Default = CreateObject();
   Default->Pkg   = Pkg;

@@ -246,7 +246,8 @@ public: \
   { \
     if (!ObjectClass) \
     { \
-      ObjectClass = UObject::StaticAllocateClass( TEXT(cls), clsflags, Super::ObjectClass, NativeConstructor ); \
+      ObjectClass = UObject::StaticAllocateClass( TEXT(cls), clsflags, Super::ObjectClass,\
+        NativeConstructor ); \
       if ( ObjectClass != NULL ) \
       { \
         ClassPool->PushBack( ObjectClass ); \
@@ -261,7 +262,8 @@ public: \
     if (!StaticNativePropList) \
     { \
       const char* ClsName = TEXT(cls); \
-      StaticNativePropList = new FNativePropertyList( FnvHashString( ClsName + 1 ), NumProperties ); \
+      StaticNativePropList = new FNativePropertyList( FnvHashString( ClsName + 1 ),\
+        NumProperties ); \
       if ( StaticNativePropList != NULL ) \
       { \
         NativePropertyLists->PushBack( StaticNativePropList ); \
@@ -321,6 +323,26 @@ public: \
 #define LINK_NATIVE_ARRAY(cls, var) \
   StaticNativePropList->AddProperty( #var, OFFSET_OF( cls, var[0] ) );
 
+#define BEGIN_PROPERTY_LINK( cls, numprop ) \
+bool cls::StaticLinkNativeProperties() \
+{ \
+  FNativePropertyList* SuperPropList = Super::StaticNativePropList; \
+  if ( SuperPropList == NULL ) \
+    return false; \
+ \
+  if ( StaticInitNativePropList( numprop + SuperPropList->Num ) ) \
+  { \
+    xstl::Copy( StaticNativePropList->Properties, \
+                sizeof( FNativePropertyLink ) * SuperPropList->Num, \
+                SuperPropList->Properties, \
+                sizeof( FNativePropertyLink ) * SuperPropList->Num ); \
+    StaticNativePropList->Added = SuperPropList->Added;
+
+#define END_PROPERTY_LINK() \
+    return true; \
+  } \
+  return false; \
+}
 #define EXPOSE_TO_USCRIPT() \
   static bool StaticLinkNativeProperties(); 
 
@@ -335,7 +357,8 @@ class DLL_EXPORT UObject
 {
   DECLARE_NATIVE_CLASS_BASE( UObject, UObject, CLASS_Abstract, Core )
   EXPOSE_TO_USCRIPT()
-  EXPORTABLE() // not really exportable, but just so all subclasses can have export called generically
+  // not really exportable, but just so all subclasses can have export called generically
+  EXPORTABLE() 
   UObject();
   
   virtual void LoadFromPackage( FPackageFileIn* In );
@@ -372,8 +395,10 @@ class DLL_EXPORT UObject
 
   static bool StaticInit();
   static bool StaticExit();
-  static UObject* StaticConstructObject( const char* InName, UClass* InClass, UObject* InOuter );
-  static UClass* StaticAllocateClass( const char* ClassName, u32 Flags, UClass* SuperClass, UObject *(*NativeCtor)(size_t) );
+  static UObject* StaticConstructObject( const char* InName, UClass* InClass, 
+    UObject* InOuter );
+  static UClass* StaticAllocateClass( const char* ClassName, u32 Flags, UClass* SuperClass, 
+    UObject *(*NativeCtor)(size_t) );
 
   static Array<UObject*>* ObjectPool;
   static Array<UClass*>*  ClassPool; 
@@ -394,7 +419,8 @@ class DLL_EXPORT UObject
   // I think this was originally here to "hide" sensitive info for objects.
   // This was due to the fact that C++ property offsets *HAVE* to match up
   // with UScript offsets, or else the whole native/scripted setup falls
-  // apart. But we don't care about that now, so these will not be used.
+  // apart. We dynamically link native variables to scripted, so this will
+  // be unused
   int ObjectInternal[6];
 
 protected:
@@ -411,5 +437,29 @@ template <class T> T* SafeCast( UObject* Obj )
 
   return (T*)Obj;
 }
+
+class DLL_EXPORT UCommandlet : public UObject
+{
+  DECLARE_NATIVE_CLASS( UCommandlet, UObject, 0, Core )
+  EXPOSE_TO_USCRIPT();
+
+  UCommandlet();
+  virtual int Main( String* Parms );
+
+  String* HelpCmd;
+  String* HelpOneLiner;
+  String* HelpUsage;
+  String* HelpWebLink;
+  String* HelpParm[16];
+  String* HelpDesc[16];
+  bool    LogToStdout;
+  bool    IsServer;
+  bool    IsClient;
+  bool    IsEditor;
+  bool    LazyLoad;
+  bool    ShowErrorCount;
+  bool    ShowBanner;
+  bool    ForceInt;
+};
 
 #endif
