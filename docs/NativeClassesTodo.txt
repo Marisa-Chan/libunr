@@ -1,0 +1,126 @@
+This is a doucment making note of any native classes that need to be stubbed
+and implemented. [O] means the class is only stubbed, [X] means the class
+has some type of complete implementation.
+
+This list includes classes from the following versions:
+  227j_39
+
+-------------------------
+Core.u
+-------------------------
+Object     [X]
+Commandlet [O]
+Subsystem  [O]
+Locale
+
+-------------------------
+Engine.u
+-------------------------
+Actor
+  BlockingActor
+  Brush
+    Mover
+  Decal
+  Decoration
+    Carcass
+  HUD
+  HUDOverlay
+  Info
+    FluidInfo
+    GameInfo
+    InternetInfo
+    ReplicationInfo
+      PlayerReplicationInfo
+    StatLog
+      StatLogFile
+    TimeDemo
+    VisibilityNotify
+    ZoneInfo
+      DynamicZoneInfo
+      LevelInfo
+      SkyZoneInfo
+      WarpZoneInfo
+  Inventory
+    Weapon
+  InventoryAttachment
+    WeaponAttachment
+    WeaponMuzzleFlash
+  Keypoint
+    ClipMarker
+    CollisionPlane
+    InterpolationPoint
+  Light
+    DistantLightActor
+    DynamicCorona
+    SunlightCorona
+  Menu
+  NavigationPoint
+    ButtonMarker
+    InventorySpot
+    LiftCenter
+    LiftExit
+    PathNode
+    PlayerStart
+    Teleporter
+    TriggerMarker
+    WarpZoneMarker
+  PathNodeIterator
+    PawnPathNodeIterator
+  Pawn
+    PlayerPawn
+      Camera
+    Scout
+  Projectile
+  Projector
+  SpawnNotify
+  StaticMeshActor
+  Triggers
+    Trigger
+Bitmap [X]
+  Texture [X]
+    ScriptedTexture
+    ShadowBitMap // NOT NEEDED
+    TextureModifierBase (careful with UE2)
+      MaterialSequence
+      TexCombiner
+      TexModifier
+        TexOscillator
+        TexPanner
+        TexRotator
+        TexScaler
+Canvas
+Console
+LevelSummary
+Palette [X]
+Player
+RenderIterator
+SecurityData
+SkeletalMeshInstance
+Subsystem (from Core.u)
+  Engine
+
+-------------------------
+Fire.u
+-------------------------
+Info (from Engine.u)
+  FluidInfo (from Engine.u)
+    FluidSurfaceInfo
+    ProceduralMesh
+  FluidSurfaceOscillator
+Texture (from Engine.u)
+  FractalTexture
+    FireTexture
+    IceTexture
+    WaterTexture
+      WaveTexture
+      WetTexture
+RenderIterator (from Engine.u)
+  FluidSurfaceRI
+
+-------------------------
+IpDrv.u
+-------------------------
+InternetInfo (from Engine.u)
+  InternetLink
+    TcpLink
+    UdpLink
