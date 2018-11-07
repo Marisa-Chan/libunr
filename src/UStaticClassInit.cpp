@@ -31,6 +31,39 @@
 #include "USystem.h"
 #include "UTexture.h"
 
+IMPLEMENT_NATIVE_CLASS( UObject );
+  IMPLEMENT_NATIVE_CLASS( UCommandlet );
+  IMPLEMENT_NATIVE_CLASS( UTextBuffer );
+  IMPLEMENT_NATIVE_CLASS( UField );
+    IMPLEMENT_NATIVE_CLASS( UConst );
+    IMPLEMENT_NATIVE_CLASS( UEnum );
+    IMPLEMENT_NATIVE_CLASS( UProperty );
+      IMPLEMENT_NATIVE_CLASS( UByteProperty );
+      IMPLEMENT_NATIVE_CLASS( UIntProperty );
+      IMPLEMENT_NATIVE_CLASS( UBoolProperty );
+      IMPLEMENT_NATIVE_CLASS( UFloatProperty );
+      IMPLEMENT_NATIVE_CLASS( UObjectProperty );
+        IMPLEMENT_NATIVE_CLASS( UClassProperty );
+      IMPLEMENT_NATIVE_CLASS( UNameProperty );
+      IMPLEMENT_NATIVE_CLASS( UStringProperty );
+      IMPLEMENT_NATIVE_CLASS( UArrayProperty );
+      IMPLEMENT_NATIVE_CLASS( UStructProperty );
+      IMPLEMENT_NATIVE_CLASS( UStrProperty );
+      IMPLEMENT_NATIVE_CLASS( UMapProperty );
+      IMPLEMENT_NATIVE_CLASS( UFixedArrayProperty );
+    IMPLEMENT_NATIVE_CLASS( UStruct );
+      IMPLEMENT_NATIVE_CLASS( UFunction );
+      IMPLEMENT_NATIVE_CLASS( UState );
+        IMPLEMENT_NATIVE_CLASS( UClass );
+  IMPLEMENT_NATIVE_CLASS( UMusic );
+  IMPLEMENT_NATIVE_CLASS( USound );
+  IMPLEMENT_NATIVE_CLASS( UPalette );
+  IMPLEMENT_NATIVE_CLASS( UPackage );
+  IMPLEMENT_NATIVE_CLASS( USubsystem );
+    IMPLEMENT_NATIVE_CLASS( USystem );
+  IMPLEMENT_NATIVE_CLASS( UBitmap );
+    IMPLEMENT_NATIVE_CLASS( UTexture );
+
 bool UObject::StaticInit()
 {
   bool Result = true;
@@ -181,36 +214,77 @@ BEGIN_PROPERTY_LINK( UTexture, 32 )
   LINK_NATIVE_PROPERTY( UTexture, PaletteTransform );
 END_PROPERTY_LINK()
 
-IMPLEMENT_NATIVE_CLASS( UObject );
-  IMPLEMENT_NATIVE_CLASS( UCommandlet );
-  IMPLEMENT_NATIVE_CLASS( UTextBuffer );
-  IMPLEMENT_NATIVE_CLASS( UField );
-    IMPLEMENT_NATIVE_CLASS( UConst );
-    IMPLEMENT_NATIVE_CLASS( UEnum );
-    IMPLEMENT_NATIVE_CLASS( UProperty );
-      IMPLEMENT_NATIVE_CLASS( UByteProperty );
-      IMPLEMENT_NATIVE_CLASS( UIntProperty );
-      IMPLEMENT_NATIVE_CLASS( UBoolProperty );
-      IMPLEMENT_NATIVE_CLASS( UFloatProperty );
-      IMPLEMENT_NATIVE_CLASS( UObjectProperty );
-        IMPLEMENT_NATIVE_CLASS( UClassProperty );
-      IMPLEMENT_NATIVE_CLASS( UNameProperty );
-      IMPLEMENT_NATIVE_CLASS( UStringProperty );
-      IMPLEMENT_NATIVE_CLASS( UArrayProperty );
-      IMPLEMENT_NATIVE_CLASS( UStructProperty );
-      IMPLEMENT_NATIVE_CLASS( UStrProperty );
-      IMPLEMENT_NATIVE_CLASS( UMapProperty );
-      IMPLEMENT_NATIVE_CLASS( UFixedArrayProperty );
-    IMPLEMENT_NATIVE_CLASS( UStruct );
-      IMPLEMENT_NATIVE_CLASS( UFunction );
-      IMPLEMENT_NATIVE_CLASS( UState );
-        IMPLEMENT_NATIVE_CLASS( UClass );
-  IMPLEMENT_NATIVE_CLASS( UMusic );
-  IMPLEMENT_NATIVE_CLASS( USound );
-  IMPLEMENT_NATIVE_CLASS( UPalette );
-  IMPLEMENT_NATIVE_CLASS( UPackage );
-  IMPLEMENT_NATIVE_CLASS( USubsystem );
-    IMPLEMENT_NATIVE_CLASS( USystem );
-  IMPLEMENT_NATIVE_CLASS( UBitmap );
-    IMPLEMENT_NATIVE_CLASS( UTexture );
-  
+BEGIN_PROPERTY_LINK( AActor, )
+  LINK_NATIVE_PROPERTY( AActor, bStatic );
+  LINK_NATIVE_PROPERTY( AActor, bHidden );
+  LINK_NATIVE_PROPERTY( AActor, bNoDelete );
+  LINK_NATIVE_PROPERTY( AActor, bAnimFinished );
+  LINK_NATIVE_PROPERTY( AActor, bAnimLoop );
+  LINK_NATIVE_PROPERTY( AActor, bAnimNotify );
+  LINK_NATIVE_PROPERTY( AActor, bAnimByOwner );
+  LINK_NATIVE_PROPERTY( AActor, bDeleteMe );
+  LINK_NATIVE_PROPERTY( AActor, bAssimilated );
+  LINK_NATIVE_PROPERTY( AActor, bTicked );
+  LINK_NATIVE_PROPERTY( AActor, bLightChanged );
+  LINK_NATIVE_PROPERTY( AActor, bDynamicLight );
+  LINK_NATIVE_PROPERTY( AActor, bTimerLoop );
+  LINK_NATIVE_PROPERTY( AActor, bNetNotify );
+  LINK_NATIVE_PROPERTY( AActor, bHandleOwnCorona );
+  LINK_NATIVE_PROPERTY( AActor, bRenderMultiEnviroMaps );
+  LINK_NATIVE_PROPERTY( AActor, bWorldGeometry );
+  LINK_NATIVE_PROPERTY( AActor, bUseMeshCollision );
+  LINK_NATIVE_PROPERTY( AActor, bEditorSelectRender );
+  LINK_NATIVE_PROPERTY( AActor, bNoDynamicShadowCast );
+  LINK_NATIVE_PROPERTY( AActor, bIsInOctree );
+  LINK_NATIVE_PROPERTY( AActor, bProjectorDecal );
+  LINK_NATIVE_PROPERTY( AActor, bUseLitSprite );
+  LINK_NATIVE_PROPERTY( AActor, bHiddenEd );
+  LINK_NATIVE_PROPERTY( AActor, bDirectional );
+  LINK_NATIVE_PROPERTY( AActor, bSelected );
+  LINK_NATIVE_PROPERTY( AActor, bMemorized );
+  LINK_NATIVE_PROPERTY( AActor, bHighlighted );
+  LINK_NATIVE_PROPERTY( AActor, bEdLocked );
+  LINK_NATIVE_PROPERTY( AActor, bEdShouldSnap );
+  LINK_NATIVE_PROPERTY( AActor, bEdSnap );
+  LINK_NATIVE_PROPERTY( AActor, bTempEditor );
+  LINK_NATIVE_PROPERTY( AActor, bDifficulty0 );
+  LINK_NATIVE_PROPERTY( AActor, bDifficulty1 );
+  LINK_NATIVE_PROPERTY( AActor, bDifficulty2 );
+  LINK_NATIVE_PROPERTY( AActor, bDifficulty3 );
+  LINK_NATIVE_PROPERTY( AActor, bSinglePlayer );
+  LINK_NATIVE_PROPERTY( AActor, bNet );
+  LINK_NATIVE_PROPERTY( AActor, bNetSpecial );
+  LINK_NATIVE_PROPERTY( AActor, bScriptInitialized );
+  LINK_NATIVE_PROPERTY( AActor, bCanTeleport );
+  LINK_NATIVE_PROPERTY( AActor, bIsSecretGoal );
+  LINK_NATIVE_PROPERTY( AActor, bIsKillGoal );
+  LINK_NATIVE_PROPERTY( AActor, bIsItemGoal );
+  LINK_NATIVE_PROPERTY( AActor, bCollideWhenPlacing );
+  LINK_NATIVE_PROPERTY( AActor, 
+  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor,
+
