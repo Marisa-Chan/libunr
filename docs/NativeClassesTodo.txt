@@ -76,6 +76,8 @@ Actor
   StaticMeshActor
   Triggers
     Trigger
+Animation
+AnimationNotify
 Bitmap [X]
   Texture [X]
     ScriptedTexture
@@ -93,6 +95,7 @@ Console
 LevelSummary
 Palette [X]
 Player
+Primitive
 RenderIterator
 SecurityData
 SkeletalMeshInstance
