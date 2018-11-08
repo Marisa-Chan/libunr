@@ -29,14 +29,18 @@ else()
   message( FATAL_ERROR, "Unknown target platform: " ${TARGET_PLATFORM} )
 endif()
 
-set (SOURCES ${UNR_SRC}/FConfig.cpp
+set (SOURCES ${UNR_SRC}/AActor.cpp
+             ${UNR_SRC}/FConfig.cpp
              ${UNR_SRC}/FUtil.cpp
              ${UNR_SRC}/UClass.cpp
+             ${UNR_SRC}/ULevel.cpp
              ${UNR_SRC}/UMusic.cpp
              ${UNR_SRC}/USound.cpp
              ${UNR_SRC}/UObject.cpp
              ${UNR_SRC}/UPackage.cpp
+             ${UNR_SRC}/UPrimitive.cpp
              ${UNR_SRC}/UProperty.cpp
+             ${UNR_SRC}/USkelAnim.cpp
              ${UNR_SRC}/UTexture.cpp
              ${UNR_SRC}/UStaticClassInit.cpp
              ${UNR_SRC}/USystem.cpp

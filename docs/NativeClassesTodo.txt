@@ -76,8 +76,8 @@ Actor
   StaticMeshActor
   Triggers
     Trigger
-Animation
-AnimationNotify
+Animation [O]
+AnimationNotify [O]
 Bitmap [X]
   Texture [X]
     ScriptedTexture
@@ -95,10 +95,10 @@ Console
 LevelSummary
 Palette [X]
 Player
-Primitive
-RenderIterator
+Primitive [O]
+RenderIterator [O]
 SecurityData
-SkeletalMeshInstance
+SkeletalMeshInstance [O]
 Subsystem (from Core.u)
   Engine
 

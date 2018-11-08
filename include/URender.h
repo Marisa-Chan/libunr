@@ -17,21 +17,39 @@
 \*========================================================================*/
 
 /*========================================================================
- * UPrimitive.h - Primitive that can be rendered and collided with
+ * URender.h - Rendering classes
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
+#pragma once
+
 #include "UObject.h"
-#include "UMath.h"
 
-class UPrimitive : public UObject
+class APlayerPawn;
+
+class URenderIterator : public UObject
 {
-  DECLARE_NATIVE_CLASS( UPrimitive, UObject, CLASS_NoExport, Engine )
+  DECLARE_NATIVE_CLASS( URenderIterator, UObject, 0, Engine )
+  EXPOSE_TO_USCRIPT()
 
-  UPrimitive();
+  URenderIterator();
 
-  FBox BoundingBox;
-  FSphere BoundingSphere;
+  // Leaving out some structs here until they're actually needed
+  // struct ActorBuffer
+  // {
+  //   u8 Padding[564];
+  // };
+  //
+  // struct ActorNode
+  // {
+  //   ActorBuffer ActorProxy;
+  //   ActorNode*  NextNode;
+  // };
+
+  int MaxItems;
+  int Index;
+  APlayerPawn* Observer;
+  void* Frame;
 };

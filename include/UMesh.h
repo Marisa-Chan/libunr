@@ -17,21 +17,52 @@
 \*========================================================================*/
 
 /*========================================================================
- * UPrimitive.h - Primitive that can be rendered and collided with
+ * UMesh.h - Mesh classes
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
+#pragma once
+
 #include "UObject.h"
 #include "UMath.h"
 
-class UPrimitive : public UObject
+class AActor;
+
+class UMesh : public UObject
 {
-  DECLARE_NATIVE_CLASS( UPrimitive, UObject, CLASS_NoExport, Engine )
+  DECLARE_NATIVE_CLASS( UMesh, UObject, CLASS_NoExport, Engine )
 
-  UPrimitive();
+  UMesh();
 
-  FBox BoundingBox;
-  FSphere BoundingSphere;
+  // TODO:
 };
+
+class UAnimationNotify : public UObject
+{
+  DECLARE_NATIVE_CLASS( UAnimationNotify, UObject, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  UAnimationNotify();
+
+  struct AnimNotify
+  {
+    idx AnimName;
+    idx FunctionName;
+    int KeyFrame;
+    EAnimNotifyEval NotifyEval;
+    bool bCallOncePerLoop;
+    bool bCalculatedFrame;
+    bool bAlreadyCalled;
+    int NumFrames;
+    float CallKey;
+  };
+
+  AnimNotify AnimationNotify[255];
+  int NumNotifies;
+  AActor* Owner;
+  bool bInitialized, bErrorOccured;
+};
+
+

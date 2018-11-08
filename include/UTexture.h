@@ -185,7 +185,7 @@ class DLL_EXPORT UTexture : public UBitmap
   
   USound* FootstepSound[6];
   USound* HitSound;
-  
+
   bool bHighColorQuality;
   bool bHighTextureQuality;
   bool bRealtime;

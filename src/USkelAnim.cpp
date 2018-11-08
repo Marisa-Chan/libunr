@@ -17,21 +17,38 @@
 \*========================================================================*/
 
 /*========================================================================
- * UPrimitive.h - Primitive that can be rendered and collided with
+ * USkelAnim.h - Skeletal Animation Classes
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#include "UObject.h"
-#include "UMath.h"
+#include "USkelAnim.h"
 
-class UPrimitive : public UObject
+USkeletalMesh::USkeletalMesh()
+  : UObject()
 {
-  DECLARE_NATIVE_CLASS( UPrimitive, UObject, CLASS_NoExport, Engine )
+}
 
-  UPrimitive();
+USkeletalMesh::~USkeletalMesh()
+{
+}
 
-  FBox BoundingBox;
-  FSphere BoundingSphere;
-};
+UAnimation::UAnimation()
+  : UObject()
+{
+}
+
+UAnimation::~UAnimation()
+{
+}
+
+USkeletalMeshInstance::USkeletalMeshInstance()
+  : UObject()
+{
+}
+
+USkeletalMeshInstance::~USkeletalMeshInstance()
+{
+}
+

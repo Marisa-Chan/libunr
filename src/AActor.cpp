@@ -17,21 +17,20 @@
 \*========================================================================*/
 
 /*========================================================================
- * UPrimitive.h - Primitive that can be rendered and collided with
+ * AActor.cpp - Actor class for tangible game objects
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#include "UObject.h"
-#include "UMath.h"
+#include "AActor.h"
 
-class UPrimitive : public UObject
+AActor::AActor()
+  : UObject()
 {
-  DECLARE_NATIVE_CLASS( UPrimitive, UObject, CLASS_NoExport, Engine )
+}
 
-  UPrimitive();
+AActor::~AActor()
+{
+}
 
-  FBox BoundingBox;
-  FSphere BoundingSphere;
-};

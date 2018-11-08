@@ -17,21 +17,59 @@
 \*========================================================================*/
 
 /*========================================================================
- * UPrimitive.h - Primitive that can be rendered and collided with
+ * UMath.h - Structs and functions for mathematical operations
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#include "UObject.h"
-#include "UMath.h"
+#pragma once
 
-class UPrimitive : public UObject
+#include "FUtil.h"
+
+struct FVector
 {
-  DECLARE_NATIVE_CLASS( UPrimitive, UObject, CLASS_NoExport, Engine )
-
-  UPrimitive();
-
-  FBox BoundingBox;
-  FSphere BoundingSphere;
+  float X;
+  float Y;
+  float Z;
 };
+
+struct FPlane : public FVector
+{
+  float W;
+};
+
+struct FQuat
+{
+  float X;
+  float Y;
+  float Z;
+  float W;
+};
+
+struct FRotator
+{
+  int Pitch;
+  int Yaw;
+  int Roll;
+};
+
+struct FBox
+{
+  FVector Min;
+  FVector Max;
+  u8      IsValid;
+};
+
+struct FSphere : public FPlane
+{
+};
+
+struct FCoords
+{
+  FVector Origin;
+  FVector XAxis;
+  FVector YAxis;
+  FVector ZAxis;
+};
+

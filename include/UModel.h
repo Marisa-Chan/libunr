@@ -17,21 +17,19 @@
 \*========================================================================*/
 
 /*========================================================================
- * UPrimitive.h - Primitive that can be rendered and collided with
+ * UModel.h - Model class, used for brushes and levels
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#include "UObject.h"
-#include "UMath.h"
+#include "UPrimitive.h"
 
-class UPrimitive : public UObject
+class UModel : public UPrimitive
 {
-  DECLARE_NATIVE_CLASS( UPrimitive, UObject, CLASS_NoExport, Engine )
+  DECLARE_NATIVE_CLASS( UModel, UPrimitive, CLASS_NoExport, Engine )
 
-  UPrimitive();
+  UModel();
 
-  FBox BoundingBox;
-  FSphere BoundingSphere;
+  // TODO:
 };

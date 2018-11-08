@@ -17,21 +17,20 @@
 \*========================================================================*/
 
 /*========================================================================
- * UPrimitive.h - Primitive that can be rendered and collided with
+ * UPrimitive.cpp - Primitive that can be rendered and collided with
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#include "UObject.h"
-#include "UMath.h"
+#include "UPrimitive.h"
 
-class UPrimitive : public UObject
+UPrimitive::UPrimitive()
+  : UObject()
 {
-  DECLARE_NATIVE_CLASS( UPrimitive, UObject, CLASS_NoExport, Engine )
+}
 
-  UPrimitive();
+UPrimitive::~UPrimitive()
+{
+}
 
-  FBox BoundingBox;
-  FSphere BoundingSphere;
-};

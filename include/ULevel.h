@@ -17,21 +17,25 @@
 \*========================================================================*/
 
 /*========================================================================
- * UPrimitive.h - Primitive that can be rendered and collided with
+ * ULevel.h - Level class
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
+#pragma once
+
 #include "UObject.h"
-#include "UMath.h"
 
-class UPrimitive : public UObject
+class ULevelBase : public UObject
 {
-  DECLARE_NATIVE_CLASS( UPrimitive, UObject, CLASS_NoExport, Engine )
-
-  UPrimitive();
-
-  FBox BoundingBox;
-  FSphere BoundingSphere;
+  DECLARE_NATIVE_ABSTRACT_CLASS( ULevelBase, UObject, CLASS_NoExport, Engine )
+  ULevelBase();
 };
+
+class ULevel : public ULevelBase
+{
+  DECLARE_NATIVE_CLASS( ULevel, ULevelBase, CLASS_NoExport, Engine )
+  ULevel();
+};
+

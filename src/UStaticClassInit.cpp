@@ -25,44 +25,15 @@
 
 #include "UObject.h"
 #include "UClass.h"
+#include "ULevel.h"
+#include "UMesh.h"
 #include "UMusic.h"
 #include "UProperty.h"
+#include "URender.h"
 #include "USound.h"
 #include "USystem.h"
 #include "UTexture.h"
-
-IMPLEMENT_NATIVE_CLASS( UObject );
-  IMPLEMENT_NATIVE_CLASS( UCommandlet );
-  IMPLEMENT_NATIVE_CLASS( UTextBuffer );
-  IMPLEMENT_NATIVE_CLASS( UField );
-    IMPLEMENT_NATIVE_CLASS( UConst );
-    IMPLEMENT_NATIVE_CLASS( UEnum );
-    IMPLEMENT_NATIVE_CLASS( UProperty );
-      IMPLEMENT_NATIVE_CLASS( UByteProperty );
-      IMPLEMENT_NATIVE_CLASS( UIntProperty );
-      IMPLEMENT_NATIVE_CLASS( UBoolProperty );
-      IMPLEMENT_NATIVE_CLASS( UFloatProperty );
-      IMPLEMENT_NATIVE_CLASS( UObjectProperty );
-        IMPLEMENT_NATIVE_CLASS( UClassProperty );
-      IMPLEMENT_NATIVE_CLASS( UNameProperty );
-      IMPLEMENT_NATIVE_CLASS( UStringProperty );
-      IMPLEMENT_NATIVE_CLASS( UArrayProperty );
-      IMPLEMENT_NATIVE_CLASS( UStructProperty );
-      IMPLEMENT_NATIVE_CLASS( UStrProperty );
-      IMPLEMENT_NATIVE_CLASS( UMapProperty );
-      IMPLEMENT_NATIVE_CLASS( UFixedArrayProperty );
-    IMPLEMENT_NATIVE_CLASS( UStruct );
-      IMPLEMENT_NATIVE_CLASS( UFunction );
-      IMPLEMENT_NATIVE_CLASS( UState );
-        IMPLEMENT_NATIVE_CLASS( UClass );
-  IMPLEMENT_NATIVE_CLASS( UMusic );
-  IMPLEMENT_NATIVE_CLASS( USound );
-  IMPLEMENT_NATIVE_CLASS( UPalette );
-  IMPLEMENT_NATIVE_CLASS( UPackage );
-  IMPLEMENT_NATIVE_CLASS( USubsystem );
-    IMPLEMENT_NATIVE_CLASS( USystem );
-  IMPLEMENT_NATIVE_CLASS( UBitmap );
-    IMPLEMENT_NATIVE_CLASS( UTexture );
+#include "AActor.h"
 
 bool UObject::StaticInit()
 {
@@ -71,6 +42,7 @@ bool UObject::StaticInit()
   ObjectPool = new Array<UObject*>();
   ClassPool  = new Array<UClass*> ();
   NativePropertyLists = new Array<FNativePropertyList*>();
+  NativeFunctions = new Array<UFunction*>();
 
   if ( ObjectPool == NULL || ClassPool == NULL || NativePropertyLists == NULL ) 
     return false;
@@ -78,6 +50,7 @@ bool UObject::StaticInit()
   ObjectPool->Reserve( 64 );
   ClassPool->Reserve( 64 );
   NativePropertyLists->Reserve( 64 );
+  NativeFunctions->Reserve( 4096 );
 
   // Create the "class" class first, everything else depends on it
   if ( !UClass::StaticCreateClass() )
@@ -120,14 +93,66 @@ bool UObject::StaticInit()
   Result &= USystem::StaticClassInit();
 
   // Register Engine.u classes
+  Result &= UAnimation::StaticClassInit();
+  Result &= ULevelBase::StaticClassInit();
+  Result &= ULevel::StaticClassInit();
+  Result &= USkeletalMesh::StaticClassInit();
   Result &= USound::StaticClassInit();
   Result &= UMusic::StaticClassInit();
+  Result &= UPrimitive::StaticClassInit();
+
   Result &= UPalette::StaticClassInit();
   Result &= UBitmap::StaticClassInit();
     Result &= UTexture::StaticClassInit();
-    
+    Result &= AActor::StaticClassInit();
+//  Result &= UAnimationNotify::StaticClassInit();
+//  Result &= USkeletalMeshInstance::StaticClassInit();
+//  Result &= URenderIterator::StaticClassInit();
+
   return Result;
 }
+
+IMPLEMENT_NATIVE_CLASS( UObject );
+  IMPLEMENT_NATIVE_CLASS( UAnimation );
+  IMPLEMENT_NATIVE_CLASS( UAnimationNotify );
+  IMPLEMENT_NATIVE_CLASS( UCommandlet );
+  IMPLEMENT_NATIVE_CLASS( ULevelBase );
+    IMPLEMENT_NATIVE_CLASS( ULevel );
+  IMPLEMENT_NATIVE_CLASS( UTextBuffer );
+  IMPLEMENT_NATIVE_CLASS( UField );
+    IMPLEMENT_NATIVE_CLASS( UConst );
+    IMPLEMENT_NATIVE_CLASS( UEnum );
+    IMPLEMENT_NATIVE_CLASS( UProperty );
+      IMPLEMENT_NATIVE_CLASS( UByteProperty );
+      IMPLEMENT_NATIVE_CLASS( UIntProperty );
+      IMPLEMENT_NATIVE_CLASS( UBoolProperty );
+      IMPLEMENT_NATIVE_CLASS( UFloatProperty );
+      IMPLEMENT_NATIVE_CLASS( UObjectProperty );
+        IMPLEMENT_NATIVE_CLASS( UClassProperty );
+      IMPLEMENT_NATIVE_CLASS( UNameProperty );
+      IMPLEMENT_NATIVE_CLASS( UStringProperty );
+      IMPLEMENT_NATIVE_CLASS( UArrayProperty );
+      IMPLEMENT_NATIVE_CLASS( UStructProperty );
+      IMPLEMENT_NATIVE_CLASS( UStrProperty );
+      IMPLEMENT_NATIVE_CLASS( UMapProperty );
+      IMPLEMENT_NATIVE_CLASS( UFixedArrayProperty );
+    IMPLEMENT_NATIVE_CLASS( UStruct );
+      IMPLEMENT_NATIVE_CLASS( UFunction );
+      IMPLEMENT_NATIVE_CLASS( UState );
+        IMPLEMENT_NATIVE_CLASS( UClass );
+  IMPLEMENT_NATIVE_CLASS( UMusic );
+  IMPLEMENT_NATIVE_CLASS( USound );
+  IMPLEMENT_NATIVE_CLASS( UPalette );
+  IMPLEMENT_NATIVE_CLASS( UPackage );
+  IMPLEMENT_NATIVE_CLASS( UPrimitive );
+  IMPLEMENT_NATIVE_CLASS( USkeletalMesh );
+  IMPLEMENT_NATIVE_CLASS( USkeletalMeshInstance );
+  IMPLEMENT_NATIVE_CLASS( USubsystem );
+    IMPLEMENT_NATIVE_CLASS( USystem );
+  IMPLEMENT_NATIVE_CLASS( UBitmap );
+    IMPLEMENT_NATIVE_CLASS( UTexture );
+
+IMPLEMENT_NATIVE_CLASS( AActor );
 
 bool UObject::StaticLinkNativeProperties()
 {
@@ -142,6 +167,14 @@ bool UObject::StaticLinkNativeProperties()
   }
   return false;
 }
+
+BEGIN_PROPERTY_LINK( UAnimationNotify, 5 )
+  LINK_NATIVE_ARRAY   ( UAnimationNotify, AnimationNotify );
+  LINK_NATIVE_PROPERTY( UAnimationNotify, NumNotifies );
+  LINK_NATIVE_PROPERTY( UAnimationNotify, Owner );
+  LINK_NATIVE_PROPERTY( UAnimationNotify, bInitialized );
+  LINK_NATIVE_PROPERTY( UAnimationNotify, bErrorOccured );
+END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( UCommandlet, 14 )
   LINK_NATIVE_PROPERTY( UCommandlet, HelpCmd );
@@ -214,7 +247,30 @@ BEGIN_PROPERTY_LINK( UTexture, 32 )
   LINK_NATIVE_PROPERTY( UTexture, PaletteTransform );
 END_PROPERTY_LINK()
 
-BEGIN_PROPERTY_LINK( AActor, )
+BEGIN_PROPERTY_LINK( USkeletalMeshInstance, 20 )
+  LINK_NATIVE_PROPERTY( USkeletalMeshInstance, SpaceBases );
+  LINK_NATIVE_PROPERTY( USkeletalMeshInstance, CachedLinks );
+  LINK_NATIVE_PROPERTY( USkeletalMeshInstance, bHasUpdated );
+  LINK_NATIVE_PROPERTY( USkeletalMeshInstance, LastDrawnMesh );
+  LINK_NATIVE_PROPERTY( USkeletalMeshInstance, CachedAnim );
+  LINK_NATIVE_PROPERTY( USkeletalMeshInstance, CachedOrientations );
+  LINK_NATIVE_PROPERTY( USkeletalMeshInstance, CachedPositions );
+  LINK_NATIVE_PROPERTY( USkeletalMeshInstance, TweenStartFrame );
+  LINK_NATIVE_PROPERTY( USkeletalMeshInstance, Base );
+  LINK_NATIVE_PROPERTY( USkeletalMeshInstance, bHasCachedFrame );
+  LINK_NATIVE_PROPERTY( USkeletalMeshInstance, bWasTweening );
+  LINK_NATIVE_PROPERTY( USkeletalMeshInstance, CachedTweenSeq );
+  LINK_NATIVE_PROPERTY( USkeletalMeshInstance, Modifiers );
+  LINK_NATIVE_PROPERTY( USkeletalMeshInstance, Channels );
+  LINK_NATIVE_PROPERTY( USkeletalMeshInstance, TChannelPtr );
+  LINK_NATIVE_PROPERTY( USkeletalMeshInstance, AttachedActors );
+  LINK_NATIVE_PROPERTY( USkeletalMeshInstance, AttachedBoneIndex );
+  LINK_NATIVE_PROPERTY( USkeletalMeshInstance, AttachedBoneName );
+  LINK_NATIVE_PROPERTY( USkeletalMeshInstance, MyAttachment );
+  LINK_NATIVE_PROPERTY( USkeletalMeshInstance, HardAttachFlags );
+END_PROPERTY_LINK()
+
+BEGIN_PROPERTY_LINK( AActor, 221 )
   LINK_NATIVE_PROPERTY( AActor, bStatic );
   LINK_NATIVE_PROPERTY( AActor, bHidden );
   LINK_NATIVE_PROPERTY( AActor, bNoDelete );
@@ -260,31 +316,181 @@ BEGIN_PROPERTY_LINK( AActor, )
   LINK_NATIVE_PROPERTY( AActor, bIsKillGoal );
   LINK_NATIVE_PROPERTY( AActor, bIsItemGoal );
   LINK_NATIVE_PROPERTY( AActor, bCollideWhenPlacing );
-  LINK_NATIVE_PROPERTY( AActor, 
-  LINK_NATIVE_PROPERTY( AActor,
-  LINK_NATIVE_PROPERTY( AActor,
-  LINK_NATIVE_PROPERTY( AActor,
-  LINK_NATIVE_PROPERTY( AActor,
-  LINK_NATIVE_PROPERTY( AActor,
-  LINK_NATIVE_PROPERTY( AActor,
-  LINK_NATIVE_PROPERTY( AActor,
-  LINK_NATIVE_PROPERTY( AActor,
-  LINK_NATIVE_PROPERTY( AActor,
-  LINK_NATIVE_PROPERTY( AActor,
-  LINK_NATIVE_PROPERTY( AActor,
-  LINK_NATIVE_PROPERTY( AActor,
-  LINK_NATIVE_PROPERTY( AActor,
-  LINK_NATIVE_PROPERTY( AActor,
-  LINK_NATIVE_PROPERTY( AActor,
-  LINK_NATIVE_PROPERTY( AActor,
-  LINK_NATIVE_PROPERTY( AActor,
-  LINK_NATIVE_PROPERTY( AActor,
-  LINK_NATIVE_PROPERTY( AActor,
-  LINK_NATIVE_PROPERTY( AActor,
-  LINK_NATIVE_PROPERTY( AActor,
-  LINK_NATIVE_PROPERTY( AActor,
-  LINK_NATIVE_PROPERTY( AActor,
-  LINK_NATIVE_PROPERTY( AActor,
-  LINK_NATIVE_PROPERTY( AActor,
-  LINK_NATIVE_PROPERTY( AActor,
+  LINK_NATIVE_PROPERTY( AActor, bTravel );
+  LINK_NATIVE_PROPERTY( AActor, bMovable );
+  LINK_NATIVE_PROPERTY( AActor, bHighDetail );
+  LINK_NATIVE_PROPERTY( AActor, bStasis );
+  LINK_NATIVE_PROPERTY( AActor, bForceStasis );
+  LINK_NATIVE_PROPERTY( AActor, bIsPawn );
+  LINK_NATIVE_PROPERTY( AActor, bNetTemporary );
+  LINK_NATIVE_PROPERTY( AActor, bNetOptional );
+  LINK_NATIVE_PROPERTY( AActor, bReplicateInstigator );
+  LINK_NATIVE_PROPERTY( AActor, bTrailerSameRotation );
+  LINK_NATIVE_PROPERTY( AActor, bUnlit );
+  LINK_NATIVE_PROPERTY( AActor, bNoSmooth );
+  LINK_NATIVE_PROPERTY( AActor, bParticles );
+  LINK_NATIVE_PROPERTY( AActor, bRandomFrame );
+  LINK_NATIVE_PROPERTY( AActor, bMeshEnviroMap );
+  LINK_NATIVE_PROPERTY( AActor, bFilterByVolume );
+  LINK_NATIVE_PROPERTY( AActor, bMeshCurvy );
+  LINK_NATIVE_PROPERTY( AActor, bShadowCast );
+  LINK_NATIVE_PROPERTY( AActor, bOwnerNoSee );
+  LINK_NATIVE_PROPERTY( AActor, bOnlyOwnerSee );
+  LINK_NATIVE_PROPERTY( AActor, bIsMover );
+  LINK_NATIVE_PROPERTY( AActor, bAlwaysRelevant );
+  LINK_NATIVE_PROPERTY( AActor, bAlwaysTick );
+  LINK_NATIVE_PROPERTY( AActor, bHurtEntry );
+  LINK_NATIVE_PROPERTY( AActor, bGameRelevant );
+  LINK_NATIVE_PROPERTY( AActor, bCarriedItem );
+  LINK_NATIVE_PROPERTY( AActor, bForcePhysicsUpdate );
+  LINK_NATIVE_PROPERTY( AActor, bSkipActorReplication );
+  LINK_NATIVE_PROPERTY( AActor, bRepAnimations );
+  LINK_NATIVE_PROPERTY( AActor, bRepAmbientSound );
+  LINK_NATIVE_PROPERTY( AActor, bSimulatedPawnRep );
+  LINK_NATIVE_PROPERTY( AActor, bRepMesh );
+  LINK_NATIVE_PROPERTY( AActor, bCollideActors );
+  LINK_NATIVE_PROPERTY( AActor, bCollideWorld );
+  LINK_NATIVE_PROPERTY( AActor, bBlockActors );
+  LINK_NATIVE_PROPERTY( AActor, bBlockPlayers );
+  LINK_NATIVE_PROPERTY( AActor, bProjTarget );
+  LINK_NATIVE_PROPERTY( AActor, bPathCollision );
+  LINK_NATIVE_PROPERTY( AActor, bSpecialLit );
+  LINK_NATIVE_PROPERTY( AActor, bActorShadows );
+  LINK_NATIVE_PROPERTY( AActor, bCorona );
+  LINK_NATIVE_PROPERTY( AActor, bLensFlare );
+  LINK_NATIVE_PROPERTY( AActor, bDarkLight );
+  LINK_NATIVE_PROPERTY( AActor, bNetInitial );
+  LINK_NATIVE_PROPERTY( AActor, bNetOwner );
+  LINK_NATIVE_PROPERTY( AActor, bNetRelevant );
+  LINK_NATIVE_PROPERTY( AActor, bNetSee );
+  LINK_NATIVE_PROPERTY( AActor, bNetHear );
+  LINK_NATIVE_PROPERTY( AActor, bNetFeel );
+  LINK_NATIVE_PROPERTY( AActor, bSimulatedPawn );
+  LINK_NATIVE_PROPERTY( AActor, bDemoRecording );
+  LINK_NATIVE_PROPERTY( AActor, bBounce );
+  LINK_NATIVE_PROPERTY( AActor, bFixedRotationDir );
+  LINK_NATIVE_PROPERTY( AActor, bRotateToDesired );
+  LINK_NATIVE_PROPERTY( AActor, bInterpolating );
+  LINK_NATIVE_PROPERTY( AActor, bJustTeleported );
+  LINK_NATIVE_PROPERTY( AActor, bIsFrobable );
+  LINK_NATIVE_PROPERTY( AActor, RandomDelayTime );
+  LINK_NATIVE_PROPERTY( AActor, RandomValue );
+  LINK_NATIVE_PROPERTY( AActor, LastRandomTime );
+  LINK_NATIVE_PROPERTY( AActor, LastRenderedTime );
+  LINK_NATIVE_PROPERTY( AActor, ActorRenderColor );
+  LINK_NATIVE_PROPERTY( AActor, CollisionOverride );
+  LINK_NATIVE_PROPERTY( AActor, MeshInstance );
+  LINK_NATIVE_PROPERTY( AActor, RelativeLocation );
+  LINK_NATIVE_PROPERTY( AActor, RelativeRotation );
+  LINK_NATIVE_PROPERTY( AActor, LightDataPtr );
+  LINK_NATIVE_PROPERTY( AActor, MeshDataPtr );
+  LINK_NATIVE_PROPERTY( AActor, DrawScale3D );
+  LINK_NATIVE_PROPERTY( AActor, ProjectorList );
+  LINK_NATIVE_PROPERTY( AActor, InitialNetProperties );
+  LINK_NATIVE_PROPERTY( AActor, RealTouching );
+  LINK_NATIVE_PROPERTY( AActor, MultiTimers );
+  LINK_NATIVE_PROPERTY( AActor, Physics );
+  LINK_NATIVE_PROPERTY( AActor, Role );
+  LINK_NATIVE_PROPERTY( AActor, RemoteRole );
+  LINK_NATIVE_PROPERTY( AActor, Owner );
+  LINK_NATIVE_PROPERTY( AActor, InitialState );
+  LINK_NATIVE_PROPERTY( AActor, Group );
+  LINK_NATIVE_PROPERTY( AActor, TimerRate );
+  LINK_NATIVE_PROPERTY( AActor, TimerCounter );
+  LINK_NATIVE_PROPERTY( AActor, LifeSpan );
+  LINK_NATIVE_PROPERTY( AActor, AnimSequence );
+  LINK_NATIVE_PROPERTY( AActor, AnimFrame );
+  LINK_NATIVE_PROPERTY( AActor, AnimRate );
+  LINK_NATIVE_PROPERTY( AActor, TweenRate );
+  LINK_NATIVE_PROPERTY( AActor, SkelAnim );
+  LINK_NATIVE_PROPERTY( AActor, LODBias );
+  LINK_NATIVE_PROPERTY( AActor, DefaultAnimationNotify );
+  LINK_NATIVE_PROPERTY( AActor, AnimationNotify );
+  LINK_NATIVE_PROPERTY( AActor, Level );
+  LINK_NATIVE_PROPERTY( AActor, XLevel );
+  LINK_NATIVE_PROPERTY( AActor, Tag );
+  LINK_NATIVE_PROPERTY( AActor, Event );
+  LINK_NATIVE_PROPERTY( AActor, Target );
+  LINK_NATIVE_PROPERTY( AActor, Instigator );
+  LINK_NATIVE_PROPERTY( AActor, Inventory );
+  LINK_NATIVE_PROPERTY( AActor, Base );
+  LINK_NATIVE_PROPERTY( AActor, Region );
+  LINK_NATIVE_PROPERTY( AActor, AttachTag );
+  LINK_NATIVE_PROPERTY( AActor, StandingCount );
+  LINK_NATIVE_PROPERTY( AActor, MiscNumber );
+  LINK_NATIVE_PROPERTY( AActor, LatentByte );
+  LINK_NATIVE_PROPERTY( AActor, LatentInt );
+  LINK_NATIVE_PROPERTY( AActor, LatentFloat );
+  LINK_NATIVE_PROPERTY( AActor, LatentActor );
+  LINK_NATIVE_ARRAY   ( AActor, Touching );
+  LINK_NATIVE_PROPERTY( AActor, Deleted );
+  LINK_NATIVE_PROPERTY( AActor, CollisionTag );
+  LINK_NATIVE_PROPERTY( AActor, LightingTag );
+  LINK_NATIVE_PROPERTY( AActor, NetTag );
+  LINK_NATIVE_PROPERTY( AActor, OtherTag );
+  LINK_NATIVE_PROPERTY( AActor, ExtraTag );
+  LINK_NATIVE_PROPERTY( AActor, SpecialTag );
+  LINK_NATIVE_PROPERTY( AActor, Location );
+  LINK_NATIVE_PROPERTY( AActor, Rotation );
+  LINK_NATIVE_PROPERTY( AActor, OldLocation );
+  LINK_NATIVE_PROPERTY( AActor, ColLocation );
+  LINK_NATIVE_PROPERTY( AActor, Velocity );
+  LINK_NATIVE_PROPERTY( AActor, Acceleration );
+  LINK_NATIVE_PROPERTY( AActor, OddsOfAppearing );
+  LINK_NATIVE_PROPERTY( AActor, HitActor );
+  LINK_NATIVE_PROPERTY( AActor, DrawType );
+  LINK_NATIVE_PROPERTY( AActor, Style );
+  LINK_NATIVE_PROPERTY( AActor, Sprite );
+  LINK_NATIVE_PROPERTY( AActor, Texture );
+  LINK_NATIVE_PROPERTY( AActor, Skin );
+  LINK_NATIVE_PROPERTY( AActor, Mesh );
+  LINK_NATIVE_PROPERTY( AActor, ShadowMesh );
+  LINK_NATIVE_PROPERTY( AActor, Brush );
+  LINK_NATIVE_PROPERTY( AActor, DrawScale );
+  LINK_NATIVE_PROPERTY( AActor, PrePivot );
+  LINK_NATIVE_PROPERTY( AActor, ScaleGlow );
+  LINK_NATIVE_PROPERTY( AActor, VisibilityRadius );
+  LINK_NATIVE_PROPERTY( AActor, VisibilityHeight );
+  LINK_NATIVE_PROPERTY( AActor, AmbientGlow );
+  LINK_NATIVE_PROPERTY( AActor, Fatness );
+  LINK_NATIVE_PROPERTY( AActor, SpriteProjForward );
+  LINK_NATIVE_ARRAY   ( AActor, MultiSkins );
+  LINK_NATIVE_PROPERTY( AActor, RenderIteratorClass );
+  LINK_NATIVE_PROPERTY( AActor, RenderInterface );
+  LINK_NATIVE_PROPERTY( AActor, SoundRadius );
+  LINK_NATIVE_PROPERTY( AActor, SoundVolume );
+  LINK_NATIVE_PROPERTY( AActor, SoundPitch );
+  LINK_NATIVE_PROPERTY( AActor, AmbientSound );
+  LINK_NATIVE_PROPERTY( AActor, TransientSoundVolume );
+  LINK_NATIVE_PROPERTY( AActor, TransientSoundRadius );
+  LINK_NATIVE_PROPERTY( AActor, CollisionRadius );
+  LINK_NATIVE_PROPERTY( AActor, CollisionHeight );
+  LINK_NATIVE_PROPERTY( AActor, LightType );
+  LINK_NATIVE_PROPERTY( AActor, LightEffect );
+  LINK_NATIVE_PROPERTY( AActor, LightBrightness );
+  LINK_NATIVE_PROPERTY( AActor, LightHue );
+  LINK_NATIVE_PROPERTY( AActor, LightSaturation );
+  LINK_NATIVE_PROPERTY( AActor, LightRadius );
+  LINK_NATIVE_PROPERTY( AActor, LightPeriod );
+  LINK_NATIVE_PROPERTY( AActor, LightPhase );
+  LINK_NATIVE_PROPERTY( AActor, LightCone );
+  LINK_NATIVE_PROPERTY( AActor, VolumeBrightness );
+  LINK_NATIVE_PROPERTY( AActor, VolumeRadius );
+  LINK_NATIVE_PROPERTY( AActor, VolumeFog );
+  LINK_NATIVE_PROPERTY( AActor, CoronaAlpha );
+  LINK_NATIVE_PROPERTY( AActor, DodgeDir );
+  LINK_NATIVE_PROPERTY( AActor, Mass );
+  LINK_NATIVE_PROPERTY( AActor, Buoyancy );
+  LINK_NATIVE_PROPERTY( AActor, RotationRate );
+  LINK_NATIVE_PROPERTY( AActor, DesiredRotation );
+  LINK_NATIVE_PROPERTY( AActor, PhysAlpha );
+  LINK_NATIVE_PROPERTY( AActor, PhysRate );
+  LINK_NATIVE_PROPERTY( AActor, PendingTouch );
+  LINK_NATIVE_PROPERTY( AActor, AnimLast );
+  LINK_NATIVE_PROPERTY( AActor, AnimMinRate );
+  LINK_NATIVE_PROPERTY( AActor, OldAnimRate );
+  LINK_NATIVE_PROPERTY( AActor, SimAnim );
+  LINK_NATIVE_PROPERTY( AActor, NetPriority );
+  LINK_NATIVE_PROPERTY( AActor, NetUpdateFrequency );
+END_PROPERTY_LINK()
 

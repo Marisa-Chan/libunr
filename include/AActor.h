@@ -23,7 +23,20 @@
  *========================================================================
 */
 
+#include "ULevel.h"
+#include "UMath.h"
+#include "UMesh.h"
+#include "UModel.h"
+#include "URender.h"
+#include "USkelAnim.h"
 #include "UObject.h"
+#include "UTexture.h"
+
+class AProjector;
+class AZoneInfo;
+class ALevelInfo;
+class APawn;
+class AInventory;
 
 // Includes state for:
 //   227j_39
@@ -33,7 +46,6 @@ class AActor : public UObject
   EXPOSE_TO_USCRIPT()
 
   AActor();
-  ~AActor();
 
   // Flags
   bool bStatic, bHidden, bNoDelete, bAnimFinished, bAnimLoop;
@@ -69,7 +81,7 @@ class AActor : public UObject
   bool bShadowCast;
 
   // Advanced
-  bool bOwnerNoSee, bOnlyOwnerSee, bIsMover, bAlwaysRevelant;
+  bool bOwnerNoSee, bOnlyOwnerSee, bIsMover, bAlwaysRelevant;
   bool bAlwaysTick, bHurtEntry, bGameRelevant, bCarriedItem;
   bool bForcePhysicsUpdate;
 
@@ -165,7 +177,7 @@ class AActor : public UObject
     AZoneInfo* Zone;
     int iLeaf;
     u8  ZoneNumber;
-  }
+  };
 
   // Major actor properties
   ALevelInfo* Level;
@@ -180,9 +192,9 @@ class AActor : public UObject
   idx         AttachTag;
 
   // Internal
-  byte    StandingCount;
-  byte    MiscNumber;
-  byte    LatentByte;
+  u8      StandingCount;
+  u8      MiscNumber;
+  u8      LatentByte;
   int     LatentInt;
   float   LatentFloat;
   AActor* LatentActor;
@@ -484,4 +496,4 @@ class AActor : public UObject
     /*F8*/  IK_ExSel        ,IK_ErEof         ,IK_Play         ,IK_Zoom    ,
     /*FC*/  IK_NoName       ,IK_PA1           ,IK_OEMClear
   };
-}
+};
