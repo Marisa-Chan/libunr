@@ -38,7 +38,7 @@ enum EScriptToken
   EX_VirtualFunction    = 0x1B, EX_FinalFunction      = 0x1C, EX_IntConst           = 0x1D,
   EX_FloatConst         = 0x1E, EX_StringConst        = 0x1F, EX_ObjectConst        = 0x20,
   EX_NameConst          = 0x21, EX_RotationConst      = 0x22, EX_VectorConst        = 0x23, 
-  EX_ByteCont           = 0x24, EX_IntZero            = 0x25, EX_IntOne             = 0x26,
+  EX_ByteConst          = 0x24, EX_IntZero            = 0x25, EX_IntOne             = 0x26,
   EX_True               = 0x27, EX_False              = 0x28, EX_NativeParm         = 0x29, 
   EX_NoObject           = 0x2A, EX_Unk2b              = 0x2B, EX_IntConstByte       = 0x2C,
   EX_BoolVariable       = 0x2D, EX_DynamicCast        = 0x2E, EX_Iterator           = 0x2F,
