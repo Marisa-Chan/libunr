@@ -15,6 +15,28 @@ Bugs/Misunderstandings
   Solution:
     Read a byte instead of a token
 
+- EX_Context: strange 3 bytes after object reference
+  Description:
+    EX_Context seems to be a bytecode that is used to tell the scripting
+    environment what object is being referred to in the following.
+
+    For example, if I wanted to refer to "Location", then I just need an
+    EX_InstanceVariable followed by the ObjRef for Location. but if I wanted
+    to refer to Location of another actor "Incoming.Location", then this
+    EX_Context bytecode is necesary.
+
+    The first byte (maybe its a CINDEX?) seems to describe the amount of bytes
+    that follow. This is likely to determine how long the "Context" is set to
+    the particular object in question.
+
+    There are two bytes that seem to follow after. Upon analyzing
+    "NavigationPoint.Accept", it appears to be "0x00" and "0x04" 
+    each time. It is currently unknown what this is for.
+
+  Solution:
+    Read a byte (or cindex??) after getting EX_Context
+    Read a word after that
+
 ---------------------------------------------------------------------
 Unknown Opcodes
 ---------------------------------------------------------------------
