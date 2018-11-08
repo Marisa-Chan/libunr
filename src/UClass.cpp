@@ -84,10 +84,10 @@ void UField::LoadFromPackage( FPackageFileIn* In )
   *In >> CINDEX( NextIdx );
   
   if ( SuperIdx )
-    SuperField = (UField*)UPackage::StaticLoadObject( Pkg, SuperIdx, NULL, Outer );
+    UPackage::StaticLoadObject( Pkg, SuperIdx, NULL, Outer, (UObject**)&SuperField );
   
   if ( NextIdx )
-    Next = (UField*)UPackage::StaticLoadObject( Pkg, NextIdx, NULL, Outer );
+    UPackage::StaticLoadObject( Pkg, NextIdx, NULL, Outer, (UObject**)&Next );
 }
 
 UConst::UConst()
@@ -155,6 +155,7 @@ UStruct::UStruct()
   ScriptCode = NULL;
   NativeSize = 0;
   StructSize = 0;
+  LabelTable = new Array<FScriptLabel>();
 }
 
 UStruct::UStruct( size_t InNativeSize )
@@ -169,6 +170,7 @@ UStruct::UStruct( size_t InNativeSize )
   ScriptCode = NULL;
   NativeSize = InNativeSize;
   StructSize = 0;
+  LabelTable = new Array<FScriptLabel>();
 }
 
 // UStruct
@@ -283,15 +285,15 @@ static inline void LoadScriptCode( UStruct* Struct, FPackageFileIn* In )
     *In >> Token;
     ParsedSize += 1;
     LOAD_CODE( Struct, Token, u8 );
-
-    // Handle extended native case up here since switch statements
+    
+    // Handle native case up here since switch statements
     // can't really handle this type of comparison
     if ( UNLIKELY( (Token && 0xF0) == EX_ExtendedNative ) )
     {
       LoadScriptByte( Struct, In, &ParsedSize );
       continue;
     }
-
+    
     switch ( Token )
     {
       case EX_LocalVariable:
@@ -310,6 +312,7 @@ static inline void LoadScriptCode( UStruct* Struct, FPackageFileIn* In )
       case EX_GlobalFunction:
         LoadScriptIndex( Struct, In, &ParsedSize );
         break;
+      case EX_ByteConst:
       case EX_IntConstByte:
       case EX_Switch:
         LoadScriptByte( Struct, In, &ParsedSize );
@@ -368,6 +371,7 @@ static inline void LoadScriptCode( UStruct* Struct, FPackageFileIn* In )
       case EX_Unk5e:
       case EX_Unk5f:
         Logf( LOG_WARN, "Loading unknown UnrealScript opcode 0x%x, loading may not finish properly", Token );
+        Logf( LOG_WARN, "Unknown opcode located at offset 0x%x", In->Tell() );
         break;
       // Everything else loads another token or nothing at all,
       // so we don't need explicit cases for them
@@ -399,7 +403,7 @@ void UStruct::LoadFromPackage( FPackageFileIn* In )
   
   ScriptText = (UTextBuffer*)UPackage::StaticLoadObject( Pkg, ScriptTextIdx, 
     UTextBuffer::StaticClass(), this );
-  Children = (UField*)UPackage::StaticLoadObject( Pkg, ChildIdx, NULL, this );
+  Children = (UField*)UPackage::StaticLoadObject( Pkg, ChildIdx, NULL, this, (UObject**)&Children );
   FriendlyName = Pkg->ResolveNameFromIdx( FriendlyNameIdx );
   *In >> Line;
   *In >> TextPos;
@@ -469,6 +473,10 @@ void UFunction::LoadFromPackage( FPackageFileIn* In )
     *In >> CINDEX( ReturnValueOffset );
 
   *In >> FunctionFlags;
+
+  if ( FunctionFlags & FUNC_Native )
+    UObject::NativeFunctions->PushBack( this );
+
   if ( FunctionFlags & FUNC_Net )
     *In >> ReplicationOffset;
 }
@@ -610,8 +618,8 @@ void UClass::LoadFromPackage( FPackageFileIn* In )
       ClassConfig = GConfigManager->GetConfig( ClassConfigName );
   }
   else
-    ClassConfig = GGameConfig;
-  
+    ClassConfig = GGameConfig; 
+
   SuperClass = SafeCast<UClass>( SuperField );
   if ( SuperClass != NULL )
   {
@@ -623,21 +631,32 @@ void UClass::LoadFromPackage( FPackageFileIn* In )
       for ( Iter = Children; Iter->Next != NULL; Iter = Iter->Next );
 
     // Link super class children to ours
-    Iter->Next = SuperClass->Children;
+    if ( Iter )
+      Iter->Next = SuperClass->Children;
+    else
+      Children = SuperClass->Children;
+
     SuperClass->Children->AddRef();
+
+    // If SuperClass does not have its SuperClass set, then set its
+    // properties that depend on it
+    if ( SuperClass->SuperClass == NULL )
+      SuperClass->SetSuperClassProperties();
   }
 
-  // Construct default object
+    // Construct default object
   if ( Constructor == NULL )
     Constructor = SuperClass->Constructor;
 
   Default = CreateObject();
+  Default->Name  = StringDup( Name );
   Default->Pkg   = Pkg;
   Default->Class = this;
   Default->Field = Children;
 
   AddRef();
-  Children->AddRef();
+  if ( LIKELY( Children ) )
+    Children->AddRef();
 
   // In Unreal, property lists seem to take precedent over config properties
   // While we should enforce that a config property is never in the property
@@ -667,5 +686,22 @@ char* UClass::CreateDefaultObjectName()
   strcat( DefObjName, "Default" );
   strcat( DefObjName, Name );
   return DefObjName;
+}
+
+void UClass::SetSuperClassProperties()
+{
+  SuperClass = SafeCast<UClass>( SuperField );
+  if ( SuperClass == NULL )
+  {
+    Logf( LOG_CRIT, "SuperField of class '%s' is not a class!!!", Name );
+  }
+  else
+  {
+    if ( SuperClass->SuperClass == NULL )
+      SuperClass->SetSuperClassProperties();
+
+    if ( Constructor == NULL )
+      Constructor = SuperClass->Constructor;
+  }
 }
 

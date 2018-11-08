@@ -179,6 +179,7 @@ class DLL_EXPORT UClass : public UState
 
   bool IsNative();
   UObject* CreateObject();
+  void SetSuperClassProperties();
 
   u32 OldClassRecordSize; // PackageVersion <= 61
   u32 ClassFlags;

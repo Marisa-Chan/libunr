@@ -574,7 +574,7 @@ UPackage* UPackage::StaticLoadPkg( const char* PkgName )
 }
 
 UObject* UPackage::StaticLoadObject( UPackage* Package, const char* ObjName, UClass* ObjClass, 
-  UObject* InOuter )
+  UObject* InOuter, UObject** Out )
 {
   FExport* Export = Package->GetExport( ObjName );
   if ( UNLIKELY( Export == NULL ) )
@@ -588,12 +588,15 @@ UObject* UPackage::StaticLoadObject( UPackage* Package, const char* ObjName, UCl
   if ( Export->Obj != NULL )
     return Export->Obj;
 
-  return UPackage::StaticLoadObject( Package, Export->Index + 1, ObjClass, InOuter );
+  return UPackage::StaticLoadObject( Package, Export->Index + 1, ObjClass, InOuter, Out );
 }
 
 UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjClass, 
-  UObject* InOuter )
+  UObject* InOuter, UObject** Out )
 {
+  if ( ObjRef == 0 )
+    return NULL;
+
   if ( UNLIKELY( Package == NULL ) )
   {
     Logf( LOG_CRIT, "StaticLoadObject: NULL argument passed (ObjClass='%s')", ObjClass->Name );
@@ -705,20 +708,32 @@ UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjC
  
     // If it's already loaded, return it
     if ( Export->Obj != NULL )
+    {
+      if ( Out != NULL )
+        *Out = Export->Obj;
+
       return Export->Obj;
+    }
 
     if ( ObjClass == NULL )
     {
       // See if the class is already loaded
       const char* ClsName = Package->ResolveNameFromObjRef( Export->Class );
-      FHash ClsNameHash  = FnvHashString( ClsName );
-      for ( size_t i = 0; i < UObject::ClassPool->Size() && i != MAX_SIZE; i++ )
+      if ( strnicmp( ClsName, "None", 4 ) == 0 )
       {
-        UClass* ClsIter = (*UObject::ClassPool)[i];
-        if ( ClsIter->Hash == ClsNameHash )
+        ObjClass = UClass::StaticClass();
+      }
+      else
+      {
+        FHash ClsNameHash  = FnvHashString( ClsName );
+        for ( size_t i = 0; i < UObject::ClassPool->Size() && i != MAX_SIZE; i++ )
         {
-          ObjClass = ClsIter;
-          break; // Already loaded the class apparently, great
+          UClass* ClsIter = (*UObject::ClassPool)[i];
+          if ( ClsIter->Hash == ClsNameHash )
+          {
+            ObjClass = ClsIter;
+            break; // Already loaded the class apparently, great
+          }
         }
       }
 
@@ -744,13 +759,21 @@ UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjC
   if ( Obj == NULL )
     return NULL;
 
+  if ( Out != NULL )
+    *Out = Obj;
+
   // In case of circular dependencies
   if ( Export != NULL )
     Export->Obj = Obj;
 
   // Load
   if ( !ObjPkg->LoadObject( &Obj, ObjName, ObjRef ) )
+  {
+    if ( Out != NULL )
+      *Out = NULL;
+
     return NULL;
+  }
 
 
   return Obj;

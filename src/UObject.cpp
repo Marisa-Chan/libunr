@@ -59,6 +59,7 @@ void FNativePropertyList::AddProperty( const char* Name, u32 Offset )
 Array<UObject*>* UObject::ObjectPool = NULL;
 Array<UClass*>*  UObject::ClassPool = NULL;
 Array<FNativePropertyList*>* UObject::NativePropertyLists = NULL;
+Array<UFunction*>* UObject::NativeFunctions = NULL;
 
 UObject* UObject::StaticConstructObject( const char* InName, UClass* InClass, UObject* InOuter )
 {
@@ -227,6 +228,7 @@ void UObject::ReadDefaultProperties( FPackageFileIn* In )
       break;
 
     UProperty* Prop = NULL;
+    bIsDescription = false;
 
     // Support for 227j property descriptions
     if ( strnicmp( PropName, "Description", 11 ) == 0 && IsA( UProperty::StaticClass() ) )
@@ -241,8 +243,22 @@ void UObject::ReadDefaultProperties( FPackageFileIn* In )
       // We don't want to totally fail if some property just doesn't exist
       // Instead, the value will just go unused (because nothing is there to use it)
       if ( !Prop )
-          Logf( LOG_CRIT, "Property '%s' in '%s.%s.%s' does not exist",
+      {
+        Logf( LOG_CRIT, "Property '%s' in '%s.%s.%s' does not exist",
+            PropName, Pkg->Name, Outer->Name, Name );
+      }
+
+      else if ( Prop->Offset == MAX_UINT32 )
+      {
+        if ( Outer )
+          Logf( LOG_WARN, "Property '%s' in '%s.%s.%s' has no native component",
               PropName, Pkg->Name, Outer->Name, Name );
+        else
+          Logf( LOG_WARN, "Property '%s' in '%s.%s' has no native component",
+              PropName, Pkg->Name, Name );
+
+        Prop = NULL;
+      }
     }
 
     *In >> InfoByte;

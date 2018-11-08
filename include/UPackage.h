@@ -201,9 +201,9 @@ class DLL_EXPORT UPackage : public UObject
   static int CalcObjRefValue( int ObjRef );
   static UPackage* StaticLoadPkg( const char* Filepath );
   static UObject* StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass = NULL, 
-      UObject* InOuter = NULL );
+      UObject* InOuter = NULL, UObject** Out = NULL );
   static UObject* StaticLoadObject( UPackage* Pkg, const char* ObjName, UClass* ObjClass = NULL,
-      UObject* InOuter = NULL );
+      UObject* InOuter = NULL, UObject** Out = NULL );
   static bool StaticLoadPartialClass( const char* PkgName, UClass* NativeClass );
   
 protected:    

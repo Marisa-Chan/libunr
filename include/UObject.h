@@ -204,6 +204,7 @@ class FPackageFileIn;
 class FPackageFileOut;
 class FPropertyHash;
 class UField;
+class UFunction;
 class UClass;
 class UPackage;
 struct FPropertyRecord;
@@ -403,6 +404,7 @@ class DLL_EXPORT UObject
   static Array<UObject*>* ObjectPool;
   static Array<UClass*>*  ClassPool; 
   static Array<FNativePropertyList*>* NativePropertyLists;
+  static Array<UFunction*>* NativeFunctions;
 
   FHash       Hash;     // Hash of this object
   const char* Name;     // Name of this object
@@ -422,6 +424,16 @@ class DLL_EXPORT UObject
   // apart. We dynamically link native variables to scripted, so this will
   // be unused
   int ObjectInternal[6];
+
+  // Advanced Animation Notify
+  enum EAnimNotifyEval
+  {
+    ANE_Equal,
+    ANE_Greater,
+    ANE_Less,
+    ANE_GreaterOrEqual,
+    ANE_LessOrEqual
+  };
 
 protected:
   static UClass* StaticAllocateClass( const char* ClassName, u32 Flags, UClass* SuperClass, 
