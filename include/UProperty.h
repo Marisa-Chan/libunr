@@ -61,6 +61,7 @@ class DLL_EXPORT UProperty : public UField
   // Instance variables
   u32 Offset; // Offset into the owner, giving the location of the value
   UClass* GlobalClass; // When reading globalconfig vars, use this
+  char*   Description; // Property description introduced in 227j
 
   // Static variables
   static u8 PropertySizes[8];

@@ -217,7 +217,8 @@ void UObject::ReadDefaultProperties( FPackageFileIn* In )
   u8  IsArray  = 0;
   int ArrayIdx = 0;
   int RealSize = 0;
-  
+  bool bIsDescription = false;
+
   while( 1 )
   {
     *In >> CINDEX( PropNameIdx );
@@ -225,14 +226,24 @@ void UObject::ReadDefaultProperties( FPackageFileIn* In )
     if ( UNLIKELY( strncmp( PropName, "None", 4 ) == 0 ) )
       break;
 
-    UProperty* Prop = FindProperty( PropName );
+    UProperty* Prop = NULL;
 
-    // Read the actual value of the properties even if they don't exist
-    // We don't want to totally fail if some property just doesn't exist
-    // Instead, the value will just go unused (because nothing is there to use it)
-    if ( !Prop )
-        Logf( LOG_CRIT, "Property '%s' in '%s.%s.%s' does not exist",
-            PropName, Pkg->Name, Outer->Name, Name );
+    // Support for 227j property descriptions
+    if ( strnicmp( PropName, "Description", 11 ) == 0 && IsA( UProperty::StaticClass() ) )
+    {
+      bIsDescription = true;
+    }
+    else
+    {
+      Prop = FindProperty( PropName );
+
+      // Read the actual value of the properties even if they don't exist
+      // We don't want to totally fail if some property just doesn't exist
+      // Instead, the value will just go unused (because nothing is there to use it)
+      if ( !Prop )
+          Logf( LOG_CRIT, "Property '%s' in '%s.%s.%s' does not exist",
+              PropName, Pkg->Name, Outer->Name, Name );
+    }
 
     *In >> InfoByte;
     PropType = InfoByte & 0x0F;
@@ -467,6 +478,12 @@ void UObject::ReadDefaultProperties( FPackageFileIn* In )
           Logf( LOG_CRIT, "Default property expected 'StrProperty', but got '%s'", Prop->Class->Name );
         else
           SetStrProperty( StrProp, NewStr, ArrayIdx );
+      }
+
+      if ( bIsDescription )
+      {
+        UProperty* PropThis = (UProperty*)this;
+        PropThis->Description = StringDup( NewStr );
       }
     }
   }
