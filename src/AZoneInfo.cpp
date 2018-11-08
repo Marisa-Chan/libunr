@@ -17,28 +17,20 @@
 \*========================================================================*/
 
 /*========================================================================
- * AActor.cpp - Actor class for tangible game objects
+ * AZoneInfo.cpp - ZoneInfo functionality
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#include "AActor.h"
+#include "AZoneInfo.h"
 
-AActor::AActor()
-  : UObject()
+AZoneInfo::AZoneInfo()
+  : AInfo()
 {
 }
 
-AActor::~AActor()
+AZoneInfo::~AZoneInfo()
 {
 }
 
-AInfo::AInfo()
-  : AActor()
-{
-}
-
-AInfo::~AInfo()
-{
-}

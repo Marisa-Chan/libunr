@@ -198,6 +198,16 @@ inline void UObject::SetStructProperty( UStructProperty* Prop, FPackageFileIn* I
       } while ( i < ChildProp->ArrayDim );
     }
 
+    else if ( ChildProp->Class == UFloatProperty::StaticClass() )
+    {
+      do
+      {
+        float Float = 0;
+        *In >> Float;
+        *GetFloatPropAddr( (UObject*)StructAddr, (UFloatProperty*)ChildProp, i++ ) = Float;
+      } while ( i < ChildProp->ArrayDim );
+    }
+
     else if ( ChildProp->Class == UBoolProperty::StaticClass() )
     {
       u8 Bool = 0;

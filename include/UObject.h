@@ -327,6 +327,9 @@ public: \
 #define BEGIN_PROPERTY_LINK( cls, numprop ) \
 bool cls::StaticLinkNativeProperties() \
 { \
+  if ( StaticNativePropList != NULL ) \
+    return true; \
+\
   FNativePropertyList* SuperPropList = Super::StaticNativePropList; \
   if ( SuperPropList == NULL ) \
     return false; \

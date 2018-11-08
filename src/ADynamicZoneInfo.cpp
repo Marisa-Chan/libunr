@@ -17,28 +17,20 @@
 \*========================================================================*/
 
 /*========================================================================
- * AActor.cpp - Actor class for tangible game objects
+ * ADynamicZoneInfo.h - DynamicZoneInfo functionality
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#include "AActor.h"
+#include "ADynamicZoneInfo.h"
 
-AActor::AActor()
-  : UObject()
+ADynamicZoneInfo::ADynamicZoneInfo()
+  : AZoneInfo()
 {
 }
 
-AActor::~AActor()
+ADynamicZoneInfo::~ADynamicZoneInfo()
 {
 }
 
-AInfo::AInfo()
-  : AActor()
-{
-}
-
-AInfo::~AInfo()
-{
-}

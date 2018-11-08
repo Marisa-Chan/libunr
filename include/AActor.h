@@ -23,6 +23,8 @@
  *========================================================================
 */
 
+#pragma once
+
 #include "ULevel.h"
 #include "UMath.h"
 #include "UMesh.h"
@@ -496,4 +498,12 @@ class AActor : public UObject
     /*F8*/  IK_ExSel        ,IK_ErEof         ,IK_Play         ,IK_Zoom    ,
     /*FC*/  IK_NoName       ,IK_PA1           ,IK_OEMClear
   };
+};
+
+class AInfo : public AActor
+{
+  DECLARE_NATIVE_CLASS( AInfo, AActor, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  AInfo();
 };

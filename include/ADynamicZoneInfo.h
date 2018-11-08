@@ -17,28 +17,39 @@
 \*========================================================================*/
 
 /*========================================================================
- * AActor.cpp - Actor class for tangible game objects
+ * ADynamicZoneInfo.h - A zone info whose properties can update at runtime
+ * Original 227 implementation that this is based off of written by .:..:
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#include "AActor.h"
+#include "AZoneInfo.h"
 
-AActor::AActor()
-  : UObject()
+class ADynamicZoneInfo : public AZoneInfo
 {
-}
+  DECLARE_NATIVE_CLASS( ADynamicZoneInfo, AZoneInfo, 0, Engine )
+  EXPOSE_TO_USCRIPT()
 
-AActor::~AActor()
-{
-}
+  ADynamicZoneInfo();
 
-AInfo::AInfo()
-  : AActor()
-{
-}
+  ADynamicZoneInfo* NextDynamicZone;
 
-AInfo::~AInfo()
-{
-}
+  enum EDynZoneInfoType
+  {
+    DZONE_Cube,
+    DZONE_Sphere,
+    DZONE_Cylinder,
+    DZONE_Script // TODO: Any benefits to this?
+  };
+  EDynZoneInfoType ZoneAreaType;
+
+  FVector BoxMin, BoxMax;
+  float CylinderSize, SphereSize;
+  AZoneInfo* MatchOnlyZone;
+  bool bUseRelativeToRotation;
+  bool bMovesForceTouchUpdate;
+  bool bUpdateTouchers;
+  FVector OldPose;
+};
+

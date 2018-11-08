@@ -30,6 +30,8 @@ else()
 endif()
 
 set (SOURCES ${UNR_SRC}/AActor.cpp
+             ${UNR_SRC}/AZoneInfo.cpp
+             ${UNR_SRC}/ADynamicZoneInfo.cpp
              ${UNR_SRC}/FConfig.cpp
              ${UNR_SRC}/FUtil.cpp
              ${UNR_SRC}/UClass.cpp

@@ -33,7 +33,10 @@
 #include "USound.h"
 #include "USystem.h"
 #include "UTexture.h"
+
 #include "AActor.h"
+#include "AZoneInfo.h"
+#include "ADynamicZoneInfo.h"
 
 bool UObject::StaticInit()
 {
@@ -104,10 +107,21 @@ bool UObject::StaticInit()
   Result &= UPalette::StaticClassInit();
   Result &= UBitmap::StaticClassInit();
     Result &= UTexture::StaticClassInit();
-    Result &= AActor::StaticClassInit();
 //  Result &= UAnimationNotify::StaticClassInit();
 //  Result &= USkeletalMeshInstance::StaticClassInit();
 //  Result &= URenderIterator::StaticClassInit();
+
+  // Circular dependencies in Engine.u require that we initialize property lists first
+  Result &= AActor::StaticLinkNativeProperties();
+  Result &= AInfo::StaticLinkNativeProperties();
+  Result &= AZoneInfo::StaticLinkNativeProperties();
+  Result &= ADynamicZoneInfo::StaticLinkNativeProperties();
+
+  // Now init classes
+  Result &= AActor::StaticClassInit();
+    Result &= AInfo::StaticClassInit();
+      Result &= AZoneInfo::StaticClassInit();
+        Result &= ADynamicZoneInfo::StaticClassInit();
 
   return Result;
 }
@@ -153,6 +167,9 @@ IMPLEMENT_NATIVE_CLASS( UObject );
     IMPLEMENT_NATIVE_CLASS( UTexture );
 
 IMPLEMENT_NATIVE_CLASS( AActor );
+  IMPLEMENT_NATIVE_CLASS( AInfo );
+    IMPLEMENT_NATIVE_CLASS( AZoneInfo );
+      IMPLEMENT_NATIVE_CLASS( ADynamicZoneInfo );
 
 bool UObject::StaticLinkNativeProperties()
 {
@@ -268,6 +285,95 @@ BEGIN_PROPERTY_LINK( USkeletalMeshInstance, 20 )
   LINK_NATIVE_PROPERTY( USkeletalMeshInstance, AttachedBoneName );
   LINK_NATIVE_PROPERTY( USkeletalMeshInstance, MyAttachment );
   LINK_NATIVE_PROPERTY( USkeletalMeshInstance, HardAttachFlags );
+END_PROPERTY_LINK()
+
+BEGIN_PROPERTY_LINK( AInfo, 0 )
+END_PROPERTY_LINK()
+
+BEGIN_PROPERTY_LINK( AZoneInfo, 70 )
+  LINK_NATIVE_PROPERTY( AZoneInfo, ZoneTag );
+  LINK_NATIVE_PROPERTY( AZoneInfo, ZoneGravity );
+  LINK_NATIVE_PROPERTY( AZoneInfo, ZoneVelocity );
+  LINK_NATIVE_PROPERTY( AZoneInfo, ZoneGroundFriction );
+  LINK_NATIVE_PROPERTY( AZoneInfo, ZoneFluidFriction );
+  LINK_NATIVE_PROPERTY( AZoneInfo, ZoneTerminalVelocity );
+  LINK_NATIVE_PROPERTY( AZoneInfo, ZonePlayerEvent );
+  LINK_NATIVE_PROPERTY( AZoneInfo, ZonePlayerCount );
+  LINK_NATIVE_PROPERTY( AZoneInfo, ZoneTimeDilation );
+  LINK_NATIVE_PROPERTY( AZoneInfo, NumCarcasses );
+  LINK_NATIVE_PROPERTY( AZoneInfo, DamagePerSec );
+  LINK_NATIVE_PROPERTY( AZoneInfo, DamageType );
+  LINK_NATIVE_PROPERTY( AZoneInfo, DamageString );
+  LINK_NATIVE_PROPERTY( AZoneInfo, ZoneName );
+  LINK_NATIVE_ARRAY   ( AZoneInfo, LocationStrings );
+  LINK_NATIVE_PROPERTY( AZoneInfo, LocationID );
+  LINK_NATIVE_PROPERTY( AZoneInfo, MaxCarcasses );
+  LINK_NATIVE_PROPERTY( AZoneInfo, EntrySound );
+  LINK_NATIVE_PROPERTY( AZoneInfo, ExitSound );
+  LINK_NATIVE_PROPERTY( AZoneInfo, EntryActor );
+  LINK_NATIVE_PROPERTY( AZoneInfo, ExitActor );
+  LINK_NATIVE_PROPERTY( AZoneInfo, SkyZone );
+  LINK_NATIVE_PROPERTY( AZoneInfo, bWaterZone );
+  LINK_NATIVE_PROPERTY( AZoneInfo, bFogZone );
+  LINK_NATIVE_PROPERTY( AZoneInfo, bKillZone );
+  LINK_NATIVE_PROPERTY( AZoneInfo, bNeutralZone );
+  LINK_NATIVE_PROPERTY( AZoneInfo, bGravityZone );
+  LINK_NATIVE_PROPERTY( AZoneInfo, bPainZone );
+  LINK_NATIVE_PROPERTY( AZoneInfo, bDestructive );
+  LINK_NATIVE_PROPERTY( AZoneInfo, bNoInventory );
+  LINK_NATIVE_PROPERTY( AZoneInfo, bMoveProjectiles );
+  LINK_NATIVE_PROPERTY( AZoneInfo, bReverbZone );
+  LINK_NATIVE_PROPERTY( AZoneInfo, bRaytraceReverb );
+  LINK_NATIVE_PROPERTY( AZoneInfo, bRepZoneProperties );
+  LINK_NATIVE_PROPERTY( AZoneInfo, bDistanceFogClips );
+  LINK_NATIVE_PROPERTY( AZoneInfo, bDistanceFog );
+  LINK_NATIVE_PROPERTY( AZoneInfo, bZoneBasedFog );
+  LINK_NATIVE_PROPERTY( AZoneInfo, FogDistanceStart );
+  LINK_NATIVE_PROPERTY( AZoneInfo, FogColor );
+  LINK_NATIVE_PROPERTY( AZoneInfo, FogDistance );
+  LINK_NATIVE_PROPERTY( AZoneInfo, FadeTime );
+  LINK_NATIVE_PROPERTY( AZoneInfo, FogDensity );
+  LINK_NATIVE_PROPERTY( AZoneInfo, FogMode );
+  LINK_NATIVE_PROPERTY( AZoneInfo, AmbientBrightness );
+  LINK_NATIVE_PROPERTY( AZoneInfo, AmbientHue );
+  LINK_NATIVE_PROPERTY( AZoneInfo, AmbientSaturation );
+  LINK_NATIVE_PROPERTY( AZoneInfo, EnvironmentMap );
+  LINK_NATIVE_PROPERTY( AZoneInfo, EnvironmentUScale );
+  LINK_NATIVE_PROPERTY( AZoneInfo, EnvironmentVScale );
+  LINK_NATIVE_PROPERTY( AZoneInfo, EnvironmentColor );
+  LINK_NATIVE_PROPERTY( AZoneInfo, TexUPanSpeed );
+  LINK_NATIVE_PROPERTY( AZoneInfo, TexVPanSpeed );
+  LINK_NATIVE_PROPERTY( AZoneInfo, ViewFlash );
+  LINK_NATIVE_PROPERTY( AZoneInfo, ViewFog );
+  LINK_NATIVE_PROPERTY( AZoneInfo, DirtyShadowLevel );
+  LINK_NATIVE_ARRAY   ( AZoneInfo, LightMapDetailLevels );
+  LINK_NATIVE_PROPERTY( AZoneInfo, SpeedOfSound );
+  LINK_NATIVE_PROPERTY( AZoneInfo, MasterGain );
+  LINK_NATIVE_PROPERTY( AZoneInfo, CutoffHz );
+  LINK_NATIVE_ARRAY   ( AZoneInfo, Delay );
+  LINK_NATIVE_ARRAY   ( AZoneInfo, Gain );
+  LINK_NATIVE_PROPERTY( AZoneInfo, EFXAmbients );
+  LINK_NATIVE_ARRAY   ( AZoneInfo, LensFlare );
+  LINK_NATIVE_ARRAY   ( AZoneInfo, LensFlareOffset );
+  LINK_NATIVE_ARRAY   ( AZoneInfo, LensFlareScale );
+  LINK_NATIVE_PROPERTY( AZoneInfo, MinLightCount );
+  LINK_NATIVE_PROPERTY( AZoneInfo, MaxLightCount );
+  LINK_NATIVE_PROPERTY( AZoneInfo, MinLightingPolyCount );
+  LINK_NATIVE_PROPERTY( AZoneInfo, MaxLightingPolyCount );
+  LINK_NATIVE_PROPERTY( AZoneInfo, VisNotify );
+END_PROPERTY_LINK()
+
+BEGIN_PROPERTY_LINK( ADynamicZoneInfo, 10 )
+  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, ZoneAreaType );
+  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, BoxMin );
+  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, BoxMax );
+  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, CylinderSize );
+  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, SphereSize );
+  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, MatchOnlyZone );
+  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, bUseRelativeToRotation );
+  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, bMovesForceTouchUpdate );
+  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, bUpdateTouchers );
+  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, OldPose );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( AActor, 221 )
