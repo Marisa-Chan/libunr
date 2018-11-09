@@ -25,17 +25,19 @@ Bugs/Misunderstandings
     to refer to Location of another actor "Incoming.Location", then this
     EX_Context bytecode is necesary.
 
-    The first byte (maybe its a CINDEX?) seems to describe the amount of bytes
-    that follow. This is likely to determine how long the "Context" is set to
-    the particular object in question.
+    Based on the UTPT source (ut_packages.pas:7968) The first two bytes 
+    (a word) is equal to the number of bytes worth of opcode that this 
+    context statement is relevant for. The last byte appears to be some
+    kind of size indicator. It is currently unknown what this size byte
+    is for.
 
-    There are two bytes that seem to follow after. Upon analyzing
-    "NavigationPoint.Accept", it appears to be "0x00" and "0x04" 
-    each time. It is currently unknown what this is for.
+    Upon further inspection, it appears that EX_Context and EX_ClassContext
+    are similar in nature. The difference here is that EX_ClassContext
+    takes object references directly while EX_Context takes TOKENs instead
 
   Solution:
-    Read a byte (or cindex??) after getting EX_Context
-    Read a word after that
+    Read a word after getting EX_Context
+    Read a byte after that (purpose still unknown)
 
 ---------------------------------------------------------------------
 Unknown Opcodes

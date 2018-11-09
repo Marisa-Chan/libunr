@@ -272,28 +272,22 @@ static inline void LoadScriptLabelTable( UStruct* Struct, FPackageFileIn* In, u3
   }
 }
 
-// Helper function to load script code
-// Does not care about type resolution whatsoever
-static inline void LoadScriptCode( UStruct* Struct, FPackageFileIn* In )
+static void LoadScriptToken( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize )
 {
   u8 Token = -1;
-  u32 ParsedSize = 0;
-  bool bQueueReadIteratorWord = false;
-  bool bReadIteratorWord = false;
-  while ( ParsedSize < Struct->ScriptSize )
+  while ( 1 )
   {
     *In >> Token;
-    ParsedSize += 1;
+    *ParsedSize += 1;
     LOAD_CODE( Struct, Token, u8 );
-    
-    // Handle native case up here since switch statements
-    // can't really handle this type of comparison
-    if ( UNLIKELY( (Token && 0xF0) == EX_ExtendedNative ) )
+
+    if ( UNLIKELY( (Token & 0xF0) == EX_ExtendedNative ) )
     {
-      LoadScriptByte( Struct, In, &ParsedSize );
-      continue;
+      LoadScriptByte( Struct, In, ParsedSize );
+      *ParsedSize += 1;
+      return;
     }
-    
+
     switch ( Token )
     {
       case EX_LocalVariable:
@@ -310,55 +304,61 @@ static inline void LoadScriptCode( UStruct* Struct, FPackageFileIn* In )
       case EX_StructCmpNe:
       case EX_StructMember:
       case EX_GlobalFunction:
-        LoadScriptIndex( Struct, In, &ParsedSize );
-        break;
+        LoadScriptIndex( Struct, In, ParsedSize );
+        return;
       case EX_ByteConst:
       case EX_IntConstByte:
       case EX_Switch:
-        LoadScriptByte( Struct, In, &ParsedSize );
-        break;
+        LoadScriptByte( Struct, In, ParsedSize );
+        return;
       case EX_Jump:
       case EX_JumpIfNot:
       case EX_Assert:
       case EX_Case:
       case EX_Skip:
-        LoadScriptWord( Struct, In, &ParsedSize );
-        break;
+        LoadScriptWord( Struct, In, ParsedSize );
+        return;
       case EX_LabelTable:
-        LoadScriptLabelTable( Struct, In, &ParsedSize );
-        break;
+        LoadScriptLabelTable( Struct, In, ParsedSize );
+        return;
       case EX_ClassContext:
-        LoadScriptIndex( Struct, In, &ParsedSize );
-        LoadScriptWord( Struct, In, &ParsedSize );
-        LoadScriptByte( Struct, In, &ParsedSize );
-        LoadScriptIndex( Struct, In, &ParsedSize );
-        break;
+        LoadScriptIndex( Struct, In, ParsedSize );
+        LoadScriptWord( Struct, In, ParsedSize );
+        LoadScriptByte( Struct, In, ParsedSize );
+        LoadScriptIndex( Struct, In, ParsedSize );
+        return;
+      case EX_Context:
+        LoadScriptToken( Struct, In, ParsedSize );
+        LoadScriptWord( Struct, In, ParsedSize );
+        LoadScriptByte( Struct, In, ParsedSize );
+        LoadScriptToken( Struct, In, ParsedSize );
+        return;
       case EX_IntConst:
-        LoadScriptDword( Struct, In, &ParsedSize );
-        break;
+        LoadScriptDword( Struct, In, ParsedSize );
+        return;
       case EX_FloatConst:
-        LoadScriptFloat( Struct, In, &ParsedSize );
-        break;
+        LoadScriptFloat( Struct, In, ParsedSize );
+        return;
       case EX_StringConst:
-        LoadScriptString( Struct, In, &ParsedSize );
-        break;
+        LoadScriptString( Struct, In, ParsedSize );
+        return;
       case EX_RotationConst:
-        LoadScriptDword( Struct, In, &ParsedSize );
-        LoadScriptDword( Struct, In, &ParsedSize );
-        LoadScriptDword( Struct, In, &ParsedSize );
-        break;
+        LoadScriptDword( Struct, In, ParsedSize );
+        LoadScriptDword( Struct, In, ParsedSize );
+        LoadScriptDword( Struct, In, ParsedSize );
+        return;
       case EX_VectorConst:
-        LoadScriptFloat( Struct, In, &ParsedSize );
-        LoadScriptFloat( Struct, In, &ParsedSize );
-        LoadScriptFloat( Struct, In, &ParsedSize );
-        break;
+        LoadScriptFloat( Struct, In, ParsedSize );
+        LoadScriptFloat( Struct, In, ParsedSize );
+        LoadScriptFloat( Struct, In, ParsedSize );
+        return;
       case EX_Iterator:
-        // stupid edge cases... see below
-        bReadIteratorWord = true;
-        break;
+        LoadScriptToken( Struct, In, ParsedSize );
+        LoadScriptWord( Struct, In, ParsedSize );
+        return;
       case EX_UnicodeStringConst:
-        LoadScriptUnicodeString( Struct, In, &ParsedSize );
-        break;
+        LoadScriptUnicodeString( Struct, In, ParsedSize );
+        return;
       case EX_Unk03:
       case EX_Unk15:
       case EX_Unk2b:
@@ -372,21 +372,27 @@ static inline void LoadScriptCode( UStruct* Struct, FPackageFileIn* In )
       case EX_Unk5f:
         Logf( LOG_WARN, "Loading unknown UnrealScript opcode 0x%x, loading may not finish properly", Token );
         Logf( LOG_WARN, "Unknown opcode located at offset 0x%x", In->Tell() );
-        break;
+        return;
       // Everything else loads another token or nothing at all,
       // so we don't need explicit cases for them
       default:
-        break;
-    }
-
-    // Iterator is the only opcode that has a word after a token
-    // Normally we just loop around, but that doesn't work here
-    if ( bReadIteratorWord )
-    {
-      LoadScriptWord( Struct, In, &ParsedSize );
-      bReadIteratorWord = false;
+        return;
     }
   }
+}
+
+// Helper function to load script code
+// Does not care about type resolution whatsoever
+static inline void LoadScriptCode( UStruct* Struct, FPackageFileIn* In )
+{
+  u8 Token = -1;
+  u32 ParsedSize = 0;
+  bool bQueueReadIteratorWord = false;
+  bool bReadIteratorWord = false;
+  while ( ParsedSize < Struct->ScriptSize )
+  {
+    LoadScriptToken( Struct, In, &ParsedSize );
+  }    
 }
 
 void UStruct::LoadFromPackage( FPackageFileIn* In )
