@@ -37,9 +37,11 @@ set (SOURCES ${UNR_SRC}/AActor.cpp
              ${UNR_SRC}/UClass.cpp
              ${UNR_SRC}/ULevel.cpp
              ${UNR_SRC}/UMusic.cpp
+             ${UNR_SRC}/UNet.cpp
              ${UNR_SRC}/USound.cpp
              ${UNR_SRC}/UObject.cpp
              ${UNR_SRC}/UPackage.cpp
+             ${UNR_SRC}/UPlayer.cpp
              ${UNR_SRC}/UPrimitive.cpp
              ${UNR_SRC}/UProperty.cpp
              ${UNR_SRC}/USkelAnim.cpp

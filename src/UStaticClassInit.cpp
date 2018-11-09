@@ -28,6 +28,8 @@
 #include "ULevel.h"
 #include "UMesh.h"
 #include "UMusic.h"
+#include "UNet.h"
+#include "UPlayer.h"
 #include "UProperty.h"
 #include "URender.h"
 #include "USound.h"
@@ -103,6 +105,8 @@ bool UObject::StaticInit()
   Result &= USound::StaticClassInit();
   Result &= UMusic::StaticClassInit();
   Result &= UPrimitive::StaticClassInit();
+  Result &= UPlayer::StaticClassInit();
+  Result &= UNetConnection::StaticClassInit();
 
   Result &= UPalette::StaticClassInit();
   Result &= UBitmap::StaticClassInit();
@@ -111,13 +115,13 @@ bool UObject::StaticInit()
 //  Result &= USkeletalMeshInstance::StaticClassInit();
 //  Result &= URenderIterator::StaticClassInit();
 
-  // Circular dependencies in Engine.u require that we initialize property lists first
+  // Circular dependencies in Engine.u require that we initialize actor property lists first
   Result &= AActor::StaticLinkNativeProperties();
   Result &= AInfo::StaticLinkNativeProperties();
   Result &= AZoneInfo::StaticLinkNativeProperties();
   Result &= ADynamicZoneInfo::StaticLinkNativeProperties();
 
-  // Now init classes
+  // Now init actor classes
   Result &= AActor::StaticClassInit();
     Result &= AInfo::StaticClassInit();
       Result &= AZoneInfo::StaticClassInit();
@@ -129,10 +133,9 @@ bool UObject::StaticInit()
 IMPLEMENT_NATIVE_CLASS( UObject );
   IMPLEMENT_NATIVE_CLASS( UAnimation );
   IMPLEMENT_NATIVE_CLASS( UAnimationNotify );
+  IMPLEMENT_NATIVE_CLASS( UBitmap );
+    IMPLEMENT_NATIVE_CLASS( UTexture );
   IMPLEMENT_NATIVE_CLASS( UCommandlet );
-  IMPLEMENT_NATIVE_CLASS( ULevelBase );
-    IMPLEMENT_NATIVE_CLASS( ULevel );
-  IMPLEMENT_NATIVE_CLASS( UTextBuffer );
   IMPLEMENT_NATIVE_CLASS( UField );
     IMPLEMENT_NATIVE_CLASS( UConst );
     IMPLEMENT_NATIVE_CLASS( UEnum );
@@ -154,18 +157,21 @@ IMPLEMENT_NATIVE_CLASS( UObject );
       IMPLEMENT_NATIVE_CLASS( UFunction );
       IMPLEMENT_NATIVE_CLASS( UState );
         IMPLEMENT_NATIVE_CLASS( UClass );
+  IMPLEMENT_NATIVE_CLASS( ULevelBase );
+    IMPLEMENT_NATIVE_CLASS( ULevel );
   IMPLEMENT_NATIVE_CLASS( UMusic );
-  IMPLEMENT_NATIVE_CLASS( USound );
+  IMPLEMENT_NATIVE_CLASS( UNetConnection );
   IMPLEMENT_NATIVE_CLASS( UPalette );
   IMPLEMENT_NATIVE_CLASS( UPackage );
+  IMPLEMENT_NATIVE_CLASS( UPlayer );
   IMPLEMENT_NATIVE_CLASS( UPrimitive );
+  IMPLEMENT_NATIVE_CLASS( USound );
   IMPLEMENT_NATIVE_CLASS( USkeletalMesh );
   IMPLEMENT_NATIVE_CLASS( USkeletalMeshInstance );
   IMPLEMENT_NATIVE_CLASS( USubsystem );
     IMPLEMENT_NATIVE_CLASS( USystem );
-  IMPLEMENT_NATIVE_CLASS( UBitmap );
-    IMPLEMENT_NATIVE_CLASS( UTexture );
-
+  IMPLEMENT_NATIVE_CLASS( UTextBuffer );
+  
 IMPLEMENT_NATIVE_CLASS( AActor );
   IMPLEMENT_NATIVE_CLASS( AInfo );
     IMPLEMENT_NATIVE_CLASS( AZoneInfo );
@@ -285,6 +291,18 @@ BEGIN_PROPERTY_LINK( USkeletalMeshInstance, 20 )
   LINK_NATIVE_PROPERTY( USkeletalMeshInstance, AttachedBoneName );
   LINK_NATIVE_PROPERTY( USkeletalMeshInstance, MyAttachment );
   LINK_NATIVE_PROPERTY( USkeletalMeshInstance, HardAttachFlags );
+END_PROPERTY_LINK()
+
+BEGIN_PROPERTY_LINK( UPlayer, 9 )
+  LINK_NATIVE_PROPERTY( UPlayer, vfOut );
+  LINK_NATIVE_PROPERTY( UPlayer, vfExec );
+  LINK_NATIVE_PROPERTY( UPlayer, Actor );
+  LINK_NATIVE_PROPERTY( UPlayer, Console );
+  LINK_NATIVE_PROPERTY( UPlayer, bWindowsMouseAvailable );
+  LINK_NATIVE_PROPERTY( UPlayer, bShowWindowsMouse );
+  LINK_NATIVE_PROPERTY( UPlayer, WindowsMouseX );
+  LINK_NATIVE_PROPERTY( UPlayer, WindowsMouseY );
+  LINK_NATIVE_PROPERTY( UPlayer, SelectedCursor );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( AInfo, 0 )
