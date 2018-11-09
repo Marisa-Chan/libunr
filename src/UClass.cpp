@@ -293,33 +293,52 @@ static void LoadScriptToken( UStruct* Struct, FPackageFileIn* In, u32* ParsedSiz
       case EX_LocalVariable:
       case EX_InstanceVariable:
       case EX_DefaultVariable:
-      case EX_MetaCast:
-      case EX_VirtualFunction:
-      case EX_FinalFunction:
-      case EX_ObjectConst:
-      case EX_NameConst:
-      case EX_NativeParm:
-      case EX_DynamicCast:
-      case EX_StructCmpEq:
-      case EX_StructCmpNe:
-      case EX_StructMember:
-      case EX_GlobalFunction:
         LoadScriptIndex( Struct, In, ParsedSize );
         return;
-      case EX_ByteConst:
-      case EX_IntConstByte:
+      case EX_Return:
+        LoadScriptToken( Struct, In, ParsedSize );
+        return;
       case EX_Switch:
         LoadScriptByte( Struct, In, ParsedSize );
+        LoadScriptToken( Struct, In, ParsedSize );
         return;
       case EX_Jump:
-      case EX_JumpIfNot:
-      case EX_Assert:
-      case EX_Case:
-      case EX_Skip:
         LoadScriptWord( Struct, In, ParsedSize );
+        return;
+      case EX_JumpIfNot:
+        LoadScriptWord( Struct, In, ParsedSize );
+        LoadScriptToken( Struct, In, ParsedSize );
+        return;
+      case EX_Stop:
+        return;
+      case EX_Assert:
+        LoadScriptWord( Struct, In, ParsedSize );
+        LoadScriptToken( Struct, In, ParsedSize );
+        return;
+      case EX_Case:
+        // There is supposed to be a conditional load token after, but
+        // it's much easier to let it fall through to the main LoadScriptCode loop
+        LoadScriptWord( Struct, In, ParsedSize );
+        return;
+      case EX_Nothing:
         return;
       case EX_LabelTable:
         LoadScriptLabelTable( Struct, In, ParsedSize );
+        return;
+      case EX_GotoLabel:
+      case EX_EatString:
+        LoadScriptToken( Struct, In, ParsedSize );
+        return;
+      case EX_Let:
+      case EX_DynArrayElement:
+        LoadScriptToken( Struct, In, ParsedSize );
+        LoadScriptToken( Struct, In, ParsedSize );
+        return;
+      case EX_New:
+        LoadScriptToken( Struct, In, ParsedSize );
+        LoadScriptToken( Struct, In, ParsedSize );
+        LoadScriptToken( Struct, In, ParsedSize );
+        LoadScriptToken( Struct, In, ParsedSize );
         return;
       case EX_ClassContext:
         LoadScriptIndex( Struct, In, ParsedSize );
@@ -327,11 +346,33 @@ static void LoadScriptToken( UStruct* Struct, FPackageFileIn* In, u32* ParsedSiz
         LoadScriptByte( Struct, In, ParsedSize );
         LoadScriptIndex( Struct, In, ParsedSize );
         return;
+      case EX_MetaCast:
+        LoadScriptIndex( Struct, In, ParsedSize );
+        LoadScriptToken( Struct, In, ParsedSize );
+        return;
+      case EX_LetBool:
+        LoadScriptToken( Struct, In, ParsedSize );
+        LoadScriptToken( Struct, In, ParsedSize );
+        return;
+      case EX_EndFunctionParms:
+      case EX_Self:
+        return;
+      case EX_Skip:
+        LoadScriptWord( Struct, In, ParsedSize );
+        return;
       case EX_Context:
         LoadScriptToken( Struct, In, ParsedSize );
         LoadScriptWord( Struct, In, ParsedSize );
         LoadScriptByte( Struct, In, ParsedSize );
         LoadScriptToken( Struct, In, ParsedSize );
+        return;
+      case EX_ArrayElement:
+        LoadScriptToken( Struct, In, ParsedSize );
+        LoadScriptToken( Struct, In, ParsedSize );
+        return;
+      case EX_VirtualFunction:
+      case EX_FinalFunction:
+        LoadScriptIndex( Struct, In, ParsedSize );
         return;
       case EX_IntConst:
         LoadScriptDword( Struct, In, ParsedSize );
@@ -341,6 +382,10 @@ static void LoadScriptToken( UStruct* Struct, FPackageFileIn* In, u32* ParsedSiz
         return;
       case EX_StringConst:
         LoadScriptString( Struct, In, ParsedSize );
+        return;
+      case EX_ObjectConst:
+      case EX_NameConst:
+        LoadScriptIndex( Struct, In, ParsedSize );
         return;
       case EX_RotationConst:
         LoadScriptDword( Struct, In, ParsedSize );
@@ -352,12 +397,84 @@ static void LoadScriptToken( UStruct* Struct, FPackageFileIn* In, u32* ParsedSiz
         LoadScriptFloat( Struct, In, ParsedSize );
         LoadScriptFloat( Struct, In, ParsedSize );
         return;
+      case EX_ByteConst:
+        LoadScriptByte( Struct, In, ParsedSize );
+        return;
+      case EX_IntZero:
+      case EX_IntOne:
+      case EX_True:
+      case EX_False:
+        return;
+      case EX_NativeParm:
+        LoadScriptIndex( Struct, In, ParsedSize );
+        return;
+      case EX_NoObject:
+        return;
+      case EX_IntConstByte:
+      case EX_BoolVariable:
+        LoadScriptToken( Struct, In, ParsedSize );
+        return;
+      case EX_DynamicCast:
+        LoadScriptIndex( Struct, In, ParsedSize );
+        LoadScriptToken( Struct, In, ParsedSize );
+        return;
       case EX_Iterator:
         LoadScriptToken( Struct, In, ParsedSize );
         LoadScriptWord( Struct, In, ParsedSize );
         return;
+      case EX_IteratorPop:
+      case EX_IteratorNext:
+        return;
+      case EX_StructCmpEq:
+      case EX_StructCmpNe:
+        LoadScriptIndex( Struct, In, ParsedSize );
+        LoadScriptToken( Struct, In, ParsedSize );
+        LoadScriptToken( Struct, In, ParsedSize );
+        return;
       case EX_UnicodeStringConst:
         LoadScriptUnicodeString( Struct, In, ParsedSize );
+        return;
+      case EX_StructMember:
+        LoadScriptIndex( Struct, In, ParsedSize );
+        LoadScriptToken( Struct, In, ParsedSize );
+        return;
+      case EX_GlobalFunction:
+        LoadScriptIndex( Struct, In, ParsedSize );
+        return;
+      case EX_RotatorToVector:
+      case EX_ByteToInt:
+      case EX_ByteToBool:
+      case EX_ByteToFloat:
+      case EX_IntToByte:
+      case EX_IntToBool:
+      case EX_IntToFloat:
+      case EX_BoolToByte:
+      case EX_BoolToInt:
+      case EX_BoolToFloat:
+      case EX_FloatToByte:
+      case EX_FloatToInt:
+      case EX_FloatToBool:
+      case EX_StringToName:
+      case EX_ObjectToBool:
+      case EX_NameToBool:
+      case EX_StringToByte:
+      case EX_StringToInt:
+      case EX_StringToBool:
+      case EX_StringToFloat:
+      case EX_StringToVector:
+      case EX_StringToRotator:
+      case EX_VectorToBool:
+      case EX_VectorToRotator:
+      case EX_RotatorToBool:
+      case EX_ByteToString:
+      case EX_IntToString:
+      case EX_BoolToString:
+      case EX_FloatToString:
+      case EX_ObjectToString:
+      case EX_NameToString:
+      case EX_VectorToString:
+      case EX_RotatorToString:
+        LoadScriptToken( Struct, In, ParsedSize );
         return;
       case EX_Unk03:
       case EX_Unk15:
@@ -392,7 +509,7 @@ static inline void LoadScriptCode( UStruct* Struct, FPackageFileIn* In )
   while ( ParsedSize < Struct->ScriptSize )
   {
     LoadScriptToken( Struct, In, &ParsedSize );
-  }    
+  }
 }
 
 void UStruct::LoadFromPackage( FPackageFileIn* In )
@@ -500,7 +617,7 @@ UState::~UState()
 void UState::LoadFromPackage( FPackageFileIn* In )
 {
   Super::LoadFromPackage( In );
-  
+
   *In >> ProbeMask;
   *In >> IgnoreMask;
   *In >> LabelTableOffset;
