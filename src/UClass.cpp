@@ -143,6 +143,8 @@ void UEnum::LoadFromPackage( FPackageFileIn* In )
   }
 }
 
+static u8 LoadScriptToken( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize );
+
 UStruct::UStruct()
   : UField()
 {
@@ -272,175 +274,195 @@ static inline void LoadScriptLabelTable( UStruct* Struct, FPackageFileIn* In, u3
   }
 }
 
-static void LoadScriptToken( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize )
+static void LoadScriptFunctionParms( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize )
+{
+  u8 Token;
+
+  do
+  {
+    Token = LoadScriptToken( Struct, In, ParsedSize );
+  } while( Token != EX_EndFunctionParms );
+}
+
+static u8 LoadScriptToken( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize )
 {
   u8 Token = -1;
-  while ( 1 )
+  volatile u32 Pos = In->Tell();
+
+  *In >> Token;
+  *ParsedSize += 1;
+  LOAD_CODE( Struct, Token, u8 );
+
+  if ( (Token & 0xF0) == EX_ExtendedNative )
   {
-    *In >> Token;
+    LoadScriptByte( Struct, In, ParsedSize );
     *ParsedSize += 1;
-    LOAD_CODE( Struct, Token, u8 );
 
-    if ( UNLIKELY( (Token & 0xF0) == EX_ExtendedNative ) )
-    {
-      LoadScriptByte( Struct, In, ParsedSize );
-      *ParsedSize += 1;
-      return;
-    }
+    LoadScriptFunctionParms( Struct, In, ParsedSize );
+  }
 
+  else if ( Token >= EX_FirstNative )
+    LoadScriptFunctionParms( Struct, In, ParsedSize );
+
+  else
+  {
     switch ( Token )
     {
       case EX_LocalVariable:
       case EX_InstanceVariable:
       case EX_DefaultVariable:
         LoadScriptIndex( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_Return:
         LoadScriptToken( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_Switch:
         LoadScriptByte( Struct, In, ParsedSize );
         LoadScriptToken( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_Jump:
         LoadScriptWord( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_JumpIfNot:
         LoadScriptWord( Struct, In, ParsedSize );
         LoadScriptToken( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_Stop:
-        return;
+        break;
       case EX_Assert:
         LoadScriptWord( Struct, In, ParsedSize );
         LoadScriptToken( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_Case:
         // There is supposed to be a conditional load token after, but
         // it's much easier to let it fall through to the main LoadScriptCode loop
         LoadScriptWord( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_Nothing:
-        return;
+        break;
       case EX_LabelTable:
         LoadScriptLabelTable( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_GotoLabel:
       case EX_EatString:
         LoadScriptToken( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_Let:
       case EX_DynArrayElement:
         LoadScriptToken( Struct, In, ParsedSize );
         LoadScriptToken( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_New:
         LoadScriptToken( Struct, In, ParsedSize );
         LoadScriptToken( Struct, In, ParsedSize );
         LoadScriptToken( Struct, In, ParsedSize );
         LoadScriptToken( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_ClassContext:
         LoadScriptIndex( Struct, In, ParsedSize );
         LoadScriptWord( Struct, In, ParsedSize );
         LoadScriptByte( Struct, In, ParsedSize );
         LoadScriptIndex( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_MetaCast:
         LoadScriptIndex( Struct, In, ParsedSize );
         LoadScriptToken( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_LetBool:
         LoadScriptToken( Struct, In, ParsedSize );
         LoadScriptToken( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_EndFunctionParms:
       case EX_Self:
-        return;
+        break;
       case EX_Skip:
         LoadScriptWord( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_Context:
         LoadScriptToken( Struct, In, ParsedSize );
         LoadScriptWord( Struct, In, ParsedSize );
         LoadScriptByte( Struct, In, ParsedSize );
         LoadScriptToken( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_ArrayElement:
         LoadScriptToken( Struct, In, ParsedSize );
         LoadScriptToken( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_VirtualFunction:
       case EX_FinalFunction:
         LoadScriptIndex( Struct, In, ParsedSize );
-        return;
+        LoadScriptFunctionParms( Struct, In, ParsedSize );
+        break;
       case EX_IntConst:
         LoadScriptDword( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_FloatConst:
         LoadScriptFloat( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_StringConst:
         LoadScriptString( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_ObjectConst:
       case EX_NameConst:
         LoadScriptIndex( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_RotationConst:
         LoadScriptDword( Struct, In, ParsedSize );
         LoadScriptDword( Struct, In, ParsedSize );
         LoadScriptDword( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_VectorConst:
         LoadScriptFloat( Struct, In, ParsedSize );
         LoadScriptFloat( Struct, In, ParsedSize );
         LoadScriptFloat( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_ByteConst:
         LoadScriptByte( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_IntZero:
       case EX_IntOne:
       case EX_True:
       case EX_False:
-        return;
+        break;
       case EX_NativeParm:
         LoadScriptIndex( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_NoObject:
-        return;
+        break;
       case EX_IntConstByte:
+        LoadScriptByte( Struct, In, ParsedSize );
+        break;
       case EX_BoolVariable:
         LoadScriptToken( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_DynamicCast:
         LoadScriptIndex( Struct, In, ParsedSize );
         LoadScriptToken( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_Iterator:
         LoadScriptToken( Struct, In, ParsedSize );
         LoadScriptWord( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_IteratorPop:
       case EX_IteratorNext:
-        return;
+        break;
       case EX_StructCmpEq:
       case EX_StructCmpNe:
         LoadScriptIndex( Struct, In, ParsedSize );
         LoadScriptToken( Struct, In, ParsedSize );
         LoadScriptToken( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_UnicodeStringConst:
         LoadScriptUnicodeString( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_StructMember:
         LoadScriptIndex( Struct, In, ParsedSize );
         LoadScriptToken( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_GlobalFunction:
         LoadScriptIndex( Struct, In, ParsedSize );
-        return;
+        LoadScriptFunctionParms( Struct, In, ParsedSize );
+        break;
       case EX_RotatorToVector:
       case EX_ByteToInt:
       case EX_ByteToBool:
@@ -475,7 +497,7 @@ static void LoadScriptToken( UStruct* Struct, FPackageFileIn* In, u32* ParsedSiz
       case EX_VectorToString:
       case EX_RotatorToString:
         LoadScriptToken( Struct, In, ParsedSize );
-        return;
+        break;
       case EX_Unk03:
       case EX_Unk15:
       case EX_Unk2b:
@@ -489,13 +511,15 @@ static void LoadScriptToken( UStruct* Struct, FPackageFileIn* In, u32* ParsedSiz
       case EX_Unk5f:
         Logf( LOG_WARN, "Loading unknown UnrealScript opcode 0x%x, loading may not finish properly", Token );
         Logf( LOG_WARN, "Unknown opcode located at offset 0x%x", In->Tell() );
-        return;
+        break;
       // Everything else loads another token or nothing at all,
       // so we don't need explicit cases for them
       default:
-        return;
+        break;
     }
   }
+  // This will go mostly unused, but we need this for LoadScriptFunctionParms()
+  return Token;
 }
 
 // Helper function to load script code
