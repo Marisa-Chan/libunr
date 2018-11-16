@@ -82,12 +82,13 @@ void UField::LoadFromPackage( FPackageFileIn* In )
   
   *In >> CINDEX( SuperIdx );
   *In >> CINDEX( NextIdx );
-  
+
+  // Never lazily load superfields
   if ( SuperIdx )
-    UPackage::StaticLoadObject( Pkg, SuperIdx, NULL, Outer, (UObject**)&SuperField );
+    SuperField = (UField*)UPackage::StaticLoadObject( Pkg, SuperIdx, NULL, Outer, false );
   
   if ( NextIdx )
-    UPackage::StaticLoadObject( Pkg, NextIdx, NULL, Outer, (UObject**)&Next );
+    Next = (UField*)UPackage::StaticLoadObject( Pkg, NextIdx, NULL, Outer, In->bLazyLoad );
 }
 
 UConst::UConst()
@@ -541,7 +542,7 @@ void UStruct::LoadFromPackage( FPackageFileIn* In )
   Super::LoadFromPackage( In );
   
   idx ScriptTextIdx = MAX_UINT32;
-  idx ChildIdx = MAX_UINT32;
+  ChildIdx = MAX_UINT32;
   idx FriendlyNameIdx = MAX_UINT32;
   
   *In >> CINDEX( ScriptTextIdx );
@@ -549,8 +550,10 @@ void UStruct::LoadFromPackage( FPackageFileIn* In )
   *In >> CINDEX( FriendlyNameIdx );
   
   ScriptText = (UTextBuffer*)UPackage::StaticLoadObject( Pkg, ScriptTextIdx, 
-    UTextBuffer::StaticClass(), this );
-  Children = (UField*)UPackage::StaticLoadObject( Pkg, ChildIdx, NULL, this, (UObject**)&Children );
+    UTextBuffer::StaticClass(), this, false );
+
+  Children = (UField*)UPackage::StaticLoadObject( Pkg, ChildIdx, NULL, this );
+
   FriendlyName = Pkg->ResolveNameFromIdx( FriendlyNameIdx );
   *In >> Line;
   *In >> TextPos;
@@ -724,10 +727,10 @@ void UClass::LoadFromPackage( FPackageFileIn* In )
   {
     idx DepObjRef;
     *In >> CINDEX( DepObjRef );
-    
+    /*
     if ( stricmp( Pkg->ResolveNameFromObjRef( DepObjRef ), FriendlyName ) )
       Dep.Class = (UClass*)UPackage::StaticLoadObject( Pkg, DepObjRef, UClass::StaticClass() );
-    
+    */
     *In >> Dep.Deep;
     *In >> Dep.ScriptTextCRC;
     
@@ -772,6 +775,12 @@ void UClass::LoadFromPackage( FPackageFileIn* In )
   {
     SuperClass->AddRef();
   
+    // If SuperClass does not have its SuperClass set, then set its
+    // properties that depend on it
+    if ( LIKELY( SuperClass != UObject::StaticClass() ) )
+      if ( SuperClass->SuperClass == NULL )
+        SuperClass->SetSuperClassProperties();
+
     // Get last child
     UField* Iter;
     if ( Children != NULL )
@@ -785,10 +794,6 @@ void UClass::LoadFromPackage( FPackageFileIn* In )
 
     SuperClass->Children->AddRef();
 
-    // If SuperClass does not have its SuperClass set, then set its
-    // properties that depend on it
-    if ( SuperClass->SuperClass == NULL )
-      SuperClass->SetSuperClassProperties();
   }
 
     // Construct default object

@@ -115,7 +115,12 @@ bool UObject::StaticInit()
 //  Result &= USkeletalMeshInstance::StaticClassInit();
 //  Result &= URenderIterator::StaticClassInit();
 
-  // Circular dependencies in Engine.u require that we initialize actor property lists first
+  // Circular dependencies in Engine.u require that we create classes first
+  Result &= AActor::StaticCreateClass();
+  Result &= AInfo::StaticCreateClass();
+  Result &= AZoneInfo::StaticCreateClass();
+  Result &= ADynamicZoneInfo::StaticCreateClass();
+
   Result &= AActor::StaticLinkNativeProperties();
   Result &= AInfo::StaticLinkNativeProperties();
   Result &= AZoneInfo::StaticLinkNativeProperties();

@@ -1,0 +1,29 @@
+This document describes the definition and rationale for "lazy loading"
+
+"Lazy loading" is the idea that certain aspects of an object can be ignored at
+load time if a load is considered lazy.
+
+Lazy loading is necesary when it comes to loading classes. When loading a
+class directly, it should not be loaded lazily. For example, if Core.Object is
+being loaded in UObject::StaticInit(), then it should be fully loaded.
+
+However, if a class has a child object (for example, a function) that has a
+child object which is a subclass of the class being loaded, then it should be
+loaded lazily. To elaborate:
+  - Engine.Actor has a function TriggerEvent()
+  - TriggerEvent() has parameters of type Action, Actor, and Pawn
+  - If Lazy Loading is not employed, then loading Actor will try to load Pawn
+    which will try to fully initialize before Actor is fully initialized
+  - If this happens, then any defaultproperties declared in Actor will appear
+    to be missing, because Actor has not finished loading yet.
+
+The following sequence of events would avoid this problem
+  - Load Actor Class
+  - Actor class loads all children lazily
+    - Meaning, if a child needs a class, then make sure it exists but don't
+      load it just yet
+  - Actor finishes loading defaultproperties
+  - Actor then goes through all children again, doing a full load.
+    - In turn, children of each child will do a full load
+    - Note that a full load of a class will do lazy loads of it's children
+      first, then fully load them, similarly to how Actor does it.

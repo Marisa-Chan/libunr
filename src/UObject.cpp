@@ -534,7 +534,6 @@ void UObject::ReadConfigProperties()
       }
       const char* Variable = Prop->Name;
 
-      
       for( int i = 0; i < Prop->ArrayDim; i++ )
       {
         if ( Prop->Class == UByteProperty::StaticClass() )
