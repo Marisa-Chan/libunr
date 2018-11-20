@@ -99,7 +99,7 @@ void UByteProperty::LoadFromPackage( FPackageFileIn* In )
   idx EnumType = 0;
   *In >> CINDEX( EnumType );
   if ( EnumType )
-    Enum = (UEnum*)UPackage::StaticLoadObject( Pkg, EnumType, UEnum::StaticClass() );
+    Enum = (UEnum*)UPackage::StaticLoadObject( Pkg, EnumType, false, UEnum::StaticClass(), Outer );
 
   ElementSize = 1;
 }
@@ -146,7 +146,8 @@ void UObjectProperty::LoadFromPackage( FPackageFileIn* In )
 
   idx ObjTypeIdx = 0;
   *In >> CINDEX( ObjTypeIdx );
-  ObjectType = (UClass*)UPackage::StaticLoadObject( Pkg, ObjTypeIdx, UClass::StaticClass(), Outer );
+  ObjectType = (UClass*)UPackage::StaticLoadObject( Pkg, ObjTypeIdx, 
+    true, UClass::StaticClass(), Outer );
 }
 
 void UClassProperty::LoadFromPackage( FPackageFileIn* In )
@@ -156,7 +157,8 @@ void UClassProperty::LoadFromPackage( FPackageFileIn* In )
 
   idx ClassIdx = 0;
   *In >> CINDEX( ClassIdx );
-  Class = (UClass*)UPackage::StaticLoadObject( Pkg, ClassIdx, UClass::StaticClass(), Outer );
+  Class = (UClass*)UPackage::StaticLoadObject( Pkg, ClassIdx, 
+    true, UClass::StaticClass(), Outer );
 }
 
 void UStructProperty::LoadFromPackage( FPackageFileIn* In )
@@ -165,7 +167,8 @@ void UStructProperty::LoadFromPackage( FPackageFileIn* In )
 
   idx StructIdx = 0;
   *In >> CINDEX( StructIdx );
-  Struct = (UStruct*)UPackage::StaticLoadObject( Pkg, StructIdx, UStruct::StaticClass(), Outer );
+  Struct = (UStruct*)UPackage::StaticLoadObject( Pkg, StructIdx, 
+    false, UStruct::StaticClass(), Outer );
 }
 
 void UArrayProperty::LoadFromPackage( FPackageFileIn* In )
@@ -174,7 +177,8 @@ void UArrayProperty::LoadFromPackage( FPackageFileIn* In )
 
   idx InnerIdx;
   *In >> CINDEX( InnerIdx );
-  Inner = (UProperty*)UPackage::StaticLoadObject( Pkg, InnerIdx, NULL, Outer );
+  Inner = (UProperty*)UPackage::StaticLoadObject( Pkg, InnerIdx, 
+    false, NULL, Outer );
 }
 
 void UFixedArrayProperty::LoadFromPackage( FPackageFileIn* In )

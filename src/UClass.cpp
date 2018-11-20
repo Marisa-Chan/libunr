@@ -85,10 +85,10 @@ void UField::LoadFromPackage( FPackageFileIn* In )
 
   // Never lazily load superfields
   if ( SuperIdx )
-    SuperField = (UField*)UPackage::StaticLoadObject( Pkg, SuperIdx, NULL, Outer, false );
+    SuperField = (UField*)UPackage::StaticLoadObject( Pkg, SuperIdx, false, NULL, Outer );
   
   if ( NextIdx )
-    Next = (UField*)UPackage::StaticLoadObject( Pkg, NextIdx, NULL, Outer, In->bLazyLoad );
+    Next = (UField*)UPackage::StaticLoadObject( Pkg, NextIdx, In->bLazyLoad, NULL, Outer );
 }
 
 UConst::UConst()
@@ -549,10 +549,10 @@ void UStruct::LoadFromPackage( FPackageFileIn* In )
   *In >> CINDEX( ChildIdx );
   *In >> CINDEX( FriendlyNameIdx );
   
-  ScriptText = (UTextBuffer*)UPackage::StaticLoadObject( Pkg, ScriptTextIdx, 
-    UTextBuffer::StaticClass(), this, false );
+  ScriptText = (UTextBuffer*)UPackage::StaticLoadObject( Pkg, ScriptTextIdx, false,
+    UTextBuffer::StaticClass(), this );
 
-  Children = (UField*)UPackage::StaticLoadObject( Pkg, ChildIdx, NULL, this );
+  Children = (UField*)UPackage::StaticLoadObject( Pkg, ChildIdx, true, NULL, this );
 
   FriendlyName = Pkg->ResolveNameFromIdx( FriendlyNameIdx );
   *In >> Line;
@@ -757,8 +757,8 @@ void UClass::LoadFromPackage( FPackageFileIn* In )
     *In >> CINDEX( ClassWithinIdx );
     *In >> CINDEX( ClassConfigNameIdx );
     
-    ClassWithin = (UClass*)UPackage::StaticLoadObject( Pkg, ClassWithinIdx, 
-      UClass::StaticClass() );
+    ClassWithin = (UClass*)UPackage::StaticLoadObject( Pkg, ClassWithinIdx, true,
+      UClass::StaticClass(), NULL );
     ClassConfigName = Pkg->ResolveNameFromIdx( ClassConfigNameIdx );
 
     FHash CfgHash = FnvHashString( ClassConfigName );
@@ -793,10 +793,9 @@ void UClass::LoadFromPackage( FPackageFileIn* In )
       Children = SuperClass->Children;
 
     SuperClass->Children->AddRef();
-
   }
 
-    // Construct default object
+  // Construct default object
   if ( Constructor == NULL )
     Constructor = SuperClass->Constructor;
 
@@ -818,6 +817,17 @@ void UClass::LoadFromPackage( FPackageFileIn* In )
     Default->ReadConfigProperties();
 
   Default->ReadDefaultProperties( In );
+
+  // Go back and load class dependencies
+  UField* Iter;
+  if ( Children != NULL )
+  {
+    for ( Iter = Children; Iter->Next != NULL; Iter = Iter->Next )
+    {
+      if ( Iter->IsA( UClass::StaticClass() ) )
+        Iter->Pkg->LoadObject( (UObject**)&Iter, Iter->Name, Iter->ExpIdx, false );
+    }
+  }
 }
 
 bool UClass::IsNative()

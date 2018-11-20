@@ -160,7 +160,8 @@ FPackageFileIn& operator>>( FPackageFileIn& In, FExport& Export )
     Export.SerialOffset = -1;
   
   Export.Obj = NULL;
-  
+  Export.bNeedsFullLoad = true;
+
   return In;
 }
 
@@ -309,38 +310,41 @@ bool UPackage::Load( const char* File )
   if ( Stream->Open( Path ) != 0 )
     return false;
   
+  FPackageFileIn* PackageFile = (FPackageFileIn*)Stream;
+  PackageFile->bLazyLoad = false;
+
   // read in the header
-  *((FPackageFileIn*)Stream) >> Header;
+  *PackageFile >> Header;
 
   if ( Header.Signature != UE1_PKG_SIG )
   {
     Logf( LOG_WARN, "File '%s' has a bad package signature", File );
-    Stream->Close();
+    PackageFile->Close();
     return false;
   }
 
   // read in the name table
   Names->Resize( Header.NameCount );
-  Stream->Seek( Header.NameOffset, ESeekBase::Begin );
+  PackageFile->Seek( Header.NameOffset, ESeekBase::Begin );
   for ( int i = 0; i < Header.NameCount; i++ )
-    *((FPackageFileIn*)Stream) >> (*Names)[i];
+    *PackageFile >> (*Names)[i];
   
   // read in imports
   Imports->Resize( Header.ImportCount );
-  Stream->Seek( Header.ImportOffset, ESeekBase::Begin );
+  PackageFile->Seek( Header.ImportOffset, ESeekBase::Begin );
   for ( int i = 0; i < Header.ImportCount; i++ )
-    *((FPackageFileIn*)Stream) >> (*Imports)[i];
+    *PackageFile >> (*Imports)[i];
   
   // read in exports
   Exports->Resize( Header.ExportCount );
-  Stream->Seek( Header.ExportOffset, ESeekBase::Begin );
+  PackageFile->Seek( Header.ExportOffset, ESeekBase::Begin );
   for ( int i = 0; i < Header.ExportCount; i++ )
   {
-    *((FPackageFileIn*)Stream) >> (*Exports)[i];
+    *PackageFile >> (*Exports)[i];
     (*Exports)[i].Index = i;
   }
 
-  Stream->Seek( 0, ESeekBase::Begin );
+  PackageFile->Seek( 0, ESeekBase::Begin );
 
   return true;
 }
@@ -448,7 +452,7 @@ const char* UPackage::ResolveNameFromObjRef( int ObjRef )
     return GetNameEntry( GetExport( CalcObjRefValue( ObjRef ) )->ObjectName )->Data;
 }
 
-bool UPackage::LoadObject( UObject** Obj, const char* ObjName, idx ObjRef )
+bool UPackage::LoadObject( UObject** Obj, const char* ObjName, idx ObjRef, bool bLazyLoad )
 {
   if ( Obj == NULL || *Obj == NULL )
     return false;
@@ -475,13 +479,14 @@ bool UPackage::LoadObject( UObject** Obj, const char* ObjName, idx ObjRef )
   }
 
   // Otherwise, prepare the package to load an object
-  ((FPackageFileIn*)Stream)->Ver = Header.PackageVersion;
+  FPackageFileIn* PackageFile = (FPackageFileIn*)Stream;
+  PackageFile->Ver = Header.PackageVersion;
 
   // Save current position
-  size_t OldPos = Stream->Tell();
-  Stream->Seek( Export->SerialOffset, Begin );
-
-  FPackageFileIn* PackageFile = (FPackageFileIn*)Stream;
+  size_t OldPos = PackageFile->Tell();
+  bool   OldLazyLoad = PackageFile->bLazyLoad;
+  PackageFile->Seek( Export->SerialOffset, Begin );
+  PackageFile->bLazyLoad = bLazyLoad;
 
   // Set export object properties
   (*Obj)->ExpIdx = Export->Index;
@@ -490,11 +495,16 @@ bool UPackage::LoadObject( UObject** Obj, const char* ObjName, idx ObjRef )
   (*Obj)->Pkg = this;
 
   // Load
+  Export->bNeedsFullLoad = false;
   (*Obj)->LoadFromPackage( PackageFile );
+  
   Export->Obj = *Obj;
   
   // Restore stream position
-  Stream->Seek( OldPos, Begin );
+  PackageFile->Seek( OldPos, Begin );
+
+  // Restore old lazy load condition
+  PackageFile->bLazyLoad = OldLazyLoad;
 
   return true;
 }
@@ -573,8 +583,8 @@ UPackage* UPackage::StaticLoadPkg( const char* PkgName )
   return Pkg;
 }
 
-UObject* UPackage::StaticLoadObject( UPackage* Package, const char* ObjName, UClass* ObjClass, 
-  UObject* InOuter, UObject** Out )
+UObject* UPackage::StaticLoadObject( UPackage* Package, const char* ObjName, bool bLazyLoad,
+  UClass* ObjClass, UObject* InOuter )
 {
   FExport* Export = Package->GetExport( ObjName );
   if ( UNLIKELY( Export == NULL ) )
@@ -588,11 +598,11 @@ UObject* UPackage::StaticLoadObject( UPackage* Package, const char* ObjName, UCl
   if ( Export->Obj != NULL )
     return Export->Obj;
 
-  return UPackage::StaticLoadObject( Package, Export->Index + 1, ObjClass, InOuter, Out );
+  return UPackage::StaticLoadObject( Package, Export->Index + 1, bLazyLoad, ObjClass, InOuter );
 }
 
-UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjClass, 
-  UObject* InOuter, UObject** Out )
+UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, bool bLazyLoad,
+  UClass* ObjClass, UObject* InOuter )
 {
   if ( ObjRef == 0 )
     return NULL;
@@ -605,6 +615,7 @@ UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjC
   const char* ObjName = Package->ResolveNameFromObjRef( ObjRef );
   UPackage* ObjPkg = Package;
   FExport* Export = NULL;
+  bool bNeedsFullLoad = true;
 
   // Is our object in this package?
   if ( ObjRef < 0 )
@@ -689,31 +700,29 @@ UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjC
 
     // Then grab it's export
     Export = ObjPkg->GetExport( ObjName );
-
-    // Return if it's already loaded
-    if ( Export->Obj != NULL )
-      return Export->Obj;
-
+    
     if ( UNLIKELY( Export == NULL ) )
     {
       Logf( LOG_CRIT, "Can't load object '%s.%s', object does not exist", 
         ObjPkgName, ObjName );
       return NULL;
     }
+
+    bNeedsFullLoad = ObjPkg->NeedsFullLoad( Export, bLazyLoad );
+
+    // Return if it's already loaded
+    if ( Export->Obj != NULL && !bNeedsFullLoad )
+      return Export->Obj;
   }
   else
   {
     // Yup, just grab the export
     Export = &(*Package->Exports)[ CalcObjRefValue( ObjRef ) ];
- 
-    // If it's already loaded, return it
-    if ( Export->Obj != NULL )
-    {
-      if ( Out != NULL )
-        *Out = Export->Obj;
+    bNeedsFullLoad = ObjPkg->NeedsFullLoad( Export, bLazyLoad );
 
+    // If it's already loaded, return it
+    if ( Export->Obj != NULL && !bNeedsFullLoad )
       return Export->Obj;
-    }
 
     if ( ObjClass == NULL )
     {
@@ -759,22 +768,14 @@ UObject* UPackage::StaticLoadObject( UPackage* Package, idx ObjRef, UClass* ObjC
   if ( Obj == NULL )
     return NULL;
 
-  if ( Out != NULL )
-    *Out = Obj;
-
   // In case of circular dependencies
   if ( Export != NULL )
     Export->Obj = Obj;
 
   // Load
-  if ( !ObjPkg->LoadObject( &Obj, ObjName, ObjRef ) )
-  {
-    if ( Out != NULL )
-      *Out = NULL;
-
-    return NULL;
-  }
-
+  if ( bNeedsFullLoad )
+    if ( !ObjPkg->LoadObject( &Obj, ObjName, ObjRef, bLazyLoad ) )
+      return NULL;
 
   return Obj;
 }
@@ -798,10 +799,18 @@ bool UPackage::StaticLoadPartialClass( const char* PkgName, UClass* NativeClass 
   Export->Obj = Obj;
   Obj->ExpIdx = Export->Index;
 
-  // We already have a constructed class object, so just load it from the package
-   
-  if ( !Package->LoadObject( &Obj, NativeClass->Name, -1 ) )
+  // We already have a constructed class object, so just load it from the package   
+  if ( !Package->LoadObject( &Obj, NativeClass->Name, -1, false ) )
     return false;
 
   return true;
 }
+
+bool UPackage::NeedsFullLoad( FExport* Export, bool bLazyLoad )
+{
+  if ( strnicmp( ResolveNameFromObjRef( Export->Class ), "None", 4 ) == 0 )
+    return !bLazyLoad && Export->bNeedsFullLoad;
+  else
+    return Export->bNeedsFullLoad;
+}
+

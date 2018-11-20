@@ -361,7 +361,7 @@ void UObject::ReadDefaultProperties( FPackageFileIn* In )
         if ( !ObjProp )
           Logf( LOG_CRIT, "Default property expected 'ObjectProperty', but got '%s'", Prop->Class->Name );
         else
-          SetObjProperty( ObjProp, UPackage::StaticLoadObject( Pkg, ObjRef ), ArrayIdx );
+          SetObjProperty( ObjProp, UPackage::StaticLoadObject( Pkg, ObjRef, true ), ArrayIdx );
       }
     }
     else if ( PropType == PROP_Name )

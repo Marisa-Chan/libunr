@@ -45,6 +45,7 @@ class DLL_EXPORT FPackageFileIn : public FileStreamIn
 public:
   int Ver;
   UPackage* Pkg;
+  bool bLazyLoad;
 };
 
 /*-----------------------------------------------------------------------------
@@ -89,6 +90,7 @@ struct DLL_EXPORT FExport
   
   UObject* Obj;
   int Index;
+  bool bNeedsFullLoad;
 
   void Read( FPackageFileIn& Pkg );
 };
@@ -191,8 +193,9 @@ class DLL_EXPORT UPackage : public UObject
   const char* ResolveNameFromObjRef( int ObjRef );
   
   // Object reading
-  bool LoadObject( UObject** Obj, const char* ObjName, idx ObjRef );
-  
+  bool LoadObject( UObject** Obj, const char* ObjName, idx ObjRef, bool bLazyLoad );
+  bool NeedsFullLoad( FExport* Export, bool bLazyLoad );
+
   // Accessors 
   String GetPackageName();
   
@@ -200,12 +203,12 @@ class DLL_EXPORT UPackage : public UObject
   static void StaticExit( bool bCrashExit = false );
   static int CalcObjRefValue( int ObjRef );
   static UPackage* StaticLoadPkg( const char* Filepath );
-  static UObject* StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass = NULL, 
-      UObject* InOuter = NULL, UObject** Out = NULL );
-  static UObject* StaticLoadObject( UPackage* Pkg, const char* ObjName, UClass* ObjClass = NULL,
-      UObject* InOuter = NULL, UObject** Out = NULL );
+  static UObject* StaticLoadObject( UPackage* Pkg, idx ObjRef, bool bLazyLoad, 
+      UClass* ObjClass = NULL, UObject* InOuter = NULL );
+  static UObject* StaticLoadObject( UPackage* Pkg, const char* ObjName, bool bLazyLoad,
+      UClass* ObjClass = NULL, UObject* InOuter = NULL );
   static bool StaticLoadPartialClass( const char* PkgName, UClass* NativeClass );
-  
+      
 protected:    
   String Path;
   FileStream* Stream;
@@ -213,8 +216,6 @@ protected:
   Array<FNameEntry>* Names;
   Array<FExport>*    Exports;
   Array<FImport>*    Imports;
-  Stack<u32>*        LinkStack;
-  u32 LinkLevel;
 
   // Global package variables
   static EPkgLoadOpts LoadOpts;
