@@ -40,18 +40,18 @@ USound::~USound()
     delete SoundData;
 }
 
-void USound::LoadFromPackage( FPackageFileIn* In )
+void USound::Load()
 {
-  ReadDefaultProperties( In );
+  ReadDefaultProperties();
 
-  *In >> CINDEX( SoundFormat );
-  if (In->Ver >= PKG_VER_UN_220)
-    *In >> OffsetNext;
+  *PkgFile >> CINDEX( SoundFormat );
+  if ( PkgFile->Ver >= PKG_VER_UN_220 )
+    *PkgFile >> OffsetNext;
   
-  *In >> CINDEX( SoundSize );
+  *PkgFile >> CINDEX( SoundSize );
   
   SoundData = new u8[SoundSize];
-  In->Read( SoundData, SoundSize );
+  PkgFile->Read( SoundData, SoundSize );
 }
 
 // TODO: Support exporting to a number of different formats

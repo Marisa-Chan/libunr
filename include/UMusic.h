@@ -42,7 +42,7 @@ class DLL_EXPORT UMusic : public UObject
   EXPORTABLE() 
   UMusic();
 
-  virtual void LoadFromPackage( FPackageFileIn* In );
+  virtual void Load();
   
   u16 ChunkCount; //?
   u32 _unknown0; // PackageVerison > 61

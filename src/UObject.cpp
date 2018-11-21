@@ -61,32 +61,31 @@ Array<UClass*>*  UObject::ClassPool = NULL;
 Array<FNativePropertyList*>* UObject::NativePropertyLists = NULL;
 Array<UFunction*>* UObject::NativeFunctions = NULL;
 
-UObject* UObject::StaticConstructObject( const char* InName, UClass* InClass, UObject* InOuter )
+UObject* UObject::StaticConstructObject( const char* InName, UClass* InClass, UObject* InOuter, 
+  UPackage* InPkg, FExport* InExport )
 {
   // Construct object with the class constructor
   UObject* Out = InClass->CreateObject();
 
   // Set up object properties
+  Out->Pkg = InPkg;
+  Out->Export = InExport;
+  Out->NameIdx = InExport->ObjectName;
   Out->Hash = FnvHashString( InName );
   Out->Name = InName;
   Out->Index = ObjectPool->Size();
   Out->RefCnt = 1;
   Out->Outer = InOuter;
-  Out->Flags = 0;
+  Out->Flags = InExport->ObjectFlags;
   Out->Class = InClass;
   Out->Field = InClass->Default == NULL ? NULL : InClass->Default->Field;
-
+ 
   // Add to object
   ObjectPool->PushBack( Out );
 
   // Script init (TODO)
   
   return Out;
-}
-
-UClass* UObject::GetUClassClass()
-{
-  return UClass::StaticClass();
 }
 
 UClass* UObject::StaticAllocateClass( const char* ClassName, u32 Flags, UClass* SuperClass, 
@@ -106,7 +105,7 @@ FPackageFileOut& operator<<( FPackageFileOut& Ar, UObject& Obj )
 UObject::UObject()
 {
   Index = -1;
-  ExpIdx = -1;
+  Export = NULL;
   NameIdx = -1;
   NextObj = NULL;
   Flags = 0;
@@ -126,7 +125,15 @@ bool UObject::ExportToFile( const char* Dir, const char* Type )
   return false;
 }
 
-void UObject::LoadFromPackage( FPackageFileIn* In )
+void UObject::PreLoad()
+{
+  PkgFile = Pkg->GetStream();
+  OldPkgFileOffset = PkgFile->Tell();
+  PkgFile->Seek( Export->SerialOffset, Begin );
+  Export->bNeedsFullLoad = false;
+}
+
+void UObject::Load()
 {
   if ( Flags & RF_HasStack )
   {
@@ -136,10 +143,15 @@ void UObject::LoadFromPackage( FPackageFileIn* In )
   if ( Class != UClass::StaticClass() )
   {
     // Load properties
-    ReadDefaultProperties( In );
+    ReadDefaultProperties();
   }
-  
-  return;
+}
+
+void UObject::PostLoad()
+{
+  PkgFile->Seek( OldPkgFileOffset, Begin );
+  OldPkgFileOffset = 0;
+  PkgFile = NULL;
 }
 
 void UObject::AddRef()
@@ -160,19 +172,11 @@ void UObject::DelRef()
     Logf( LOG_INFO, "Reference count is zero for '%s'", Name );
 }
 
-void UObject::SetPkgProperties( UPackage* InPkg, int InExpIdx, int InNameIdx )
-{
-  Pkg = InPkg;
-  ExpIdx = InExpIdx;
-  NameIdx = InNameIdx;
-  Name = Pkg->ResolveNameFromIdx( NameIdx );
-}
-
 bool UObject::IsA( UClass* ClassType )
 {
   for ( UClass* Cls = Class; Cls != NULL; Cls = Cls->SuperClass )
   {
-    if ( UNLIKELY( Cls->StaticClass() != UClass::StaticClass() ) )
+    if ( UNLIKELY( Cls->Class != UClass::StaticClass() ) )
     {
       Logf( LOG_CRIT, "CLASS SUPERFIELD IS NOT A UCLASS INSTANCE!!!" );
       // Add some exit thing here
@@ -184,17 +188,28 @@ bool UObject::IsA( UClass* ClassType )
   return false;
 }
 
-static int ReadArrayIndex( FPackageFileIn* In )
+bool UObject::ParentsIsA( UClass* ClassType )
+{
+  for ( UObject* Parent = Outer; Parent != NULL; Parent = Parent->Outer )
+  {
+    if ( Parent->IsA( ClassType ) )
+      return true;
+  }
+
+  return false;
+}
+
+static int ReadArrayIndex( FPackageFileIn* PkgFile )
 {
   u8 ArrayIdx[4] = { 0, 0 ,0 ,0 };
-  *In >> ArrayIdx[0];
+  *PkgFile >> ArrayIdx[0];
   if ( ArrayIdx[0] >= 128 )
   {
-    *In >> ArrayIdx[1];
+    *PkgFile >> ArrayIdx[1];
     if ( (ArrayIdx[1] & 0x80) != 0 && *((u16*)&ArrayIdx[0]) >= 16384 )
     {
-      *In >> ArrayIdx[2];
-      *In >> ArrayIdx[3];
+      *PkgFile >> ArrayIdx[2];
+      *PkgFile >> ArrayIdx[3];
       ArrayIdx[3] &= ~0xC0;
     }
     else
@@ -208,7 +223,7 @@ static int ReadArrayIndex( FPackageFileIn* In )
 }
 
 // TODO: Print out full names of objects for when properties don't exist
-void UObject::ReadDefaultProperties( FPackageFileIn* In )
+void UObject::ReadDefaultProperties()
 {
   const char* PropName = NULL;
   idx PropNameIdx = 0;
@@ -222,7 +237,7 @@ void UObject::ReadDefaultProperties( FPackageFileIn* In )
 
   while( 1 )
   {
-    *In >> CINDEX( PropNameIdx );
+    *PkgFile >> CINDEX( PropNameIdx );
     PropName = Pkg->ResolveNameFromIdx( PropNameIdx );
     if ( UNLIKELY( strncmp( PropName, "None", 4 ) == 0 ) )
       break;
@@ -265,7 +280,7 @@ void UObject::ReadDefaultProperties( FPackageFileIn* In )
       }
     }
 
-    *In >> InfoByte;
+    *PkgFile >> InfoByte;
     PropType = InfoByte & 0x0F;
     SizeByte = (InfoByte & 0x70) >> 4;
     IsArray  = InfoByte & 0x80;
@@ -277,15 +292,15 @@ void UObject::ReadDefaultProperties( FPackageFileIn* In )
       switch( SizeByte )
       {
         case 5:
-          *In >> Size8;
+          *PkgFile >> Size8;
           RealSize = Size8;
           break;
         case 6:
-          *In >> Size16;
+          *PkgFile >> Size16;
           RealSize = Size16;
           break;
         case 7:
-          *In >> RealSize;
+          *PkgFile >> RealSize;
           break;
       }
     }
@@ -295,18 +310,19 @@ void UObject::ReadDefaultProperties( FPackageFileIn* In )
     }
     
     if ( IsArray && PropType != PROP_Bool )
-      ArrayIdx = ReadArrayIndex( In );
+      ArrayIdx = ReadArrayIndex( PkgFile );
 
     if ( PropType == PROP_Byte )
     {
       u8 Value = 0;
-      *In >> Value;
+      *PkgFile >> Value;
 
       if ( Prop )
       {
         UByteProperty* ByteProp = SafeCast<UByteProperty>( Prop );
         if ( !ByteProp )
-          Logf( LOG_CRIT, "Default property expected 'ByteProperty', but got '%s'", Prop->Class->Name );
+          Logf( LOG_CRIT, "Default property expected 'ByteProperty', but got '%s'", 
+            Prop->Class->Name );
         else
           SetByteProperty( ByteProp, Value, ArrayIdx );
       }
@@ -314,7 +330,7 @@ void UObject::ReadDefaultProperties( FPackageFileIn* In )
     else if ( PropType == PROP_Int )
     {
       int Value = 0;
-      *In >> Value;
+      *PkgFile >> Value;
      
       if ( Prop )
       {
@@ -339,7 +355,7 @@ void UObject::ReadDefaultProperties( FPackageFileIn* In )
     else if ( PropType == PROP_Float )
     {
       float Value = 0;
-      *In >> Value;
+      *PkgFile >> Value;
 
       if ( Prop )
       {
@@ -353,21 +369,23 @@ void UObject::ReadDefaultProperties( FPackageFileIn* In )
     else if ( PropType == PROP_Object )
     {
       idx ObjRef = 0;
-      *In >> CINDEX( ObjRef );
+      *PkgFile >> CINDEX( ObjRef );
  
       if ( Prop )
       {
         UObjectProperty* ObjProp = SafeCast<UObjectProperty>( Prop );
         if ( !ObjProp )
-          Logf( LOG_CRIT, "Default property expected 'ObjectProperty', but got '%s'", Prop->Class->Name );
+          Logf( LOG_CRIT, "Default property expected 'ObjectProperty', but got '%s'", 
+            Prop->Class->Name );
         else
-          SetObjProperty( ObjProp, UPackage::StaticLoadObject( Pkg, ObjRef, true ), ArrayIdx );
+          SetObjProperty( ObjProp, LoadObject( ObjRef, ObjProp->ObjectType, NULL ), 
+            ArrayIdx );
       }
     }
     else if ( PropType == PROP_Name )
     {
       idx Name = 0;
-      *In >> CINDEX( Name );
+      *PkgFile >> CINDEX( Name );
 
       if ( Prop )
       {
@@ -388,15 +406,17 @@ void UObject::ReadDefaultProperties( FPackageFileIn* In )
     else if ( PropType == PROP_Class )
     {
       idx ObjRef = 0;
-      *In >> CINDEX( ObjRef );
+      *PkgFile >> CINDEX( ObjRef );
 
       if ( Prop )
       {
         UClassProperty* ClassProp = SafeCast<UClassProperty>( Prop );
         if ( !ClassProp )
-          Logf( LOG_CRIT, "Default property expected 'ClassProperty', but got '%s'", Prop->Class->Name );
+          Logf( LOG_CRIT, "Default property expected 'ClassProperty', but got '%s'", 
+            Prop->Class->Name );
         else
-          SetObjProperty( ClassProp, UPackage::StaticLoadObject( Pkg, ObjRef, UClass::StaticClass() ), ArrayIdx );
+          SetObjProperty( ClassProp, LoadObject( ObjRef, UClass::StaticClass(), NULL ), 
+            ArrayIdx );
       }
     }
     else if ( PropType == PROP_Array )
@@ -431,7 +451,7 @@ void UObject::ReadDefaultProperties( FPackageFileIn* In )
 
       // Verify struct name
       idx StructName = 0;
-      *In >> CINDEX( StructName );
+      *PkgFile >> CINDEX( StructName );
       
       if ( StructName < 0 )
         Logf( LOG_CRIT, "Bad struct name index for StructProperty '%s'", Prop->Name );
@@ -452,13 +472,13 @@ void UObject::ReadDefaultProperties( FPackageFileIn* In )
         switch( SizeByte )
         {
           case 5:
-            *In >> *(u8*)&StructSize;
+            *PkgFile >> *(u8*)&StructSize;
             break;
           case 6:
-            *In >> *(u16*)&StructSize;
+            *PkgFile >> *(u16*)&StructSize;
             break;
           case 7:
-            *In >> StructSize;
+            *PkgFile >> StructSize;
             break;
         }
       }
@@ -479,17 +499,17 @@ void UObject::ReadDefaultProperties( FPackageFileIn* In )
         else
         {
           // Read in struct properties based on our definition that we have loaded
-          SetStructProperty( StructProp, In, ArrayIdx );
+          SetStructProperty( StructProp, PkgFile, ArrayIdx );
         }
       }
     }
     else if ( PropType == PROP_Ascii )
     {
       idx StrLength = 0;
-      *In >> CINDEX( StrLength );
+      *PkgFile >> CINDEX( StrLength );
 
       char* NewStr = new char[StrLength]; // Serialized length includes null terminator
-      In->Read( NewStr, StrLength );
+      PkgFile->Read( NewStr, StrLength );
 
       if ( Prop )
       {
@@ -612,6 +632,280 @@ UProperty* UObject::FindProperty( const char* PropName )
   }
 
   return NULL;
+}
+
+UObject* UObject::LoadObject( const char* ObjName, UClass* ObjClass, UObject* InOuter, bool bLoadClassNow )
+{
+  FExport* ObjExport = Pkg->GetExport( ObjName );
+  if ( UNLIKELY( ObjExport == NULL ) )
+  {
+    Logf( LOG_CRIT, "Can't load object '%s.%s', object does not exist", Pkg->Name, ObjName );
+    return NULL;
+  }
+
+  // Is it already loaded?
+  if ( ObjExport->Obj != NULL )
+    return ObjExport->Obj;
+
+  return StaticLoadObject( Pkg, ObjExport, ObjClass, InOuter );
+}
+
+UObject* UObject::LoadObject( idx ObjRef, UClass* ObjClass, UObject* InOuter, bool bLoadClassNow )
+{
+  return StaticLoadObject( Pkg, ObjRef, ObjClass, InOuter );
+}
+
+UObject* UObject::StaticLoadObject( UPackage* Pkg, const char* ObjName, UClass* ObjClass, UObject* InOuter, 
+  bool bLoadClassNow )
+{
+  FExport* ObjExport = Pkg->GetExport( ObjName );
+  if ( UNLIKELY( ObjExport == NULL ) )
+  {
+    Logf( LOG_CRIT, "Can't load object '%s.%s', object does not exist", Pkg->Name, ObjName );
+    return NULL;
+  }
+
+  // Is it already loaded?
+  if ( ObjExport->Obj != NULL )
+    return ObjExport->Obj;
+
+  return StaticLoadObject( Pkg, ObjExport, ObjClass, InOuter );
+}
+
+UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass, 
+  UObject* InOuter, bool bLoadClassNow )
+{
+  FExport* ObjExport = NULL;
+  UPackage* ObjPkg = NULL;
+  const char* ObjName = Pkg->ResolveNameFromObjRef( ObjRef );
+  const char* ObjPkgName = NULL;
+  FNameEntry ClassNameEntry( "Class" );
+
+  // Is our object in this package?
+  if ( ObjRef < 0 )
+  {
+    // We can figure out which package it should be in from our current package
+    FImport* Import = &(*Pkg->GetImportTable())[ CalcObjRefValue( ObjRef ) ];
+    const char* ClsName = Pkg->ResolveNameFromIdx( Import->ClassName );
+
+    FHash ObjNameHash = FnvHashString( ObjName );
+    FHash ClsNameHash = FnvHashString( ClsName );
+
+    // No, but check to see if we're trying to load some intrinsic class
+    if ( ObjClass == UClass::StaticClass() && ObjClass->ClassFlags & CLASS_NoExport )
+    {
+      // Go find it in the class pool
+      for ( size_t i = 0; i < ClassPool->Size() && i != MAX_SIZE; i++ )
+      {
+        UClass* ClsIter = (*ClassPool)[i];
+        if ( ClsIter->Hash == ObjNameHash );
+          return ClsIter;
+      }
+    }
+
+    // We'll likely need the class too
+    if ( LIKELY( ObjClass == NULL ) )
+    {
+      for ( size_t i = 0; i < ClassPool->Size() && i != MAX_SIZE; i++ )
+      {
+        UClass* ClsIter = (*ClassPool)[i];
+        if ( ClsIter->Hash == ClsNameHash )
+        {
+          ObjClass = ClsIter;
+          break;
+        }
+      }
+
+      if ( ObjClass == NULL )
+      {
+        // Alright, it's not loaded at all. Grab the package it belongs to
+        const char* ClsPkgName = Pkg->ResolveNameFromIdx( Import->ClassPackage );
+        UPackage* ClsPkg = UPackage::StaticLoadPackage( ClsPkgName );
+        if ( ClsPkg == NULL )
+        {
+          // We can't find the package we need, bail out
+          Logf( LOG_CRIT, "Can't load class '%s.%s', package is missing", ClsPkgName, ClsName );
+          return NULL;
+        }
+
+        // Got it, now load the class
+        ObjClass = (UClass*)StaticLoadObject( ClsPkg, ClsPkg->GetExport( ClsName ), 
+            UClass::StaticClass(), NULL );
+
+        if ( UNLIKELY( ObjClass == NULL ) )
+        {
+          // Class doesn't exist in that package, bail out
+          Logf( LOG_CRIT, "Can't load class '%s.%s', class does not exist", ClsPkgName, ClsName );
+          return NULL;
+        }
+      }
+    }
+
+    FImport* PkgImport = Import;
+    do
+    {
+      // The 'Package' field for FImport does not actually tell what package it is in,
+      // but what 'Group' it belongs to (which may be the package it belongs to)
+      // i.e., "Core.Object" -> Package points to the import for the 'Core' package
+      // "Core.Object.Color" -> Package points to the import for 'Object'
+      // to get around this, we keep going back and getting the package until Import->Class 
+      // points to "Package"
+      PkgImport = &(*Pkg->GetImportTable())[ CalcObjRefValue( PkgImport->Package ) ]; 
+    } while ( strnicmp( Pkg->ResolveNameFromIdx( PkgImport->ClassName ), "Package", 7 ) != 0 );
+
+    ObjPkgName = Pkg->ResolveNameFromIdx( PkgImport->ObjectName );
+    ObjPkg = UPackage::StaticLoadPackage( ObjPkgName );
+    if ( UNLIKELY( ObjPkg == NULL ) )
+    {
+      Logf( LOG_CRIT, "Can't load object '%s.%s', package is missing", ObjPkgName, ObjName );
+      return NULL;
+    } 
+
+    // Get the corresponding export index for this package
+    Array<FExport>* Exports = ObjPkg->GetExportTable();
+    for ( size_t i = 0; i < Exports->Size() && i != MAX_SIZE; i++ )
+    {
+      FExport* ExpIter = &(*Exports)[i];
+
+      // Get object name entry
+      FNameEntry* ExpObjName = ObjPkg->GetNameEntry( ExpIter->ObjectName );
+
+      // Get class name entry
+      FNameEntry* ExpClsName = NULL;
+      if ( ExpIter->Class < 0 )
+      {
+        Import = &(*ObjPkg->GetImportTable())[ CalcObjRefValue( ExpIter->Class ) ];
+        ExpClsName = ObjPkg->GetNameEntry( Import->ObjectName );
+      }
+      else
+      {
+        // Check if the export's class type is a class
+        if ( ExpIter->Class == 0 )
+          ExpClsName = &ClassNameEntry;
+        else
+          ExpClsName = ObjPkg->GetNameEntry( (*Exports)[ ExpIter->Class ].ObjectName );
+      }
+
+      if ( ExpObjName->Hash == ObjNameHash && ExpClsName->Hash == ClsNameHash )
+      {
+        ObjExport = ExpIter;
+        break;
+      }
+    }
+  }
+  else
+  {
+    ObjPkg = Pkg;
+    ObjExport = ObjPkg->GetExport( ObjRef - 1 );
+  }
+
+  if ( UNLIKELY( ObjExport == NULL ) )
+  {
+    Logf( LOG_CRIT, "Can't load object '%s.%s', object does not exist", ObjPkgName, ObjName );
+    return NULL;
+  }
+
+  return StaticLoadObject( ObjPkg, ObjExport, ObjClass, InOuter, bLoadClassNow );
+}
+
+UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass* ObjClass, 
+  UObject* InOuter, bool bLoadClassNow )
+{
+  const char* ObjName = ObjPkg->ResolveNameFromIdx( ObjExport->ObjectName );
+  bool bNeedsFullLoad = true;
+
+  // 'None' object means NULL, don't load anything
+  if ( strnicmp( ObjName, "None", 4 ) == 0 )
+    return NULL;
+
+  if ( ObjClass == NULL )
+  {
+    const char* ClsName = ObjPkg->ResolveNameFromObjRef( ObjExport->Class );
+    if ( strnicmp( ClsName, "None", 4 ) == 0 )
+    {
+      ObjClass = UClass::StaticClass();
+    }
+    else
+    {
+      FHash ClsNameHash  = FnvHashString( ClsName );
+      for ( size_t i = 0; i < ClassPool->Size() && i != MAX_SIZE; i++ )
+      {
+        UClass* ClsIter = (*ClassPool)[i];
+        if ( ClsIter->Hash == ClsNameHash )
+        {
+          ObjClass = ClsIter;
+          break; // Already loaded the class apparently, great
+        }
+      }
+    }
+
+    // If not, then we need to load it
+    if ( UNLIKELY( ObjClass == NULL ) )
+    {
+      ObjClass = (UClass*)StaticLoadObject( ObjPkg, ObjExport->Class, UClass::StaticClass(), NULL );
+      if ( UNLIKELY( ObjClass == NULL ) )
+      {
+        Logf( LOG_CRIT, "Can't load object '%s.%s', cannot load class", 
+          ObjPkg->Name, ObjName );
+        return NULL;
+      }
+    }
+  }
+
+  UObject* Obj = NULL;
+
+  // If Outer object is a class, then don't fully load other classes that Outer depends on
+  if ( InOuter != NULL )
+  {
+    if ( InOuter->IsA(UClass::StaticClass()) || InOuter->ParentsIsA(UClass::StaticClass()) )
+    {
+      if ( !bLoadClassNow && (ObjClass == UClass::StaticClass() || !ObjExport->bNeedsFullLoad ))
+        bNeedsFullLoad = false;
+    }
+  }
+
+  else if ( !bLoadClassNow && ObjClass == UClass::StaticClass() )
+  {
+    bNeedsFullLoad = false;
+  }
+
+  // Determine if the object has already been constructed or needs constructing
+  if ( ObjExport->Obj != NULL )
+  {
+    Obj = ObjExport->Obj;
+  }
+  else
+  {
+    // Construct the object
+    Obj = StaticConstructObject( ObjName, ObjClass, InOuter, ObjPkg, ObjExport );
+    if ( Obj == NULL )
+      return NULL;
+
+    // In case of circular dependencies
+    ObjExport->Obj = Obj;
+  }
+
+  // If we are fully loading...
+  if ( bNeedsFullLoad )
+  {
+    // Do a full object load
+    Obj->PreLoad(); 
+    Obj->Load();
+    Obj->PostLoad();
+  }
+
+  return Obj;
+}
+
+int UObject::CalcObjRefValue( idx ObjRef )
+{
+  if ( ObjRef == 0 )
+    return ObjRef;
+  
+  else if ( ObjRef < 0 )
+    ObjRef = -ObjRef;
+  
+  return ObjRef - 1;
 }
 
 UCommandlet::UCommandlet()

@@ -43,9 +43,10 @@ using namespace xstl;
 class DLL_EXPORT FPackageFileIn : public FileStreamIn
 {
 public:
+  
+
   int Ver;
   UPackage* Pkg;
-  bool bLazyLoad;
 };
 
 /*-----------------------------------------------------------------------------
@@ -67,7 +68,7 @@ class DLL_EXPORT FCompactIndex
 {
 public:
   int Value;
-  friend FPackageFileIn& operator>> ( FPackageFileIn& Ar,  FCompactIndex& Index );
+  friend FPackageFileIn&  operator>>( FPackageFileIn& Ar,  FCompactIndex& Index );
   friend FPackageFileOut& operator<<( FPackageFileOut& Ar, FCompactIndex& Index );
 };
 
@@ -191,31 +192,22 @@ class DLL_EXPORT UPackage : public UObject
   // Name resolution
   const char* ResolveNameFromIdx( idx Index );
   const char* ResolveNameFromObjRef( int ObjRef );
-  
-  // Object reading
-  bool LoadObject( UObject** Obj, const char* ObjName, idx ObjRef, bool bLazyLoad );
-  bool NeedsFullLoad( FExport* Export, bool bLazyLoad );
 
   // Accessors 
   String GetPackageName();
-  
+  FPackageFileIn* GetStream();
+
   static bool StaticInit();
   static void StaticExit( bool bCrashExit = false );
-  static int CalcObjRefValue( int ObjRef );
-  static UPackage* StaticLoadPkg( const char* Filepath );
-  static UObject* StaticLoadObject( UPackage* Pkg, idx ObjRef, bool bLazyLoad, 
-      UClass* ObjClass = NULL, UObject* InOuter = NULL );
-  static UObject* StaticLoadObject( UPackage* Pkg, const char* ObjName, bool bLazyLoad,
-      UClass* ObjClass = NULL, UObject* InOuter = NULL );
-  static bool StaticLoadPartialClass( const char* PkgName, UClass* NativeClass );
+  static UPackage* StaticLoadPackage( const char* Filepath );
       
 protected:    
   String Path;
-  FileStream* Stream;
-  UPackageHeader Header;
   Array<FNameEntry>* Names;
   Array<FExport>*    Exports;
   Array<FImport>*    Imports;
+  FileStream* Stream;
+  UPackageHeader Header;
 
   // Global package variables
   static EPkgLoadOpts LoadOpts;

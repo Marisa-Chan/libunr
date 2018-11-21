@@ -38,8 +38,8 @@ set (SOURCES ${UNR_SRC}/AActor.cpp
              ${UNR_SRC}/ULevel.cpp
              ${UNR_SRC}/UMusic.cpp
              ${UNR_SRC}/UNet.cpp
-             ${UNR_SRC}/USound.cpp
              ${UNR_SRC}/UObject.cpp
+             ${UNR_SRC}/USound.cpp
              ${UNR_SRC}/UPackage.cpp
              ${UNR_SRC}/UPlayer.cpp
              ${UNR_SRC}/UPrimitive.cpp
@@ -64,7 +64,7 @@ target_link_libraries(unr "xstl")
 
 # Debug symbols & optimization levels
 if ( CMAKE_BUILD_TYPE STREQUAL "Debug" )
-  add_definitions("-O1" "-g")
+  add_definitions("-O0" "-g")
 elseif ( CMAKE_BUILD_TYPE STREQUAL "Release" )
   add_definitions("-O2")
 elseif ( CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo" )

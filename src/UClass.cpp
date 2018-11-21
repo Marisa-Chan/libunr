@@ -41,19 +41,19 @@ UTextBuffer::~UTextBuffer()
     delete Text;
 }
 
-void UTextBuffer::LoadFromPackage( FPackageFileIn* In )
+void UTextBuffer::Load()
 {
-  Super::LoadFromPackage( In );
+  Super::Load();
   
-  *In >> Pos;
-  *In >> Top;
+  *PkgFile >> Pos;
+  *PkgFile >> Top;
 
   idx TextSize;
-  *In >> CINDEX( TextSize );
+  *PkgFile >> CINDEX( TextSize );
   if ( TextSize > 0 )
   {
     char* TextBuf = (char*)xstl::Malloc( TextSize + 1 );
-    In->Read( TextBuf, TextSize + 1 );
+    PkgFile->Read( TextBuf, TextSize + 1 );
     Text = new String( TextBuf );
     xstl::Free( TextBuf );
   }
@@ -73,22 +73,22 @@ UField::~UField()
   Next->DelRef();
 }
 
-void UField::LoadFromPackage( FPackageFileIn* In )
+void UField::Load()
 {
-  Super::LoadFromPackage( In );
+  Super::Load();
   
   idx SuperIdx = MAX_UINT32;
   idx NextIdx = MAX_UINT32;
   
-  *In >> CINDEX( SuperIdx );
-  *In >> CINDEX( NextIdx );
+  *PkgFile >> CINDEX( SuperIdx );
+  *PkgFile >> CINDEX( NextIdx );
 
   // Never lazily load superfields
   if ( SuperIdx )
-    SuperField = (UField*)UPackage::StaticLoadObject( Pkg, SuperIdx, false, NULL, Outer );
+    SuperField = (UField*)LoadObject( SuperIdx, NULL, Outer, true );
   
   if ( NextIdx )
-    Next = (UField*)UPackage::StaticLoadObject( Pkg, NextIdx, In->bLazyLoad, NULL, Outer );
+    Next = (UField*)LoadObject( NextIdx, NULL, Outer );
 }
 
 UConst::UConst()
@@ -103,16 +103,16 @@ UConst::~UConst()
     delete Value;
 }
 
-void UConst::LoadFromPackage( FPackageFileIn* In )
+void UConst::Load()
 {
-  Super::LoadFromPackage( In );
+  Super::Load();
 
   idx Size;
-  *In >> CINDEX( Size );
+  *PkgFile >> CINDEX( Size );
 
   // Size includes null terminator
   char* Str = (char*)xstl::Malloc( Size ); 
-  In->Read( Str, Size );
+  PkgFile->Read( Str, Size );
 
   Value = new String( Str );
   xstl::Free( Str );
@@ -128,23 +128,23 @@ UEnum::~UEnum()
   Names.Clear();
 }
 
-void UEnum::LoadFromPackage( FPackageFileIn* In )
+void UEnum::Load()
 {
-  Super::LoadFromPackage( In );
+  Super::Load();
 
   idx ArraySize;
-  *In >> CINDEX( ArraySize );
+  *PkgFile >> CINDEX( ArraySize );
   Names.Reserve( ArraySize );
 
   for( int i = 0; i < ArraySize; i++ )
   {
     idx ElementIdx;
-    *In >> CINDEX( ElementIdx );
+    *PkgFile >> CINDEX( ElementIdx );
     Names.PushBack( Pkg->ResolveNameFromIdx( ElementIdx ) );
   }
 }
 
-static u8 LoadScriptToken( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize );
+static u8 LoadScriptToken( UStruct* Struct, FPackageFileIn* PkgFile, u32* ParsedSize );
 
 UStruct::UStruct()
   : UField()
@@ -187,52 +187,52 @@ UStruct::~UStruct()
 #define LOAD_CODE( strct, var, type ) \
   *(strct->ScriptCode)++ = var
 
-static inline void LoadScriptByte( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize )
+static inline void LoadScriptByte( UStruct* Struct, FPackageFileIn* PkgFile, u32* ParsedSize )
 {
   u8 Byte;
-  *In >> Byte;
+  *PkgFile >> Byte;
   *ParsedSize += 1;
   LOAD_CODE( Struct, Byte, u8 );
 }
 
-static inline void LoadScriptWord( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize )
+static inline void LoadScriptWord( UStruct* Struct, FPackageFileIn* PkgFile, u32* ParsedSize )
 {
   u16 Word;
-  *In >> Word;
+  *PkgFile >> Word;
   *ParsedSize += 2;
   LOAD_CODE( Struct, Word, u16 );
 }
 
-static inline void LoadScriptDword( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize )
+static inline void LoadScriptDword( UStruct* Struct, FPackageFileIn* PkgFile, u32* ParsedSize )
 {
   u32 Dword;
-  *In >> Dword;
+  *PkgFile >> Dword;
   *ParsedSize += 4;
   LOAD_CODE( Struct, Dword, u32 );
 }
 
-static inline void LoadScriptIndex( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize )
+static inline void LoadScriptIndex( UStruct* Struct, FPackageFileIn* PkgFile, u32* ParsedSize )
 {
   idx Index;
-  *In >> CINDEX( Index );
+  *PkgFile >> CINDEX( Index );
   *ParsedSize += 4;
   LOAD_CODE( Struct, Index, idx );
 }
 
-static inline void LoadScriptFloat( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize )
+static inline void LoadScriptFloat( UStruct* Struct, FPackageFileIn* PkgFile, u32* ParsedSize )
 {
   float Float;
-  *In >> Float;
+  *PkgFile >> Float;
   *ParsedSize += 4;
   LOAD_CODE( Struct, Float, float );
 }
 
-static inline void LoadScriptString( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize )
+static inline void LoadScriptString( UStruct* Struct, FPackageFileIn* PkgFile, u32* ParsedSize )
 {
   u8 Char = 0;
   do
   {
-    *In >> Char;
+    *PkgFile >> Char;
     *ParsedSize += 1;
     LOAD_CODE( Struct, Char, u8 );
     
@@ -241,19 +241,19 @@ static inline void LoadScriptString( UStruct* Struct, FPackageFileIn* In, u32* P
 
 // FIXME: We don't actually deal with unicode strings because we should be using
 // UTF-8 instead, should we convert the characters later?
-static inline void LoadScriptUnicodeString( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize )
+static inline void LoadScriptUnicodeString( UStruct* Struct, FPackageFileIn* PkgFile, u32* ParsedSize )
 {
   u16 Wchar = 0;
   do
   {
-    *In >> Wchar;
+    *PkgFile >> Wchar;
     *ParsedSize += 2;
     LOAD_CODE( Struct, Wchar, u16 );
 
   } while ( Wchar != 0 ); 
 }
 
-static inline void LoadScriptLabelTable( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize )
+static inline void LoadScriptLabelTable( UStruct* Struct, FPackageFileIn* PkgFile, u32* ParsedSize )
 {
   FScriptLabel Label;
   Label.Index = 0;
@@ -261,8 +261,8 @@ static inline void LoadScriptLabelTable( UStruct* Struct, FPackageFileIn* In, u3
 
   while ( 1 )
   {
-    *In >> CINDEX( Label.Index );
-    *In >> Label.Offset;
+    *PkgFile >> CINDEX( Label.Index );
+    *PkgFile >> Label.Offset;
     *ParsedSize += 8;
 
     LOAD_CODE( Struct, Label.Index, idx );
@@ -275,35 +275,34 @@ static inline void LoadScriptLabelTable( UStruct* Struct, FPackageFileIn* In, u3
   }
 }
 
-static void LoadScriptFunctionParms( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize )
+static void LoadScriptFunctionParms( UStruct* Struct, FPackageFileIn* PkgFile, u32* ParsedSize )
 {
   u8 Token;
 
   do
   {
-    Token = LoadScriptToken( Struct, In, ParsedSize );
+    Token = LoadScriptToken( Struct, PkgFile, ParsedSize );
   } while( Token != EX_EndFunctionParms );
 }
 
-static u8 LoadScriptToken( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize )
+static u8 LoadScriptToken( UStruct* Struct, FPackageFileIn* PkgFile, u32* ParsedSize )
 {
   u8 Token = -1;
-  volatile u32 Pos = In->Tell();
 
-  *In >> Token;
+  *PkgFile >> Token;
   *ParsedSize += 1;
   LOAD_CODE( Struct, Token, u8 );
 
   if ( (Token & 0xF0) == EX_ExtendedNative )
   {
-    LoadScriptByte( Struct, In, ParsedSize );
+    LoadScriptByte( Struct, PkgFile, ParsedSize );
     *ParsedSize += 1;
 
-    LoadScriptFunctionParms( Struct, In, ParsedSize );
+    LoadScriptFunctionParms( Struct, PkgFile, ParsedSize );
   }
 
   else if ( Token >= EX_FirstNative )
-    LoadScriptFunctionParms( Struct, In, ParsedSize );
+    LoadScriptFunctionParms( Struct, PkgFile, ParsedSize );
 
   else
   {
@@ -312,113 +311,113 @@ static u8 LoadScriptToken( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize 
       case EX_LocalVariable:
       case EX_InstanceVariable:
       case EX_DefaultVariable:
-        LoadScriptIndex( Struct, In, ParsedSize );
+        LoadScriptIndex( Struct, PkgFile, ParsedSize );
         break;
       case EX_Return:
-        LoadScriptToken( Struct, In, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
         break;
       case EX_Switch:
-        LoadScriptByte( Struct, In, ParsedSize );
-        LoadScriptToken( Struct, In, ParsedSize );
+        LoadScriptByte( Struct, PkgFile, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
         break;
       case EX_Jump:
-        LoadScriptWord( Struct, In, ParsedSize );
+        LoadScriptWord( Struct, PkgFile, ParsedSize );
         break;
       case EX_JumpIfNot:
-        LoadScriptWord( Struct, In, ParsedSize );
-        LoadScriptToken( Struct, In, ParsedSize );
+        LoadScriptWord( Struct, PkgFile, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
         break;
       case EX_Stop:
         break;
       case EX_Assert:
-        LoadScriptWord( Struct, In, ParsedSize );
-        LoadScriptToken( Struct, In, ParsedSize );
+        LoadScriptWord( Struct, PkgFile, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
         break;
       case EX_Case:
         // There is supposed to be a conditional load token after, but
         // it's much easier to let it fall through to the main LoadScriptCode loop
-        LoadScriptWord( Struct, In, ParsedSize );
+        LoadScriptWord( Struct, PkgFile, ParsedSize );
         break;
       case EX_Nothing:
         break;
       case EX_LabelTable:
-        LoadScriptLabelTable( Struct, In, ParsedSize );
+        LoadScriptLabelTable( Struct, PkgFile, ParsedSize );
         break;
       case EX_GotoLabel:
       case EX_EatString:
-        LoadScriptToken( Struct, In, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
         break;
       case EX_Let:
       case EX_DynArrayElement:
-        LoadScriptToken( Struct, In, ParsedSize );
-        LoadScriptToken( Struct, In, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
         break;
       case EX_New:
-        LoadScriptToken( Struct, In, ParsedSize );
-        LoadScriptToken( Struct, In, ParsedSize );
-        LoadScriptToken( Struct, In, ParsedSize );
-        LoadScriptToken( Struct, In, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
         break;
       case EX_ClassContext:
-        LoadScriptIndex( Struct, In, ParsedSize );
-        LoadScriptWord( Struct, In, ParsedSize );
-        LoadScriptByte( Struct, In, ParsedSize );
-        LoadScriptIndex( Struct, In, ParsedSize );
+        LoadScriptIndex( Struct, PkgFile, ParsedSize );
+        LoadScriptWord( Struct, PkgFile, ParsedSize );
+        LoadScriptByte( Struct, PkgFile, ParsedSize );
+        LoadScriptIndex( Struct, PkgFile, ParsedSize );
         break;
       case EX_MetaCast:
-        LoadScriptIndex( Struct, In, ParsedSize );
-        LoadScriptToken( Struct, In, ParsedSize );
+        LoadScriptIndex( Struct, PkgFile, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
         break;
       case EX_LetBool:
-        LoadScriptToken( Struct, In, ParsedSize );
-        LoadScriptToken( Struct, In, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
         break;
       case EX_EndFunctionParms:
       case EX_Self:
         break;
       case EX_Skip:
-        LoadScriptWord( Struct, In, ParsedSize );
+        LoadScriptWord( Struct, PkgFile, ParsedSize );
         break;
       case EX_Context:
-        LoadScriptToken( Struct, In, ParsedSize );
-        LoadScriptWord( Struct, In, ParsedSize );
-        LoadScriptByte( Struct, In, ParsedSize );
-        LoadScriptToken( Struct, In, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
+        LoadScriptWord( Struct, PkgFile, ParsedSize );
+        LoadScriptByte( Struct, PkgFile, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
         break;
       case EX_ArrayElement:
-        LoadScriptToken( Struct, In, ParsedSize );
-        LoadScriptToken( Struct, In, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
         break;
       case EX_VirtualFunction:
       case EX_FinalFunction:
-        LoadScriptIndex( Struct, In, ParsedSize );
-        LoadScriptFunctionParms( Struct, In, ParsedSize );
+        LoadScriptIndex( Struct, PkgFile, ParsedSize );
+        LoadScriptFunctionParms( Struct, PkgFile, ParsedSize );
         break;
       case EX_IntConst:
-        LoadScriptDword( Struct, In, ParsedSize );
+        LoadScriptDword( Struct, PkgFile, ParsedSize );
         break;
       case EX_FloatConst:
-        LoadScriptFloat( Struct, In, ParsedSize );
+        LoadScriptFloat( Struct, PkgFile, ParsedSize );
         break;
       case EX_StringConst:
-        LoadScriptString( Struct, In, ParsedSize );
+        LoadScriptString( Struct, PkgFile, ParsedSize );
         break;
       case EX_ObjectConst:
       case EX_NameConst:
-        LoadScriptIndex( Struct, In, ParsedSize );
+        LoadScriptIndex( Struct, PkgFile, ParsedSize );
         break;
       case EX_RotationConst:
-        LoadScriptDword( Struct, In, ParsedSize );
-        LoadScriptDword( Struct, In, ParsedSize );
-        LoadScriptDword( Struct, In, ParsedSize );
+        LoadScriptDword( Struct, PkgFile, ParsedSize );
+        LoadScriptDword( Struct, PkgFile, ParsedSize );
+        LoadScriptDword( Struct, PkgFile, ParsedSize );
         break;
       case EX_VectorConst:
-        LoadScriptFloat( Struct, In, ParsedSize );
-        LoadScriptFloat( Struct, In, ParsedSize );
-        LoadScriptFloat( Struct, In, ParsedSize );
+        LoadScriptFloat( Struct, PkgFile, ParsedSize );
+        LoadScriptFloat( Struct, PkgFile, ParsedSize );
+        LoadScriptFloat( Struct, PkgFile, ParsedSize );
         break;
       case EX_ByteConst:
-        LoadScriptByte( Struct, In, ParsedSize );
+        LoadScriptByte( Struct, PkgFile, ParsedSize );
         break;
       case EX_IntZero:
       case EX_IntOne:
@@ -426,43 +425,43 @@ static u8 LoadScriptToken( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize 
       case EX_False:
         break;
       case EX_NativeParm:
-        LoadScriptIndex( Struct, In, ParsedSize );
+        LoadScriptIndex( Struct, PkgFile, ParsedSize );
         break;
       case EX_NoObject:
         break;
       case EX_IntConstByte:
-        LoadScriptByte( Struct, In, ParsedSize );
+        LoadScriptByte( Struct, PkgFile, ParsedSize );
         break;
       case EX_BoolVariable:
-        LoadScriptToken( Struct, In, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
         break;
       case EX_DynamicCast:
-        LoadScriptIndex( Struct, In, ParsedSize );
-        LoadScriptToken( Struct, In, ParsedSize );
+        LoadScriptIndex( Struct, PkgFile, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
         break;
       case EX_Iterator:
-        LoadScriptToken( Struct, In, ParsedSize );
-        LoadScriptWord( Struct, In, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
+        LoadScriptWord( Struct, PkgFile, ParsedSize );
         break;
       case EX_IteratorPop:
       case EX_IteratorNext:
         break;
       case EX_StructCmpEq:
       case EX_StructCmpNe:
-        LoadScriptIndex( Struct, In, ParsedSize );
-        LoadScriptToken( Struct, In, ParsedSize );
-        LoadScriptToken( Struct, In, ParsedSize );
+        LoadScriptIndex( Struct, PkgFile, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
         break;
       case EX_UnicodeStringConst:
-        LoadScriptUnicodeString( Struct, In, ParsedSize );
+        LoadScriptUnicodeString( Struct, PkgFile, ParsedSize );
         break;
       case EX_StructMember:
-        LoadScriptIndex( Struct, In, ParsedSize );
-        LoadScriptToken( Struct, In, ParsedSize );
+        LoadScriptIndex( Struct, PkgFile, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
         break;
       case EX_GlobalFunction:
-        LoadScriptIndex( Struct, In, ParsedSize );
-        LoadScriptFunctionParms( Struct, In, ParsedSize );
+        LoadScriptIndex( Struct, PkgFile, ParsedSize );
+        LoadScriptFunctionParms( Struct, PkgFile, ParsedSize );
         break;
       case EX_RotatorToVector:
       case EX_ByteToInt:
@@ -497,7 +496,7 @@ static u8 LoadScriptToken( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize 
       case EX_NameToString:
       case EX_VectorToString:
       case EX_RotatorToString:
-        LoadScriptToken( Struct, In, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
         break;
       case EX_Unk03:
       case EX_Unk15:
@@ -511,7 +510,7 @@ static u8 LoadScriptToken( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize 
       case EX_Unk5e:
       case EX_Unk5f:
         Logf( LOG_WARN, "Loading unknown UnrealScript opcode 0x%x, loading may not finish properly", Token );
-        Logf( LOG_WARN, "Unknown opcode located at offset 0x%x", In->Tell() );
+        Logf( LOG_WARN, "Unknown opcode located at offset 0x%x", PkgFile->Tell() );
         break;
       // Everything else loads another token or nothing at all,
       // so we don't need explicit cases for them
@@ -525,7 +524,7 @@ static u8 LoadScriptToken( UStruct* Struct, FPackageFileIn* In, u32* ParsedSize 
 
 // Helper function to load script code
 // Does not care about type resolution whatsoever
-static inline void LoadScriptCode( UStruct* Struct, FPackageFileIn* In )
+static inline void LoadScriptCode( UStruct* Struct, FPackageFileIn* PkgFile )
 {
   u8 Token = -1;
   u32 ParsedSize = 0;
@@ -533,36 +532,37 @@ static inline void LoadScriptCode( UStruct* Struct, FPackageFileIn* In )
   bool bReadIteratorWord = false;
   while ( ParsedSize < Struct->ScriptSize )
   {
-    LoadScriptToken( Struct, In, &ParsedSize );
+    LoadScriptToken( Struct, PkgFile, &ParsedSize );
   }
 }
 
-void UStruct::LoadFromPackage( FPackageFileIn* In )
+void UStruct::Load()
 {
-  Super::LoadFromPackage( In );
+  Super::Load();
   
   idx ScriptTextIdx = MAX_UINT32;
   ChildIdx = MAX_UINT32;
   idx FriendlyNameIdx = MAX_UINT32;
   
-  *In >> CINDEX( ScriptTextIdx );
-  *In >> CINDEX( ChildIdx );
-  *In >> CINDEX( FriendlyNameIdx );
-  
-  ScriptText = (UTextBuffer*)UPackage::StaticLoadObject( Pkg, ScriptTextIdx, false,
-    UTextBuffer::StaticClass(), this );
+  *PkgFile >> CINDEX( ScriptTextIdx );
+  *PkgFile >> CINDEX( ChildIdx );
+  *PkgFile >> CINDEX( FriendlyNameIdx );
+ 
+  if ( ScriptTextIdx )
+    ScriptText = (UTextBuffer*)LoadObject( ScriptTextIdx, UTextBuffer::StaticClass(), this );
 
-  Children = (UField*)UPackage::StaticLoadObject( Pkg, ChildIdx, true, NULL, this );
+  if ( ChildIdx )
+    Children = (UField*)LoadObject( ChildIdx, NULL, this );
 
   FriendlyName = Pkg->ResolveNameFromIdx( FriendlyNameIdx );
-  *In >> Line;
-  *In >> TextPos;
-  *In >> ScriptSize;
+  *PkgFile >> Line;
+  *PkgFile >> TextPos;
+  *PkgFile >> ScriptSize;
   
   if ( ScriptSize > 0 )
   {
     ScriptCode = new u8[ ScriptSize ];
-    ::LoadScriptCode( this, In );
+    ::LoadScriptCode( this, PkgFile );
   }
 
   // Calculate struct size
@@ -589,6 +589,30 @@ void UStruct::LoadFromPackage( FPackageFileIn* In )
   }
 }
 
+void UStruct::FinalizeClassLoad()
+{
+  UField* Iter;
+  for ( Iter = Children; Iter != NULL; Iter = Iter->Next )
+  {
+    if ( Iter->Export->bNeedsFullLoad )
+    {
+      if ( Iter->IsA( UClass::StaticClass() ) )
+      {
+        // Only do full loads on classes
+        Iter->PreLoad();
+        Iter->Load();
+        Iter->PostLoad();
+      }
+      else if ( Iter->IsA( UStruct::StaticClass() ) )
+      {
+        // Make sure any children that have their own child classes get loaded
+        UStruct* StructIter = (UStruct*)Iter;
+        StructIter->FinalizeClassLoad();
+      }
+    }
+  }
+}
+
 UFunction::UFunction()
   : UStruct()
 {
@@ -605,30 +629,30 @@ UFunction::~UFunction()
 {
 }
 
-void UFunction::LoadFromPackage( FPackageFileIn* In )
+void UFunction::Load()
 {
-  Super::LoadFromPackage( In );
+  Super::Load();
 
-  if ( In->Ver <= PKG_VER_UN_220 )
-    *In >> CINDEX( ParmsSize );
+  if ( PkgFile->Ver <= PKG_VER_UN_220 )
+    *PkgFile >> CINDEX( ParmsSize );
 
-  *In >> iNative;
+  *PkgFile >> iNative;
 
-  if ( In->Ver <= PKG_VER_UN_220 )
-    *In >> CINDEX( NumParms );
+  if ( PkgFile->Ver <= PKG_VER_UN_220 )
+    *PkgFile >> CINDEX( NumParms );
 
-  *In >> OperatorPrecedence;
+  *PkgFile >> OperatorPrecedence;
 
-  if ( In->Ver <= PKG_VER_UN_220 )
-    *In >> CINDEX( ReturnValueOffset );
+  if ( PkgFile->Ver <= PKG_VER_UN_220 )
+    *PkgFile >> CINDEX( ReturnValueOffset );
 
-  *In >> FunctionFlags;
+  *PkgFile >> FunctionFlags;
 
   if ( FunctionFlags & FUNC_Native )
     UObject::NativeFunctions->PushBack( this );
 
   if ( FunctionFlags & FUNC_Net )
-    *In >> ReplicationOffset;
+    *PkgFile >> ReplicationOffset;
 }
 
 // UState
@@ -641,14 +665,14 @@ UState::~UState()
 {
 }
 
-void UState::LoadFromPackage( FPackageFileIn* In )
+void UState::Load()
 {
-  Super::LoadFromPackage( In );
+  Super::Load();
 
-  *In >> ProbeMask;
-  *In >> IgnoreMask;
-  *In >> LabelTableOffset;
-  *In >> StateFlags;
+  *PkgFile >> ProbeMask;
+  *PkgFile >> IgnoreMask;
+  *PkgFile >> LabelTableOffset;
+  *PkgFile >> StateFlags;
 }
 
 // FDependency
@@ -660,6 +684,18 @@ FDependency::FDependency()
 }
 
 // UClass
+void UClass::BootstrapStage1()
+{
+  ObjectClass = new UClass( "Class", CLASS_NoExport, NULL, UClass::NativeConstructor );
+  ObjectClass->Class = ObjectClass;
+  UObject::ClassPool->PushBack( ObjectClass );
+}
+
+void UClass::BootstrapStage2()
+{
+  ObjectClass->SuperClass = UState::StaticClass();
+}
+
 UClass::UClass()
   : UState()
 {
@@ -695,7 +731,7 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
   if ( Filename->Back() != '/' )
     Filename->Append( "/" );
 
-  Filename->Append( Pkg->ResolveNameFromIdx( NameIdx ) );
+  Filename->Append( Pkg->ResolveNameFromIdx( Export->ObjectName ) );
   Filename->Append( ".uc" ); // Scripts won't get exported to any other type
  
   FileStreamOut* Out = new FileStreamOut();
@@ -711,54 +747,54 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
   return true;
 }
 
-void UClass::LoadFromPackage( FPackageFileIn* In )
+void UClass::Load()
 {
-  Super::LoadFromPackage( In );
+  Super::Load();
 
-  *In >> ClassFlags;
-  In->Read( ClassGuid, sizeof( ClassGuid ) );
+  *PkgFile >> ClassFlags;
+  PkgFile->Read( ClassGuid, sizeof( ClassGuid ) );
   
   idx DepCount = 0;
-  *In >> CINDEX( DepCount );
+  *PkgFile >> CINDEX( DepCount );
   Dependencies.Reserve( DepCount );
   
   FDependency Dep;
   for ( int i = 0; i < DepCount; i++ )
   {
     idx DepObjRef;
-    *In >> CINDEX( DepObjRef );
+    *PkgFile >> CINDEX( DepObjRef );
     /*
     if ( stricmp( Pkg->ResolveNameFromObjRef( DepObjRef ), FriendlyName ) )
-      Dep.Class = (UClass*)UPackage::StaticLoadObject( Pkg, DepObjRef, UClass::StaticClass() );
+      Dep.Class = (UClass*)UPackage::LoadObject( Pkg, DepObjRef, UClass::StaticClass() );
     */
-    *In >> Dep.Deep;
-    *In >> Dep.ScriptTextCRC;
+    *PkgFile >> Dep.Deep;
+    *PkgFile >> Dep.ScriptTextCRC;
     
     Dependencies.PushBack( Dep );
   }
   
   // I don't actually know what these are for
   idx NumPkgImports = 0;
-  *In >> CINDEX( NumPkgImports );
+  *PkgFile >> CINDEX( NumPkgImports );
   PackageImports.Reserve( NumPkgImports );
   
   for ( int i = 0; i < NumPkgImports; i++ )
   {
     idx PkgImport = 0;
-    *In >> CINDEX( PkgImport );
+    *PkgFile >> CINDEX( PkgImport );
     PackageImports.PushBack( PkgImport );
   }
   
-  if ( In->Ver >= PKG_VER_UN_220 - 1 ) // package version 62 ??
+  if ( PkgFile->Ver >= PKG_VER_UN_220 - 1 ) // package version 62 ??
   {
     idx ClassWithinIdx = 0;
     idx ClassConfigNameIdx = 0;
     
-    *In >> CINDEX( ClassWithinIdx );
-    *In >> CINDEX( ClassConfigNameIdx );
-    
-    ClassWithin = (UClass*)UPackage::StaticLoadObject( Pkg, ClassWithinIdx, true,
-      UClass::StaticClass(), NULL );
+    *PkgFile >> CINDEX( ClassWithinIdx );
+    *PkgFile >> CINDEX( ClassConfigNameIdx );
+   
+    ClassWithin = (UClass*)LoadObject( ClassWithinIdx, UClass::StaticClass(), NULL );
+
     ClassConfigName = Pkg->ResolveNameFromIdx( ClassConfigNameIdx );
 
     FHash CfgHash = FnvHashString( ClassConfigName );
@@ -782,9 +818,9 @@ void UClass::LoadFromPackage( FPackageFileIn* In )
         SuperClass->SetSuperClassProperties();
 
     // Get last child
-    UField* Iter;
-    if ( Children != NULL )
-      for ( Iter = Children; Iter->Next != NULL; Iter = Iter->Next );
+    UField* Iter = Children;
+    if ( Iter != NULL )
+      for ( ; Iter->Next != NULL; Iter = Iter->Next );
 
     // Link super class children to ours
     if ( Iter )
@@ -804,10 +840,19 @@ void UClass::LoadFromPackage( FPackageFileIn* In )
   Default->Pkg   = Pkg;
   Default->Class = this;
   Default->Field = Children;
-
+  
   AddRef();
   if ( LIKELY( Children ) )
     Children->AddRef();
+}
+
+void UClass::PostLoad()
+{
+  // Set this before finalizing class load
+  Export->bNeedsFullLoad = false;
+
+  // Fully load all class dependencies
+  FinalizeClassLoad();
 
   // In Unreal, property lists seem to take precedent over config properties
   // While we should enforce that a config property is never in the property
@@ -816,18 +861,11 @@ void UClass::LoadFromPackage( FPackageFileIn* In )
   if ( ( ClassFlags & CLASS_Config ) ) 
     Default->ReadConfigProperties();
 
-  Default->ReadDefaultProperties( In );
+  Default->PkgFile = PkgFile;
+  Default->ReadDefaultProperties();
+  Default->PkgFile = NULL;
 
-  // Go back and load class dependencies
-  UField* Iter;
-  if ( Children != NULL )
-  {
-    for ( Iter = Children; Iter->Next != NULL; Iter = Iter->Next )
-    {
-      if ( Iter->IsA( UClass::StaticClass() ) )
-        Iter->Pkg->LoadObject( (UObject**)&Iter, Iter->Name, Iter->ExpIdx, false );
-    }
-  }
+  Super::PostLoad();
 }
 
 bool UClass::IsNative()

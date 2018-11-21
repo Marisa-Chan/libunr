@@ -208,6 +208,7 @@ class UFunction;
 class UClass;
 class UPackage;
 struct FPropertyRecord;
+struct FExport;
 
 #define TEXT(s) #s
 
@@ -237,8 +238,6 @@ public: \
   } \
   static UClass* StaticClass() \
   { return ObjectClass; } \
-  static UClass* GetUClassClass(); \
-  static bool BootstrapUClass(); \
   static UObject* NativeConstructor( size_t ObjSize ) \
   { \
     return new(ObjSize) cls(); \
@@ -315,7 +314,19 @@ public: \
   FNativePropertyList* cls::StaticNativePropList = NULL; \
   bool cls::StaticLoadNativeClass() \
   { \
-    return UPackage::StaticLoadPartialClass( NativePkgName, ObjectClass );  \
+    ObjectClass->Pkg = UPackage::StaticLoadPackage( NativePkgName ); \
+    if ( ObjectClass->Pkg == NULL ) \
+    { \
+      Logf( LOG_CRIT, "Failed to load package '%s' for class '%s'.", NativePkgName, ObjectClass->Name ); \
+      return false; \
+    } \
+    ObjectClass->Export = ObjectClass->Pkg->GetExport( ObjectClass->Name ); \
+    ObjectClass->Export->Obj = ObjectClass; \
+    ObjectClass->Flags = ObjectClass->Export->ObjectFlags; \
+    ObjectClass->PreLoad(); \
+    ObjectClass->Load(); \
+    ObjectClass->PostLoad(); \
+    return true; \
   }
  
 #define LINK_NATIVE_PROPERTY(cls, var) \
@@ -364,14 +375,19 @@ class DLL_EXPORT UObject
   // not really exportable, but just so all subclasses can have export called generically
   EXPORTABLE() 
   UObject();
-  
-  virtual void LoadFromPackage( FPackageFileIn* In );
+ 
+  UObject* LoadObject( idx ObjRef, UClass* ObjClass, UObject* InOuter, bool bLoadClassNow = false );
+  UObject* LoadObject( const char* ObjName, UClass* ObjClass, UObject* InOuter, bool bLoadClassNow = false );
+  virtual void PreLoad();
+  virtual void Load();
+  virtual void PostLoad();
+
   void AddRef();
   void DelRef();
 
-  void SetPkgProperties( UPackage* InPkg, int InExpIdx, int InNameIdx );
   bool IsA( UClass* ClassType );
-  void ReadDefaultProperties( FPackageFileIn* In );  
+  bool ParentsIsA( UClass* ClassType );
+  void ReadDefaultProperties();  
   void ReadConfigProperties();
 
   // Property getters
@@ -399,10 +415,17 @@ class DLL_EXPORT UObject
 
   static bool StaticInit();
   static bool StaticExit();
+  static UObject* StaticLoadObject( UPackage* ObjPkg, const char* InName, UClass* ObjClass, 
+    UObject* InOuter, bool bLoadClassNow = false );
+  static UObject* StaticLoadObject( UPackage* ObjPkg, idx ObjRef, UClass* ObjClass, 
+    UObject* InOuter, bool bLoadClassNow = false );
+  static UObject* StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass* ObjClass,
+    UObject* InOuter, bool bLoadClassNow = false );
   static UObject* StaticConstructObject( const char* InName, UClass* InClass, 
-    UObject* InOuter );
+    UObject* InOuter, UPackage* InPkg, FExport* InExport );
   static UClass* StaticAllocateClass( const char* ClassName, u32 Flags, UClass* SuperClass, 
     UObject *(*NativeCtor)(size_t) );
+  static int CalcObjRefValue( idx ObjRef );
 
   static Array<UObject*>* ObjectPool;
   static Array<UClass*>*  ClassPool; 
@@ -412,14 +435,15 @@ class DLL_EXPORT UObject
   FHash       Hash;     // Hash of this object
   const char* Name;     // Name of this object
   int         Index;    // Index of the object in object pool
-  int         ExpIdx;   // Index of this object in the export table
-  int         NameIdx;  // Index of this object's name in the package's name table
+  idx         NameIdx;  // Name index in the packages name table
   UObject*    NextObj;  // The next object in the list
   UPackage*   Pkg;      // Package this object was loaded from
+  FExport*    Export;   // Export struct from the package of this object
   UObject*    Outer;    // Object that this object resides in
   u32         Flags;    // Object flags
   UClass*     Class;    // Class of this object
   UField*     Field;    // All fields relevant to this object (points to Class->Children)
+  FPackageFileIn* PkgFile; // Only relevant when loading
 
   // I think this was originally here to "hide" sensitive info for objects.
   // This was due to the fact that C++ property offsets *HAVE* to match up
@@ -443,6 +467,7 @@ protected:
       UObject *(*NativeCtor)(void) );
 
   int RefCnt;
+  size_t OldPkgFileOffset;
 };
 
 template <class T> T* SafeCast( UObject* Obj )

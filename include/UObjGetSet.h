@@ -231,8 +231,8 @@ inline void UObject::SetStructProperty( UStructProperty* Prop, FPackageFileIn* I
       {
         idx ObjRef = 0;
         *In >> CINDEX( ObjRef );
-        UObject* Obj = (UObject*)UPackage::StaticLoadObject( Prop->Pkg, ObjRef, 
-            ((UObjectProperty*)ChildProp)->ObjectType );
+        UObject* Obj = (UObject*)LoadObject( ObjRef, 
+          ((UObjectProperty*)ChildProp)->ObjectType, NULL );
 
         if ( Obj == NULL )
         {
@@ -251,8 +251,7 @@ inline void UObject::SetStructProperty( UStructProperty* Prop, FPackageFileIn* I
       {
         idx ObjRef = 0;
         *In >> CINDEX( ObjRef );
-        UClass* Cls = (UClass*)UPackage::StaticLoadObject( Prop->Pkg, ObjRef, 
-            UClassProperty::StaticClass() );
+        UClass* Cls = (UClass*)LoadObject( ObjRef, UClassProperty::StaticClass(), NULL );
 
         if ( Cls == NULL )
         {

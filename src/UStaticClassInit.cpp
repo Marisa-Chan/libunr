@@ -58,8 +58,7 @@ bool UObject::StaticInit()
   NativeFunctions->Reserve( 4096 );
 
   // Create the "class" class first, everything else depends on it
-  if ( !UClass::StaticCreateClass() )
-    return false;
+  UClass::BootstrapStage1();
 
   // Create UObject class so child classes have a parent
   Result &= UObject::StaticCreateClass();
@@ -87,7 +86,8 @@ bool UObject::StaticInit()
       Result &= UStruct::StaticClassInit();
         Result &= UFunction::StaticClassInit();
         Result &= UState::StaticClassInit();
-          Result &= UClass::StaticClassInit();
+ 
+  UClass::BootstrapStage2();
 
   // Now initialize all of UObject
   Result &= UObject::StaticClassInit();

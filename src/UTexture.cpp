@@ -39,19 +39,19 @@ UPalette::~UPalette()
 {
 }
 
-void UPalette::LoadFromPackage( FPackageFileIn* In )
+void UPalette::Load()
 {
-  ReadDefaultProperties( In );
+  ReadDefaultProperties();
 
   idx PaletteSize;
-  *In >> CINDEX( PaletteSize );
+  *PkgFile >> CINDEX( PaletteSize );
   
   if ( PaletteSize != 256 )
     Logf( LOG_WARN, "Palette does not have 256 entries!" );
   
   // Load colors
   for (int i = 0; i < PaletteSize; i++) {
-    *In >> Colors[i];
+    *PkgFile >> Colors[i];
   }
 }
 
@@ -73,7 +73,7 @@ UBitmap::~UBitmap()
 {
 }
 
-void UBitmap::LoadFromPackage( FPackageFileIn* In )
+void UBitmap::Load()
 {
 }
 
@@ -117,12 +117,12 @@ UTexture::~UTexture()
 {
 }
 
-void UTexture::LoadFromPackage( FPackageFileIn* In )
+void UTexture::Load()
 {
-  ReadDefaultProperties( In );
+  ReadDefaultProperties();
 
   u8 MipCount = 0;
-  *In >> MipCount;
+  *PkgFile >> MipCount;
   Mips.Resize( MipCount );
 
   for ( int i = 0; i < MipCount; i++ )
@@ -131,22 +131,22 @@ void UTexture::LoadFromPackage( FPackageFileIn* In )
     idx MipMapSize;
 
     // Get the width offset if we need it (but I never see it used?)
-    if ( In->Ver >= PKG_VER_UN_220 )
-      *In >> WidthOffset;
+    if ( PkgFile->Ver >= PKG_VER_UN_220 )
+      *PkgFile >> WidthOffset;
 
     // Read mip map data
-    *In >> CINDEX( MipMapSize );
+    *PkgFile >> CINDEX( MipMapSize );
     Mips[i].DataArray.Resize( MipMapSize );
-    In->Read( Mips[i].DataArray.Data(), MipMapSize );
+    PkgFile->Read( Mips[i].DataArray.Data(), MipMapSize );
 
     // Read in width and height data
-    *In >> Mips[i].USize;
-    *In >> Mips[i].VSize;
+    *PkgFile >> Mips[i].USize;
+    *PkgFile >> Mips[i].VSize;
 
     // Unused width and height in bits
     u8 Unused[2];
-    *In >> Unused[0];
-    *In >> Unused[1];
+    *PkgFile >> Unused[0];
+    *PkgFile >> Unused[1];
   }
 }
 

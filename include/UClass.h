@@ -37,7 +37,7 @@ class DLL_EXPORT UTextBuffer : public UObject
   DECLARE_NATIVE_ABSTRACT_CLASS( UTextBuffer, UObject, CLASS_NoExport, Core )
 
   UTextBuffer();
-  virtual void LoadFromPackage( FPackageFileIn* In );
+  virtual void Load();
 
   u32 Pos, Top;
   String* Text;
@@ -48,7 +48,7 @@ class DLL_EXPORT UField : public UObject
   DECLARE_NATIVE_ABSTRACT_CLASS( UField, UObject, CLASS_NoExport, Core )
 
   UField();
-  virtual void LoadFromPackage( FPackageFileIn* In );
+  virtual void Load();
 
   UField* SuperField; // Parent object
   UField* Next;       // Next object in list
@@ -59,7 +59,7 @@ class DLL_EXPORT UConst : public UField
   DECLARE_NATIVE_CLASS( UConst, UField, CLASS_NoExport, Core )
 
   UConst();
-  virtual void LoadFromPackage( FPackageFileIn* In );
+  virtual void Load();
 
   String* Value;
 };
@@ -69,7 +69,7 @@ class DLL_EXPORT UEnum : public UField
   DECLARE_NATIVE_CLASS( UEnum, UField, CLASS_NoExport, Core )
 
   UEnum();
-  virtual void LoadFromPackage( FPackageFileIn* In );
+  virtual void Load();
 
   Array<const char*> Names;
 };
@@ -86,7 +86,9 @@ class DLL_EXPORT UStruct : public UField
 
   UStruct();
   UStruct( size_t InNativeSize );
-  virtual void LoadFromPackage( FPackageFileIn* In );
+  virtual void Load();
+
+  void FinalizeClassLoad();
 
   UTextBuffer* ScriptText;
   UField* Children;
@@ -135,7 +137,7 @@ class DLL_EXPORT UFunction : public UStruct
   DECLARE_NATIVE_CLASS( UFunction, UStruct, CLASS_NoExport, Core )
 
   UFunction();
-  virtual void LoadFromPackage( FPackageFileIn* In );
+  virtual void Load();
 
   idx ParmsSize; // PackageVersion <= 63
   u16 iNative;   // Native function index
@@ -151,7 +153,7 @@ class DLL_EXPORT UState : public UStruct
   DECLARE_NATIVE_CLASS( UState, UStruct, CLASS_NoExport, Core )
 
   UState();
-  virtual void LoadFromPackage( FPackageFileIn* In );
+  virtual void Load();
  
   u64 ProbeMask;
   u64 IgnoreMask;
@@ -172,11 +174,14 @@ class DLL_EXPORT UClass : public UState
 {
   DECLARE_NATIVE_CLASS( UClass, UState, CLASS_NoExport, Core )
   EXPORTABLE();
+  static void BootstrapStage1();
+  static void BootstrapStage2();
 
   UClass();
   UClass( const char* ClassName, u32 Flags, UClass* SuperClass, UObject *(*NativeCtor)(size_t) );
   
-  virtual void LoadFromPackage( FPackageFileIn* In );
+  virtual void Load();
+  virtual void PostLoad();
 
   bool IsNative();
   UObject* CreateObject();

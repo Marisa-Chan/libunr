@@ -44,7 +44,7 @@ class DLL_EXPORT USound : public UObject
   EXPORTABLE()
   USound();
 
-  virtual void LoadFromPackage( FPackageFileIn* In );
+  virtual void Load();
   
   int SoundFormat;
   u32 OffsetNext;  // PackageVersion >= 63

@@ -96,7 +96,7 @@ class DLL_EXPORT UPalette : public UObject
   EXPOSE_TO_USCRIPT()
 
   UPalette();
-  virtual void LoadFromPackage( FPackageFileIn* In );
+  virtual void Load();
   
   FColor Colors[256];
 };
@@ -116,7 +116,7 @@ class DLL_EXPORT UBitmap : public UObject
   FColor MaxColor;
   int InternalTime[2];
 
-  virtual void LoadFromPackage( FPackageFileIn* In );
+  virtual void Load();
 };
 
 enum ELODSet
@@ -212,6 +212,6 @@ class DLL_EXPORT UTexture : public UBitmap
 
   FColor PaletteTransform;
   
-  virtual void LoadFromPackage( FPackageFileIn* In );
+  virtual void Load();
 };
 

@@ -54,17 +54,17 @@ UProperty::~UProperty()
 {
 }
 
-void UProperty::LoadFromPackage( FPackageFileIn* In )
+void UProperty::Load()
 {
-  Super::LoadFromPackage( In );
+  Super::Load();
   
-  *In >> ArrayDim;
-  *In >> ElementSize;
-  *In >> PropertyFlags;
-  *In >> CINDEX( Category );
+  *PkgFile >> ArrayDim;
+  *PkgFile >> ElementSize;
+  *PkgFile >> PropertyFlags;
+  *PkgFile >> CINDEX( Category );
   
   if ( PropertyFlags & CPF_Net )
-    *In >> ReplicationOffset;
+    *PkgFile >> ReplicationOffset;
   
   if ( Outer->Flags & RF_Native )
     Offset = GetNativeOffset( Outer->Name, Name );
@@ -92,105 +92,102 @@ u32 UProperty::GetNativeOffset( const char* ClassName, const char* PropName )
   return MAX_UINT32;
 }
 
-void UByteProperty::LoadFromPackage( FPackageFileIn* In )
+void UByteProperty::Load()
 {
-  Super::LoadFromPackage( In );
+  Super::Load();
  
   idx EnumType = 0;
-  *In >> CINDEX( EnumType );
+  *PkgFile >> CINDEX( EnumType );
   if ( EnumType )
-    Enum = (UEnum*)UPackage::StaticLoadObject( Pkg, EnumType, false, UEnum::StaticClass(), Outer );
+    Enum = (UEnum*)LoadObject( EnumType, UEnum::StaticClass(), Outer );
 
   ElementSize = 1;
 }
 
-void UIntProperty::LoadFromPackage( FPackageFileIn* In )
+void UIntProperty::Load()
 {
-  Super::LoadFromPackage( In );
+  Super::Load();
   ElementSize = 4;
 }
 
-void UBoolProperty::LoadFromPackage( FPackageFileIn* In )
+void UBoolProperty::Load()
 {
-  Super::LoadFromPackage( In );
+  Super::Load();
   ElementSize = sizeof( bool );
 }
 
-void UFloatProperty::LoadFromPackage( FPackageFileIn* In )
+void UFloatProperty::Load()
 {
-  Super::LoadFromPackage( In );
+  Super::Load();
   ElementSize = 4;
 }
 
-void UNameProperty::LoadFromPackage( FPackageFileIn* In )
+void UNameProperty::Load()
 {
-  Super::LoadFromPackage( In );
+  Super::Load();
   ElementSize = 4;
 }
 
-void UStrProperty::LoadFromPackage( FPackageFileIn* In )
+void UStrProperty::Load()
 {
-  Super::LoadFromPackage( In );
+  Super::Load();
   ElementSize = sizeof( char* );
 }
 
-void UStringProperty::LoadFromPackage( FPackageFileIn* In )
+void UStringProperty::Load()
 {
-  Super::LoadFromPackage( In );
+  Super::Load();
 }
 
-void UObjectProperty::LoadFromPackage( FPackageFileIn* In )
+void UObjectProperty::Load()
 {
-  Super::LoadFromPackage( In );
+  Super::Load();
   ElementSize = sizeof( UObject* );
 
   idx ObjTypeIdx = 0;
-  *In >> CINDEX( ObjTypeIdx );
-  ObjectType = (UClass*)UPackage::StaticLoadObject( Pkg, ObjTypeIdx, 
-    true, UClass::StaticClass(), Outer );
+  *PkgFile >> CINDEX( ObjTypeIdx );
+  ObjectType = (UClass*)LoadObject( ObjTypeIdx, UClass::StaticClass(), Outer );
 }
 
-void UClassProperty::LoadFromPackage( FPackageFileIn* In )
+void UClassProperty::Load()
 {
-  Super::LoadFromPackage( In );
+  Super::Load();
   ElementSize = sizeof( UClass* );
 
   idx ClassIdx = 0;
-  *In >> CINDEX( ClassIdx );
-  Class = (UClass*)UPackage::StaticLoadObject( Pkg, ClassIdx, 
-    true, UClass::StaticClass(), Outer );
+  *PkgFile >> CINDEX( ClassIdx );
+  
+  ClassObj = (UClass*)LoadObject( ClassIdx, UClass::StaticClass(), Outer );
 }
 
-void UStructProperty::LoadFromPackage( FPackageFileIn* In )
+void UStructProperty::Load()
 {
-  Super::LoadFromPackage( In );
+  Super::Load();
 
   idx StructIdx = 0;
-  *In >> CINDEX( StructIdx );
-  Struct = (UStruct*)UPackage::StaticLoadObject( Pkg, StructIdx, 
-    false, UStruct::StaticClass(), Outer );
+  *PkgFile >> CINDEX( StructIdx );
+  Struct = (UStruct*)LoadObject( StructIdx, UStruct::StaticClass(), Outer );
 }
 
-void UArrayProperty::LoadFromPackage( FPackageFileIn* In )
+void UArrayProperty::Load()
 {
-  Super::LoadFromPackage( In );
+  Super::Load();
 
   idx InnerIdx;
-  *In >> CINDEX( InnerIdx );
-  Inner = (UProperty*)UPackage::StaticLoadObject( Pkg, InnerIdx, 
-    false, NULL, Outer );
+  *PkgFile >> CINDEX( InnerIdx );
+  Inner = (UProperty*)LoadObject( InnerIdx, NULL, Outer );
 }
 
-void UFixedArrayProperty::LoadFromPackage( FPackageFileIn* In )
+void UFixedArrayProperty::Load()
 {
-  Super::LoadFromPackage( In );
+  Super::Load();
   Logf( LOG_CRIT, "Go pop '%s' in UTPT and see how to load a FixedArrayProperty", Pkg->Name );
   exit( -1 ); // <- can we not do this
 }
 
-void UMapProperty::LoadFromPackage( FPackageFileIn* In )
+void UMapProperty::Load()
 {
-  Super::LoadFromPackage( In );
+  Super::Load();
   Logf( LOG_CRIT, "Go pop '%s' in UTPT and see how to load a MapProperty", Pkg->Name );
   exit( -1 ); // <- can we not do this
 }
