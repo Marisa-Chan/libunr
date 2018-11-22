@@ -156,7 +156,6 @@ void UClassProperty::Load()
 
   idx ClassIdx = 0;
   *PkgFile >> CINDEX( ClassIdx );
-  
   ClassObj = (UClass*)LoadObject( ClassIdx, UClass::StaticClass(), Outer );
 }
 

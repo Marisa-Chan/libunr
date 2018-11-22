@@ -101,7 +101,7 @@ class DLL_EXPORT UStruct : public UField
   // Runtime variables
   u32 StructSize;
   Array<FScriptLabel>* LabelTable;
-  idx ChildIdx; // Need to save for lazy loading
+  bool bFinalizedLoad; // So FinalizeClassLoad doesn't needlessly recurse
 };
 
 enum EFunctionFlags

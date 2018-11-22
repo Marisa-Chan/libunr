@@ -644,15 +644,15 @@ UObject* UObject::LoadObject( const char* ObjName, UClass* ObjClass, UObject* In
   }
 
   // Is it already loaded?
-  if ( ObjExport->Obj != NULL )
+  if ( ObjExport->Obj != NULL && ~ObjExport->bNeedsFullLoad )
     return ObjExport->Obj;
 
-  return StaticLoadObject( Pkg, ObjExport, ObjClass, InOuter );
+  return StaticLoadObject( Pkg, ObjExport, ObjClass, InOuter, bLoadClassNow );
 }
 
 UObject* UObject::LoadObject( idx ObjRef, UClass* ObjClass, UObject* InOuter, bool bLoadClassNow )
 {
-  return StaticLoadObject( Pkg, ObjRef, ObjClass, InOuter );
+  return StaticLoadObject( Pkg, ObjRef, ObjClass, InOuter, bLoadClassNow );
 }
 
 UObject* UObject::StaticLoadObject( UPackage* Pkg, const char* ObjName, UClass* ObjClass, UObject* InOuter, 
@@ -666,10 +666,10 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, const char* ObjName, UClass* 
   }
 
   // Is it already loaded?
-  if ( ObjExport->Obj != NULL )
+  if ( ObjExport->Obj != NULL && !ObjExport->bNeedsFullLoad )
     return ObjExport->Obj;
 
-  return StaticLoadObject( Pkg, ObjExport, ObjClass, InOuter );
+  return StaticLoadObject( Pkg, ObjExport, ObjClass, InOuter, bLoadClassNow );
 }
 
 UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass, 
@@ -698,7 +698,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
       for ( size_t i = 0; i < ClassPool->Size() && i != MAX_SIZE; i++ )
       {
         UClass* ClsIter = (*ClassPool)[i];
-        if ( ClsIter->Hash == ObjNameHash );
+        if ( ClsIter->Hash == ObjNameHash )
           return ClsIter;
       }
     }
@@ -854,20 +854,8 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
 
   UObject* Obj = NULL;
 
-  // If Outer object is a class, then don't fully load other classes that Outer depends on
-  if ( InOuter != NULL )
-  {
-    if ( InOuter->IsA(UClass::StaticClass()) || InOuter->ParentsIsA(UClass::StaticClass()) )
-    {
-      if ( !bLoadClassNow && (ObjClass == UClass::StaticClass() || !ObjExport->bNeedsFullLoad ))
-        bNeedsFullLoad = false;
-    }
-  }
-
-  else if ( !bLoadClassNow && ObjClass == UClass::StaticClass() )
-  {
+  if ( ( !bLoadClassNow && ObjClass == UClass::StaticClass() ) || !ObjExport->bNeedsFullLoad ) 
     bNeedsFullLoad = false;
-  }
 
   // Determine if the object has already been constructed or needs constructing
   if ( ObjExport->Obj != NULL )

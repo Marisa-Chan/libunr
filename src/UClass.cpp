@@ -174,6 +174,7 @@ UStruct::UStruct( size_t InNativeSize )
   NativeSize = InNativeSize;
   StructSize = 0;
   LabelTable = new Array<FScriptLabel>();
+  bFinalizedLoad = false;
 }
 
 // UStruct
@@ -541,7 +542,7 @@ void UStruct::Load()
   Super::Load();
   
   idx ScriptTextIdx = MAX_UINT32;
-  ChildIdx = MAX_UINT32;
+  idx ChildIdx = MAX_UINT32;
   idx FriendlyNameIdx = MAX_UINT32;
   
   *PkgFile >> CINDEX( ScriptTextIdx );
@@ -591,10 +592,18 @@ void UStruct::Load()
 
 void UStruct::FinalizeClassLoad()
 {
+  if ( bFinalizedLoad )
+    return;
+
   UField* Iter;
   for ( Iter = Children; Iter != NULL; Iter = Iter->Next )
   {
-    if ( Iter->Export->bNeedsFullLoad )
+    if ( Class == UClass::StaticClass() && Iter->Outer != this )
+    {
+      // Don't finalize loads on parent class variables
+      break;
+    }
+    else if ( Iter->Export->bNeedsFullLoad )
     {
       if ( Iter->IsA( UClass::StaticClass() ) )
       {
@@ -603,14 +612,38 @@ void UStruct::FinalizeClassLoad()
         Iter->Load();
         Iter->PostLoad();
       }
-      else if ( Iter->IsA( UStruct::StaticClass() ) )
+    }
+    else if ( Iter->Class == UObjectProperty::StaticClass() )
+    {
+      UObjectProperty* ObjPropIter = (UObjectProperty*)Iter;
+      if ( ObjPropIter->ObjectType->Export != NULL &&
+           ObjPropIter->ObjectType->Export->bNeedsFullLoad )
       {
-        // Make sure any children that have their own child classes get loaded
-        UStruct* StructIter = (UStruct*)Iter;
-        StructIter->FinalizeClassLoad();
+        ObjPropIter->ObjectType->PreLoad();
+        ObjPropIter->ObjectType->Load();
+        ObjPropIter->ObjectType->PostLoad();
       }
     }
+    else if ( Iter->Class == UClassProperty::StaticClass() )
+    {
+      UClassProperty* ClsPropIter = (UClassProperty*)Iter;
+      if ( ClsPropIter->ClassObj->Export != NULL &&
+           ClsPropIter->ClassObj->Export->bNeedsFullLoad )
+      {
+        ClsPropIter->ClassObj->PreLoad();
+        ClsPropIter->ClassObj->Load();
+        ClsPropIter->ClassObj->PostLoad();
+      }
+    }
+    else if ( Iter->IsA( UStruct::StaticClass() ) )
+    {
+      // Make sure any children that have their own child classes get loaded
+      UStruct* StructIter = (UStruct*)Iter;
+      StructIter->FinalizeClassLoad();
+    }
   }
+
+  bFinalizedLoad = true;
 }
 
 UFunction::UFunction()

@@ -117,7 +117,7 @@ class DLL_EXPORT UStringProperty : public UProperty
 
 class DLL_EXPORT UClassProperty : public UObjectProperty
 {
-  DECLARE_NATIVE_CLASS( UClassProperty, UProperty, CLASS_NoExport, Core )
+  DECLARE_NATIVE_CLASS( UClassProperty, UObjectProperty, CLASS_NoExport, Core )
   virtual void Load();
   UClass* ClassObj;
 };
