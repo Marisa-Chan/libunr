@@ -360,10 +360,10 @@ static u8 LoadScriptToken( UStruct* Struct, FPackageFileIn* PkgFile, u32* Parsed
         LoadScriptToken( Struct, PkgFile, ParsedSize );
         break;
       case EX_ClassContext:
-        LoadScriptIndex( Struct, PkgFile, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
         LoadScriptWord( Struct, PkgFile, ParsedSize );
         LoadScriptByte( Struct, PkgFile, ParsedSize );
-        LoadScriptIndex( Struct, PkgFile, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
         break;
       case EX_MetaCast:
         LoadScriptIndex( Struct, PkgFile, ParsedSize );
@@ -827,7 +827,6 @@ void UClass::Load()
     *PkgFile >> CINDEX( ClassConfigNameIdx );
    
     ClassWithin = (UClass*)LoadObject( ClassWithinIdx, UClass::StaticClass(), NULL );
-
     ClassConfigName = Pkg->ResolveNameFromIdx( ClassConfigNameIdx );
 
     FHash CfgHash = FnvHashString( ClassConfigName );
@@ -873,7 +872,7 @@ void UClass::Load()
   Default->Pkg   = Pkg;
   Default->Class = this;
   Default->Field = Children;
-  
+
   AddRef();
   if ( LIKELY( Children ) )
     Children->AddRef();
