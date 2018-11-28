@@ -282,6 +282,9 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC )
     xstl::Free( PkgPath );
   }
 
+  // Set up config manager
+  GConfigManager = new FConfigManager();
+
   // Open the user config
   GUserConfig = new FConfig();
   IniStatus = GUserConfig->Load( "User.ini" );
@@ -306,6 +309,8 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC )
       return false;
     }
   }
+
+  GConfigManager->AddConfig( GUserConfig );
 
   return true;
 }
@@ -412,3 +417,4 @@ bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC )
 
   return true;
 }
+
