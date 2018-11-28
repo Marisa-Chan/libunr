@@ -15,29 +15,30 @@ Bugs/Misunderstandings
   Solution:
     Read a byte instead of a token
 
-- EX_Context: strange 3 bytes after object reference
+- EX_ClassContext inconsistency with documentation
   Description:
-    EX_Context seems to be a bytecode that is used to tell the scripting
-    environment what object is being referred to in the following.
-
-    For example, if I wanted to refer to "Location", then I just need an
-    EX_InstanceVariable followed by the ObjRef for Location. but if I wanted
-    to refer to Location of another actor "Incoming.Location", then this
-    EX_Context bytecode is necesary.
-
-    Based on the UTPT source (ut_packages.pas:7968) The first two bytes 
-    (a word) is equal to the number of bytes worth of opcode that this 
-    context statement is relevant for. The last byte appears to be some
-    kind of size indicator. It is currently unknown what this size byte
-    is for.
-
-    Upon further inspection, it appears that EX_Context and EX_ClassContext
-    are similar in nature. The difference here is that EX_ClassContext
-    takes object references directly while EX_Context takes TOKENs instead
-
+    The package file format pdf says that an INDEX is used for the first
+    and last parts of the ClassContext token. However, parsing the token in
+    this way will lead to a crash. Upon manual inspection, it appears that
+    a TOKEN is used instead of an INDEX, which leads to a consistent results
+    when compared with UTPT's disassembly.
   Solution:
-    Read a word after getting EX_Context
-    Read a byte after that (purpose still unknown)
+    EX_ClassContext is:
+      TOKEN
+      WORD
+      BYTE
+      TOKEN
+
+- EX_Context
+  Description:
+    EX_Context is not described in the UT-Package-File-Format document.
+    However, it appears to function the same as EX_ClassContext.
+  Solution:
+    EX_Context is:
+      TOKEN
+      WORD
+      BYTE
+      TOKEN
 
 ---------------------------------------------------------------------
 Unknown Opcodes
