@@ -35,8 +35,12 @@
 #include "USound.h"
 #include "USystem.h"
 #include "UTexture.h"
+#include "UViewport.h"
+#include "UConsole.h"
 
 #include "AActor.h"
+#include "AHUD.h"
+#include "ANavigationPoint.h"
 #include "AZoneInfo.h"
 #include "ADynamicZoneInfo.h"
 
@@ -105,32 +109,47 @@ bool UObject::StaticInit()
   Result &= USound::StaticClassInit();
   Result &= UMusic::StaticClassInit();
   Result &= UPrimitive::StaticClassInit();
+    Result &= UMesh::StaticClassInit();
+    Result &= UModel::StaticClassInit();
   Result &= UPlayer::StaticClassInit();
+    Result &= UViewport::StaticClassInit();
   Result &= UNetConnection::StaticClassInit();
 
   Result &= UPalette::StaticClassInit();
   Result &= UBitmap::StaticClassInit();
     Result &= UTexture::StaticClassInit();
+  Result &= UFont::StaticClassInit();
 //  Result &= UAnimationNotify::StaticClassInit();
 //  Result &= USkeletalMeshInstance::StaticClassInit();
 //  Result &= URenderIterator::StaticClassInit();
 
   // Circular dependencies in Engine.u require that we create classes first
   Result &= AActor::StaticCreateClass();
+  Result &= AHUD::StaticCreateClass();
+  Result &= AHUDOverlay::StaticCreateClass();
   Result &= AInfo::StaticCreateClass();
   Result &= AZoneInfo::StaticCreateClass();
   Result &= ADynamicZoneInfo::StaticCreateClass();
+  Result &= ANavigationPoint::StaticCreateClass();
 
   Result &= AActor::StaticLinkNativeProperties();
+  Result &= AHUD::StaticLinkNativeProperties();
+  Result &= AHUDOverlay::StaticLinkNativeProperties();
   Result &= AInfo::StaticLinkNativeProperties();
   Result &= AZoneInfo::StaticLinkNativeProperties();
   Result &= ADynamicZoneInfo::StaticLinkNativeProperties();
+  Result &= ANavigationPoint::StaticLinkNativeProperties();
 
   // Now init actor classes
   Result &= AActor::StaticClassInit();
+    Result &= AHUD::StaticClassInit();
+    Result &= AHUDOverlay::StaticClassInit();
     Result &= AInfo::StaticClassInit();
       Result &= AZoneInfo::StaticClassInit();
         Result &= ADynamicZoneInfo::StaticClassInit();
+    Result &= ANavigationPoint::StaticClassInit();
+
+  Result &= UConsole::StaticClassInit();
 
   return Result;
 }
@@ -141,6 +160,7 @@ IMPLEMENT_NATIVE_CLASS( UObject );
   IMPLEMENT_NATIVE_CLASS( UBitmap );
     IMPLEMENT_NATIVE_CLASS( UTexture );
   IMPLEMENT_NATIVE_CLASS( UCommandlet );
+  IMPLEMENT_NATIVE_CLASS( UConsole );
   IMPLEMENT_NATIVE_CLASS( UField );
     IMPLEMENT_NATIVE_CLASS( UConst );
     IMPLEMENT_NATIVE_CLASS( UEnum );
@@ -162,6 +182,7 @@ IMPLEMENT_NATIVE_CLASS( UObject );
       IMPLEMENT_NATIVE_CLASS( UFunction );
       IMPLEMENT_NATIVE_CLASS( UState );
         IMPLEMENT_NATIVE_CLASS( UClass );
+  IMPLEMENT_NATIVE_CLASS( UFont );
   IMPLEMENT_NATIVE_CLASS( ULevelBase );
     IMPLEMENT_NATIVE_CLASS( ULevel );
   IMPLEMENT_NATIVE_CLASS( UMusic );
@@ -169,18 +190,24 @@ IMPLEMENT_NATIVE_CLASS( UObject );
   IMPLEMENT_NATIVE_CLASS( UPalette );
   IMPLEMENT_NATIVE_CLASS( UPackage );
   IMPLEMENT_NATIVE_CLASS( UPlayer );
+    IMPLEMENT_NATIVE_CLASS( UViewport );
   IMPLEMENT_NATIVE_CLASS( UPrimitive );
+    IMPLEMENT_NATIVE_CLASS( UMesh );
+    IMPLEMENT_NATIVE_CLASS( UModel );
   IMPLEMENT_NATIVE_CLASS( USound );
   IMPLEMENT_NATIVE_CLASS( USkeletalMesh );
   IMPLEMENT_NATIVE_CLASS( USkeletalMeshInstance );
   IMPLEMENT_NATIVE_CLASS( USubsystem );
     IMPLEMENT_NATIVE_CLASS( USystem );
   IMPLEMENT_NATIVE_CLASS( UTextBuffer );
-  
+ 
 IMPLEMENT_NATIVE_CLASS( AActor );
+  IMPLEMENT_NATIVE_CLASS( AHUD );
+  IMPLEMENT_NATIVE_CLASS( AHUDOverlay );
   IMPLEMENT_NATIVE_CLASS( AInfo );
     IMPLEMENT_NATIVE_CLASS( AZoneInfo );
       IMPLEMENT_NATIVE_CLASS( ADynamicZoneInfo );
+  IMPLEMENT_NATIVE_CLASS( ANavigationPoint );
 
 bool UObject::StaticLinkNativeProperties()
 {
@@ -219,6 +246,49 @@ BEGIN_PROPERTY_LINK( UCommandlet, 14 )
   LINK_NATIVE_PROPERTY( UCommandlet, ShowErrorCount );
   LINK_NATIVE_PROPERTY( UCommandlet, ShowBanner );
   LINK_NATIVE_PROPERTY( UCommandlet, ForceInt );
+END_PROPERTY_LINK()
+
+BEGIN_PROPERTY_LINK( UConsole, 40 )
+  LINK_NATIVE_PROPERTY( UConsole, vtblOut );
+  LINK_NATIVE_PROPERTY( UConsole, Viewport );
+  LINK_NATIVE_PROPERTY( UConsole, HistoryTop );
+  LINK_NATIVE_PROPERTY( UConsole, HistoryBot );
+  LINK_NATIVE_PROPERTY( UConsole, HistoryCur );
+  LINK_NATIVE_PROPERTY( UConsole, TypedStr );
+  LINK_NATIVE_ARRAY   ( UConsole, History );
+  LINK_NATIVE_PROPERTY( UConsole, Scrollback );
+  LINK_NATIVE_PROPERTY( UConsole, NumLines );
+  LINK_NATIVE_PROPERTY( UConsole, TopLine );
+  LINK_NATIVE_PROPERTY( UConsole, TextLines );
+  LINK_NATIVE_PROPERTY( UConsole, MsgTime );
+  LINK_NATIVE_ARRAY   ( UConsole, MsgText );
+  LINK_NATIVE_ARRAY   ( UConsole, MsgPRINames );
+  LINK_NATIVE_ARRAY   ( UConsole, MsgPlayer );
+  LINK_NATIVE_ARRAY   ( UConsole, MsgTick );
+  LINK_NATIVE_PROPERTY( UConsole, BorderSize );
+  LINK_NATIVE_PROPERTY( UConsole, ConsoleLines );
+  LINK_NATIVE_PROPERTY( UConsole, BorderLines );
+  LINK_NATIVE_PROPERTY( UConsole, BorderPixels );
+  LINK_NATIVE_PROPERTY( UConsole, ConsolePos );
+  LINK_NATIVE_PROPERTY( UConsole, ConsoleDest );
+  LINK_NATIVE_PROPERTY( UConsole, FrameX );
+  LINK_NATIVE_PROPERTY( UConsole, FrameY );
+  LINK_NATIVE_PROPERTY( UConsole, ConBackground );
+  LINK_NATIVE_PROPERTY( UConsole, Border );
+  LINK_NATIVE_PROPERTY( UConsole, bNoStuff );
+  LINK_NATIVE_PROPERTY( UConsole, bTyping );
+  LINK_NATIVE_PROPERTY( UConsole, bTimeDemo );
+  LINK_NATIVE_PROPERTY( UConsole, TimeDemo );
+  LINK_NATIVE_PROPERTY( UConsole, bNoDrawWorld );
+  LINK_NATIVE_PROPERTY( UConsole, TypingOffset );
+  LINK_NATIVE_PROPERTY( UConsole, GlobalConsoleKey );
+  LINK_NATIVE_PROPERTY( UConsole, GlobalWindowKey );
+  LINK_NATIVE_PROPERTY( UConsole, LoadingMessage );
+  LINK_NATIVE_PROPERTY( UConsole, SavingMessage );
+  LINK_NATIVE_PROPERTY( UConsole, ConnectingMessage );
+  LINK_NATIVE_PROPERTY( UConsole, PausedMessage );
+  LINK_NATIVE_PROPERTY( UConsole, PrecachingMessage );
+  LINK_NATIVE_PROPERTY( UConsole, bValidKeyEvent );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( UPalette, 1 )
@@ -310,6 +380,21 @@ BEGIN_PROPERTY_LINK( UPlayer, 9 )
   LINK_NATIVE_PROPERTY( UPlayer, SelectedCursor );
 END_PROPERTY_LINK()
 
+BEGIN_PROPERTY_LINK( AHUD, 6 )
+  LINK_NATIVE_PROPERTY( AHUD, HudMode );
+  LINK_NATIVE_PROPERTY( AHUD, Crosshair );
+  LINK_NATIVE_PROPERTY( AHUD, MainMenuType );
+  LINK_NATIVE_PROPERTY( AHUD, HUDConfigWindowType );
+  LINK_NATIVE_PROPERTY( AHUD, MainMenu );
+  LINK_NATIVE_PROPERTY( AHUD, Overlays );
+END_PROPERTY_LINK()
+
+BEGIN_PROPERTY_LINK( AHUDOverlay, 3 )
+  LINK_NATIVE_PROPERTY( AHUDOverlay, myHUD );
+  LINK_NATIVE_PROPERTY( AHUDOverlay, bPostRender );
+  LINK_NATIVE_PROPERTY( AHUDOverlay, bPreRender );
+END_PROPERTY_LINK()
+
 BEGIN_PROPERTY_LINK( AInfo, 0 )
 END_PROPERTY_LINK()
 
@@ -397,6 +482,38 @@ BEGIN_PROPERTY_LINK( ADynamicZoneInfo, 10 )
   LINK_NATIVE_PROPERTY( ADynamicZoneInfo, bMovesForceTouchUpdate );
   LINK_NATIVE_PROPERTY( ADynamicZoneInfo, bUpdateTouchers );
   LINK_NATIVE_PROPERTY( ADynamicZoneInfo, OldPose );
+END_PROPERTY_LINK()
+
+BEGIN_PROPERTY_LINK( ANavigationPoint, 30 )
+  LINK_NATIVE_PROPERTY( ANavigationPoint, OwnerTeam );
+  LINK_NATIVE_ARRAY   ( ANavigationPoint, ProscribedPaths );
+  LINK_NATIVE_ARRAY   ( ANavigationPoint, ForcedPaths );
+  LINK_NATIVE_ARRAY   ( ANavigationPoint, UpstreamPaths );
+  LINK_NATIVE_ARRAY   ( ANavigationPoint, Paths );
+  LINK_NATIVE_ARRAY   ( ANavigationPoint, PrunedPaths );
+  LINK_NATIVE_ARRAY   ( ANavigationPoint, VisNoReachPaths );
+  LINK_NATIVE_PROPERTY( ANavigationPoint, VisitedWeight );
+  LINK_NATIVE_PROPERTY( ANavigationPoint, RouteCache );
+  LINK_NATIVE_PROPERTY( ANavigationPoint, BestPathWeight );
+  LINK_NATIVE_PROPERTY( ANavigationPoint, NextNavigationPoint );
+  LINK_NATIVE_PROPERTY( ANavigationPoint, NextOrdered );
+  LINK_NATIVE_PROPERTY( ANavigationPoint, PrevOrdered );
+  LINK_NATIVE_PROPERTY( ANavigationPoint, StartPath );
+  LINK_NATIVE_PROPERTY( ANavigationPoint, PreviousPath );
+  LINK_NATIVE_PROPERTY( ANavigationPoint, Cost );
+  LINK_NATIVE_PROPERTY( ANavigationPoint, ExtraCost );
+  LINK_NATIVE_PROPERTY( ANavigationPoint, PathDescription );
+  LINK_NATIVE_PROPERTY( ANavigationPoint, EditorData );
+  LINK_NATIVE_PROPERTY( ANavigationPoint, ForcedPathSize );
+  LINK_NATIVE_PROPERTY( ANavigationPoint, MaxPathDistance );
+  LINK_NATIVE_PROPERTY( ANavigationPoint, Taken );
+  LINK_NATIVE_PROPERTY( ANavigationPoint, bPlayerOnly );
+  LINK_NATIVE_PROPERTY( ANavigationPoint, bEndPoint );
+  LINK_NATIVE_PROPERTY( ANavigationPoint, bEndPointOnly );
+  LINK_NATIVE_PROPERTY( ANavigationPoint, bSpecialCost );
+  LINK_NATIVE_PROPERTY( ANavigationPoint, bOneWayPath );
+  LINK_NATIVE_PROPERTY( ANavigationPoint, bAutoBuilt );
+  LINK_NATIVE_PROPERTY( ANavigationPoint, bNoStrafeTo );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( AActor, 221 )

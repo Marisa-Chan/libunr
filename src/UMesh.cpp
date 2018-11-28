@@ -17,27 +17,20 @@
 \*========================================================================*/
 
 /*========================================================================
- * UViewport.h - Object that manages a clients view
+ * UMesh.cpp - Mesh functionality
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#pragma once
+#include "UMesh.h"
 
-#include "UPlayer.h"
-
-class UViewport : public UPlayer
+UMesh::UMesh()
+  : UPrimitive()
 {
-  DECLARE_NATIVE_CLASS( UViewport, UPlayer, CLASS_NoExport, Engine )
-  UViewport();
+}
 
-  // Viewport properties
-  int Width;
-  int Height;
-  int BitsPerPixel;
-  int MaxDesiredFramerate;
-
-  //URenderDevice* RenderDevice;
-};
+UMesh::~UMesh()
+{
+}
 

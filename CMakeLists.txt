@@ -30,24 +30,30 @@ else()
 endif()
 
 set (SOURCES ${UNR_SRC}/AActor.cpp
-             ${UNR_SRC}/AZoneInfo.cpp
              ${UNR_SRC}/ADynamicZoneInfo.cpp
+             ${UNR_SRC}/AHUD.cpp
+             ${UNR_SRC}/ANavigationPoint.cpp
+             ${UNR_SRC}/AZoneInfo.cpp
              ${UNR_SRC}/FConfig.cpp
              ${UNR_SRC}/FUtil.cpp
              ${UNR_SRC}/UClass.cpp
+             ${UNR_SRC}/UConsole.cpp
              ${UNR_SRC}/ULevel.cpp
+             ${UNR_SRC}/UMesh.cpp
+             ${UNR_SRC}/UModel.cpp
              ${UNR_SRC}/UMusic.cpp
              ${UNR_SRC}/UNet.cpp
              ${UNR_SRC}/UObject.cpp
-             ${UNR_SRC}/USound.cpp
              ${UNR_SRC}/UPackage.cpp
              ${UNR_SRC}/UPlayer.cpp
              ${UNR_SRC}/UPrimitive.cpp
              ${UNR_SRC}/UProperty.cpp
              ${UNR_SRC}/USkelAnim.cpp
-             ${UNR_SRC}/UTexture.cpp
+             ${UNR_SRC}/USound.cpp
              ${UNR_SRC}/UStaticClassInit.cpp
              ${UNR_SRC}/USystem.cpp
+             ${UNR_SRC}/UTexture.cpp
+             ${UNR_SRC}/UViewport.cpp
 )
 
 include_directories (${UNR_INC} ${XSTL_INC} /usr/include)

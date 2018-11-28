@@ -17,7 +17,7 @@
 \*========================================================================*/
 
 /*========================================================================
- * UViewport.h - Object that manages a clients view
+ * ANavigationPoint.h - AI Pathing Base Class
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
@@ -25,19 +25,56 @@
 
 #pragma once
 
-#include "UPlayer.h"
+#include "AActor.h"
 
-class UViewport : public UPlayer
+class ANavigationPoint : public AActor
 {
-  DECLARE_NATIVE_CLASS( UViewport, UPlayer, CLASS_NoExport, Engine )
-  UViewport();
+  DECLARE_NATIVE_CLASS( ANavigationPoint, AActor, 0, Engine )
+  EXPOSE_TO_USCRIPT()
 
-  // Viewport properties
-  int Width;
-  int Height;
-  int BitsPerPixel;
-  int MaxDesiredFramerate;
+  ANavigationPoint();
 
-  //URenderDevice* RenderDevice;
+  // NavigationPoint variables
+  idx OwnerTeam;
+  idx ProscribedPaths[4];
+  idx ForcedPaths[4];
+
+  int UpstreamPaths[16];
+  int Paths[16];
+  int PrunedPaths[16];
+  ANavigationPoint* VisNoReachPaths[16];
+  int VisitedWeight;
+  AActor* RouteCache;
+  int BestPathWeight;
+  ANavigationPoint* NextNavigationPoint;
+  ANavigationPoint* NextOrdered;
+  ANavigationPoint* PrevOrdered;
+  ANavigationPoint* StartPath;
+  ANavigationPoint* PreviousPath;
+  int Cost;
+  int ExtraCost;
+
+  u8 PathDescription;
+  void* EditorData;
+
+  int ForcedPathSize;
+  float MaxPathDistance;
+
+  enum PathBuildingType
+  {
+    PATHING_Normal,
+    PATHING_Proscribe,
+    PATHING_Force,
+    PATHING_Special,
+  };
+
+  // Flags
+  bool Taken;
+  bool bPlayerOnly;
+  bool bEndPoint;
+  bool bEndPointOnly;
+  bool bSpecialCost;
+  bool bOneWayPath;
+  bool bAutoBuilt;
+  bool bNoStrafeTo;
 };
-

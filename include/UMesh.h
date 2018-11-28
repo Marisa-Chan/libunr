@@ -25,14 +25,13 @@
 
 #pragma once
 
-#include "UObject.h"
-#include "UMath.h"
+#include "UPrimitive.h"
 
 class AActor;
 
-class UMesh : public UObject
+class UMesh : public UPrimitive
 {
-  DECLARE_NATIVE_CLASS( UMesh, UObject, CLASS_NoExport, Engine )
+  DECLARE_NATIVE_CLASS( UMesh, UPrimitive, CLASS_NoExport, Engine )
 
   UMesh();
 
@@ -64,5 +63,4 @@ class UAnimationNotify : public UObject
   AActor* Owner;
   bool bInitialized, bErrorOccured;
 };
-
 

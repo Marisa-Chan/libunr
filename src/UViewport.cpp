@@ -17,27 +17,24 @@
 \*========================================================================*/
 
 /*========================================================================
- * UViewport.h - Object that manages a clients view
+ * UViewport.cpp - Base viewport code
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#pragma once
+#include "UViewport.h"
 
-#include "UPlayer.h"
-
-class UViewport : public UPlayer
+UViewport::UViewport()
+  : UPlayer()
 {
-  DECLARE_NATIVE_CLASS( UViewport, UPlayer, CLASS_NoExport, Engine )
-  UViewport();
+  Width = 0;
+  Height = 0;
+  BitsPerPixel = 32;
+  MaxDesiredFramerate = 60;
+}
 
-  // Viewport properties
-  int Width;
-  int Height;
-  int BitsPerPixel;
-  int MaxDesiredFramerate;
-
-  //URenderDevice* RenderDevice;
-};
+UViewport::~UViewport()
+{
+}
 

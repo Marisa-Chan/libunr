@@ -241,3 +241,47 @@ bool UTexture::ExportToFile( const char* Dir, const char* Type )
   }
 }
 
+UFont::UFont()
+  : UObject()
+{
+  FontTextures = new Array<FFontTexture>();
+  FontTextures->Reserve( 1 ); // there's not even a way to access subfonts???
+}
+
+UFont::~UFont()
+{
+  delete FontTextures;
+}
+
+void UFont::Load()
+{
+  ReadDefaultProperties();
+
+  u8 TextureCount = MAX_UINT8;
+  *PkgFile >> TextureCount;
+  FontTextures->Reserve( TextureCount );
+
+  for ( int i = 0; i < TextureCount; i++ )
+  {
+    FFontTexture* FontTexture = &(*FontTextures)[i];
+
+    idx TextureIdx = MAX_UINT32;
+    idx CharCount  = MAX_UINT32;
+
+    *PkgFile >> CINDEX( TextureIdx );
+    *PkgFile >> CINDEX( CharCount );
+
+    FontTexture->Texture = (UTexture*)LoadObject( TextureIdx, UTexture::StaticClass(), this );
+    FontTexture->Characters->Reserve( CharCount );
+
+    for ( int j = 0; j < CharCount; j++ )
+    {
+      FFontCharInfo* Character = &(*FontTexture->Characters)[j];
+      *PkgFile >> Character->X;
+      *PkgFile >> Character->Y;
+      *PkgFile >> Character->Width;
+      *PkgFile >> Character->Height;
+    }
+  }
+}
+

@@ -23,6 +23,8 @@
  *========================================================================
 */
 
+#pragma once
+
 #include "UPrimitive.h"
 
 class UModel : public UPrimitive

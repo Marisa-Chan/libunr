@@ -49,3 +49,4 @@ class UPlayer : public UObject
   float WindowsMouseY;
   u8    SelectedCursor;
 };
+

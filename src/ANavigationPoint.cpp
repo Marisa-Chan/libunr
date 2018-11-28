@@ -17,27 +17,20 @@
 \*========================================================================*/
 
 /*========================================================================
- * UViewport.h - Object that manages a clients view
+ * ANavigationPoint.cpp - AI Pathing functionality
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#pragma once
+#include "ANavigationPoint.h"
 
-#include "UPlayer.h"
-
-class UViewport : public UPlayer
+ANavigationPoint::ANavigationPoint()
+  : AActor()
 {
-  DECLARE_NATIVE_CLASS( UViewport, UPlayer, CLASS_NoExport, Engine )
-  UViewport();
+}
 
-  // Viewport properties
-  int Width;
-  int Height;
-  int BitsPerPixel;
-  int MaxDesiredFramerate;
-
-  //URenderDevice* RenderDevice;
-};
+ANavigationPoint::~ANavigationPoint()
+{
+}
 

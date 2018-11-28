@@ -18,7 +18,10 @@
 
 /*========================================================================
  * UTexture.h - Native texture object type
- * See the 'Class Texture' and 'Class Palette' in UT-Package-File-Format.pdf
+ * See the following in in UT-Package-File-Format.pdf
+ *   Class 'Texture'
+ *   Class 'Palette'
+ *   Class 'Font'
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
@@ -212,6 +215,50 @@ class DLL_EXPORT UTexture : public UBitmap
 
   FColor PaletteTransform;
   
+  virtual void Load();
+};
+
+class UFont : public UObject
+{
+  DECLARE_NATIVE_CLASS( UFont, UObject, CLASS_NoExport, Engine )
+  UFont();
+
+  struct FFontCharInfo
+  {
+    FFontCharInfo()
+    {
+      X = 0;
+      Y = 0;
+      Width = 0;
+      Height = 0;
+    }
+
+    u32 X;
+    u32 Y;
+    u32 Width;
+    u32 Height;
+  };
+
+  struct FFontTexture
+  {
+    FFontTexture()
+    {
+      Texture = NULL;
+      Characters = new Array<FFontCharInfo>();
+      Characters->Reserve( 256 ); // this is the minimum amount of characters I think
+    }
+    ~FFontTexture()
+    {
+      Texture->DelRef();
+      delete Characters;
+    }
+
+    UTexture* Texture;
+    Array<FFontCharInfo>* Characters;
+  };
+
+  Array<FFontTexture>* FontTextures;
+
   virtual void Load();
 };
 

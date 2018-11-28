@@ -17,27 +17,42 @@
 \*========================================================================*/
 
 /*========================================================================
- * UViewport.h - Object that manages a clients view
+ * AHUD.h - Heads-Up Display Class
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#pragma once
+#include "AActor.h"
 
-#include "UPlayer.h"
+class AHUDOverlay;
+class AMenu;
 
-class UViewport : public UPlayer
+class DLL_EXPORT AHUD : public AActor
 {
-  DECLARE_NATIVE_CLASS( UViewport, UPlayer, CLASS_NoExport, Engine )
-  UViewport();
+  DECLARE_NATIVE_CLASS( AHUD, AActor, CLASS_Abstract, Engine )
+  EXPOSE_TO_USCRIPT()
 
-  // Viewport properties
-  int Width;
-  int Height;
-  int BitsPerPixel;
-  int MaxDesiredFramerate;
+  AHUD();
 
-  //URenderDevice* RenderDevice;
+  int HudMode;
+  int Crosshair;
+  UClass* MainMenuType;
+  String* HUDConfigWindowType;
+
+  AMenu* MainMenu;
+  Array<AHUDOverlay*>* Overlays;
+};
+
+class DLL_EXPORT AHUDOverlay : public AActor
+{
+  DECLARE_NATIVE_CLASS( AHUDOverlay, AActor, CLASS_Abstract, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  AHUDOverlay();
+
+  AHUD* myHUD;
+  bool bPostRender;
+  bool bPreRender;
 };
 
