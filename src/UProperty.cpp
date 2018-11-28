@@ -68,11 +68,16 @@ void UProperty::Load()
   
   if ( Outer->Flags & RF_Native )
     Offset = GetNativeOffset( Outer->Name, Name );
+
+  if ( Outer->Class == UClass::StaticClass() && PropertyFlags & CPF_GlobalConfig )
+    GlobalClass = (UClass*)Outer;
 }
 
 u32 UProperty::GetNativeOffset( const char* ClassName, const char* PropName )
 {
   FNativePropertyList* NativePropList;
+  u32 Offset = MAX_UINT32;
+
   FHash ClassHash = FnvHashString( ClassName );
   for ( size_t i = 0; i < NativePropertyLists->Size() && i != MAX_SIZE; i++ )
   {
@@ -81,15 +86,20 @@ u32 UProperty::GetNativeOffset( const char* ClassName, const char* PropName )
     if ( ClassHash == NativePropList->Hash )
       break;
   }
-  
-  FHash PropHash = FnvHashString( PropName );
+ 
+  char* UpperPropName = strupper( PropName );
+  FHash PropHash = FnvHashString( UpperPropName );
   for ( size_t i = 0; i < NativePropList->Num; i++ )
   {
     if ( NativePropList->Properties[i].Hash == PropHash )
-      return NativePropList->Properties[i].Offset;
+    {
+      Offset = NativePropList->Properties[i].Offset;
+      break;
+    }
   }
-  
-  return MAX_UINT32;
+ 
+  xstl::Free( UpperPropName );
+  return Offset;
 }
 
 void UByteProperty::Load()

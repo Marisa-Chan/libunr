@@ -315,7 +315,12 @@ int FConfig::Load( const char* Filename )
     }
   }
   Logf( LOG_INFO, "Successfully read config file '%s'", Filename );
+
   Name = StringDup( Filename );
+  char* Dot = strrchr( Name, '.' );
+  if ( Dot )
+    *Dot = '\0';
+
   IniFile.Close();
   return 0;
 }

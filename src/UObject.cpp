@@ -50,9 +50,11 @@ void FNativePropertyList::AddProperty( const char* Name, u32 Offset )
 {
   if ( LIKELY( Added < Num ) )
   {
-    Properties[Added].Hash = FnvHashString( Name );
+    char* UpperName = strupper( Name );
+    Properties[Added].Hash = FnvHashString( UpperName );
     Properties[Added].Offset = Offset;
     Added++;
+    xstl::Free( UpperName );
   }
 }
 
@@ -243,6 +245,7 @@ void UObject::ReadDefaultProperties()
       break;
 
     UProperty* Prop = NULL;
+    ArrayIdx = 0;
     bIsDescription = false;
 
     // Support for 227j property descriptions
@@ -552,6 +555,10 @@ void UObject::ReadConfigProperties()
         *Category += ".";
         *Category += Name;
       }
+      else
+      {
+        continue;
+      }
       const char* Variable = Prop->Name;
 
       for( int i = 0; i < Prop->ArrayDim; i++ )
@@ -680,6 +687,10 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
   const char* ObjName = Pkg->ResolveNameFromObjRef( ObjRef );
   const char* ObjPkgName = NULL;
   FNameEntry ClassNameEntry( "Class" );
+
+  // Is the object reference None?
+  if ( strnicmp( ObjName, "None", 4 ) == 0 )
+    return NULL;
 
   // Is our object in this package?
   if ( ObjRef < 0 )
