@@ -539,6 +539,19 @@ void UObject::ReadConfigProperties()
     UProperty* Prop = SafeCast<UProperty>( FieldIter );
     if ( Prop )
     {
+      if ( Prop->Offset == MAX_UINT32 )
+      {
+        if ( Outer )
+          Logf( LOG_WARN, "Property '%s' in '%s.%s.%s' has no native component",
+              Prop->Name, Pkg->Name, Outer->Name, Name );
+        else
+          Logf( LOG_WARN, "Property '%s' in '%s.%s' has no native component",
+              Prop->Name, Pkg->Name, Name );
+
+        Prop = NULL;
+        continue;
+      }
+
       FConfig* Cfg;
       String* Category = new String();
       if ( Prop->PropertyFlags & CPF_GlobalConfig )
@@ -625,6 +638,7 @@ void UObject::ReadConfigProperties()
           GSystem->Exit( -1 );
         }
       }
+      delete Category;
     }
   }
 }
