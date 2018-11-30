@@ -159,6 +159,7 @@ UStruct::UStruct()
   NativeSize = 0;
   StructSize = 0;
   LabelTable = new Array<FScriptLabel>();
+  bFinalizedLoad = false;
 }
 
 UStruct::UStruct( size_t InNativeSize )
