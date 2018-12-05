@@ -247,7 +247,7 @@ public: \
     if (!ObjectClass) \
     { \
       ObjectClass = UObject::StaticAllocateClass( TEXT(cls), clsflags, Super::ObjectClass,\
-        NativeConstructor ); \
+        NativeSize, NativeConstructor ); \
       if ( ObjectClass != NULL ) \
       { \
         ClassPool->PushBack( ObjectClass ); \
@@ -424,7 +424,7 @@ class DLL_EXPORT UObject
   static UObject* StaticConstructObject( const char* InName, UClass* InClass, 
     UObject* InOuter, UPackage* InPkg, FExport* InExport );
   static UClass* StaticAllocateClass( const char* ClassName, u32 Flags, UClass* SuperClass, 
-    UObject *(*NativeCtor)(size_t) );
+    size_t InStructSize, UObject *(*NativeCtor)(size_t) );
   static int CalcObjRefValue( idx ObjRef );
 
   static Array<UObject*>* ObjectPool;
@@ -463,9 +463,6 @@ class DLL_EXPORT UObject
   };
 
 protected:
-  static UClass* StaticAllocateClass( const char* ClassName, u32 Flags, UClass* SuperClass, 
-      UObject *(*NativeCtor)(void) );
-
   int RefCnt;
   size_t OldPkgFileOffset;
 };

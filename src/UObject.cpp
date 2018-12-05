@@ -91,10 +91,10 @@ UObject* UObject::StaticConstructObject( const char* InName, UClass* InClass, UO
 }
 
 UClass* UObject::StaticAllocateClass( const char* ClassName, u32 Flags, UClass* SuperClass, 
-    UObject *(*NativeCtor)(size_t) )
+    size_t InStructSize, UObject *(*NativeCtor)(size_t) )
 {
   ClassName++; // We don't want the prefix indicating object type in the name of the class
-  UClass* Out = new UClass( ClassName, Flags, SuperClass, NativeCtor );
+  UClass* Out = new UClass( ClassName, Flags, SuperClass, InStructSize, NativeCtor );
   Out->Class = UClass::StaticClass();
   return Out;
 }
