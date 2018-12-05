@@ -91,10 +91,10 @@ UObject* UObject::StaticConstructObject( const char* InName, UClass* InClass, UO
 }
 
 UClass* UObject::StaticAllocateClass( const char* ClassName, u32 Flags, UClass* SuperClass, 
-    UObject *(*NativeCtor)(size_t) )
+    size_t InStructSize, UObject *(*NativeCtor)(size_t) )
 {
   ClassName++; // We don't want the prefix indicating object type in the name of the class
-  UClass* Out = new UClass( ClassName, Flags, SuperClass, NativeCtor );
+  UClass* Out = new UClass( ClassName, Flags, SuperClass, InStructSize, NativeCtor );
   Out->Class = UClass::StaticClass();
   return Out;
 }
@@ -679,6 +679,8 @@ UObject* UObject::LoadObject( idx ObjRef, UClass* ObjClass, UObject* InOuter, bo
 UObject* UObject::StaticLoadObject( UPackage* Pkg, const char* ObjName, UClass* ObjClass, UObject* InOuter, 
   bool bLoadClassNow )
 {
+  // FIXME: This does no type checking, if there are objects with duplicate names
+  // then it is possible to get the wrong object
   FExport* ObjExport = Pkg->GetExport( ObjName );
   if ( UNLIKELY( ObjExport == NULL ) )
   {

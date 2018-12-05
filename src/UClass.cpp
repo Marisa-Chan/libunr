@@ -568,11 +568,7 @@ void UStruct::Load()
   }
 
   // Calculate struct size
-  if ( UNLIKELY( Flags & RF_Native ) )
-  {
-    StructSize = NativeSize;
-  }
-  else
+  if ( LIKELY( !(Flags & RF_Native) ) )
   {
     if ( SuperField != NULL && SuperField->IsA( UStruct::StaticClass() ) )
       StructSize = ((UStruct*)SuperField)->StructSize;
@@ -720,7 +716,8 @@ FDependency::FDependency()
 // UClass
 void UClass::BootstrapStage1()
 {
-  ObjectClass = new UClass( "Class", CLASS_NoExport, NULL, UClass::NativeConstructor );
+  ObjectClass = new UClass( "Class", CLASS_NoExport, NULL, 
+      sizeof(UClass), UClass::NativeConstructor );
   ObjectClass->Class = ObjectClass;
   UObject::ClassPool->PushBack( ObjectClass );
 }
@@ -734,10 +731,11 @@ UClass::UClass()
   : UState()
 {
   Constructor = NULL;
+  StructSize = 0;
 }
 
 UClass::UClass( const char* ClassName, u32 Flags, UClass* InSuperClass, 
-    UObject *(*NativeCtor)(size_t) )
+    size_t InStructSize, UObject *(*NativeCtor)(size_t) )
   : UState()
 {
   Name = StringDup( ClassName );
@@ -748,6 +746,7 @@ UClass::UClass( const char* ClassName, u32 Flags, UClass* InSuperClass,
   Constructor = NativeCtor;
   Default = NULL;
   NativeNeedsPkgLoad = true;
+  StructSize = InStructSize;
 }
 
 UClass::~UClass()
@@ -871,6 +870,7 @@ void UClass::Load()
   Default = CreateObject();
   Default->Name  = StringDup( Name );
   Default->Pkg   = Pkg;
+  Default->PkgFile = PkgFile;
   Default->Class = this;
   Default->Field = Children;
 
@@ -892,7 +892,7 @@ void UClass::PostLoad()
   // list when saving packages, we will read the config property first before
   // overriding it with the property in the list
   if ( ( ClassFlags & CLASS_Config ) ) 
-    Default->ReadConfigProperties();
+//    Default->ReadConfigProperties();
 
   Default->PkgFile = PkgFile;
   Default->ReadDefaultProperties();

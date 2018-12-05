@@ -178,7 +178,8 @@ class DLL_EXPORT UClass : public UState
   static void BootstrapStage2();
 
   UClass();
-  UClass( const char* ClassName, u32 Flags, UClass* SuperClass, UObject *(*NativeCtor)(size_t) );
+  UClass( const char* ClassName, u32 Flags, UClass* SuperClass, 
+      size_t InStructSize, UObject *(*NativeCtor)(size_t) );
   
   virtual void Load();
   virtual void PostLoad();
