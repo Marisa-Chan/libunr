@@ -665,6 +665,8 @@ UObject* UObject::LoadObject( idx ObjRef, UClass* ObjClass, UObject* InOuter, bo
 UObject* UObject::StaticLoadObject( UPackage* Pkg, const char* ObjName, UClass* ObjClass, UObject* InOuter, 
   bool bLoadClassNow )
 {
+  // FIXME: This does no type checking, if there are objects with duplicate names
+  // then it is possible to get the wrong object
   FExport* ObjExport = Pkg->GetExport( ObjName );
   if ( UNLIKELY( ObjExport == NULL ) )
   {
