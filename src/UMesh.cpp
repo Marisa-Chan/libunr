@@ -34,3 +34,12 @@ UMesh::~UMesh()
 {
 }
 
+UAnimationNotify::UAnimationNotify()
+  : UObject()
+{
+}
+
+UAnimationNotify::~UAnimationNotify()
+{
+}
+

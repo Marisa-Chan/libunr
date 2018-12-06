@@ -272,6 +272,7 @@ void UFont::Load()
     *PkgFile >> CINDEX( CharCount );
 
     FontTexture->Texture = (UTexture*)LoadObject( TextureIdx, UTexture::StaticClass(), this );
+    FontTexture->Characters = new Array<FFontCharInfo>();
     FontTexture->Characters->Reserve( CharCount );
 
     for ( int j = 0; j < CharCount; j++ )

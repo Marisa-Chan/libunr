@@ -29,7 +29,12 @@
 class DLL_EXPORT USubsystem : public UObject
 {
   DECLARE_NATIVE_ABSTRACT_CLASS( USubsystem, UObject, 0, Core )
+  EXPOSE_TO_USCRIPT()
+
   USubsystem();
+
+  // ??
+  int ExecVtbl;
 };
 
 // Prompt callback for if the game has not been picked 

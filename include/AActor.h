@@ -500,6 +500,31 @@ class AActor : public UObject
   };
 };
 
+class ADecoration : public AActor
+{
+  DECLARE_NATIVE_CLASS( ADecoration, AActor, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  ADecoration();
+
+  bool bPushable;
+  bool bOnlyTriggerable;
+  bool bSplash;
+  bool bBobbing;
+  bool bWasCarried;
+  bool bPushSoundPlaying;
+
+  UClass* EffectWhenDestroyed;
+  USound* PushSound;
+  int     NumLandings;
+  UClass* Contents;
+  UClass* Contents2;
+  UClass* Contents3;
+  USound* EndPushSound;
+
+  AActor* Shadow;
+};
+
 class AInfo : public AActor
 {
   DECLARE_NATIVE_CLASS( AInfo, AActor, 0, Engine )
@@ -507,3 +532,28 @@ class AInfo : public AActor
 
   AInfo();
 };
+
+class AProjectile : public AActor
+{
+  DECLARE_NATIVE_CLASS( AProjectile, AActor, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  AProjectile();
+
+  float Speed;
+  float MaxSpeed;
+  
+  float Damage;
+  int   MomentumTransfer;
+  idx   MyDamageType;
+
+  USound* SpawnSound;
+  USound* ImpactSound;
+  USound* MiscSound;
+
+  float ExploWallOut;
+  UClass* ExplosionDecal;
+
+  AActor* LastHitActor;
+};
+

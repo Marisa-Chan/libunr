@@ -418,3 +418,7 @@ bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC )
   return true;
 }
 
+BEGIN_PROPERTY_LINK( USubsystem, 1 )
+  LINK_NATIVE_PROPERTY( USubsystem, ExecVtbl );
+END_PROPERTY_LINK()
+

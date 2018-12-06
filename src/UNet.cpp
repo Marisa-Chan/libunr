@@ -34,3 +34,12 @@ UNetConnection::~UNetConnection()
 {
 }
 
+UNetDriver::UNetDriver()
+  : USubsystem()
+{
+}
+
+UNetDriver::~UNetDriver()
+{
+}
+

@@ -189,6 +189,10 @@ class DLL_EXPORT UTexture : public UBitmap
   USound* FootstepSound[6];
   USound* HitSound;
 
+  // Surface flags
+  bool bMasked;
+
+  // Texture flags
   bool bHighColorQuality;
   bool bHighTextureQuality;
   bool bRealtime;
@@ -241,12 +245,6 @@ class UFont : public UObject
 
   struct FFontTexture
   {
-    FFontTexture()
-    {
-      Texture = NULL;
-      Characters = new Array<FFontCharInfo>();
-      Characters->Reserve( 256 ); // this is the minimum amount of characters I think
-    }
     ~FFontTexture()
     {
       Texture->DelRef();

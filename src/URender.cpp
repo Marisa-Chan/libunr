@@ -17,33 +17,71 @@
 \*========================================================================*/
 
 /*========================================================================
- * UNet.h - Networking classes
+ * URender.cpp - Rendering Functionality
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#pragma once
+#include "UClass.h"
+#include "UPackage.h"
+#include "URender.h"
+//#include "APlayerPawn.h"
 
-#include "UPlayer.h"
-#include "USystem.h"
-
-class UNetConnection : public UPlayer
+URenderIterator::URenderIterator()
+  : UObject()
 {
-  DECLARE_NATIVE_CLASS( UNetConnection, UPlayer, 
-      CLASS_NoExport | CLASS_Transient | CLASS_Config, Engine )
+  MaxItems = -1;
+  Index = -1;
+  Observer = NULL;
+  Frame = NULL;
+}
 
- 
-  UNetConnection();
-};
-
-class UNetDriver : public USubsystem
+URenderIterator::~URenderIterator()
 {
-  DECLARE_NATIVE_CLASS( UNetDriver, USubsystem,
-      CLASS_NoExport | CLASS_Transient, Engine )
+  //if ( Observer )
+  //  Observer->DelRef();
+}
 
-  UNetDriver();
+URenderDevice::URenderDevice()
+  : USubsystem()
+{
+}
 
-  // TODO:
-};
+URenderDevice::~URenderDevice()
+{
+}
+
+URenderBase::URenderBase()
+  : USubsystem()
+{
+  RenderDevice = NULL;
+}
+
+URenderBase::~URenderBase()
+{
+  if ( RenderDevice )
+    delete RenderDevice;
+}
+
+UStaticLightData::UStaticLightData()
+  : UObject()
+{
+}
+
+UStaticLightData::~UStaticLightData()
+{
+}
+
+IMPLEMENT_NATIVE_CLASS( URenderBase );
+IMPLEMENT_NATIVE_CLASS( URenderDevice );
+IMPLEMENT_NATIVE_CLASS( URenderIterator );
+IMPLEMENT_NATIVE_CLASS( UStaticLightData );
+
+BEGIN_PROPERTY_LINK( URenderIterator, 4 )
+  LINK_NATIVE_PROPERTY( URenderIterator, MaxItems );
+  LINK_NATIVE_PROPERTY( URenderIterator, Index );
+  LINK_NATIVE_PROPERTY( URenderIterator, Observer );
+  LINK_NATIVE_PROPERTY( URenderIterator, Frame );
+END_PROPERTY_LINK()
 

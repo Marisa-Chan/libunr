@@ -17,7 +17,7 @@
 \*========================================================================*/
 
 /*========================================================================
- * UNet.h - Networking classes
+ * UEngine.h - Base Engine Subsystem
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
@@ -25,25 +25,47 @@
 
 #pragma once
 
-#include "UPlayer.h"
+#include "UAudio.h"
+#include "URender.h"
 #include "USystem.h"
+#include "UPrimitive.h"
 
-class UNetConnection : public UPlayer
+class UClient : public UObject
 {
-  DECLARE_NATIVE_CLASS( UNetConnection, UPlayer, 
-      CLASS_NoExport | CLASS_Transient | CLASS_Config, Engine )
+  DECLARE_NATIVE_CLASS( UClient, UObject, CLASS_NoExport, Engine )
 
- 
-  UNetConnection();
-};
-
-class UNetDriver : public USubsystem
-{
-  DECLARE_NATIVE_CLASS( UNetDriver, USubsystem,
-      CLASS_NoExport | CLASS_Transient, Engine )
-
-  UNetDriver();
+  UClient();
 
   // TODO:
 };
+
+class UEngine : public USubsystem
+{
+  DECLARE_NATIVE_CLASS( UEngine, USubsystem, CLASS_Transient, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  UEngine();
+
+  UClass* GameRenderDevice;
+  UClass* AudioDevice;
+  UClass* Console;
+  UClass* NetworkDevice;
+  UClass* Language;
+
+  UPrimitive*      Cylinder; // but why?
+  UClient*         Client;
+  URenderBase*     Render;
+  UAudioSubsystem* Audio;
+
+  int TickCycles;
+  int GameCycles;
+  int ClientCycles;
+
+  int CacheSizeMegs;
+  bool UseSound;
+
+  float CurrentTickRate;
+};
+
+
 

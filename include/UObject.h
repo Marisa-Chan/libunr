@@ -273,7 +273,7 @@ public: \
     } \
     return true; \
   } \
-  static bool StaticLoadNativeClass(); \
+  static bool StaticSetPackageProperties(); \
   static bool StaticClassInit() \
   { \
     if ( !StaticCreateClass() ) \
@@ -288,9 +288,9 @@ public: \
         Logf( LOG_CRIT, "%s::StaticLinkNativeProperties() failed!", TEXT(cls) ); \
         return false; \
       } \
-      if ( !StaticLoadNativeClass() ) \
+      if ( !StaticSetPackageProperties() ) \
       { \
-        Logf( LOG_CRIT, "%s::StaticLoadNativeClass() failed!", TEXT(cls) ); \
+        Logf( LOG_CRIT, "%s::StaticSetPackageProperties() failed!", TEXT(cls) ); \
         return false; \
       } \
     } \
@@ -312,7 +312,7 @@ public: \
   UClass* cls::ObjectClass = NULL; \
   size_t  cls::NativeSize  = sizeof( cls ); \
   FNativePropertyList* cls::StaticNativePropList = NULL; \
-  bool cls::StaticLoadNativeClass() \
+  bool cls::StaticSetPackageProperties() \
   { \
     ObjectClass->Pkg = UPackage::StaticLoadPackage( NativePkgName ); \
     if ( ObjectClass->Pkg == NULL ) \
@@ -323,9 +323,6 @@ public: \
     ObjectClass->Export = ObjectClass->Pkg->GetExport( ObjectClass->Name ); \
     ObjectClass->Export->Obj = ObjectClass; \
     ObjectClass->Flags = ObjectClass->Export->ObjectFlags; \
-    ObjectClass->PreLoad(); \
-    ObjectClass->Load(); \
-    ObjectClass->PostLoad(); \
     return true; \
   }
  
@@ -444,6 +441,7 @@ class DLL_EXPORT UObject
   UClass*     Class;    // Class of this object
   UField*     Field;    // All fields relevant to this object (points to Class->Children)
   FPackageFileIn* PkgFile; // Only relevant when loading
+  bool bLoading;
 
   // I think this was originally here to "hide" sensitive info for objects.
   // This was due to the fact that C++ property offsets *HAVE* to match up

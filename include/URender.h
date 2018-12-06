@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include "UObject.h"
+#include "USystem.h"
 
 class APlayerPawn;
 
@@ -53,3 +53,32 @@ class URenderIterator : public UObject
   APlayerPawn* Observer;
   void* Frame;
 };
+
+class URenderDevice : public USubsystem
+{
+  DECLARE_NATIVE_CLASS( URenderDevice, USubsystem, CLASS_NoExport, Engine )
+
+  URenderDevice();
+
+  // TODO:
+};
+
+class URenderBase : public USubsystem
+{
+  DECLARE_NATIVE_CLASS( URenderBase, USubsystem, CLASS_NoExport, Engine )
+
+  URenderBase();
+
+  URenderDevice* RenderDevice;
+  // TODO:
+};
+
+class UStaticLightData : public UObject
+{
+  DECLARE_NATIVE_CLASS( UStaticLightData, UObject, CLASS_NoExport, Engine )
+  UStaticLightData();
+
+  // TODO:
+};
+
+

@@ -17,33 +17,20 @@
 \*========================================================================*/
 
 /*========================================================================
- * UNet.h - Networking classes
+ * ULocale.cpp - Localization functionality
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#pragma once
+#include "ULocale.h"
 
-#include "UPlayer.h"
-#include "USystem.h"
-
-class UNetConnection : public UPlayer
+ULanguage::ULanguage()
+  : UObject()
 {
-  DECLARE_NATIVE_CLASS( UNetConnection, UPlayer, 
-      CLASS_NoExport | CLASS_Transient | CLASS_Config, Engine )
+}
 
- 
-  UNetConnection();
-};
-
-class UNetDriver : public USubsystem
+ULanguage::~ULanguage()
 {
-  DECLARE_NATIVE_CLASS( UNetDriver, USubsystem,
-      CLASS_NoExport | CLASS_Transient, Engine )
-
-  UNetDriver();
-
-  // TODO:
-};
+}
 

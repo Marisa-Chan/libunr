@@ -17,33 +17,29 @@
 \*========================================================================*/
 
 /*========================================================================
- * UNet.h - Networking classes
+ * UEngine.cpp - Base Engine Functionality
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#pragma once
+#include "UEngine.h"
 
-#include "UPlayer.h"
-#include "USystem.h"
-
-class UNetConnection : public UPlayer
+UClient::UClient()
+  : UObject()
 {
-  DECLARE_NATIVE_CLASS( UNetConnection, UPlayer, 
-      CLASS_NoExport | CLASS_Transient | CLASS_Config, Engine )
+}
 
- 
-  UNetConnection();
-};
-
-class UNetDriver : public USubsystem
+UClient::~UClient()
 {
-  DECLARE_NATIVE_CLASS( UNetDriver, USubsystem,
-      CLASS_NoExport | CLASS_Transient, Engine )
+}
 
-  UNetDriver();
+UEngine::UEngine()
+  : USubsystem()
+{
+}
 
-  // TODO:
-};
+UEngine::~UEngine()
+{
+}
 

@@ -541,7 +541,12 @@ static inline void LoadScriptCode( UStruct* Struct, FPackageFileIn* PkgFile )
 void UStruct::Load()
 {
   Super::Load();
-  
+ 
+  // With circular dependencies, it's possible that we accidentally loaded
+  // this struct already
+  if ( UNLIKELY( !bLoading ) )
+    return;
+
   idx ScriptTextIdx = MAX_UINT32;
   idx ChildIdx = MAX_UINT32;
   idx FriendlyNameIdx = MAX_UINT32;
@@ -600,7 +605,7 @@ void UStruct::FinalizeClassLoad()
       // Don't finalize loads on parent class variables
       break;
     }
-    else if ( Iter->Export->bNeedsFullLoad )
+    else if ( Iter->Export->bNeedsFullLoad && !Iter->bLoading )
     {
       if ( Iter->IsA( UClass::StaticClass() ) )
       {
@@ -614,7 +619,8 @@ void UStruct::FinalizeClassLoad()
     {
       UObjectProperty* ObjPropIter = (UObjectProperty*)Iter;
       if ( ObjPropIter->ObjectType->Export != NULL &&
-           ObjPropIter->ObjectType->Export->bNeedsFullLoad )
+           ObjPropIter->ObjectType->Export->bNeedsFullLoad &&
+           !ObjPropIter->ObjectType->bLoading )
       {
         ObjPropIter->ObjectType->PreLoad();
         ObjPropIter->ObjectType->Load();
@@ -625,7 +631,8 @@ void UStruct::FinalizeClassLoad()
     {
       UClassProperty* ClsPropIter = (UClassProperty*)Iter;
       if ( ClsPropIter->ClassObj->Export != NULL &&
-           ClsPropIter->ClassObj->Export->bNeedsFullLoad )
+           ClsPropIter->ClassObj->Export->bNeedsFullLoad && 
+           !ClsPropIter->ClassObj->bLoading )
       {
         ClsPropIter->ClassObj->PreLoad();
         ClsPropIter->ClassObj->Load();
@@ -698,6 +705,9 @@ UState::~UState()
 void UState::Load()
 {
   Super::Load();
+
+  if ( !bLoading )
+    return;
 
   *PkgFile >> ProbeMask;
   *PkgFile >> IgnoreMask;
@@ -782,7 +792,11 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
 
 void UClass::Load()
 {
+  Export->bNeedsFullLoad = true;
   Super::Load();
+
+  if ( !bLoading )
+    return;
 
   *PkgFile >> ClassFlags;
   PkgFile->Read( ClassGuid, sizeof( ClassGuid ) );
@@ -839,66 +853,52 @@ void UClass::Load()
     ClassConfig = GGameConfig; 
 
   SuperClass = SafeCast<UClass>( SuperField );
-  if ( SuperClass != NULL )
-  {
-    SuperClass->AddRef();
-  
-    // If SuperClass does not have its SuperClass set, then set its
-    // properties that depend on it
-    if ( LIKELY( SuperClass != UObject::StaticClass() ) )
-      if ( SuperClass->SuperClass == NULL )
-        SuperClass->SetSuperClassProperties();
-
-    // Get last child
-    UField* Iter = Children;
-    if ( Iter != NULL )
-      for ( ; Iter->Next != NULL; Iter = Iter->Next );
-
-    // Link super class children to ours
-    if ( Iter )
-      Iter->Next = SuperClass->Children;
-    else
-      Children = SuperClass->Children;
-
-    SuperClass->Children->AddRef();
-  }
-
-  // Construct default object
-  if ( Constructor == NULL )
-    Constructor = SuperClass->Constructor;
-
-  Default = CreateObject();
-  Default->Name  = StringDup( Name );
-  Default->Pkg   = Pkg;
-  Default->PkgFile = PkgFile;
-  Default->Class = this;
-  Default->Field = Children;
-
-  AddRef();
-  if ( LIKELY( Children ) )
-    Children->AddRef();
 }
 
 void UClass::PostLoad()
 {
-  // Set this before finalizing class load
-  Export->bNeedsFullLoad = false;
+  if ( bLoading )
+  {
+    // Set this before finalizing class load
+    Export->bNeedsFullLoad = false;
 
-  // Fully load all class dependencies
-  FinalizeClassLoad();
+    if ( SuperClass != NULL && SuperClass->bLinkedChildren )
+      LinkSuperClassChildren();
 
-  // In Unreal, property lists seem to take precedent over config properties
-  // While we should enforce that a config property is never in the property
-  // list when saving packages, we will read the config property first before
-  // overriding it with the property in the list
-  if ( ( ClassFlags & CLASS_Config ) ) 
-//    Default->ReadConfigProperties();
+    // Fully load all class dependencies
+    FinalizeClassLoad();
 
-  Default->PkgFile = PkgFile;
-  Default->ReadDefaultProperties();
-  Default->PkgFile = NULL;
+    if ( !bLinkedChildren )
+      LinkSuperClassChildren();
 
-  Super::PostLoad();
+    // Construct default object
+    if ( Constructor == NULL )
+      Constructor = SuperClass->Constructor;
+
+    Default = CreateObject();
+    Default->Name  = StringDup( Name );
+    Default->Pkg   = Pkg;
+    Default->PkgFile = PkgFile;
+    Default->Class = this;
+    Default->Field = Children;
+
+    AddRef();
+    if ( LIKELY( Children ) )
+      Children->AddRef();
+
+    // In Unreal, property lists seem to take precedent over config properties
+    // While we should enforce that a config property is never in the property
+    // list when saving packages, we will read the config property first before
+    // overriding it with the property in the list
+    if ( ( ClassFlags & CLASS_Config ) ) 
+//      Default->ReadConfigProperties();
+
+    Default->PkgFile = PkgFile;
+    Default->ReadDefaultProperties();
+    Default->PkgFile = NULL;
+
+    Super::PostLoad();
+  }
 }
 
 bool UClass::IsNative()
@@ -935,6 +935,35 @@ void UClass::SetSuperClassProperties()
 
     if ( Constructor == NULL )
       Constructor = SuperClass->Constructor;
+  }
+}
+
+void UClass::LinkSuperClassChildren()
+{
+  if ( SuperClass != NULL && !bLinkedChildren )
+  {
+    SuperClass->AddRef();
+  
+    // If SuperClass does not have its SuperClass set, then set its
+    // properties that depend on it
+    if ( LIKELY( SuperClass != UObject::StaticClass() ) )
+      if ( SuperClass->SuperClass == NULL )
+        SuperClass->SetSuperClassProperties();
+
+    // Get last child
+    UField* Iter = Children;
+    if ( Iter != NULL )
+      for ( ; Iter->Next != NULL; Iter = Iter->Next );
+
+    // Link super class children to ours
+    if ( Iter )
+      Iter->Next = SuperClass->Children;
+    else
+      Children = SuperClass->Children;
+
+    SuperClass->Children->AddRef();
+
+    bLinkedChildren = true;
   }
 }
 

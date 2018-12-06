@@ -29,15 +29,14 @@ else()
   message( FATAL_ERROR, "Unknown target platform: " ${TARGET_PLATFORM} )
 endif()
 
-set (SOURCES ${UNR_SRC}/AActor.cpp
-             ${UNR_SRC}/ADynamicZoneInfo.cpp
-             ${UNR_SRC}/AHUD.cpp
-             ${UNR_SRC}/ANavigationPoint.cpp
-             ${UNR_SRC}/AZoneInfo.cpp
-             ${UNR_SRC}/FConfig.cpp
+set (SOURCES ${UNR_SRC}/FConfig.cpp
              ${UNR_SRC}/FUtil.cpp
+             ${UNR_SRC}/UAudio.cpp
+             ${UNR_SRC}/UCanvas.cpp
              ${UNR_SRC}/UClass.cpp
              ${UNR_SRC}/UConsole.cpp
+             ${UNR_SRC}/UEngine.cpp
+             ${UNR_SRC}/ULocale.cpp
              ${UNR_SRC}/ULevel.cpp
              ${UNR_SRC}/UMesh.cpp
              ${UNR_SRC}/UModel.cpp
@@ -48,12 +47,24 @@ set (SOURCES ${UNR_SRC}/AActor.cpp
              ${UNR_SRC}/UPlayer.cpp
              ${UNR_SRC}/UPrimitive.cpp
              ${UNR_SRC}/UProperty.cpp
+             ${UNR_SRC}/URender.cpp
              ${UNR_SRC}/USkelAnim.cpp
              ${UNR_SRC}/USound.cpp
              ${UNR_SRC}/UStaticClassInit.cpp
              ${UNR_SRC}/USystem.cpp
              ${UNR_SRC}/UTexture.cpp
              ${UNR_SRC}/UViewport.cpp
+             ${UNR_SRC}/AActor.cpp
+             ${UNR_SRC}/ADecal.cpp
+             ${UNR_SRC}/ADynamicZoneInfo.cpp
+             ${UNR_SRC}/AHUD.cpp
+             ${UNR_SRC}/AInventory.cpp
+             ${UNR_SRC}/ANavigationPoint.cpp
+             ${UNR_SRC}/APawn.cpp
+             ${UNR_SRC}/AReplicationInfo.cpp
+             ${UNR_SRC}/AWeapon.cpp
+             ${UNR_SRC}/AZoneInfo.cpp
+
 )
 
 include_directories (${UNR_INC} ${XSTL_INC} /usr/include)

@@ -17,33 +17,72 @@
 \*========================================================================*/
 
 /*========================================================================
- * UNet.h - Networking classes
+ * AReplicationInfo.h - ReplicationInfo classes
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#pragma once
+#include "AActor.h"
+#include "AZoneInfo.h"
 
-#include "UPlayer.h"
-#include "USystem.h"
-
-class UNetConnection : public UPlayer
+class AReplicationInfo : public AInfo
 {
-  DECLARE_NATIVE_CLASS( UNetConnection, UPlayer, 
-      CLASS_NoExport | CLASS_Transient | CLASS_Config, Engine )
+  DECLARE_NATIVE_CLASS( AReplicationInfo, AInfo, 0, Engine )
+  EXPOSE_TO_USCRIPT()
 
- 
-  UNetConnection();
+  AReplicationInfo();
 };
 
-class UNetDriver : public USubsystem
+class APlayerReplicationInfo : public AReplicationInfo
 {
-  DECLARE_NATIVE_CLASS( UNetDriver, USubsystem,
-      CLASS_NoExport | CLASS_Transient, Engine )
+  DECLARE_NATIVE_CLASS( APlayerReplicationInfo, AReplicationInfo, 0, Engine );
+  EXPOSE_TO_USCRIPT()
 
-  UNetDriver();
+  APlayerReplicationInfo();
 
-  // TODO:
+  String*      PlayerName;
+  int          PlayerID;
+  String*      TeamName;
+  u8           Team;
+  int          TeamID;
+  float        Score;
+  float        Spree;
+  UClass*      VoiceType;
+  ADecoration* HasFlag;
+  int          Ping;
+  bool         bIsFemale;
+  bool         bIsABot;
+  bool         bFeigningDeath;
+  bool         bIsSpectator;
+  UTexture*    TalkTexture;
+  AZoneInfo*   PlayerZone;
+};
+
+class AGameReplicationInfo : public AReplicationInfo
+{
+  DECLARE_NATIVE_CLASS( AGameReplicationInfo, AReplicationInfo, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  AGameReplicationInfo();
+
+  String* GameName;
+  bool    bTeamGame;
+  int     RemainingTime;
+  int     ElapsedTime;
+
+  String* ServerName;
+  String* ShortName;
+  String* AdminName;
+  String* AdminEmail;
+  int     Region;
+  
+  bool    ShowMOTD;
+  String* MOTDLine1;
+  String* MOTDLine2;
+  String* MOTDLine3;
+  String* MOTDLine4;
+
+  String* GameEndedComments;
 };
 

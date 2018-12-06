@@ -17,7 +17,7 @@
 \*========================================================================*/
 
 /*========================================================================
- * UNet.h - Networking classes
+ * ULocale.h - Language class, handles localization
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
@@ -25,25 +25,14 @@
 
 #pragma once
 
-#include "UPlayer.h"
-#include "USystem.h"
+#include "UObject.h"
 
-class UNetConnection : public UPlayer
+class ULanguage : public UObject
 {
-  DECLARE_NATIVE_CLASS( UNetConnection, UPlayer, 
-      CLASS_NoExport | CLASS_Transient | CLASS_Config, Engine )
+  DECLARE_NATIVE_CLASS( ULanguage, UObject, CLASS_NoExport, Core )
 
+  ULanguage();
  
-  UNetConnection();
-};
-
-class UNetDriver : public USubsystem
-{
-  DECLARE_NATIVE_CLASS( UNetDriver, USubsystem,
-      CLASS_NoExport | CLASS_Transient, Engine )
-
-  UNetDriver();
-
-  // TODO:
+  String* LocaleExt;
 };
 

@@ -75,7 +75,7 @@ void UProperty::Load()
 
 u32 UProperty::GetNativeOffset( const char* ClassName, const char* PropName )
 {
-  FNativePropertyList* NativePropList;
+  FNativePropertyList* NativePropList = NULL;
   u32 Offset = MAX_UINT32;
 
   FHash ClassHash = FnvHashString( ClassName );

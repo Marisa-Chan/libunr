@@ -63,6 +63,9 @@ Array<UClass*>*  UObject::ClassPool = NULL;
 Array<FNativePropertyList*>* UObject::NativePropertyLists = NULL;
 Array<UFunction*>* UObject::NativeFunctions = NULL;
 
+IMPLEMENT_NATIVE_CLASS( UObject );
+IMPLEMENT_NATIVE_CLASS( UCommandlet );
+
 UObject* UObject::StaticConstructObject( const char* InName, UClass* InClass, UObject* InOuter, 
   UPackage* InPkg, FExport* InExport )
 {
@@ -133,6 +136,7 @@ void UObject::PreLoad()
   OldPkgFileOffset = PkgFile->Tell();
   PkgFile->Seek( Export->SerialOffset, Begin );
   Export->bNeedsFullLoad = false;
+  bLoading = true;
 }
 
 void UObject::Load()
@@ -154,6 +158,7 @@ void UObject::PostLoad()
   PkgFile->Seek( OldPkgFileOffset, Begin );
   OldPkgFileOffset = 0;
   PkgFile = NULL;
+  bLoading = false;
 }
 
 void UObject::AddRef()
@@ -490,20 +495,15 @@ void UObject::ReadDefaultProperties()
         StructSize = UProperty::PropertySizes[SizeByte];
       }
 
-      if ( Prop && StructProp )
+      if ( StructProp )
       {
         if ( StructSize != StructProp->Struct->StructSize )
         {
-          Logf( LOG_CRIT, "Struct size of default property '%i' does not match actual size '%i'", 
-              StructSize, StructProp->Struct->StructSize );
-          Logf( LOG_CRIT, "Cannot continue parsing defaultproperty list.");
-          return;
+          Logf( LOG_CRIT, "StructProperty '%s' struct size mismatch (Expected %i, got %i)", 
+              PropName, StructProp->Struct->StructSize, StructSize );
         }
-        else
-        {
-          // Read in struct properties based on our definition that we have loaded
-          SetStructProperty( StructProp, PkgFile, ArrayIdx );
-        }
+        // Read in struct properties based on our definition that we have loaded
+        SetStructProperty( StructProp, PkgFile, ArrayIdx );
       }
     }
     else if ( PropType == PROP_Ascii )
@@ -937,4 +937,35 @@ int UCommandlet::Main( String* Parms )
 {
   return 0;
 }
+
+bool UObject::StaticLinkNativeProperties()
+{
+  if ( StaticInitNativePropList( 5 ) )
+  {
+    LINK_NATIVE_ARRAY( UObject, ObjectInternal );
+    LINK_NATIVE_PROPERTY( UObject, Outer );
+    LINK_NATIVE_PROPERTY( UObject, Flags );
+    LINK_NATIVE_PROPERTY( UObject, Name );
+    LINK_NATIVE_PROPERTY( UObject, Class );
+    return true;
+  }
+  return false;
+}
+
+BEGIN_PROPERTY_LINK( UCommandlet, 14 )
+  LINK_NATIVE_PROPERTY( UCommandlet, HelpCmd );
+  LINK_NATIVE_PROPERTY( UCommandlet, HelpOneLiner );
+  LINK_NATIVE_PROPERTY( UCommandlet, HelpUsage );
+  LINK_NATIVE_PROPERTY( UCommandlet, HelpWebLink );
+  LINK_NATIVE_ARRAY   ( UCommandlet, HelpParm );
+  LINK_NATIVE_ARRAY   ( UCommandlet, HelpDesc );
+  LINK_NATIVE_PROPERTY( UCommandlet, LogToStdout );
+  LINK_NATIVE_PROPERTY( UCommandlet, IsServer );
+  LINK_NATIVE_PROPERTY( UCommandlet, IsClient );
+  LINK_NATIVE_PROPERTY( UCommandlet, IsEditor );
+  LINK_NATIVE_PROPERTY( UCommandlet, LazyLoad );
+  LINK_NATIVE_PROPERTY( UCommandlet, ShowErrorCount );
+  LINK_NATIVE_PROPERTY( UCommandlet, ShowBanner );
+  LINK_NATIVE_PROPERTY( UCommandlet, ForceInt );
+END_PROPERTY_LINK()
 

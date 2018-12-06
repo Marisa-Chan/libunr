@@ -17,33 +17,27 @@
 \*========================================================================*/
 
 /*========================================================================
- * UNet.h - Networking classes
+ * ADecal.h - Decals for projectiles, gibs, etc
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#pragma once
+#include "AActor.h"
 
-#include "UPlayer.h"
-#include "USystem.h"
-
-class UNetConnection : public UPlayer
+class ADecal : public AActor
 {
-  DECLARE_NATIVE_CLASS( UNetConnection, UPlayer, 
-      CLASS_NoExport | CLASS_Transient | CLASS_Config, Engine )
+  DECLARE_NATIVE_CLASS( ADecal, AActor, 0, Engine )
+  EXPOSE_TO_USCRIPT()
 
- 
-  UNetConnection();
-};
+  ADecal();
 
-class UNetDriver : public USubsystem
-{
-  DECLARE_NATIVE_CLASS( UNetDriver, USubsystem,
-      CLASS_NoExport | CLASS_Transient, Engine )
+  int  MultiDecalLevel;
+  bool bAttachPanningSurfs;
+  bool bAttachUnlitSurfs;
+  Array<int>* SurfList;
 
-  UNetDriver();
-
-  // TODO:
+  UTexture* AttachDecal( float TraceDistance, FVector* DecalDir = NULL );
+  void DetachDecal();
 };
 

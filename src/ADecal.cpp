@@ -17,33 +17,31 @@
 \*========================================================================*/
 
 /*========================================================================
- * UNet.h - Networking classes
+ * ADecal.cpp - Decal functionality
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#pragma once
+#include "UClass.h"
+#include "ADecal.h"
 
-#include "UPlayer.h"
-#include "USystem.h"
-
-class UNetConnection : public UPlayer
+ADecal::ADecal()
+  : AActor()
 {
-  DECLARE_NATIVE_CLASS( UNetConnection, UPlayer, 
-      CLASS_NoExport | CLASS_Transient | CLASS_Config, Engine )
+  SurfList = new Array<int>();
+}
 
- 
-  UNetConnection();
-};
-
-class UNetDriver : public USubsystem
+ADecal::~ADecal()
 {
-  DECLARE_NATIVE_CLASS( UNetDriver, USubsystem,
-      CLASS_NoExport | CLASS_Transient, Engine )
+}
 
-  UNetDriver();
+IMPLEMENT_NATIVE_CLASS( ADecal );
 
-  // TODO:
-};
+BEGIN_PROPERTY_LINK( ADecal, 4 )
+  LINK_NATIVE_PROPERTY( ADecal, MultiDecalLevel );
+  LINK_NATIVE_PROPERTY( ADecal, bAttachPanningSurfs );
+  LINK_NATIVE_PROPERTY( ADecal, bAttachUnlitSurfs );
+  LINK_NATIVE_PROPERTY( ADecal, SurfList );
+END_PROPERTY_LINK()
 

@@ -17,33 +17,20 @@
 \*========================================================================*/
 
 /*========================================================================
- * UNet.h - Networking classes
+ * UAudio.h - Base audio subsystem functionality
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#pragma once
+#include "UAudio.h"
 
-#include "UPlayer.h"
-#include "USystem.h"
-
-class UNetConnection : public UPlayer
+UAudioSubsystem::UAudioSubsystem()
+  : USubsystem()
 {
-  DECLARE_NATIVE_CLASS( UNetConnection, UPlayer, 
-      CLASS_NoExport | CLASS_Transient | CLASS_Config, Engine )
+}
 
- 
-  UNetConnection();
-};
-
-class UNetDriver : public USubsystem
+UAudioSubsystem::~UAudioSubsystem()
 {
-  DECLARE_NATIVE_CLASS( UNetDriver, USubsystem,
-      CLASS_NoExport | CLASS_Transient, Engine )
-
-  UNetDriver();
-
-  // TODO:
-};
+}
 
