@@ -862,9 +862,14 @@ void UClass::PostLoad()
     // Set this before finalizing class load
     Export->bNeedsFullLoad = false;
 
-    if ( SuperClass != NULL && SuperClass->bLinkedChildren )
-      LinkSuperClassChildren();
+    if ( SuperClass != NULL ) 
+    {
+      if ( Constructor == NULL )
+        Constructor = SuperClass->Constructor;
 
+      if ( SuperClass->bLinkedChildren )
+        LinkSuperClassChildren();
+    }
     // Fully load all class dependencies
     FinalizeClassLoad();
 
@@ -872,9 +877,7 @@ void UClass::PostLoad()
       LinkSuperClassChildren();
 
     // Construct default object
-    if ( Constructor == NULL )
-      Constructor = SuperClass->Constructor;
-
+    
     Default = CreateObject();
     Default->Name  = StringDup( Name );
     Default->Pkg   = Pkg;
