@@ -37,7 +37,7 @@ APawn::~APawn()
 
 IMPLEMENT_NATIVE_CLASS( APawn );
 
-BEGIN_PROPERTY_LINK( APawn, 170 )
+BEGIN_PROPERTY_LINK( APawn, 171 )
   LINK_NATIVE_PROPERTY( APawn, bBehindView );
   LINK_NATIVE_PROPERTY( APawn, bIsPlayer );
   LINK_NATIVE_PROPERTY( APawn, bJustLanded );
@@ -145,6 +145,7 @@ BEGIN_PROPERTY_LINK( APawn, 170 )
   LINK_NATIVE_PROPERTY( APawn, DropWhenKilled );
   LINK_NATIVE_PROPERTY( APawn, UnderWaterTime );
   LINK_NATIVE_PROPERTY( APawn, AttitudeToPlayer );
+  LINK_NATIVE_PROPERTY( APawn, Intelligence );
   LINK_NATIVE_PROPERTY( APawn, Skill );
   LINK_NATIVE_PROPERTY( APawn, SpecialGoal );
   LINK_NATIVE_PROPERTY( APawn, SpecialPause );

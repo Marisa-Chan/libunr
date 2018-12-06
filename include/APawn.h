@@ -179,6 +179,8 @@ class APawn : public AActor
     BRAINS_Human
   };
 
+  EIntelligence Intelligence;
+
   float Skill;
   AActor* SpecialGoal;
   float   SpecialPause;
