@@ -17,7 +17,7 @@
 \*========================================================================*/
 
 /*========================================================================
- * libunr.h - Master libunr header file, do not use internally
+ * UNet.h - Networking classes
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
@@ -25,29 +25,25 @@
 
 #pragma once
 
-#include "Core/FConfig.h"
-#include "Core/FUtil.h"
-#include "Core/UClass.h"
-#include "Core/UMusic.h"
-#include "Core/UObject.h"
-#include "Core/UPackage.h"
-#include "Core/UProperty.h"
-#include "Core/UScript.h"
-#include "Core/USound.h"
+#include "Core/UPlayer.h"
 #include "Core/USystem.h"
-#include "Core/UTexture.h"
 
-#include "Actors/AActor.h"
-#include "Actors/ADecal.h"
-#include "Actors/ADynamicZoneInfo.h"
-#include "Actors/AGameInfo.h"
-#include "Actors/AHUD.h"
-#include "Actors/AInventory.h"
-#include "Actors/ANavigationPoint.h"
-#include "Actors/APawn.h"
-#include "Actors/AProjector.h"
-#include "Actors/AReplicationInfo.h"
-#include "Actors/ASkyZoneInfo.h"
-#include "Actors/AStatLog.h"
-#include "Actors/AWeapon.h"
-#include "Actors/AZoneInfo.h"
+class UNetConnection : public UPlayer
+{
+  DECLARE_NATIVE_CLASS( UNetConnection, UPlayer, 
+      CLASS_NoExport | CLASS_Transient | CLASS_Config, Engine )
+
+ 
+  UNetConnection();
+};
+
+class UNetDriver : public USubsystem
+{
+  DECLARE_NATIVE_CLASS( UNetDriver, USubsystem,
+      CLASS_NoExport | CLASS_Transient, Engine )
+
+  UNetDriver();
+
+  // TODO:
+};
+

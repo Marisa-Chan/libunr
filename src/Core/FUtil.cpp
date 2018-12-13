@@ -17,37 +17,36 @@
 \*========================================================================*/
 
 /*========================================================================
- * libunr.h - Master libunr header file, do not use internally
+ * FUtil.cpp - Utility functions
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#pragma once
-
-#include "Core/FConfig.h"
 #include "Core/FUtil.h"
-#include "Core/UClass.h"
-#include "Core/UMusic.h"
-#include "Core/UObject.h"
-#include "Core/UPackage.h"
-#include "Core/UProperty.h"
-#include "Core/UScript.h"
-#include "Core/USound.h"
-#include "Core/USystem.h"
-#include "Core/UTexture.h"
+#include "stdarg.h"
 
-#include "Actors/AActor.h"
-#include "Actors/ADecal.h"
-#include "Actors/ADynamicZoneInfo.h"
-#include "Actors/AGameInfo.h"
-#include "Actors/AHUD.h"
-#include "Actors/AInventory.h"
-#include "Actors/ANavigationPoint.h"
-#include "Actors/APawn.h"
-#include "Actors/AProjector.h"
-#include "Actors/AReplicationInfo.h"
-#include "Actors/ASkyZoneInfo.h"
-#include "Actors/AStatLog.h"
-#include "Actors/AWeapon.h"
-#include "Actors/AZoneInfo.h"
+#define MAX_MSG_LEN  512
+#define MAX_TYPE_LEN 32
+#define MAX_LINE_LEN (MAX_MSG_LEN + MAX_TYPE_LEN - 1)
+
+void Logf( const char* Type, const char* Str, ... )
+{
+  static char StrBuf[MAX_MSG_LEN];
+  static char Msg[MAX_LINE_LEN];
+  
+  va_list vl;
+  va_start( vl, Str );
+  vsnprintf( StrBuf, MAX_MSG_LEN, Str, vl );
+  va_end( vl );
+  
+  size_t MsgLen = snprintf( Msg, MAX_LINE_LEN, "[%s] %s\n", Type, StrBuf );
+  size_t WriteLen = MsgLen;
+  if ( MsgLen > MAX_LINE_LEN ) 
+  {
+    Logf( LOG_WARN, "Following log message exceeds maximum length" );
+    WriteLen = MAX_LINE_LEN;
+  }
+
+  printf( "%s", Msg );
+}

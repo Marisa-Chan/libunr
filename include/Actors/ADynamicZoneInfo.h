@@ -17,7 +17,8 @@
 \*========================================================================*/
 
 /*========================================================================
- * libunr.h - Master libunr header file, do not use internally
+ * ADynamicZoneInfo.h - A zone info whose properties can update at runtime
+ * Original 227 implementation that this is based off of written by .:..:
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
@@ -25,29 +26,32 @@
 
 #pragma once
 
-#include "Core/FConfig.h"
-#include "Core/FUtil.h"
-#include "Core/UClass.h"
-#include "Core/UMusic.h"
-#include "Core/UObject.h"
-#include "Core/UPackage.h"
-#include "Core/UProperty.h"
-#include "Core/UScript.h"
-#include "Core/USound.h"
-#include "Core/USystem.h"
-#include "Core/UTexture.h"
-
-#include "Actors/AActor.h"
-#include "Actors/ADecal.h"
-#include "Actors/ADynamicZoneInfo.h"
-#include "Actors/AGameInfo.h"
-#include "Actors/AHUD.h"
-#include "Actors/AInventory.h"
-#include "Actors/ANavigationPoint.h"
-#include "Actors/APawn.h"
-#include "Actors/AProjector.h"
-#include "Actors/AReplicationInfo.h"
-#include "Actors/ASkyZoneInfo.h"
-#include "Actors/AStatLog.h"
-#include "Actors/AWeapon.h"
 #include "Actors/AZoneInfo.h"
+
+class ADynamicZoneInfo : public AZoneInfo
+{
+  DECLARE_NATIVE_CLASS( ADynamicZoneInfo, AZoneInfo, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  ADynamicZoneInfo();
+
+  ADynamicZoneInfo* NextDynamicZone;
+
+  enum EDynZoneInfoType
+  {
+    DZONE_Cube,
+    DZONE_Sphere,
+    DZONE_Cylinder,
+    DZONE_Script // TODO: Any benefits to this?
+  };
+  EDynZoneInfoType ZoneAreaType;
+
+  FVector BoxMin, BoxMax;
+  float CylinderSize, SphereSize;
+  AZoneInfo* MatchOnlyZone;
+  bool bUseRelativeToRotation;
+  bool bMovesForceTouchUpdate;
+  bool bUpdateTouchers;
+  FVector OldPose;
+};
+

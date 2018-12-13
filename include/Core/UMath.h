@@ -17,7 +17,7 @@
 \*========================================================================*/
 
 /*========================================================================
- * libunr.h - Master libunr header file, do not use internally
+ * UMath.h - Structs and functions for mathematical operations
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
@@ -25,29 +25,69 @@
 
 #pragma once
 
-#include "Core/FConfig.h"
 #include "Core/FUtil.h"
-#include "Core/UClass.h"
-#include "Core/UMusic.h"
-#include "Core/UObject.h"
-#include "Core/UPackage.h"
-#include "Core/UProperty.h"
-#include "Core/UScript.h"
-#include "Core/USound.h"
-#include "Core/USystem.h"
-#include "Core/UTexture.h"
 
-#include "Actors/AActor.h"
-#include "Actors/ADecal.h"
-#include "Actors/ADynamicZoneInfo.h"
-#include "Actors/AGameInfo.h"
-#include "Actors/AHUD.h"
-#include "Actors/AInventory.h"
-#include "Actors/ANavigationPoint.h"
-#include "Actors/APawn.h"
-#include "Actors/AProjector.h"
-#include "Actors/AReplicationInfo.h"
-#include "Actors/ASkyZoneInfo.h"
-#include "Actors/AStatLog.h"
-#include "Actors/AWeapon.h"
-#include "Actors/AZoneInfo.h"
+struct FVector
+{
+  float X;
+  float Y;
+  float Z;
+};
+
+struct FPlane : public FVector
+{
+  float W;
+};
+
+struct FQuat
+{
+  float X;
+  float Y;
+  float Z;
+  float W;
+};
+
+struct FRotator
+{
+  int Pitch;
+  int Yaw;
+  int Roll;
+};
+
+struct FBox
+{
+  FVector Min;
+  FVector Max;
+  u8      IsValid;
+};
+
+struct FSphere : public FPlane
+{
+};
+
+struct FCoords
+{
+  FVector Origin;
+  FVector XAxis;
+  FVector YAxis;
+  FVector ZAxis;
+};
+
+struct FScale
+{
+  FVector Scale;
+  float   SheerRate;
+  enum ESheerAxis
+  {
+    SHEER_None,
+    SHEER_XY,
+    SHEER_XZ,
+    SHEER_YX,
+    SHEER_YZ,
+    SHEER_ZX,
+    SHEER_ZY
+  };
+
+  ESheerAxis SheerAxis;
+};
+

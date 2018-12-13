@@ -17,7 +17,7 @@
 \*========================================================================*/
 
 /*========================================================================
- * libunr.h - Master libunr header file, do not use internally
+ * AStatLog.h - Logs game events for stat collection
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
@@ -25,29 +25,51 @@
 
 #pragma once
 
-#include "Core/FConfig.h"
-#include "Core/FUtil.h"
-#include "Core/UClass.h"
-#include "Core/UMusic.h"
-#include "Core/UObject.h"
-#include "Core/UPackage.h"
-#include "Core/UProperty.h"
-#include "Core/UScript.h"
-#include "Core/USound.h"
-#include "Core/USystem.h"
-#include "Core/UTexture.h"
-
 #include "Actors/AActor.h"
-#include "Actors/ADecal.h"
-#include "Actors/ADynamicZoneInfo.h"
-#include "Actors/AGameInfo.h"
-#include "Actors/AHUD.h"
-#include "Actors/AInventory.h"
-#include "Actors/ANavigationPoint.h"
-#include "Actors/APawn.h"
-#include "Actors/AProjector.h"
-#include "Actors/AReplicationInfo.h"
-#include "Actors/ASkyZoneInfo.h"
-#include "Actors/AStatLog.h"
-#include "Actors/AWeapon.h"
-#include "Actors/AZoneInfo.h"
+
+class AStatLog : public AInfo
+{
+  DECLARE_NATIVE_CLASS( AStatLog, AInfo, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  AStatLog();
+
+  void* Context; // ???
+  bool  bWorld;
+  float TimeStamp;
+
+  String* LocalStandard;
+  String* WorldStandard;
+  String* LogVersion;
+  String* LogInfoURL;
+  String* GameName;
+  String* GameCreator;
+  String* GameCreatorURL;
+  String* DecoderRingURL;
+
+  String* LocalLogDir;
+  String* WorldLogDir;
+};
+
+class AStatLogFile : public AStatLog
+{
+  DECLARE_NATIVE_CLASS( AStatLogFile, AStatLog, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  AStatLogFile();
+
+  bool bWatermark;
+  Stream* LogAr;
+
+  String* StatLogFile;
+  String* StatLogFinal;
+
+  void OpenLog();
+  void CloseLog();
+  void Watermark( String* EventString );
+  String* GetChecksum();
+  String* GetPlayerChecksum( String* PlayerName, String* Secret );
+  void FileFlush();
+  void FileLog( String* EventString );
+};
+

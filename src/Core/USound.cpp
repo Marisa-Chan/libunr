@@ -17,37 +17,72 @@
 \*========================================================================*/
 
 /*========================================================================
- * libunr.h - Master libunr header file, do not use internally
+ * USound.cpp - Native sound object type
+ * See the 'Class Sound' in UT-Package-File-Format.pdf
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#pragma once
-
-#include "Core/FConfig.h"
-#include "Core/FUtil.h"
-#include "Core/UClass.h"
-#include "Core/UMusic.h"
-#include "Core/UObject.h"
-#include "Core/UPackage.h"
-#include "Core/UProperty.h"
-#include "Core/UScript.h"
 #include "Core/USound.h"
-#include "Core/USystem.h"
-#include "Core/UTexture.h"
+#include "Core/UPackage.h"
 
-#include "Actors/AActor.h"
-#include "Actors/ADecal.h"
-#include "Actors/ADynamicZoneInfo.h"
-#include "Actors/AGameInfo.h"
-#include "Actors/AHUD.h"
-#include "Actors/AInventory.h"
-#include "Actors/ANavigationPoint.h"
-#include "Actors/APawn.h"
-#include "Actors/AProjector.h"
-#include "Actors/AReplicationInfo.h"
-#include "Actors/ASkyZoneInfo.h"
-#include "Actors/AStatLog.h"
-#include "Actors/AWeapon.h"
-#include "Actors/AZoneInfo.h"
+USound::USound()
+{
+  SoundFormat = 0;
+  SoundSize = 0;
+  SoundData = NULL;
+}
+
+USound::~USound()
+{
+  if (SoundData != NULL)
+    delete SoundData;
+}
+
+void USound::Load()
+{
+  ReadDefaultProperties();
+
+  *PkgFile >> CINDEX( SoundFormat );
+  if ( PkgFile->Ver >= PKG_VER_UN_220 )
+    *PkgFile >> OffsetNext;
+  
+  *PkgFile >> CINDEX( SoundSize );
+  
+  SoundData = new u8[SoundSize];
+  PkgFile->Read( SoundData, SoundSize );
+}
+
+// TODO: Support exporting to a number of different formats
+bool USound::ExportToFile( const char* Dir, const char* Type )
+{
+  // Set up filename
+  String* Filename = new String( Dir );
+#if defined LIBUNR_WIN32
+  Filename->ReplaceChars( '\\', '/' );
+#endif
+  if ( Filename->Back() != '/' )
+    Filename->Append( "/" );
+
+  Filename->Append( Pkg->ResolveNameFromIdx( NameIdx ) );
+  Filename->Append( "." );
+  Filename->Append( Pkg->ResolveNameFromIdx( SoundFormat ) );
+  
+  // Open file
+  FileStreamOut* Out = new FileStreamOut();
+  if ( Out->Open( *Filename ) != 0 )
+  {
+    Logf( LOG_WARN, "Failed to export sound to wav file '%s'", Filename->Data() );
+    return false;
+  }
+
+  // Write
+  Out->Write( SoundData, SoundSize );
+  
+  // Close
+  Out->Close();
+  delete Out;
+  delete Filename;  
+  return true;
+}

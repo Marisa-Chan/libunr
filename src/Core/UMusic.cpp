@@ -17,37 +17,70 @@
 \*========================================================================*/
 
 /*========================================================================
- * libunr.h - Master libunr header file, do not use internally
+ * UMusic.cpp - Native music object type
+ * See the 'Class Music' in UT-Package-File-Format.pdf
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#pragma once
-
-#include "Core/FConfig.h"
-#include "Core/FUtil.h"
-#include "Core/UClass.h"
 #include "Core/UMusic.h"
-#include "Core/UObject.h"
 #include "Core/UPackage.h"
-#include "Core/UProperty.h"
-#include "Core/UScript.h"
-#include "Core/USound.h"
-#include "Core/USystem.h"
-#include "Core/UTexture.h"
 
-#include "Actors/AActor.h"
-#include "Actors/ADecal.h"
-#include "Actors/ADynamicZoneInfo.h"
-#include "Actors/AGameInfo.h"
-#include "Actors/AHUD.h"
-#include "Actors/AInventory.h"
-#include "Actors/ANavigationPoint.h"
-#include "Actors/APawn.h"
-#include "Actors/AProjector.h"
-#include "Actors/AReplicationInfo.h"
-#include "Actors/ASkyZoneInfo.h"
-#include "Actors/AStatLog.h"
-#include "Actors/AWeapon.h"
-#include "Actors/AZoneInfo.h"
+UMusic::UMusic()
+{
+  MusicType = 0; // Index 0 in a package's name table always points to music type
+  ChunkSize = 0;
+  ChunkData = NULL;
+}
+
+UMusic::~UMusic()
+{
+  if ( ChunkData != NULL )
+    delete ChunkData;
+}
+
+void UMusic::Load()
+{
+  *PkgFile >> ChunkCount;
+  
+  if ( PkgFile->Ver > PKG_VER_UN_200 )
+    *PkgFile >> _unknown0;
+  
+  *PkgFile >> CINDEX( ChunkSize );
+  
+  ChunkData = new u8[ChunkSize];
+  PkgFile->Read( ChunkData, ChunkSize );
+}
+
+bool UMusic::ExportToFile( const char* Dir, const char* Type )
+{
+  // Set up filename
+  String* Filename = new String( Dir );
+#if defined LIBUNR_WIN32
+  Filename->ReplaceChars( '\\', '/' );
+#endif
+  if ( Filename->Back() != '/' )
+    Filename->Append( "/" );
+
+  Filename->Append( Pkg->ResolveNameFromIdx( NameIdx ) );
+  Filename->Append( "." );
+  Filename->Append( Pkg->ResolveNameFromIdx( MusicType ) );
+
+  // Open file
+  FileStreamOut* Out = new FileStreamOut();
+  if ( Out->Open( *Filename ) != 0 )
+  {
+    Logf( LOG_WARN, "Failed to export music to file '%s'", Filename );
+    return false;
+  }
+  
+  // Write
+  Out->Write( ChunkData, ChunkSize );
+  
+  // Close
+  Out->Close();
+  delete Out;
+  delete Filename;  
+  return true;
+}

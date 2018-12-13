@@ -17,37 +17,71 @@
 \*========================================================================*/
 
 /*========================================================================
- * libunr.h - Master libunr header file, do not use internally
+ * URender.cpp - Rendering Functionality
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#pragma once
-
-#include "Core/FConfig.h"
-#include "Core/FUtil.h"
 #include "Core/UClass.h"
-#include "Core/UMusic.h"
-#include "Core/UObject.h"
 #include "Core/UPackage.h"
-#include "Core/UProperty.h"
-#include "Core/UScript.h"
-#include "Core/USound.h"
-#include "Core/USystem.h"
-#include "Core/UTexture.h"
+#include "Core/URender.h"
+//#include "APlayerPawn.h"
 
-#include "Actors/AActor.h"
-#include "Actors/ADecal.h"
-#include "Actors/ADynamicZoneInfo.h"
-#include "Actors/AGameInfo.h"
-#include "Actors/AHUD.h"
-#include "Actors/AInventory.h"
-#include "Actors/ANavigationPoint.h"
-#include "Actors/APawn.h"
-#include "Actors/AProjector.h"
-#include "Actors/AReplicationInfo.h"
-#include "Actors/ASkyZoneInfo.h"
-#include "Actors/AStatLog.h"
-#include "Actors/AWeapon.h"
-#include "Actors/AZoneInfo.h"
+URenderIterator::URenderIterator()
+  : UObject()
+{
+  MaxItems = -1;
+  Index = -1;
+  Observer = NULL;
+  Frame = NULL;
+}
+
+URenderIterator::~URenderIterator()
+{
+  //if ( Observer )
+  //  Observer->DelRef();
+}
+
+URenderDevice::URenderDevice()
+  : USubsystem()
+{
+}
+
+URenderDevice::~URenderDevice()
+{
+}
+
+URenderBase::URenderBase()
+  : USubsystem()
+{
+  RenderDevice = NULL;
+}
+
+URenderBase::~URenderBase()
+{
+  if ( RenderDevice )
+    delete RenderDevice;
+}
+
+UStaticLightData::UStaticLightData()
+  : UObject()
+{
+}
+
+UStaticLightData::~UStaticLightData()
+{
+}
+
+IMPLEMENT_NATIVE_CLASS( URenderBase );
+IMPLEMENT_NATIVE_CLASS( URenderDevice );
+IMPLEMENT_NATIVE_CLASS( URenderIterator );
+IMPLEMENT_NATIVE_CLASS( UStaticLightData );
+
+BEGIN_PROPERTY_LINK( URenderIterator, 4 )
+  LINK_NATIVE_PROPERTY( URenderIterator, MaxItems );
+  LINK_NATIVE_PROPERTY( URenderIterator, Index );
+  LINK_NATIVE_PROPERTY( URenderIterator, Observer );
+  LINK_NATIVE_PROPERTY( URenderIterator, Frame );
+END_PROPERTY_LINK()
+

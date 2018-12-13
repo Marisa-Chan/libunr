@@ -17,7 +17,7 @@
 \*========================================================================*/
 
 /*========================================================================
- * libunr.h - Master libunr header file, do not use internally
+ * AReplicationInfo.h - ReplicationInfo classes
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
@@ -25,29 +25,66 @@
 
 #pragma once
 
-#include "Core/FConfig.h"
-#include "Core/FUtil.h"
-#include "Core/UClass.h"
-#include "Core/UMusic.h"
-#include "Core/UObject.h"
-#include "Core/UPackage.h"
-#include "Core/UProperty.h"
-#include "Core/UScript.h"
-#include "Core/USound.h"
-#include "Core/USystem.h"
-#include "Core/UTexture.h"
-
 #include "Actors/AActor.h"
-#include "Actors/ADecal.h"
-#include "Actors/ADynamicZoneInfo.h"
-#include "Actors/AGameInfo.h"
-#include "Actors/AHUD.h"
-#include "Actors/AInventory.h"
-#include "Actors/ANavigationPoint.h"
-#include "Actors/APawn.h"
-#include "Actors/AProjector.h"
-#include "Actors/AReplicationInfo.h"
-#include "Actors/ASkyZoneInfo.h"
-#include "Actors/AStatLog.h"
-#include "Actors/AWeapon.h"
 #include "Actors/AZoneInfo.h"
+
+class AReplicationInfo : public AInfo
+{
+  DECLARE_NATIVE_CLASS( AReplicationInfo, AInfo, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  AReplicationInfo();
+};
+
+class APlayerReplicationInfo : public AReplicationInfo
+{
+  DECLARE_NATIVE_CLASS( APlayerReplicationInfo, AReplicationInfo, 0, Engine );
+  EXPOSE_TO_USCRIPT()
+
+  APlayerReplicationInfo();
+
+  String*      PlayerName;
+  int          PlayerID;
+  String*      TeamName;
+  u8           Team;
+  int          TeamID;
+  float        Score;
+  float        Spree;
+  UClass*      VoiceType;
+  ADecoration* HasFlag;
+  int          Ping;
+  bool         bIsFemale;
+  bool         bIsABot;
+  bool         bFeigningDeath;
+  bool         bIsSpectator;
+  UTexture*    TalkTexture;
+  AZoneInfo*   PlayerZone;
+};
+
+class AGameReplicationInfo : public AReplicationInfo
+{
+  DECLARE_NATIVE_CLASS( AGameReplicationInfo, AReplicationInfo, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  AGameReplicationInfo();
+
+  String* GameName;
+  bool    bTeamGame;
+  int     RemainingTime;
+  int     ElapsedTime;
+
+  String* ServerName;
+  String* ShortName;
+  String* AdminName;
+  String* AdminEmail;
+  int     Region;
+  
+  bool    ShowMOTD;
+  String* MOTDLine1;
+  String* MOTDLine2;
+  String* MOTDLine3;
+  String* MOTDLine4;
+
+  String* GameEndedComments;
+};
+

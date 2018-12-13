@@ -17,37 +17,31 @@
 \*========================================================================*/
 
 /*========================================================================
- * libunr.h - Master libunr header file, do not use internally
+ * ADecal.cpp - Decal functionality
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#pragma once
-
-#include "Core/FConfig.h"
-#include "Core/FUtil.h"
 #include "Core/UClass.h"
-#include "Core/UMusic.h"
-#include "Core/UObject.h"
-#include "Core/UPackage.h"
-#include "Core/UProperty.h"
-#include "Core/UScript.h"
-#include "Core/USound.h"
-#include "Core/USystem.h"
-#include "Core/UTexture.h"
-
-#include "Actors/AActor.h"
 #include "Actors/ADecal.h"
-#include "Actors/ADynamicZoneInfo.h"
-#include "Actors/AGameInfo.h"
-#include "Actors/AHUD.h"
-#include "Actors/AInventory.h"
-#include "Actors/ANavigationPoint.h"
-#include "Actors/APawn.h"
-#include "Actors/AProjector.h"
-#include "Actors/AReplicationInfo.h"
-#include "Actors/ASkyZoneInfo.h"
-#include "Actors/AStatLog.h"
-#include "Actors/AWeapon.h"
-#include "Actors/AZoneInfo.h"
+
+ADecal::ADecal()
+  : AActor()
+{
+  SurfList = new Array<int>();
+}
+
+ADecal::~ADecal()
+{
+}
+
+IMPLEMENT_NATIVE_CLASS( ADecal );
+
+BEGIN_PROPERTY_LINK( ADecal, 4 )
+  LINK_NATIVE_PROPERTY( ADecal, MultiDecalLevel );
+  LINK_NATIVE_PROPERTY( ADecal, bAttachPanningSurfs );
+  LINK_NATIVE_PROPERTY( ADecal, bAttachUnlitSurfs );
+  LINK_NATIVE_PROPERTY( ADecal, SurfList );
+END_PROPERTY_LINK()
+

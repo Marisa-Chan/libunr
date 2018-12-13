@@ -17,7 +17,7 @@
 \*========================================================================*/
 
 /*========================================================================
- * libunr.h - Master libunr header file, do not use internally
+ * URender.h - Rendering classes
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
@@ -25,29 +25,60 @@
 
 #pragma once
 
-#include "Core/FConfig.h"
-#include "Core/FUtil.h"
-#include "Core/UClass.h"
-#include "Core/UMusic.h"
-#include "Core/UObject.h"
-#include "Core/UPackage.h"
-#include "Core/UProperty.h"
-#include "Core/UScript.h"
-#include "Core/USound.h"
 #include "Core/USystem.h"
-#include "Core/UTexture.h"
 
-#include "Actors/AActor.h"
-#include "Actors/ADecal.h"
-#include "Actors/ADynamicZoneInfo.h"
-#include "Actors/AGameInfo.h"
-#include "Actors/AHUD.h"
-#include "Actors/AInventory.h"
-#include "Actors/ANavigationPoint.h"
-#include "Actors/APawn.h"
-#include "Actors/AProjector.h"
-#include "Actors/AReplicationInfo.h"
-#include "Actors/ASkyZoneInfo.h"
-#include "Actors/AStatLog.h"
-#include "Actors/AWeapon.h"
-#include "Actors/AZoneInfo.h"
+class APlayerPawn;
+
+class URenderIterator : public UObject
+{
+  DECLARE_NATIVE_CLASS( URenderIterator, UObject, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  URenderIterator();
+
+  // Leaving out some structs here until they're actually needed
+  // struct ActorBuffer
+  // {
+  //   u8 Padding[564];
+  // };
+  //
+  // struct ActorNode
+  // {
+  //   ActorBuffer ActorProxy;
+  //   ActorNode*  NextNode;
+  // };
+
+  int MaxItems;
+  int Index;
+  APlayerPawn* Observer;
+  void* Frame;
+};
+
+class URenderDevice : public USubsystem
+{
+  DECLARE_NATIVE_CLASS( URenderDevice, USubsystem, CLASS_NoExport, Engine )
+
+  URenderDevice();
+
+  // TODO:
+};
+
+class URenderBase : public USubsystem
+{
+  DECLARE_NATIVE_CLASS( URenderBase, USubsystem, CLASS_NoExport, Engine )
+
+  URenderBase();
+
+  URenderDevice* RenderDevice;
+  // TODO:
+};
+
+class UStaticLightData : public UObject
+{
+  DECLARE_NATIVE_CLASS( UStaticLightData, UObject, CLASS_NoExport, Engine )
+  UStaticLightData();
+
+  // TODO:
+};
+
+

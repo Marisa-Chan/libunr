@@ -1,0 +1,183 @@
+Fire textures follow the same format as normal Textures, followed by
+- An INDEX for the number of sparks
+- Sparks
+=======================================================================================
+Each spark consists of (as seen in FireTexture.uc)
+- [u8]  Spark type
+- [u8]  Spark heat
+- [u8]  Spark X location (0 - Xdimension-1)
+- [u8]  Spark Y location (0 - Ydimension-1)
+- [u8]  X-speed
+- [u8]  Y-speed
+- [u8]  Age, Emitter freq (???)
+- [u8]  Exp. Time (Controls lifespan of residual sparks?)
+=======================================================================================
+
+Spark Behavior
+=======================================================================================
+- In general
+  - Spark drawing will loop between image boundaries (a spark placed too close
+    to the top will show effects towards the bottom)
+    - Same goes for left and right sides
+
+  - Spark residual effect seems to take on the same color as the spark itself
+    for about 3 pixels, then tapers off to an average color, then tapers off
+    to black
+
+  - When the residual effect of sparks are touching, their effects appear to
+    ADD together
+
+  - Residual sparks are sparks that are spawned by main sparks
+=======================================================================================
+- bRising
+  - All sparks in a fire texture rise significantly longer
+    - In particular, the color that is copied each line is darkened at a much
+      slower rate
+=======================================================================================
+- RenderHeat
+  - Determines how long it takes for the residual effect of a spark to
+    begin darkening, and also how slow a color darkens to black
+=======================================================================================
+- FX_Size
+  - Appears to control Exp. Time
+=======================================================================================
+
+Spark Effects
+=======================================================================================
+- SPARK_Burn
+  - Each spark takes on a random color within the palette every frame
+=======================================================================================
+- SPARK_Sparkle
+  - Sparks travel to random X coordinates without changing their Y coordinate
+  - Each spark appears to be set to the same color every frame
+=======================================================================================
+- SPARK_Pulse
+  - When painted, the spark heat decrements at fixed intervals, loops back
+    around when 00 is hit
+  - Sparks appear to cycle color brightness by starting at black and ramping
+    up close to white before resetting back to black
+    - Is this dependent based on spark heat?
+=======================================================================================
+- SPARK_Signal
+  - Basically the same as burn, but colors tend to be brighter rather than
+    totally random
+=======================================================================================
+- SPARK_Blaze
+  - Residual sparks appear to be generated, traveling outward in a random
+    direction before dying after some period of time
+=======================================================================================
+- SPARK_OzHasSpoken
+  - Residual sparks appear to fly upward at slightly random velocities,
+    horizontal velocities tend toward either left or right, with slightly
+    random X movement
+=======================================================================================
+- SPARK_Cone
+  - Residual sparks taper off either to the left or the right, with some
+    downward Y acceleration (almost like they're being affected by gravity)
+=======================================================================================
+- SPARK_BlazeRight
+  - Same as SPARK_Blaze, but residual sparks always go to the right and appear
+    to have a constant downward Y velocity
+=======================================================================================
+- SPARK_BlazeLeft
+  - Same as SPARK_BlazeRight, but residual sparks go to the left
+=======================================================================================
+- SPARK_Cylinder
+  - Sparks appear to move from left to right, and then back  based on some 
+    fixed range
+    - Movement speed is affected by FX_HorizSpeed
+=======================================================================================
+- SPARK_Cylinder3D
+  - Same as SPARK_Cylinder, but when a spark reaches the rightmost point, it
+    turns black until the spark reaches the left again
+======================================================================================= 
+- SPARK_Lissajous
+  - Same as SPARK_Cylinder3D, but sparks follow a vertical sine wave movement
+=======================================================================================
+- SPARK_Jugglers
+  - Performs like SPARK_Cylinder, but sparks move only vertically rather than
+    up and down
+=======================================================================================
+- SPARK_Emit
+  - Residual sparks move very slowly upward with minor horizontal variation,
+    have a very short life span
+=======================================================================================
+- SPARK_Fountain
+  - Residual sparks move downward with minor horizontal variation
+    - Life span of residual sparks determined by Exp. Time
+=======================================================================================
+- SPARK_Flocks
+  - Residual spark "group" moves around the texture randomly, residual sparks
+    spawn off of this group with varying X and Y coordinates based on the
+    group's position.
+
+  - Seems to spawn residual spark every tick
+
+  - Residual sparks move in a circular motion while traveling at some random
+    velocity very slowly until death
+=======================================================================================
+- SPARK_Eels
+  - Residual spark "group" as seen in SPARK_Flocks
+  
+  - Seems to spawn residual spark every 2-4 ticks
+
+  - Residual sparks seem to pick some general direction and move in that
+    direction, stopping every second or so to readjust direction
+=======================================================================================
+- SPARK_Organic
+  - Like SPARK_OzHasSpoken, but residual sparks seem to spawn anywhere between 
+    0-32 pixels to the right of the main spark
+=======================================================================================
+- SPARK_WanderOrganic
+  - Like a mix of SPARK_Flocks and SPARK_Organic
+=======================================================================================
+- SPARK_RandomCloud
+  - Residual sparks spawn at varying X and Y locations based off of main
+    spark, seem to fly straight upward for awhile with little horizontal
+    velocity
+=======================================================================================
+- SPARK_CustomCloud
+  - Like SPARK_RandomCloud, but sparks do not move at all
+=======================================================================================
+- SPARK_LocalCloud
+  - Like SPARK_CustomCloud, but sparks spawn much closer to the main spark
+=======================================================================================
+- SPARK_Stars
+  - Doesn't seem to do anything except draw a white pixel on the main spark's
+    location????
+=======================================================================================
+- SPARK_LineLightning
+  - Creates a lightning effect between two points
+    - X and Y coordinates mark where the spark is located, as usual
+    - X-speed and Y-speed are used as offsets do the main spark coordinate,
+      lightning is shown between those two points
+        - (X,Y) and (X+X-speed,Y+Y-speed)
+  - Residual sparks are drawn by picking a random line length, then drawing
+    each spark by moving down one frame and moving either 1 or 2 pixels in the
+    direction of the line
+=======================================================================================
+- SPARK_RampLightning
+  - Creates a lightning effect between two points, as described in
+    SPARK_LineLightning
+  - The color of each spark gets darker based on how long the lightning is and
+    how close it is to the end
+=======================================================================================
+- SPARK_SphereLightning
+  - Creates a lightning effect between two points, one being the spark's
+    coordinate and the other being random within a set radius of spark's
+    origin
+  - Age/Emitter Freq. stores the radius
+=======================================================================================
+- SPARK_Wheel
+  - Like SPARK_Flocks, but sparks spawn around the origin
+=======================================================================================
+- SPARK_Gametes
+  - Like SPARK_Eels, but sparks will alternate moving left and right
+    consistently
+=======================================================================================
+- SPARK_Sprinkler
+  - Residual sparks spawn consistently from left to right, in a sprinkler like
+    effect
+  - Residual sparks have same X and Y velocity, appear to terminate when they
+    loop back to the sparks origin
+

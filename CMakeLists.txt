@@ -29,41 +29,41 @@ else()
   message( FATAL_ERROR, "Unknown target platform: " ${TARGET_PLATFORM} )
 endif()
 
-set (SOURCES ${UNR_SRC}/FConfig.cpp
-             ${UNR_SRC}/FUtil.cpp
-             ${UNR_SRC}/UAudio.cpp
-             ${UNR_SRC}/UCanvas.cpp
-             ${UNR_SRC}/UClass.cpp
-             ${UNR_SRC}/UConsole.cpp
-             ${UNR_SRC}/UEngine.cpp
-             ${UNR_SRC}/ULocale.cpp
-             ${UNR_SRC}/ULevel.cpp
-             ${UNR_SRC}/UMesh.cpp
-             ${UNR_SRC}/UModel.cpp
-             ${UNR_SRC}/UMusic.cpp
-             ${UNR_SRC}/UNet.cpp
-             ${UNR_SRC}/UObject.cpp
-             ${UNR_SRC}/UPackage.cpp
-             ${UNR_SRC}/UPlayer.cpp
-             ${UNR_SRC}/UPrimitive.cpp
-             ${UNR_SRC}/UProperty.cpp
-             ${UNR_SRC}/URender.cpp
-             ${UNR_SRC}/USkelAnim.cpp
-             ${UNR_SRC}/USound.cpp
-             ${UNR_SRC}/UStaticClassInit.cpp
-             ${UNR_SRC}/USystem.cpp
-             ${UNR_SRC}/UTexture.cpp
-             ${UNR_SRC}/UViewport.cpp
-             ${UNR_SRC}/AActor.cpp
-             ${UNR_SRC}/ADecal.cpp
-             ${UNR_SRC}/ADynamicZoneInfo.cpp
-             ${UNR_SRC}/AHUD.cpp
-             ${UNR_SRC}/AInventory.cpp
-             ${UNR_SRC}/ANavigationPoint.cpp
-             ${UNR_SRC}/APawn.cpp
-             ${UNR_SRC}/AReplicationInfo.cpp
-             ${UNR_SRC}/AWeapon.cpp
-             ${UNR_SRC}/AZoneInfo.cpp
+set (SOURCES ${UNR_SRC}/Core/FConfig.cpp
+             ${UNR_SRC}/Core/FUtil.cpp
+             ${UNR_SRC}/Core/UAudio.cpp
+             ${UNR_SRC}/Core/UCanvas.cpp
+             ${UNR_SRC}/Core/UClass.cpp
+             ${UNR_SRC}/Core/UConsole.cpp
+             ${UNR_SRC}/Core/UEngine.cpp
+             ${UNR_SRC}/Core/ULocale.cpp
+             ${UNR_SRC}/Core/ULevel.cpp
+             ${UNR_SRC}/Core/UMesh.cpp
+             ${UNR_SRC}/Core/UModel.cpp
+             ${UNR_SRC}/Core/UMusic.cpp
+             ${UNR_SRC}/Core/UNet.cpp
+             ${UNR_SRC}/Core/UObject.cpp
+             ${UNR_SRC}/Core/UPackage.cpp
+             ${UNR_SRC}/Core/UPlayer.cpp
+             ${UNR_SRC}/Core/UPrimitive.cpp
+             ${UNR_SRC}/Core/UProperty.cpp
+             ${UNR_SRC}/Core/URender.cpp
+             ${UNR_SRC}/Core/USkelAnim.cpp
+             ${UNR_SRC}/Core/USound.cpp
+             ${UNR_SRC}/Core/UStaticClassInit.cpp
+             ${UNR_SRC}/Core/USystem.cpp
+             ${UNR_SRC}/Core/UTexture.cpp
+             ${UNR_SRC}/Core/UViewport.cpp
+             ${UNR_SRC}/Actors/AActor.cpp
+             ${UNR_SRC}/Actors/ADecal.cpp
+             ${UNR_SRC}/Actors/ADynamicZoneInfo.cpp
+             ${UNR_SRC}/Actors/AHUD.cpp
+             ${UNR_SRC}/Actors/AInventory.cpp
+             ${UNR_SRC}/Actors/ANavigationPoint.cpp
+             ${UNR_SRC}/Actors/APawn.cpp
+             ${UNR_SRC}/Actors/AReplicationInfo.cpp
+             ${UNR_SRC}/Actors/AWeapon.cpp
+             ${UNR_SRC}/Actors/AZoneInfo.cpp
 
 )
 

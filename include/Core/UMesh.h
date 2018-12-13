@@ -17,7 +17,7 @@
 \*========================================================================*/
 
 /*========================================================================
- * libunr.h - Master libunr header file, do not use internally
+ * UMesh.h - Mesh classes
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
@@ -25,29 +25,42 @@
 
 #pragma once
 
-#include "Core/FConfig.h"
-#include "Core/FUtil.h"
-#include "Core/UClass.h"
-#include "Core/UMusic.h"
-#include "Core/UObject.h"
-#include "Core/UPackage.h"
-#include "Core/UProperty.h"
-#include "Core/UScript.h"
-#include "Core/USound.h"
-#include "Core/USystem.h"
-#include "Core/UTexture.h"
+#include "Core/UPrimitive.h"
 
-#include "Actors/AActor.h"
-#include "Actors/ADecal.h"
-#include "Actors/ADynamicZoneInfo.h"
-#include "Actors/AGameInfo.h"
-#include "Actors/AHUD.h"
-#include "Actors/AInventory.h"
-#include "Actors/ANavigationPoint.h"
-#include "Actors/APawn.h"
-#include "Actors/AProjector.h"
-#include "Actors/AReplicationInfo.h"
-#include "Actors/ASkyZoneInfo.h"
-#include "Actors/AStatLog.h"
-#include "Actors/AWeapon.h"
-#include "Actors/AZoneInfo.h"
+class AActor;
+
+class UMesh : public UPrimitive
+{
+  DECLARE_NATIVE_CLASS( UMesh, UPrimitive, CLASS_NoExport, Engine )
+
+  UMesh();
+
+  // TODO:
+};
+
+class UAnimationNotify : public UObject
+{
+  DECLARE_NATIVE_CLASS( UAnimationNotify, UObject, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  UAnimationNotify();
+
+  struct AnimNotify
+  {
+    idx AnimName;
+    idx FunctionName;
+    int KeyFrame;
+    EAnimNotifyEval NotifyEval;
+    bool bCallOncePerLoop;
+    bool bCalculatedFrame;
+    bool bAlreadyCalled;
+    int NumFrames;
+    float CallKey;
+  };
+
+  AnimNotify AnimationNotify[255];
+  int NumNotifies;
+  AActor* Owner;
+  bool bInitialized, bErrorOccured;
+};
+
