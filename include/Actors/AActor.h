@@ -679,6 +679,34 @@ class AInfo : public AActor
   AInfo();
 };
 
+class AKeypoint : public AActor
+{
+  DECLARE_NATIVE_CLASS( AKeypoint, AActor, CLASS_Abstract, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  AKeypoint();
+};
+
+class AInterpolationPoint : public AKeypoint
+{
+  DECLARE_NATIVE_CLASS( AInterpolationPoint, AKeypoint, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  AInterpolationPoint();
+
+  int     Position;
+  float   RateModifier;
+  float   GameSpeedModifier;
+  float   FovModifier;
+  bool    bEndOfPath;
+  bool    bSkipNextPath;
+  float   ScreenFlashScale;
+  FVector ScreenFlashFog;
+
+  AInterpolationPoint* Prev;
+  AInterpolationPoint* Next;
+};
+
 class AMutator : public AActor
 {
   DECLARE_NATIVE_CLASS( AMutator, AActor, 0, Engine )
@@ -744,6 +772,17 @@ class AProjectile : public AActor
   UClass* ExplosionDecal;
 
   AActor* LastHitActor;
+};
+
+class ASpawnNotify : public AActor
+{
+  DECLARE_NATIVE_CLASS( ASpawnNotify, AActor, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  ASpawnNotify();
+
+  UClass* ActorClass;
+  ASpawnNotify* Next;
 };
 
 class ATriggers : public AActor

@@ -45,10 +45,14 @@
 #include "Actors/AActor.h"
 #include "Actors/ADecal.h"
 #include "Actors/ADynamicZoneInfo.h"
+#include "Actors/AGameInfo.h"
 #include "Actors/AHUD.h"
 #include "Actors/AInventory.h"
 #include "Actors/ANavigationPoint.h"
 #include "Actors/APawn.h"
+#include "Actors/APlayerPawn.h"
+#include "Actors/AProjector.h"
+#include "Actors/AStatLog.h"
 #include "Actors/AWeapon.h"
 #include "Actors/AZoneInfo.h"
 
@@ -118,6 +122,7 @@ bool UObject::StaticInit()
   Result &= UAudioSubsystem::StaticClassInit();
   Result &= UBitmap::StaticClassInit();
     Result &= UTexture::StaticClassInit();
+      Result &= UScriptedTexture::StaticClassInit();
   Result &= UCanvas::StaticClassInit();
   Result &= UClient::StaticClassInit();
   Result &= UConsole::StaticClassInit();
@@ -125,6 +130,7 @@ bool UObject::StaticInit()
   Result &= UFont::StaticClassInit();
   Result &= ULevelBase::StaticClassInit();
   Result &= ULevel::StaticClassInit();
+  Result &= ULevelSummary::StaticClassInit();
   Result &= UNetConnection::StaticClassInit();
   Result &= UNetDriver::StaticClassInit();
   Result &= USkeletalMesh::StaticClassInit();
@@ -145,26 +151,38 @@ bool UObject::StaticInit()
   // Init actor classes
   Result &= AActor::StaticClassInit();
     Result &= ABrush::StaticClassInit();
+      Result &= AMover::StaticClassInit();
     Result &= ADecal::StaticClassInit();
     Result &= ADecoration::StaticClassInit();
       Result &= ACarcass::StaticClassInit();
     Result &= AHUD::StaticClassInit();
     Result &= AHUDOverlay::StaticClassInit();
     Result &= AInfo::StaticClassInit();
+    Result &= AKeypoint::StaticClassInit();
+      Result &= AInterpolationPoint::StaticClassInit();
+      Result &= AGameInfo::StaticClassInit();
       Result &= AReplicationInfo::StaticClassInit();
         Result &= AGameReplicationInfo::StaticClassInit();
         Result &= APlayerReplicationInfo::StaticClassInit();
+      Result &= AStatLog::StaticClassInit();
+        Result &= AStatLog::StaticClassInit();
       Result &= AZoneInfo::StaticClassInit();
         Result &= ADynamicZoneInfo::StaticClassInit();
+        Result &= ALevelInfo::StaticClassInit();
     Result &= AInventory::StaticClassInit();
       Result &= AWeapon::StaticClassInit();
     Result &= AInventoryAttachment::StaticClassInit();
       Result &= AWeaponAttachment::StaticClassInit();
       Result &= AWeaponMuzzleFlash::StaticClassInit();
+    Result &= AMenu::StaticClassInit();
     Result &= ANavigationPoint::StaticClassInit();
       Result &= AInventorySpot::StaticClassInit();
+      Result &= APlayerStart::StaticClassInit();
+      Result &= ATeleporter::StaticClassInit();
     Result &= APawn::StaticClassInit();
+      Result &= APlayerPawn::StaticClassInit();
     Result &= AProjectile::StaticClassInit();
+    Result &= ASpawnNotify::StaticClassInit();
     Result &= ATriggers::StaticClassInit();
       Result &= ATrigger::StaticClassInit();
 
@@ -173,8 +191,6 @@ bool UObject::StaticInit()
 
   IMPLEMENT_NATIVE_CLASS( UAnimation );
   IMPLEMENT_NATIVE_CLASS( UAnimationNotify );
-  IMPLEMENT_NATIVE_CLASS( UBitmap );
-    IMPLEMENT_NATIVE_CLASS( UTexture );
   IMPLEMENT_NATIVE_CLASS( UCanvas );
   IMPLEMENT_NATIVE_CLASS( UClient );
     IMPLEMENT_NATIVE_CLASS( UConsole );
@@ -199,13 +215,11 @@ bool UObject::StaticInit()
       IMPLEMENT_NATIVE_CLASS( UFunction );
       IMPLEMENT_NATIVE_CLASS( UState );
         IMPLEMENT_NATIVE_CLASS( UClass );
-  IMPLEMENT_NATIVE_CLASS( UFont );
   IMPLEMENT_NATIVE_CLASS( ULanguage );
   IMPLEMENT_NATIVE_CLASS( ULevelBase );
     IMPLEMENT_NATIVE_CLASS( ULevel );
   IMPLEMENT_NATIVE_CLASS( UMusic );
   IMPLEMENT_NATIVE_CLASS( UNetConnection );
-  IMPLEMENT_NATIVE_CLASS( UPalette );
   IMPLEMENT_NATIVE_CLASS( UPackage );
   IMPLEMENT_NATIVE_CLASS( UPlayer );
     IMPLEMENT_NATIVE_CLASS( UViewport );
@@ -224,9 +238,7 @@ bool UObject::StaticInit()
  
   IMPLEMENT_NATIVE_CLASS( AHUD );
   IMPLEMENT_NATIVE_CLASS( AHUDOverlay );
-    IMPLEMENT_NATIVE_CLASS( AZoneInfo );
-      IMPLEMENT_NATIVE_CLASS( ADynamicZoneInfo );
-  IMPLEMENT_NATIVE_CLASS( ANavigationPoint );
+  IMPLEMENT_NATIVE_CLASS( ADynamicZoneInfo );
 
 BEGIN_PROPERTY_LINK( UAnimationNotify, 5 )
   LINK_NATIVE_ARRAY   ( UAnimationNotify, AnimationNotify );
@@ -279,60 +291,6 @@ BEGIN_PROPERTY_LINK( UConsole, 40 )
   LINK_NATIVE_PROPERTY( UConsole, bValidKeyEvent );
 END_PROPERTY_LINK()
 
-BEGIN_PROPERTY_LINK( UPalette, 1 )
-  LINK_NATIVE_ARRAY( UPalette, Colors ); 
-END_PROPERTY_LINK()
-
-BEGIN_PROPERTY_LINK( UBitmap, 11 )
-  LINK_NATIVE_PROPERTY( UBitmap, Format );
-  LINK_NATIVE_PROPERTY( UBitmap, Palette );
-  LINK_NATIVE_PROPERTY( UBitmap, UBits );
-  LINK_NATIVE_PROPERTY( UBitmap, VBits );
-  LINK_NATIVE_PROPERTY( UBitmap, USize );
-  LINK_NATIVE_PROPERTY( UBitmap, VSize );
-  LINK_NATIVE_PROPERTY( UBitmap, UClamp );
-  LINK_NATIVE_PROPERTY( UBitmap, VClamp );
-  LINK_NATIVE_PROPERTY( UBitmap, MipZero );
-  LINK_NATIVE_PROPERTY( UBitmap, MaxColor );
-  LINK_NATIVE_ARRAY( UBitmap, InternalTime );
-END_PROPERTY_LINK()
-
-BEGIN_PROPERTY_LINK( UTexture, 33 )
-  LINK_NATIVE_PROPERTY( UTexture, BumpMap );
-  LINK_NATIVE_PROPERTY( UTexture, DetailTexture );
-  LINK_NATIVE_PROPERTY( UTexture, MacroTexture );
-  LINK_NATIVE_PROPERTY( UTexture, Diffuse );
-  LINK_NATIVE_PROPERTY( UTexture, Specular );
-  LINK_NATIVE_PROPERTY( UTexture, Alpha );
-  LINK_NATIVE_PROPERTY( UTexture, DrawScale );
-  LINK_NATIVE_PROPERTY( UTexture, Friction );
-  LINK_NATIVE_PROPERTY( UTexture, MipMult );
-  LINK_NATIVE_ARRAY   ( UTexture, FootstepSound );
-  LINK_NATIVE_PROPERTY( UTexture, HitSound );
-  LINK_NATIVE_PROPERTY( UTexture, bMasked );
-  LINK_NATIVE_PROPERTY( UTexture, bHighColorQuality );
-  LINK_NATIVE_PROPERTY( UTexture, bHighTextureQuality );
-  LINK_NATIVE_PROPERTY( UTexture, bRealtime );
-  LINK_NATIVE_PROPERTY( UTexture, bParametric );
-  LINK_NATIVE_PROPERTY( UTexture, bRealtimeChanged );
-  LINK_NATIVE_PROPERTY( UTexture, bHasComp );
-  LINK_NATIVE_PROPERTY( UTexture, bFractical );
-  LINK_NATIVE_PROPERTY( UTexture, LODSet );
-  LINK_NATIVE_PROPERTY( UTexture, AnimNext );
-  LINK_NATIVE_PROPERTY( UTexture, AnimCurrent );
-  LINK_NATIVE_PROPERTY( UTexture, PrimeCount );
-  LINK_NATIVE_PROPERTY( UTexture, PrimeCurrent );
-  LINK_NATIVE_PROPERTY( UTexture, MinFrameRate );
-  LINK_NATIVE_PROPERTY( UTexture, MaxFrameRate );
-  LINK_NATIVE_PROPERTY( UTexture, Accumulator );
-  LINK_NATIVE_PROPERTY( UTexture, Mips );
-  LINK_NATIVE_PROPERTY( UTexture, CompMips );
-  LINK_NATIVE_PROPERTY( UTexture, CompFormat );
-  LINK_NATIVE_PROPERTY( UTexture, SurfaceType );
-  LINK_NATIVE_PROPERTY( UTexture, UClampMode );
-  LINK_NATIVE_PROPERTY( UTexture, VClampMode );
-  LINK_NATIVE_PROPERTY( UTexture, PaletteTransform );
-END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( USkeletalMeshInstance, 20 )
   LINK_NATIVE_PROPERTY( USkeletalMeshInstance, SpaceBases );
@@ -402,78 +360,7 @@ BEGIN_PROPERTY_LINK( AHUDOverlay, 3 )
   LINK_NATIVE_PROPERTY( AHUDOverlay, bPreRender );
 END_PROPERTY_LINK()
 
-BEGIN_PROPERTY_LINK( AZoneInfo, 70 )
-  LINK_NATIVE_PROPERTY( AZoneInfo, ZoneTag );
-  LINK_NATIVE_PROPERTY( AZoneInfo, ZoneGravity );
-  LINK_NATIVE_PROPERTY( AZoneInfo, ZoneVelocity );
-  LINK_NATIVE_PROPERTY( AZoneInfo, ZoneGroundFriction );
-  LINK_NATIVE_PROPERTY( AZoneInfo, ZoneFluidFriction );
-  LINK_NATIVE_PROPERTY( AZoneInfo, ZoneTerminalVelocity );
-  LINK_NATIVE_PROPERTY( AZoneInfo, ZonePlayerEvent );
-  LINK_NATIVE_PROPERTY( AZoneInfo, ZonePlayerCount );
-  LINK_NATIVE_PROPERTY( AZoneInfo, ZoneTimeDilation );
-  LINK_NATIVE_PROPERTY( AZoneInfo, NumCarcasses );
-  LINK_NATIVE_PROPERTY( AZoneInfo, DamagePerSec );
-  LINK_NATIVE_PROPERTY( AZoneInfo, DamageType );
-  LINK_NATIVE_PROPERTY( AZoneInfo, DamageString );
-  LINK_NATIVE_PROPERTY( AZoneInfo, ZoneName );
-  LINK_NATIVE_ARRAY   ( AZoneInfo, LocationStrings );
-  LINK_NATIVE_PROPERTY( AZoneInfo, LocationID );
-  LINK_NATIVE_PROPERTY( AZoneInfo, MaxCarcasses );
-  LINK_NATIVE_PROPERTY( AZoneInfo, EntrySound );
-  LINK_NATIVE_PROPERTY( AZoneInfo, ExitSound );
-  LINK_NATIVE_PROPERTY( AZoneInfo, EntryActor );
-  LINK_NATIVE_PROPERTY( AZoneInfo, ExitActor );
-  LINK_NATIVE_PROPERTY( AZoneInfo, SkyZone );
-  LINK_NATIVE_PROPERTY( AZoneInfo, bWaterZone );
-  LINK_NATIVE_PROPERTY( AZoneInfo, bFogZone );
-  LINK_NATIVE_PROPERTY( AZoneInfo, bKillZone );
-  LINK_NATIVE_PROPERTY( AZoneInfo, bNeutralZone );
-  LINK_NATIVE_PROPERTY( AZoneInfo, bGravityZone );
-  LINK_NATIVE_PROPERTY( AZoneInfo, bPainZone );
-  LINK_NATIVE_PROPERTY( AZoneInfo, bDestructive );
-  LINK_NATIVE_PROPERTY( AZoneInfo, bNoInventory );
-  LINK_NATIVE_PROPERTY( AZoneInfo, bMoveProjectiles );
-  LINK_NATIVE_PROPERTY( AZoneInfo, bReverbZone );
-  LINK_NATIVE_PROPERTY( AZoneInfo, bRaytraceReverb );
-  LINK_NATIVE_PROPERTY( AZoneInfo, bRepZoneProperties );
-  LINK_NATIVE_PROPERTY( AZoneInfo, bDistanceFogClips );
-  LINK_NATIVE_PROPERTY( AZoneInfo, bDistanceFog );
-  LINK_NATIVE_PROPERTY( AZoneInfo, bZoneBasedFog );
-  LINK_NATIVE_PROPERTY( AZoneInfo, FogDistanceStart );
-  LINK_NATIVE_PROPERTY( AZoneInfo, FogColor );
-  LINK_NATIVE_PROPERTY( AZoneInfo, FogDistance );
-  LINK_NATIVE_PROPERTY( AZoneInfo, FadeTime );
-  LINK_NATIVE_PROPERTY( AZoneInfo, FogDensity );
-  LINK_NATIVE_PROPERTY( AZoneInfo, FogMode );
-  LINK_NATIVE_PROPERTY( AZoneInfo, AmbientBrightness );
-  LINK_NATIVE_PROPERTY( AZoneInfo, AmbientHue );
-  LINK_NATIVE_PROPERTY( AZoneInfo, AmbientSaturation );
-  LINK_NATIVE_PROPERTY( AZoneInfo, EnvironmentMap );
-  LINK_NATIVE_PROPERTY( AZoneInfo, EnvironmentUScale );
-  LINK_NATIVE_PROPERTY( AZoneInfo, EnvironmentVScale );
-  LINK_NATIVE_PROPERTY( AZoneInfo, EnvironmentColor );
-  LINK_NATIVE_PROPERTY( AZoneInfo, TexUPanSpeed );
-  LINK_NATIVE_PROPERTY( AZoneInfo, TexVPanSpeed );
-  LINK_NATIVE_PROPERTY( AZoneInfo, ViewFlash );
-  LINK_NATIVE_PROPERTY( AZoneInfo, ViewFog );
-  LINK_NATIVE_PROPERTY( AZoneInfo, DirtyShadowLevel );
-  LINK_NATIVE_ARRAY   ( AZoneInfo, LightMapDetailLevels );
-  LINK_NATIVE_PROPERTY( AZoneInfo, SpeedOfSound );
-  LINK_NATIVE_PROPERTY( AZoneInfo, MasterGain );
-  LINK_NATIVE_PROPERTY( AZoneInfo, CutoffHz );
-  LINK_NATIVE_ARRAY   ( AZoneInfo, Delay );
-  LINK_NATIVE_ARRAY   ( AZoneInfo, Gain );
-  LINK_NATIVE_PROPERTY( AZoneInfo, EFXAmbients );
-  LINK_NATIVE_ARRAY   ( AZoneInfo, LensFlare );
-  LINK_NATIVE_ARRAY   ( AZoneInfo, LensFlareOffset );
-  LINK_NATIVE_ARRAY   ( AZoneInfo, LensFlareScale );
-  LINK_NATIVE_PROPERTY( AZoneInfo, MinLightCount );
-  LINK_NATIVE_PROPERTY( AZoneInfo, MaxLightCount );
-  LINK_NATIVE_PROPERTY( AZoneInfo, MinLightingPolyCount );
-  LINK_NATIVE_PROPERTY( AZoneInfo, MaxLightingPolyCount );
-  LINK_NATIVE_PROPERTY( AZoneInfo, VisNotify );
-END_PROPERTY_LINK()
+
 
 BEGIN_PROPERTY_LINK( ADynamicZoneInfo, 10 )
   LINK_NATIVE_PROPERTY( ADynamicZoneInfo, ZoneAreaType );
@@ -487,37 +374,4 @@ BEGIN_PROPERTY_LINK( ADynamicZoneInfo, 10 )
   LINK_NATIVE_PROPERTY( ADynamicZoneInfo, bUpdateTouchers );
   LINK_NATIVE_PROPERTY( ADynamicZoneInfo, OldPose );
 END_PROPERTY_LINK()
-
-BEGIN_PROPERTY_LINK( ANavigationPoint, 30 )
-  LINK_NATIVE_PROPERTY( ANavigationPoint, OwnerTeam );
-  LINK_NATIVE_ARRAY   ( ANavigationPoint, ProscribedPaths );
-  LINK_NATIVE_ARRAY   ( ANavigationPoint, ForcedPaths );
-  LINK_NATIVE_ARRAY   ( ANavigationPoint, UpstreamPaths );
-  LINK_NATIVE_ARRAY   ( ANavigationPoint, Paths );
-  LINK_NATIVE_ARRAY   ( ANavigationPoint, PrunedPaths );
-  LINK_NATIVE_ARRAY   ( ANavigationPoint, VisNoReachPaths );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, VisitedWeight );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, RouteCache );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, BestPathWeight );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, NextNavigationPoint );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, NextOrdered );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, PrevOrdered );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, StartPath );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, PreviousPath );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, Cost );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, ExtraCost );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, PathDescription );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, EditorData );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, ForcedPathSize );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, MaxPathDistance );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, Taken );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, bPlayerOnly );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, bEndPoint );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, bEndPointOnly );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, bSpecialCost );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, bOneWayPath );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, bAutoBuilt );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, bNoStrafeTo );
-END_PROPERTY_LINK()
-
 

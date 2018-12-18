@@ -25,6 +25,7 @@
 
 #include "XMemory.h"
 #include "Core/UClass.h"
+#include "Core/UMath.h"
 #include "Core/UObject.h"
 #include "Core/UProperty.h"
 #include "Core/UPackage.h"
@@ -43,6 +44,11 @@ DEFINE_GET_PROPERTY_ADDRESS( GetObjPropAddr,   UObject*,  UObjectProperty )
 DEFINE_GET_PROPERTY_ADDRESS( GetNamePropAddr,  idx,       UNameProperty   )
 DEFINE_GET_PROPERTY_ADDRESS( GetClassPropAddr, UClass*,   UClassProperty  )
 DEFINE_GET_PROPERTY_ADDRESS( GetStrPropAddr, const char*, UStrProperty    )
+
+template <class T> inline Array<T>** GetArrayPropAddr( UObject* Obj, UArrayProperty* Prop, int Idx )
+{
+  return (Array<T>**)((u8*)Obj + Prop->Offset + (Idx * sizeof(Array<T>*)));
+}
 
 // Property getters
 inline u8 UObject::GetByteProperty( UByteProperty* Prop, int Idx )
@@ -108,6 +114,12 @@ inline const char* UObject::GetStrProperty( UStrProperty* Prop, int Idx )
   return *GetStrPropAddr( this, Prop, Idx );
 }
 
+template <class T> inline
+Array<T>* UObject::GetArrayProperty( UArrayProperty* Prop, int Idx )
+{
+  return *GetArrayPropAddr<T>( this, Prop, Idx );
+}
+
 inline void UObject::SetByteProperty( UByteProperty* Prop, u8 NewVal, int Idx )
 {
   *GetBytePropAddr( this, Prop, Idx ) = NewVal;
@@ -165,9 +177,9 @@ inline void UObject::SetStrProperty( UStrProperty* Prop, const char* NewVal, int
 
 // Not something that should be called in the scripting environment
 // Only for defaultproperty lists
-void UObject::SetStructProperty( UStructProperty* Prop, FPackageFileIn* In, int Idx )
+void UObject::SetStructProperty( UStructProperty* Prop, FPackageFileIn* In, int Idx, u32 Offset )
 {
-  void* StructAddr = GetStructProperty( Prop, Idx );
+  void* StructAddr = PtrAdd( GetStructProperty( Prop, Idx ), Offset );
 
   for ( UField* Child = Prop->Struct->Children; Child != NULL; Child = Child->Next )
   {
@@ -237,10 +249,10 @@ void UObject::SetStructProperty( UStructProperty* Prop, FPackageFileIn* In, int 
         UObject* Obj = (UObject*)LoadObject( ObjRef, 
           ((UObjectProperty*)ChildProp)->ObjectType, NULL );
 
-        if ( Obj == NULL )
+        if ( ObjRef != 0 && Obj == NULL )
         {
           Logf( LOG_CRIT, "Can't load object '%s' for struct property '%s' in property list for object '%s'", 
-                Prop->Pkg->ResolveNameFromObjRef( ObjRef ), Prop->Name, Prop->Outer );
+                Prop->Pkg->ResolveNameFromObjRef( ObjRef ), Prop->Name, Prop->Outer->Name );
           return;
         }
 
@@ -254,12 +266,12 @@ void UObject::SetStructProperty( UStructProperty* Prop, FPackageFileIn* In, int 
       {
         idx ObjRef = 0;
         *In >> CINDEX( ObjRef );
-        UClass* Cls = (UClass*)LoadObject( ObjRef, UClassProperty::StaticClass(), NULL );
+        UClass* Cls = (UClass*)LoadObject( ObjRef, UClass::StaticClass(), NULL );
 
-        if ( Cls == NULL )
+        if ( ObjRef != 0 && Cls == NULL )
         {
           Logf( LOG_CRIT, "Can't load class '%s' for struct property '%s' in property list for object '%s'", 
-                Prop->Pkg->ResolveNameFromObjRef( ObjRef ), Prop->Name, Prop->Outer );
+                Prop->Pkg->ResolveNameFromObjRef( ObjRef ), Prop->Name, Prop->Outer->Name );
           return;
         }
 
@@ -270,7 +282,7 @@ void UObject::SetStructProperty( UStructProperty* Prop, FPackageFileIn* In, int 
     else if ( ChildProp->Class == UStructProperty::StaticClass() )
     {
       for ( int i = 0; i < ChildProp->ArrayDim; i++ )
-        SetStructProperty( (UStructProperty*)ChildProp, In, i );
+        SetStructProperty( (UStructProperty*)ChildProp, In, i, Prop->Offset );
     }
 
     else if ( ChildProp->Class == UStrProperty::StaticClass() )
@@ -293,3 +305,84 @@ void UObject::SetStructProperty( UStructProperty* Prop, FPackageFileIn* In, int 
     }
   }
 }
+
+template<class T> inline
+void UObject::SetArrayProperty( UArrayProperty* Prop, FPackageFileIn* In, int Idx,
+  u8 ByteSize, u8 NumElem )
+{
+  Array<T>* ArrayAddr = GetArrayProperty<T>( Prop, Idx );
+  ArrayAddr->Reserve( NumElem );
+
+  while ( ByteSize && NumElem )
+  {
+    T Value;
+    *In >> Value;
+    ArrayAddr->PushBack( Value );
+
+    NumElem--;
+    ByteSize -= sizeof(T);
+  }
+}
+
+template<> inline
+void UObject::SetArrayProperty<bool>( UArrayProperty* Prop, FPackageFileIn* In, int Idx,
+  u8 ByteSize, u8 NumElem )
+{
+  Array<bool>* ArrayAddr = GetArrayProperty<bool>( Prop, Idx );
+  ArrayAddr->Reserve( NumElem );
+
+  while ( ByteSize && NumElem )
+  {
+    bool bValue;
+    u8 Value;
+    *In >> Value;
+
+    bValue = Value;
+    ArrayAddr->PushBack( bValue );
+
+    NumElem--;
+    ByteSize -= sizeof(idx);
+  }
+}
+
+template<> inline
+void UObject::SetArrayProperty<idx>( UArrayProperty* Prop, FPackageFileIn* In, int Idx,
+  u8 ByteSize, u8 NumElem )
+{
+  Array<idx>* ArrayAddr = GetArrayProperty<idx>( Prop, Idx );
+  ArrayAddr->Reserve( NumElem );
+
+  while ( ByteSize && NumElem )
+  {
+    idx Value;
+    *In >> CINDEX( Value );
+    ArrayAddr->PushBack( Value );
+
+    NumElem--;
+    ByteSize -= sizeof(idx);
+  }
+}
+
+template<> inline
+void UObject::SetArrayProperty<String*>( UArrayProperty* Prop, FPackageFileIn* In, int Idx,
+  u8 ByteSize, u8 NumElem )
+{
+  Array<String*>* ArrayAddr = GetArrayProperty<String*>( Prop, Idx );
+  ArrayAddr->Reserve( NumElem );
+
+  // TODO: Properly check ByteSize
+  while ( NumElem )
+  {
+    // Read string size
+    idx StringLength = 0;
+    *In >> CINDEX( StringLength );
+
+    String* Str = new String();
+    Str->Resize( StringLength );
+
+    In->Read( Str->Data(), StringLength );
+    ArrayAddr->PushBack( Str );
+    NumElem--;
+  }
+}
+

@@ -200,6 +200,7 @@ class UNameProperty;
 class UClassProperty;
 class UStructProperty;
 class UStrProperty;
+class UArrayProperty;
 class FPackageFileIn;
 class FPackageFileOut;
 class FPropertyHash;
@@ -396,6 +397,7 @@ class DLL_EXPORT UObject
   inline UClass*  GetClassProperty ( UClassProperty* Prop, int Idx = 0 );
   inline void*    GetStructProperty( UStructProperty* Prop, int Idx = 0 );
   inline const char* GetStrProperty( UStrProperty* Prop, int Idx = 0 );
+  template <class T> inline Array<T>* GetArrayProperty( UArrayProperty* Prop, int Idx );
   UProperty* FindProperty( const char* PropName );
 
   // Property setters
@@ -406,8 +408,10 @@ class DLL_EXPORT UObject
   inline void SetObjProperty  ( UObjectProperty* Prop, UObject* NewVal, int Idx = 0 );
   inline void SetNameProperty ( UNameProperty* Prop, idx NewVal, int Idx = 0 );
   inline void SetClassProperty( UClassProperty* Prop, UClass* NewVal, int Idx = 0 );
-  inline void SetStructProperty( UStructProperty* Prop, FPackageFileIn* In, int Idx = 0 );
+  inline void SetStructProperty( UStructProperty* Prop, FPackageFileIn* In, int Idx = 0, u32 Offset = 0 );
   inline void SetStrProperty  ( UStrProperty* Prop, const char* NewVal, int Idx = 0 );
+  template<class T> inline void SetArrayProperty
+    ( UArrayProperty* ArrayProp, FPackageFileIn* In, int Idx, u8 ByteSize, u8 NumElem );
 
   static bool StaticInit();
   static bool StaticExit();

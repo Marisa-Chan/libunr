@@ -318,7 +318,7 @@ void UObject::ReadDefaultProperties()
       RealSize = UProperty::PropertySizes[SizeByte];
     }
     
-    if ( IsArray && PropType != PROP_Bool )
+    if ( IsArray && PropType != PROP_Bool && PropType != PROP_Struct )
       ArrayIdx = ReadArrayIndex( PkgFile );
 
     if ( PropType == PROP_Byte )
@@ -430,10 +430,90 @@ void UObject::ReadDefaultProperties()
     }
     else if ( PropType == PROP_Array )
     {
-      // TODO: Crash here
-      Logf( LOG_WARN, "ArrayProperty loading in UObject::ReadDefaultProperties() is stubbed" );
-      Logf( LOG_WARN, "  Info: (Package = '%s', Class = '%s', Object = '%s', Property = '%s')",
-            Pkg->Name, Class->Name, Name, Prop->Name );
+      if ( !Prop )
+      {
+        Logf( LOG_CRIT, "Property does not exist, but property type is array" );
+        goto err;
+      }
+
+      UArrayProperty* ArrayProp = SafeCast<UArrayProperty>( Prop );
+      if ( !ArrayProp )
+      {
+        Logf( LOG_CRIT, "Default property expected 'ArrayProperty', but got '%s'", Prop->Class->Name );
+        goto err;
+      }
+
+      u8 NumElem  = 0;
+      *PkgFile >> NumElem;
+
+      // I reeeeeeally hate not using switch/case here
+      if ( ArrayProp->Inner->Class == UByteProperty::StaticClass() )
+      {
+        *GetArrayPropAddr<u8>( this, ArrayProp, ArrayIdx ) = new Array<u8>();
+        SetArrayProperty<u8>( ArrayProp, PkgFile, ArrayIdx, RealSize, NumElem );
+      }
+      else if ( ArrayProp->Inner->Class == UIntProperty::StaticClass() )
+      {
+        *GetArrayPropAddr<int>( this, ArrayProp, ArrayIdx ) = new Array<int>();
+        SetArrayProperty<int>( ArrayProp, PkgFile, ArrayIdx, RealSize, NumElem );
+      }
+      else if ( ArrayProp->Inner->Class == UIntProperty::StaticClass() )
+      {
+        *GetArrayPropAddr<bool>( this, ArrayProp, ArrayIdx ) = new Array<bool>();
+        SetArrayProperty<bool>( ArrayProp, PkgFile, ArrayIdx, RealSize, NumElem );
+      }
+      else if ( ArrayProp->Inner->Class == UFloatProperty::StaticClass() )
+      {
+        *GetArrayPropAddr<float>( this, ArrayProp, ArrayIdx ) = new Array<float>();
+        SetArrayProperty<float>( ArrayProp, PkgFile, ArrayIdx, RealSize, NumElem );
+      }
+      else if ( ArrayProp->Inner->Class == UObjectProperty::StaticClass() )
+      {
+        Logf( LOG_WARN, "Default ArrayProperty contains Objects" );
+      }
+      else if ( ArrayProp->Inner->Class == UNameProperty::StaticClass() )
+      {
+        *GetArrayPropAddr<idx>( this, ArrayProp, ArrayIdx ) = new Array<idx>();
+        SetArrayProperty<idx>( ArrayProp, PkgFile, ArrayIdx, RealSize, NumElem );
+      }
+      else if ( ArrayProp->Inner->Class == UStringProperty::StaticClass() )
+      {
+        Logf( LOG_WARN, "Default ArrayProperty contains Strings (but not ascii???)" );
+      }
+      else if ( ArrayProp->Inner->Class == UClassProperty::StaticClass() )
+      {
+        Logf( LOG_WARN, "Default ArrayProperty contains Classes" );
+      }
+      else if ( ArrayProp->Inner->Class == UArrayProperty::StaticClass() )
+      {
+        Logf( LOG_WARN, "Default ArrayProperty contains Arrays" );
+      }
+      else if ( ArrayProp->Inner->Class == UStructProperty::StaticClass() )
+      {
+        Logf( LOG_WARN, "Default ArrayProperty contains Structs" );
+      }
+      else if ( ArrayProp->Inner->Class == UStrProperty::StaticClass() )
+      {
+        *GetArrayPropAddr<String*>( this, ArrayProp, ArrayIdx ) = new Array<String*>();
+        SetArrayProperty<String*>( ArrayProp, PkgFile, ArrayIdx, RealSize, NumElem );
+      }
+      else if ( ArrayProp->Inner->Class == UMapProperty::StaticClass() )
+      {      
+        Logf( LOG_WARN, "Default ArrayProperty contains Maps" );
+      }
+      else if ( ArrayProp->Inner->Class == UFixedArrayProperty::StaticClass() )
+      {
+        Logf( LOG_WARN, "Default ArrayProperty contains FixedArrays" );
+      }
+/*    else if ( ArrayProp->Inner->Class == ULongProperty::StaticClass() )
+      {
+        *GetArrayPropAddr<i64>( this, ArrayProp, ArrayIdx ) = new Array<i64>();
+        SetArrayProperty<i64>( ArrayProp, PkgFile, ArrayIdx, ByteSize, NumElem );
+      }*/
+      else
+      {
+        Logf( LOG_CRIT, "Default ArrayProperty contains unknown type '%x'", PropType );
+      }
     }
     else if ( PropType == PROP_Struct )
     {
@@ -446,16 +526,14 @@ void UObject::ReadDefaultProperties()
       if ( !Prop )
       {
         Logf( LOG_CRIT, "Property does not exist, but property type is a struct." );
-        Logf( LOG_CRIT, "Cannot continue parsing defaultproperty list.");
-        return;
+        goto err;
       }
 
       UStructProperty* StructProp = SafeCast<UStructProperty>( Prop );
       if ( !StructProp )
       {
         Logf( LOG_CRIT, "Default property expected 'StructProperty', but got '%s'", Prop->Class->Name );
-        Logf( LOG_CRIT, "Cannot continue parsing defaultproperty list.");
-        return;
+        goto err;
       }
 
       // Verify struct name
@@ -469,9 +547,8 @@ void UObject::ReadDefaultProperties()
       if ( StructProp && StructProp->Struct->Hash != StructHash )
       {
         Logf( LOG_CRIT, "Default property expected struct type '%s', but got '%s'",
-              Prop->Class->Name, Pkg->ResolveNameFromIdx( StructName ) );
-        Logf( LOG_CRIT, "Cannot continue parsing defaultproperty list.");
-        return;
+              StructProp->Struct->Name, Pkg->ResolveNameFromIdx( StructName ) );
+        goto err;
       }
 
       // Verify struct size
@@ -496,12 +573,17 @@ void UObject::ReadDefaultProperties()
         StructSize = UProperty::PropertySizes[SizeByte];
       }
 
+      if ( IsArray )
+        ArrayIdx = ReadArrayIndex( PkgFile );
+
+
       if ( StructProp )
       {
-        if ( StructSize != StructProp->Struct->StructSize )
+        if ( StructSize > StructProp->Struct->StructSize )
         {
-          Logf( LOG_CRIT, "StructProperty '%s' struct size mismatch (Expected %i, got %i)", 
+          Logf( LOG_CRIT, "StructProperty '%s' struct size too large (Expected %i, got %i)", 
               PropName, StructProp->Struct->StructSize, StructSize );
+          goto err;
         }
         // Read in struct properties based on our definition that we have loaded
         SetStructProperty( StructProp, PkgFile, ArrayIdx );
@@ -531,6 +613,11 @@ void UObject::ReadDefaultProperties()
       }
     }
   }
+
+  return;
+
+err:
+  Logf( LOG_CRIT, "Cannot continue parsing defaultproperty list" );
 }
 
 void UObject::ReadConfigProperties()
@@ -744,7 +831,8 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
       // to get around this, we keep going back and getting the package until Import->Class 
       // points to "Package"
       PkgImport = &(*Pkg->GetImportTable())[ CalcObjRefValue( PkgImport->Package ) ]; 
-    } while ( strnicmp( Pkg->ResolveNameFromIdx( PkgImport->ClassName ), "Package", 7 ) != 0 );
+    } while ( strnicmp( Pkg->ResolveNameFromIdx( PkgImport->ClassName ), "Package", 7 ) != 0 ||
+              PkgImport->Package != 0 );
 
     ObjPkgName = Pkg->ResolveNameFromIdx( PkgImport->ObjectName );
     ObjPkg = UPackage::StaticLoadPackage( ObjPkgName );
@@ -776,7 +864,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
         if ( ExpIter->Class == 0 )
           ExpClsName = &ClassNameEntry;
         else
-          ExpClsName = ObjPkg->GetNameEntry( (*Exports)[ ExpIter->Class ].ObjectName );
+          ExpClsName = ObjPkg->GetNameEntry( (*Exports)[ ExpIter->Class - 1 ].ObjectName );
       }
 
       if ( ExpObjName->Hash == ObjNameHash && ExpClsName->Hash == ClsNameHash )

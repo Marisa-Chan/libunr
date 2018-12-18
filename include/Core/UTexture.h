@@ -33,6 +33,7 @@
 #include "Core/UObject.h"
 #include "Core/UPackage.h"
 #include "Core/USound.h"
+#include "Core/UMath.h"
 
 // Order is dictated by Engine.Bitmap.ETextureFormat
 // if this order is broken for some reason, that game
@@ -222,7 +223,7 @@ class DLL_EXPORT UTexture : public UBitmap
   virtual void Load();
 };
 
-class UFont : public UObject
+class DLL_EXPORT UFont : public UObject
 {
   DECLARE_NATIVE_CLASS( UFont, UObject, CLASS_NoExport, Engine )
   UFont();
@@ -258,5 +259,48 @@ class UFont : public UObject
   Array<FFontTexture>* FontTextures;
 
   virtual void Load();
+};
+
+class DLL_EXPORT UScriptedTexture : public UTexture
+{
+  DECLARE_NATIVE_CLASS( UScriptedTexture, UTexture, CLASS_SafeReplace, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  UScriptedTexture();
+
+  bool bUse32BitFormat;
+  bool bConstantRender;
+  bool bClearScreen;
+  bool bDrawFrame;
+
+  u8 DrawStyle, DrawOpacity;
+  class AActor* NotifyActor;
+  UTexture* SourceTexture;
+
+  UBitmap*  LocalSourceBitmap;
+  UPalette* PaletteMap;
+  float     LocalTime;
+
+  void* PortalPtr;
+
+  struct PortalRenderInfo
+  {
+    float  FOV;
+    u8     RendMap;
+    FPlane ColorScale;
+    int    PixelOffset;
+    FPlane NearClip;
+    bool   bUseNearClip;
+    bool   bWrapPixels;
+  };
+
+  PortalRenderInfo PortalInfo;
+
+  enum ETexCompressType
+  {
+    COMP_None,
+    COMP_P8,
+    COMP_Mono,
+  };
 };
 

@@ -122,7 +122,6 @@ class DLL_EXPORT UClassProperty : public UObjectProperty
   UClass* ClassObj;
 };
 
-// ?
 class DLL_EXPORT UArrayProperty : public UProperty
 {
   DECLARE_NATIVE_CLASS( UArrayProperty, UProperty, CLASS_NoExport, Core )

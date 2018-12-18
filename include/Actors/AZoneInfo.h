@@ -26,6 +26,7 @@
 #pragma once
 
 #include "Actors/AActor.h"
+#include "Core/UMusic.h"
 
 class ASkyZoneInfo;
 
@@ -245,5 +246,131 @@ class AZoneInfo : public AInfo
   
   // Network replication.
   AVisibilityNotify* VisNotify;
+};
+
+class ULevelSummary : public UObject
+{
+  DECLARE_NATIVE_CLASS( ULevelSummary, UObject, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  ULevelSummary();
+
+  String* Title;
+  String* Author;
+  String* IdealPlayerCount;
+  int     RecommendedEnemies;
+  int     RecommendedTeammates;
+  String* LevelEnterText;
+};
+
+class ALevelInfo : public AZoneInfo
+{
+  DECLARE_NATIVE_CLASS( ALevelInfo, AZoneInfo, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  ALevelInfo();
+
+  String* GetLocalURL();
+  String* GetAddressURL();
+
+  float TimeDilation;
+  float TimeSeconds;
+  int   Year;
+  int   Month;
+  int   Day;
+  int   DayOfWeek;
+  int   Hour;
+  int   Minute;
+  int   Second;
+  int   Millisecond;
+
+  String* Title;
+  String* Author;
+  String* IdealPlayerCount;
+  int     RecommendedEnemies;
+  int     RecommendedTeammates;
+  String* LevelEnterText;
+  String* LocalizedPkg;
+  String* Pauser;
+  ULevelSummary* Summary;
+  String* VisibleGroups;
+
+  bool bLonePlayer;
+  bool bBegunPlay;
+  bool bPlayersOnly;
+  bool bHighDetailMode;
+  bool bDropDetail;
+  bool bAggressiveLOD;
+  bool bStartup;
+  bool bHumansOnly;
+  bool bNoCheating;
+  bool bAllowFOV;
+  bool bSupportsRealCrouching;
+  int  EdBuildOpt;
+  bool bSpecularLight;
+
+  UMusic* Song;
+  u8      SongSection;
+  u8      CdTrack;
+  float   PlayerDoppler;
+  UMusic* backup_Song;
+  u8      backup_SongSection;
+
+  APlayerPawn* LocalPlayer;
+
+  float Brightness;
+  UTexture* Screenshot;
+  UTexture* DefaultTexture;
+  UTexture* WhiteTexture;
+  UTexture* TemplateLightTex;
+  int       HubStackLevel;
+  enum ELevelAction
+  {
+    LEVACT_None,
+    LEVACT_Loading,
+    LEVACT_Saving,
+    LEVACT_Connecting,
+    LEVACT_Precaching
+  } LevelAction;
+
+  enum ENetMode
+  {
+    NM_Standalone,
+    NM_DedicatedServer,
+    NM_ListenServer,
+    NM_Client
+  } NetMode;
+  
+  String* ComputerName;
+  String* EngineVersion;
+  String* EngineSubVersion;
+  String* MinNetVersion;
+
+  UClass* DefaultGameType;
+  class AGameInfo* Game;
+
+  ANavigationPoint* NavigationPointList;
+  APawn* PawnList;
+
+  String* NextURL;
+  bool bNextItems;
+  float NextSwitchCountdown;
+
+  int   AIProfile[8];
+  float AvgAITime;
+
+  bool bCheckWalkSurfaces;
+  ASpawnNotify* SpawnNotify;
+  UClass* FootprintManager;
+  UObject* ObjList;
+  APlayerPawn* ReplicationTarget;
+
+  int MaxCommonRadius;
+  int MaxCommonHeight;
+  int MinCommonHeight;
+  int MinCommonRadius;
+  int CommonRadius;
+  int HumanRadius;
+  int HumanHeight;
 };
 

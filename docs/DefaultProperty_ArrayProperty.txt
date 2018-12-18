@@ -1,0 +1,9 @@
+ArrayProperty loading from defaultproperties:
+  Var name (name index)
+  Info byte (byte)
+  Total array size in bytes (byte)
+  Number of array elements to read (byte)
+  elements
+    - how do we handle arrayproperty where array is full of objects?
+
+See UnrealShare.DMmaplist defaultproperties for an example

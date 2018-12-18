@@ -217,7 +217,7 @@ FNameEntry::FNameEntry( const char* InStr )
   strncpy( Data, InStr, NAME_LEN );
   Data[NAME_LEN-1] = '\0';
   Flags = 0;
-  Hash = FnvHashString( Data );;
+  Hash = FnvHashString( Data );
 }
 
 FNameEntry::~FNameEntry()

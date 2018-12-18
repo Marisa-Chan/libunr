@@ -168,11 +168,12 @@ static inline FHash FnvHashString( const char* Data )
 
   int Len = strlen( Data );
   for (int i = 0; i < Len; i++) {
-    Hash.FnvHash[FNV1A_HASH] ^= ((u8*)Data)[i];
+    u8 ConvData = isalpha( Data[i] ) ? toupper( Data[i] ) : Data[i];
+    Hash.FnvHash[FNV1A_HASH] ^= ConvData;
     Hash.FnvHash[FNV1A_HASH] *= FNV_PRIME;
 
     Hash.FnvHash[FNV1_HASH] *= FNV_PRIME;
-    Hash.FnvHash[FNV1_HASH] ^= ((u8*)Data)[i];
+    Hash.FnvHash[FNV1_HASH] ^= ConvData;
   }
   return Hash;
 }

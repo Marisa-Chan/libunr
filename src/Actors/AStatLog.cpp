@@ -17,39 +17,56 @@
 \*========================================================================*/
 
 /*========================================================================
- * UMusic.h - Native music object type
- * See the 'Class Music' in UT-Package-File-Format.pdf
+ * AStatLog.h - Logs game events for stat collection
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#pragma once
+#include "Actors/AStatLog.h"
+#include "Core/UClass.h"
 
-#include "Core/UObject.h"
-
-enum EMusicTransition
+AStatLog::AStatLog()
+  : AInfo()
 {
-	MTRAN_None,
-	MTRAN_Instant,
-	MTRAN_Segue,
-	MTRAN_Fade,
-	MTRAN_FastFade,
-	MTRAN_SlowFade,
-};
+}
 
-class DLL_EXPORT UMusic : public UObject
+AStatLog::~AStatLog()
 {
-  DECLARE_NATIVE_CLASS( UMusic, UObject, CLASS_NoExport | CLASS_SafeReplace, Core )
-  EXPORTABLE() 
-  UMusic();
+}
 
-  virtual void Load();
-  
-  u16 ChunkCount; //?
-  u32 _unknown0; // PackageVerison > 61
-  idx ChunkSize;
-  u8* ChunkData;
-  
-  int MusicType;
-};
+AStatLogFile::AStatLogFile()
+  : AStatLog()
+{
+}
+
+AStatLogFile::~AStatLogFile()
+{
+}
+
+IMPLEMENT_NATIVE_CLASS( AStatLog );
+IMPLEMENT_NATIVE_CLASS( AStatLogFile );
+
+BEGIN_PROPERTY_LINK( AStatLog, 13 )
+  LINK_NATIVE_PROPERTY( AStatLog, Context );
+  LINK_NATIVE_PROPERTY( AStatLog, bWorld );
+  LINK_NATIVE_PROPERTY( AStatLog, TimeStamp );
+  LINK_NATIVE_PROPERTY( AStatLog, LocalStandard );
+  LINK_NATIVE_PROPERTY( AStatLog, WorldStandard );
+  LINK_NATIVE_PROPERTY( AStatLog, LogVersion );
+  LINK_NATIVE_PROPERTY( AStatLog, LogInfoURL );
+  LINK_NATIVE_PROPERTY( AStatLog, GameName );
+  LINK_NATIVE_PROPERTY( AStatLog, GameCreator );
+  LINK_NATIVE_PROPERTY( AStatLog, GameCreatorURL );
+  LINK_NATIVE_PROPERTY( AStatLog, DecoderRingURL );
+  LINK_NATIVE_PROPERTY( AStatLog, LocalLogDir );
+  LINK_NATIVE_PROPERTY( AStatLog, WorldLogDir );
+END_PROPERTY_LINK()
+
+BEGIN_PROPERTY_LINK( AStatLogFile, 4 )
+  LINK_NATIVE_PROPERTY( AStatLogFile, bWatermark );
+  LINK_NATIVE_PROPERTY( AStatLogFile, LogAr );
+  LINK_NATIVE_PROPERTY( AStatLogFile, StatLogFile );
+  LINK_NATIVE_PROPERTY( AStatLogFile, StatLogFinal );
+END_PROPERTY_LINK()
+

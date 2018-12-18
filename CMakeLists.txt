@@ -57,11 +57,14 @@ set (SOURCES ${UNR_SRC}/Core/FConfig.cpp
              ${UNR_SRC}/Actors/AActor.cpp
              ${UNR_SRC}/Actors/ADecal.cpp
              ${UNR_SRC}/Actors/ADynamicZoneInfo.cpp
+             ${UNR_SRC}/Actors/AGameInfo.cpp
              ${UNR_SRC}/Actors/AHUD.cpp
              ${UNR_SRC}/Actors/AInventory.cpp
              ${UNR_SRC}/Actors/ANavigationPoint.cpp
              ${UNR_SRC}/Actors/APawn.cpp
+             ${UNR_SRC}/Actors/APlayerPawn.cpp
              ${UNR_SRC}/Actors/AReplicationInfo.cpp
+             ${UNR_SRC}/Actors/AStatLog.cpp
              ${UNR_SRC}/Actors/AWeapon.cpp
              ${UNR_SRC}/Actors/AZoneInfo.cpp
 
