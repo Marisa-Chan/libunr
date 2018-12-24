@@ -131,7 +131,7 @@ bool USystem::PromptForGameInfo()
 
   // Get real path 
   GamePath = (char*)xstl::Malloc( 4096 );
-  realpath( PathBuf, (char*)GamePath );
+  RealPath( PathBuf, (char*)GamePath, 4096 );
 
   // Free retrieved name values
   for ( i = 0; i < Names.Size(); i++ )
@@ -385,6 +385,119 @@ bool USystem::FileExists( const char* Filename )
   File.Close();
 
   return (Status != ENOENT) ? true : false;
+}
+
+void USystem::RealPath( const char* Path, char* FullPath, size_t FullPathSize )
+{
+  char CurrentFolder[128] = { 0 };
+  const char* p = Path;
+  char* f = FullPath;
+  char* c = &CurrentFolder[0];
+  u16 Len = 0;
+
+  // If the path doesn't start from root, get the current directory
+  if ( *p != DIRECTORY_SEPARATOR )
+  {
+    getcwd( FullPath, FullPathSize );
+    f += strlen( FullPath ) - 1; // slash at the end or no?
+  }
+
+  while ( 1 )
+  {
+    if ( *p == DIRECTORY_SEPARATOR || *p == '\0' )
+    {
+      *c = '\0';
+      c = CurrentFolder;
+      if ( c[1] == '.' )
+      {
+        // Check if we're going backwards
+        if ( c[2] == '.' && c[3] == '\0' )
+        {
+          // Go backwards in the full path until a slash is seen, then null terminate
+          while ( *f != DIRECTORY_SEPARATOR )
+          {
+            f--;
+          }
+          *f = '\0';
+        }
+
+        // If there's just a dot, then don't do anything
+      }
+      else
+      {
+        // Copy the current folder contents to the full path
+        u16 CfLen = strlen( c );
+        if ( CfLen > 0 )
+        {
+          memcpy( f, c, CfLen );
+          f += CfLen;
+        }
+      }
+
+      if ( !*p )
+        break;
+    }
+    *c++ = *p++;
+  }
+
+//  if ( f != FullPath )
+//    *f = '/';
+}
+
+bool USystem::MakeDir( const char* Path )
+{
+  size_t PathLen = strlen( Path );
+  if ( PathLen >= 4096 )
+  {
+    Logf( LOG_WARN, "Can't create directory '%s'; path is too long" );
+    return false;
+  }
+
+  char CurrentPath[4096] = { 0 };
+  strcpy( CurrentPath, Path );
+  if ( CurrentPath[PathLen-1] != DIRECTORY_SEPARATOR )
+    CurrentPath[PathLen] = DIRECTORY_SEPARATOR;
+
+  char FullPath[4096] = { 0 };
+  RealPath( CurrentPath, FullPath, sizeof(FullPath) );
+  xstl::Set( CurrentPath, 0, sizeof(CurrentPath) );
+
+  struct stat sb;
+  char* s = FullPath;
+  char* c = &CurrentPath[0];
+
+  while ( *s )
+  {
+    if ( *s == DIRECTORY_SEPARATOR && CurrentPath[0] != '\0' )
+    {
+      // Folder should now have the name of our current folder
+      // stat() once to check for existence at all
+      if (stat(CurrentPath, &sb) == 0)
+      {
+        if ( !S_ISDIR(sb.st_mode) )
+        {
+          Logf( LOG_WARN, "Failed to create directory '%s'; '%s' is a file",
+                Path, CurrentPath );
+          return false;
+        }
+      }
+      else
+      {
+        // Directory does not exist, try to make it
+        if ( mkdir( CurrentPath, S_IRWXU | S_IRGRP | S_IROTH ) < 0 ) 
+        {
+          int err = errno;
+          Logf( LOG_WARN, "Failed to create directory '%s'; couldn't create directory '%s'",
+                Path, CurrentPath );
+          return false;
+        }
+      }
+    }
+
+    *c++ = *s++;
+  }
+
+  return true;
 }
 
 #if defined LIBUNR_LINUX || LIBUNR_BSD

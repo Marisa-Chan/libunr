@@ -41,7 +41,9 @@
   #include <sys/stat.h>
   #include <dirent.h>
   #include <pwd.h>
+  #define DIRECTORY_SEPARATOR '/'
 #elif defined LIBUNR_WIN32
+  #define DIRECTORY_SEPARATOR '\\'
 #endif
 
 // TODO: architecture defines for non-x86 platforms

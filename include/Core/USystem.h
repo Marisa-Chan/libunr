@@ -61,6 +61,8 @@ class DLL_EXPORT USystem : public USubsystem
   static const char* GetDefaultLibunrIniPath();
   static bool CopyFile( const char* OrigFile, const char* NewFile );
   static bool FileExists( const char* Filename );
+  static void RealPath( const char* Path, char* FullPath, size_t FullPathSize );
+  static bool MakeDir( const char* Path );
 #if defined __linux__ || __unix__
   static const char* GetHomeDir();
 #endif
