@@ -408,20 +408,22 @@ void USystem::RealPath( const char* Path, char* FullPath, size_t FullPathSize )
     {
       *c = '\0';
       c = CurrentFolder;
-      if ( c[1] == '.' )
+     
+      // If just a dot, do nothing
+      if ( c[1] == '.' && c[2] == '\0' )
       {
-        // Check if we're going backwards
-        if ( c[2] == '.' && c[3] == '\0' )
-        {
-          // Go backwards in the full path until a slash is seen, then null terminate
-          while ( *f != DIRECTORY_SEPARATOR )
-          {
-            f--;
-          }
-          *f = '\0';
-        }
+        continue;
+      }
 
-        // If there's just a dot, then don't do anything
+      // Check if we're going backwards
+      else if ( c[1] == '.' && c[2] == '.' && c[3] == '\0' )
+      {
+        // Go backwards in the full path until a slash is seen, then null terminate
+        while ( *f != DIRECTORY_SEPARATOR )
+        {
+          f--;
+        }
+        *f = '\0';
       }
       else
       {
