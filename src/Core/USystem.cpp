@@ -131,6 +131,7 @@ bool USystem::PromptForGameInfo()
 
   // Get real path 
   GamePath = (char*)xstl::Malloc( 4096 );
+  xstl::Set( (char*)GamePath, 0, 4096 );
   RealPath( PathBuf, (char*)GamePath, 4096 );
 
   // Free retrieved name values
@@ -395,11 +396,22 @@ void USystem::RealPath( const char* Path, char* FullPath, size_t FullPathSize )
   char* c = &CurrentFolder[0];
   u16 Len = 0;
 
-  // If the path doesn't start from root, get the current directory
   if ( *p != DIRECTORY_SEPARATOR )
   {
-    getcwd( FullPath, FullPathSize );
-    f += strlen( FullPath ) - 1; // slash at the end or no?
+    if ( *p == '~' )
+    {
+      strcat( FullPath, GetHomeDir() );
+      p++;
+      f += strlen( FullPath );
+    }
+    else
+    {
+      // If the path doesn't start from root, get the current directory
+      char* ignored = getcwd( FullPath, FullPathSize );
+      f += strlen( FullPath );
+      *f++ = '/';
+      *c++ = '/';
+    }
   }
 
   while ( 1 )
@@ -417,12 +429,16 @@ void USystem::RealPath( const char* Path, char* FullPath, size_t FullPathSize )
 
       // Check if we're going backwards
       else if ( c[1] == '.' && c[2] == '.' && c[3] == '\0' )
-      {
+      {  
+        // Go back to first actual character
+        f--;
+
         // Go backwards in the full path until a slash is seen, then null terminate
-        while ( *f != DIRECTORY_SEPARATOR )
+        do        
         {
           f--;
-        }
+        } while ( *f != DIRECTORY_SEPARATOR );
+
         *f = '\0';
       }
       else
@@ -441,9 +457,6 @@ void USystem::RealPath( const char* Path, char* FullPath, size_t FullPathSize )
     }
     *c++ = *p++;
   }
-
-//  if ( f != FullPath )
-//    *f = '/';
 }
 
 bool USystem::MakeDir( const char* Path )
