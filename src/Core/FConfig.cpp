@@ -325,11 +325,14 @@ int FConfig::Load( const char* Filename )
   return 0;
 }
 
-// TODO: Write failure cases
 int FConfig::Save()
 {
   FileStreamOut IniFile;
-  int Status = IniFile.Open( Name );
+  String Filename( Name );
+
+  Filename += ".ini";
+
+  int Status = IniFile.Open( Filename );
   if ( Status != 0 )
   {
     Logf( LOG_WARN, "Failed to open ini file '%s' for saving (errno = %s)", Name, strerror( Status ) );
@@ -565,7 +568,7 @@ void FConfig::WriteString( const char* Category, const char* Variable, const cha
   }
      
   char** Val = &Entry->Values->Data()[ Index ];
-  *Val = (char*)Value;
+  *Val = StringDup( Value );
 }
 
 const char* FConfig::GetName()
