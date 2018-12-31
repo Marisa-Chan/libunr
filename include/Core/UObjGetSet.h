@@ -31,51 +31,24 @@
 #include "Core/UPackage.h"
 #include "Core/USystem.h"
 
-#define DEFINE_GET_PROPERTY_ADDRESS(name, type, proptype) \
-  inline type* name( UObject* Obj, proptype* Prop, int Idx ) { \
-    return (type*)((u8*)Obj + Prop->Offset + (Idx * sizeof(type))); \
-  } \
-
-DEFINE_GET_PROPERTY_ADDRESS( GetBytePropAddr,  u8,        UByteProperty   )
-DEFINE_GET_PROPERTY_ADDRESS( GetIntPropAddr,   int,       UIntProperty    )
-DEFINE_GET_PROPERTY_ADDRESS( GetBoolPropAddr,  bool,      UBoolProperty   )
-DEFINE_GET_PROPERTY_ADDRESS( GetFloatPropAddr, float,     UFloatProperty  )
-DEFINE_GET_PROPERTY_ADDRESS( GetObjPropAddr,   UObject*,  UObjectProperty )
-DEFINE_GET_PROPERTY_ADDRESS( GetNamePropAddr,  idx,       UNameProperty   )
-DEFINE_GET_PROPERTY_ADDRESS( GetClassPropAddr, UClass*,   UClassProperty  )
-DEFINE_GET_PROPERTY_ADDRESS( GetStrPropAddr, const char*, UStrProperty    )
-
-template <class T> inline Array<T>** GetArrayPropAddr( UObject* Obj, UArrayProperty* Prop, int Idx )
-{
-  return (Array<T>**)((u8*)Obj + Prop->Offset + (Idx * sizeof(Array<T>*)));
-}
-
+//-------------------------------------------------
 // Property getters
-inline u8 UObject::GetByteProperty( UByteProperty* Prop, int Idx )
+//-------------------------------------------------
+
+template <class T> inline T* GetPropAddr( UObject* Obj, UProperty* Prop, int Idx )
 {
-  return *GetBytePropAddr( this, Prop, Idx );
+  return (T*)((u8*)Obj + Prop->Offset + (Idx * sizeof(T)));
 }
 
-inline int UObject::GetIntProperty( UIntProperty* Prop, int Idx )
+template <class T> inline T UObject::GetProperty( UProperty* Prop, int Idx )
 {
-  return *GetIntPropAddr( this, Prop, Idx );
-}
-
-inline bool UObject::GetBoolProperty( UBoolProperty* Prop )
-{
-  // Unreal currently doesn't support bool arrays, maybe in the future?
-  return *GetBoolPropAddr( this, Prop, 0 );
-}
-
-inline float UObject::GetFloatProperty( UFloatProperty* Prop, int Idx )
-{
-  return *GetFloatPropAddr( this, Prop, Idx );
+  return *GetPropAddr<T>( this, Prop, Idx );
 }
 
 // TODO: Need some better checking here
-inline UObject* UObject::GetObjProperty( UObjectProperty* Prop, int Idx )
+template <> inline UObject* UObject::GetProperty<UObject*>( UProperty* Prop, int Idx )
 {
-  UObject* Out = *GetObjPropAddr( this, Prop, Idx );
+  UObject* Out = *GetPropAddr<UObject*>( this, Prop, Idx );
   if ( !Out->IsA( UObject::StaticClass() ) )
   {
     // Maybe make a config way for this check to be optional? Could get very slow
@@ -85,14 +58,9 @@ inline UObject* UObject::GetObjProperty( UObjectProperty* Prop, int Idx )
   return Out;
 }
 
-inline idx UObject::GetNameProperty( UNameProperty* Prop, int Idx )
+template<> inline UClass* UObject::GetProperty<UClass*>( UProperty* Prop, int Idx )
 {
-  return *GetNamePropAddr( this, Prop, Idx );
-}
-
-inline UClass* UObject::GetClassProperty( UClassProperty* Prop, int Idx )
-{
-  UClass* Out = *GetClassPropAddr( this, Prop, Idx );
+  UClass* Out = *GetPropAddr<UClass*>( this, Prop, Idx );
   if ( Out->StaticClass() != UClass::StaticClass() )
   {
     // see GetObjProperty for same comment
@@ -102,48 +70,38 @@ inline UClass* UObject::GetClassProperty( UClassProperty* Prop, int Idx )
   return Out;
 }
 
-inline void* UObject::GetStructProperty( UStructProperty* Prop, int Idx )
+template<> inline UStruct* UObject::GetProperty<UStruct*>( UProperty* Prop, int Idx )
 {
   // this one just returns the pointer to where a struct would begin, you still need the struct
   // definition to access anything meaningful here
-  return (void*)( (u8*)this + Prop->Offset + ( Idx * Prop->Struct->StructSize ) );
+  UStructProperty* StructProp = SafeCast<UStructProperty>( Prop );
+  if ( !StructProp )
+  {
+    Logf( LOG_CRIT, "GetProperty<UStruct*> did not get a StructProperty" );
+    GSystem->Exit( -1 );
+  }
+  return (UStruct*)( (u8*)this + Prop->Offset + ( Idx * StructProp->Struct->StructSize ) );
 }
 
-inline const char* UObject::GetStrProperty( UStrProperty* Prop, int Idx )
+template <class T> inline Array<T>** GetArrayPropAddr( UObject* Obj, UArrayProperty* Prop, int Idx )
 {
-  return *GetStrPropAddr( this, Prop, Idx );
+  return (Array<T>**)((u8*)Obj + Prop->Offset + (Idx * sizeof(Array<T>*)));
 }
 
-template <class T> inline
-Array<T>* UObject::GetArrayProperty( UArrayProperty* Prop, int Idx )
-{
-  return *GetArrayPropAddr<T>( this, Prop, Idx );
-}
+//-------------------------------------------------
+// Property setters
+//-------------------------------------------------
 
-inline void UObject::SetByteProperty( UByteProperty* Prop, u8 NewVal, int Idx )
+template <class T> inline void UObject::SetProperty( UProperty* Prop, T NewVal, int Idx )
 {
-  *GetBytePropAddr( this, Prop, Idx ) = NewVal;
-}
-
-inline void UObject::SetIntProperty( UIntProperty* Prop, int NewVal, int Idx )
-{
-  *GetIntPropAddr( this, Prop, Idx ) = NewVal;
-}
-
-inline void UObject::SetBoolProperty( UBoolProperty* Prop, bool NewVal )
-{
-  *GetBoolPropAddr( this, Prop, 0 ) = NewVal;
-}
-
-inline void UObject::SetFloatProperty( UFloatProperty* Prop, float NewVal, int Idx )
-{
-  *GetFloatPropAddr( this, Prop, Idx ) = NewVal;
+  *GetPropAddr<T>( this, Prop, Idx ) = NewVal;
 }
 
 // TODO: Need some better checking here
-inline void UObject::SetObjProperty( UObjectProperty* Prop, UObject* NewVal, int Idx )
+template <> 
+inline void UObject::SetProperty<UObject*>( UProperty* Prop, UObject* NewVal, int Idx )
 {
-  UObject** Out = GetObjPropAddr( this, Prop, Idx );
+  UObject** Out = GetPropAddr<UObject*>( this, Prop, Idx );
   //if ( !(*Out)->IsA( UObject::StaticClass() ) )
   //{
   //  // Maybe make a config way for this check to be optional? Could get very slow
@@ -153,164 +111,24 @@ inline void UObject::SetObjProperty( UObjectProperty* Prop, UObject* NewVal, int
   *Out = NewVal;
 }
 
-inline void UObject::SetNameProperty( UNameProperty* Prop, idx NewVal, int Idx )
+template <>
+inline void UObject::SetProperty<UClass*>( UProperty* Prop, UClass* NewVal, int Idx )
 {
-  *GetNamePropAddr( this, Prop, Idx ) = NewVal;
-}
-
-inline void UObject::SetClassProperty( UClassProperty* Prop, UClass* NewVal, int Idx )
-{
-  UClass** Out = GetClassPropAddr( this, Prop, Idx );
+  UClass** Out = GetPropAddr<UClass*>( this, Prop, Idx );
   if ( !(*Out)->IsA( UClass::StaticClass() ) )
   {
     // Maybe make a config way for this check to be optional? Could get very slow
-    Logf( LOG_CRIT, "OBJECT PROPERTY DOES NOT POINT TO AN OBJECT!!!" );
+    Logf( LOG_CRIT, "CLASS PROPERTY DOES NOT POINT TO A CLASS!!!" );
     GSystem->Exit( -1 );
   }
   *Out = NewVal;
-}
-
-inline void UObject::SetStrProperty( UStrProperty* Prop, const char* NewVal, int Idx )
-{
-  *GetStrPropAddr( this, Prop, Idx ) = NewVal;
-}
-
-// Not something that should be called in the scripting environment
-// Only for defaultproperty lists
-void UObject::SetStructProperty( UStructProperty* Prop, FPackageFileIn* In, int Idx, u32 Offset )
-{
-  void* StructAddr = PtrAdd( GetStructProperty( Prop, Idx ), Offset );
-
-  for ( UField* Child = Prop->Struct->Children; Child != NULL; Child = Child->Next )
-  {
-    // Pure structs should not have anything besides property types or enums
-    if ( !Child->IsA( UProperty::StaticClass() ) && !Child->IsA( UEnum::StaticClass() ) )
-    {
-      Logf( LOG_CRIT, "Pure struct type has a bad child type!" );
-      return;
-    }
-    
-    // Determine property type and set property
-    int i = 0;
-    UProperty* ChildProp = (UProperty*)Child;
-    if ( ChildProp->Class == UByteProperty::StaticClass() )
-    {
-      do
-      {
-        u8 Byte = 0;
-        *In >> Byte;
-        *GetBytePropAddr( (UObject*)StructAddr, (UByteProperty*)ChildProp, i++ ) = Byte;
-      } while ( i < ChildProp->ArrayDim );
-    }
-
-    else if ( ChildProp->Class == UIntProperty::StaticClass() )
-    {
-      do
-      {
-        int Int = 0;
-        *In >> Int;
-        *GetIntPropAddr( (UObject*)StructAddr, (UIntProperty*)ChildProp, i++ ) = Int;
-      } while ( i < ChildProp->ArrayDim );
-    }
-
-    else if ( ChildProp->Class == UFloatProperty::StaticClass() )
-    {
-      do
-      {
-        float Float = 0;
-        *In >> Float;
-        *GetFloatPropAddr( (UObject*)StructAddr, (UFloatProperty*)ChildProp, i++ ) = Float;
-      } while ( i < ChildProp->ArrayDim );
-    }
-
-    else if ( ChildProp->Class == UBoolProperty::StaticClass() )
-    {
-      u8 Bool = 0;
-      *In >> Bool;
-      *GetBoolPropAddr( (UObject*)StructAddr, (UBoolProperty*)ChildProp, 0 ) = (Bool == 1);
-    }
-
-    else if ( ChildProp->Class == UNameProperty::StaticClass() )
-    {
-      do
-      {
-        idx Name = 0;
-        *In >> CINDEX( Name );
-        *GetNamePropAddr( (UObject*)StructAddr, (UNameProperty*)ChildProp, i++ ) = Name;
-      } while ( i < ChildProp->ArrayDim );
-    }
-
-    else if ( ChildProp->Class == UObjectProperty::StaticClass() )
-    {
-      do
-      {
-        idx ObjRef = 0;
-        *In >> CINDEX( ObjRef );
-        UObject* Obj = (UObject*)LoadObject( ObjRef, 
-          ((UObjectProperty*)ChildProp)->ObjectType, NULL );
-
-        if ( ObjRef != 0 && Obj == NULL )
-        {
-          Logf( LOG_CRIT, "Can't load object '%s' for struct property '%s' in property list for object '%s'", 
-                Prop->Pkg->ResolveNameFromObjRef( ObjRef ), Prop->Name, Prop->Outer->Name );
-          return;
-        }
-
-        *GetObjPropAddr( (UObject*)StructAddr, (UObjectProperty*)ChildProp, i++ ) = Obj;
-      } while ( i < ChildProp->ArrayDim );
-    }
-
-    else if ( ChildProp->Class == UClassProperty::StaticClass() )
-    {
-      do
-      {
-        idx ObjRef = 0;
-        *In >> CINDEX( ObjRef );
-        UClass* Cls = (UClass*)LoadObject( ObjRef, UClass::StaticClass(), NULL );
-
-        if ( ObjRef != 0 && Cls == NULL )
-        {
-          Logf( LOG_CRIT, "Can't load class '%s' for struct property '%s' in property list for object '%s'", 
-                Prop->Pkg->ResolveNameFromObjRef( ObjRef ), Prop->Name, Prop->Outer->Name );
-          return;
-        }
-
-        *GetClassPropAddr( (UObject*)StructAddr, (UClassProperty*)ChildProp, i++ ) = Cls;
-      } while ( i < ChildProp->ArrayDim );
-    }
-
-    else if ( ChildProp->Class == UStructProperty::StaticClass() )
-    {
-      for ( int i = 0; i < ChildProp->ArrayDim; i++ )
-        SetStructProperty( (UStructProperty*)ChildProp, In, i, Prop->Offset );
-    }
-
-    else if ( ChildProp->Class == UStrProperty::StaticClass() )
-    {
-      do
-      {
-        idx StringLength = 0;
-        *In >> CINDEX( StringLength );
-
-        char* String = new char[StringLength];
-        In->Read( String, StringLength );
-
-        *GetStrPropAddr( (UObject*)StructAddr, (UStrProperty*)ChildProp, i++ ) = String;
-      } while ( i < ChildProp->ArrayDim );
-    }
-
-    else if ( ChildProp->Class != UEnum::StaticClass() )
-    {
-      Logf( LOG_WARN, "Unhandled case for StructProperty loading (Class = '%s')", ChildProp->Class->Name );
-    }
-  }
 }
 
 template<class T> inline
 void UObject::SetArrayProperty( UArrayProperty* Prop, FPackageFileIn* In, int Idx,
   u8 ByteSize, u8 NumElem )
 {
-  Array<T>* ArrayAddr = GetArrayProperty<T>( Prop, Idx );
+  Array<T>* ArrayAddr = GetProperty<Array<T>*>( Prop, Idx );
   ArrayAddr->Reserve( NumElem );
 
   while ( ByteSize && NumElem )
@@ -328,7 +146,7 @@ template<> inline
 void UObject::SetArrayProperty<bool>( UArrayProperty* Prop, FPackageFileIn* In, int Idx,
   u8 ByteSize, u8 NumElem )
 {
-  Array<bool>* ArrayAddr = GetArrayProperty<bool>( Prop, Idx );
+  Array<bool>* ArrayAddr = GetProperty<Array<bool>*>( Prop, Idx );
   ArrayAddr->Reserve( NumElem );
 
   while ( ByteSize && NumElem )
@@ -349,7 +167,7 @@ template<> inline
 void UObject::SetArrayProperty<idx>( UArrayProperty* Prop, FPackageFileIn* In, int Idx,
   u8 ByteSize, u8 NumElem )
 {
-  Array<idx>* ArrayAddr = GetArrayProperty<idx>( Prop, Idx );
+  Array<idx>* ArrayAddr = GetProperty<Array<idx>*>( Prop, Idx );
   ArrayAddr->Reserve( NumElem );
 
   while ( ByteSize && NumElem )
@@ -367,7 +185,7 @@ template<> inline
 void UObject::SetArrayProperty<String*>( UArrayProperty* Prop, FPackageFileIn* In, int Idx,
   u8 ByteSize, u8 NumElem )
 {
-  Array<String*>* ArrayAddr = GetArrayProperty<String*>( Prop, Idx );
+  Array<String*>* ArrayAddr = GetProperty<Array<String*>*>( Prop, Idx );
   ArrayAddr->Reserve( NumElem );
 
   // TODO: Properly check ByteSize

@@ -328,12 +328,11 @@ void UObject::ReadDefaultProperties()
 
       if ( Prop )
       {
-        UByteProperty* ByteProp = SafeCast<UByteProperty>( Prop );
-        if ( !ByteProp )
+        if ( Prop->Class != UByteProperty::StaticClass() )
           Logf( LOG_CRIT, "Default property expected 'ByteProperty', but got '%s'", 
             Prop->Class->Name );
         else
-          SetByteProperty( ByteProp, Value, ArrayIdx );
+          SetProperty<u8>( Prop, Value, ArrayIdx );
       }
     }
     else if ( PropType == PROP_Int )
@@ -343,22 +342,20 @@ void UObject::ReadDefaultProperties()
      
       if ( Prop )
       {
-        UIntProperty* IntProp = SafeCast<UIntProperty>( Prop );
-        if ( !IntProp )
+        if ( Prop->Class != UIntProperty::StaticClass() )
           Logf( LOG_CRIT, "Default property expected 'IntProperty', but got '%s'", Prop->Class->Name );
         else
-          SetIntProperty( IntProp, Value, ArrayIdx );
+          SetProperty<int>( Prop, Value, ArrayIdx );
       }
     }
     else if ( PropType == PROP_Bool )
     {
       if ( Prop )
       {
-        UBoolProperty* BoolProp = SafeCast<UBoolProperty>( Prop );
-        if ( !BoolProp )
+        if ( Prop->Class != UBoolProperty::StaticClass() )
           Logf( LOG_CRIT, "Default property expected 'BoolProperty', but got '%s'", Prop->Class->Name );
         else
-          SetBoolProperty( BoolProp, IsArray == 1 );
+          SetProperty<bool>( Prop, IsArray == 1 );
       }
     }
     else if ( PropType == PROP_Float )
@@ -368,11 +365,10 @@ void UObject::ReadDefaultProperties()
 
       if ( Prop )
       {
-        UFloatProperty* FloatProp = SafeCast<UFloatProperty>( Prop );
-        if ( !FloatProp )
+        if ( Prop->Class != UFloatProperty::StaticClass() )
           Logf( LOG_CRIT, "Default property expected 'FloatProperty', but got '%s'", Prop->Class->Name );
         else
-          SetFloatProperty( FloatProp, Value, ArrayIdx );
+          SetProperty<float>( Prop, Value, ArrayIdx );
       }
     }
     else if ( PropType == PROP_Object )
@@ -387,7 +383,7 @@ void UObject::ReadDefaultProperties()
           Logf( LOG_CRIT, "Default property expected 'ObjectProperty', but got '%s'", 
             Prop->Class->Name );
         else
-          SetObjProperty( ObjProp, LoadObject( ObjRef, ObjProp->ObjectType, NULL ), 
+          SetProperty<UObject*>( ObjProp, LoadObject( ObjRef, ObjProp->ObjectType, NULL ), 
             ArrayIdx );
       }
     }
@@ -398,11 +394,10 @@ void UObject::ReadDefaultProperties()
 
       if ( Prop )
       {
-        UNameProperty* NameProp = SafeCast<UNameProperty>( Prop );
-        if ( !NameProp )
+        if ( Prop->Class != UNameProperty::StaticClass() )
           Logf( LOG_CRIT, "Default property expected 'NameProperty', but got '%s'", Prop->Class->Name );
         else    
-          SetNameProperty( NameProp, Name, ArrayIdx );
+          SetProperty<idx>( Prop, Name, ArrayIdx );
       }
     }
     else if ( PropType == PROP_String )
@@ -419,12 +414,11 @@ void UObject::ReadDefaultProperties()
 
       if ( Prop )
       {
-        UClassProperty* ClassProp = SafeCast<UClassProperty>( Prop );
-        if ( !ClassProp )
+        if ( Prop->Class != UClassProperty::StaticClass() )
           Logf( LOG_CRIT, "Default property expected 'ClassProperty', but got '%s'", 
             Prop->Class->Name );
         else
-          SetObjProperty( ClassProp, LoadObject( ObjRef, UClass::StaticClass(), NULL ), 
+          SetProperty<UObject*>( Prop, LoadObject( ObjRef, UClass::StaticClass(), NULL ), 
             ArrayIdx );
       }
     }
@@ -599,11 +593,10 @@ void UObject::ReadDefaultProperties()
 
       if ( Prop )
       {
-        UStrProperty* StrProp = SafeCast<UStrProperty>( Prop );
-        if ( !StrProp )
+        if ( Prop->Class != UStrProperty::StaticClass() )
           Logf( LOG_CRIT, "Default property expected 'StrProperty', but got '%s'", Prop->Class->Name );
         else
-          SetStrProperty( StrProp, NewStr, ArrayIdx );
+          SetProperty<char*>( Prop, NewStr, ArrayIdx );
       }
 
       if ( bIsDescription )
@@ -665,16 +658,16 @@ void UObject::ReadConfigProperties()
       for( int i = 0; i < Prop->ArrayDim; i++ )
       {
         if ( Prop->Class == UByteProperty::StaticClass() )
-          SetByteProperty( (UByteProperty*)Prop, Cfg->ReadUInt8( Category->Data(), Variable, i ), i );
+          SetProperty<u8>( (UByteProperty*)Prop, Cfg->ReadUInt8( Category->Data(), Variable, i ), i );
 
         else if ( Prop->Class == UIntProperty::StaticClass() )
-          SetIntProperty( (UIntProperty*)Prop, Cfg->ReadInt32( Category->Data(), Variable, i ), i );
+          SetProperty<int>( (UIntProperty*)Prop, Cfg->ReadInt32( Category->Data(), Variable, i ), i );
 
         else if ( Prop->Class == UBoolProperty::StaticClass() )
-          SetBoolProperty( (UBoolProperty*)Prop, Cfg->ReadBool( Category->Data(), Variable ) );
+          SetProperty<bool>( (UBoolProperty*)Prop, Cfg->ReadBool( Category->Data(), Variable ) );
 
         else if ( Prop->Class == UFloatProperty::StaticClass() )
-          SetFloatProperty( (UFloatProperty*)Prop, Cfg->ReadFloat( Category->Data(), Variable, i ), i );
+          SetProperty<float>( (UFloatProperty*)Prop, Cfg->ReadFloat( Category->Data(), Variable, i ), i );
 
         else if ( Prop->Class == UObjectProperty::StaticClass() )
         {
@@ -682,19 +675,19 @@ void UObject::ReadConfigProperties()
           if ( ObjProp == NULL )
             ObjProp = StaticConstructObject( 
           SetObjectProperty( (UObjectProperty*)Prop, Cfg->ReadUInt8( Category->Data(), Variable, i ), i );*/
-          Logf( LOG_WARN, "Found an object property, look at the class in ued/utpt and figure out how to handle this" );
+          Logf( LOG_WARN, "Found an object property, look at '%s'.ini", Cfg->GetName() );
           GSystem->Exit( -1 );
         }
 
         else if ( Prop->Class == UClassProperty::StaticClass() )
         {
-          Logf( LOG_WARN, "Found a class property, look at the class in ued/utpt and figure out how to handle this" );
+          Logf( LOG_WARN, "Found a class property, look at '%s'.ini", Cfg->GetName() );
           GSystem->Exit( -1 );
         }
 
         else if ( Prop->Class == UArrayProperty::StaticClass() )
         {
-          Logf( LOG_WARN, "Found an array property, look at the class in ued/utpt and figure out how to handle this" );
+          Logf( LOG_WARN, "Found an array property, look at '%s'.ini", Cfg->GetName() );
           GSystem->Exit( -1 );
         }
 
@@ -702,27 +695,27 @@ void UObject::ReadConfigProperties()
         {
           UStructProperty* StructProp = (UStructProperty*)Prop;
           Cfg->ReadStruct( Category->Data(), Variable, StructProp->Struct, 
-              GetStructProperty( StructProp, i ), i );
+              GetProperty<UStruct*>( StructProp, i ), i );
         }
 
         else if ( Prop->Class == UStrProperty::StaticClass() )
-          SetStrProperty( (UStrProperty*)Prop, Cfg->ReadString( Category->Data(), Variable, i ), i );
+          SetProperty<char*>( (UStrProperty*)Prop, Cfg->ReadString( Category->Data(), Variable, i ), i );
         
         else if ( Prop->Class == UMapProperty::StaticClass() )
         {
-          Logf( LOG_WARN, "Found a map property, look at the class in ued/utpt and figure out how to handle this" );
+          Logf( LOG_WARN, "Found a map property, look at '%s'.ini", Cfg->GetName() );
           GSystem->Exit( -1 );
         }
 
         else if ( Prop->Class == UFixedArrayProperty::StaticClass() )
         {
-          Logf( LOG_WARN, "Found a fixed array property, look at the class in ued/utpt and figure out how to handle this" );
+          Logf( LOG_WARN, "Found a fixed array property, look at '%s'.ini", Cfg->GetName() );
           GSystem->Exit( -1 );
         }
 
         else if ( Prop->Class == UStringProperty::StaticClass() )
         {
-          Logf( LOG_WARN, "How is this different from UStrProperty?" );
+          Logf( LOG_WARN, "How is this different from UStrProperty in a config?" );
           GSystem->Exit( -1 );
         }
       }
@@ -975,6 +968,139 @@ int UObject::CalcObjRefValue( idx ObjRef )
     ObjRef = -ObjRef;
   
   return ObjRef - 1;
+}
+
+// Not something that should be called in the scripting environment
+// Only for defaultproperty lists
+void UObject::SetStructProperty( UStructProperty* Prop, FPackageFileIn* In, int Idx, u32 Offset )
+{
+  void* StructAddr = PtrAdd( GetProperty<UStruct*>( Prop, Idx ), Offset );
+
+  for ( UField* Child = Prop->Struct->Children; Child != NULL; Child = Child->Next )
+  {
+    // Pure structs should not have anything besides property types or enums
+    if ( !Child->IsA( UProperty::StaticClass() ) && !Child->IsA( UEnum::StaticClass() ) )
+    {
+      Logf( LOG_CRIT, "Pure struct type has a bad child type!" );
+      return;
+    }
+    
+    // Determine property type and set property
+    int i = 0;
+    UProperty* ChildProp = (UProperty*)Child;
+    if ( ChildProp->Class == UByteProperty::StaticClass() )
+    {
+      do
+      {
+        u8 Byte = 0;
+        *In >> Byte;
+        *GetPropAddr<u8>( (UObject*)StructAddr, ChildProp, i++ ) = Byte;
+      } while ( i < ChildProp->ArrayDim );
+    }
+
+    else if ( ChildProp->Class == UIntProperty::StaticClass() )
+    {
+      do
+      {
+        int Int = 0;
+        *In >> Int;
+        *GetPropAddr<int>( (UObject*)StructAddr, ChildProp, i++ ) = Int;
+      } while ( i < ChildProp->ArrayDim );
+    }
+
+    else if ( ChildProp->Class == UFloatProperty::StaticClass() )
+    {
+      do
+      {
+        float Float = 0;
+        *In >> Float;
+        *GetPropAddr<float>( (UObject*)StructAddr, ChildProp, i++ ) = Float;
+      } while ( i < ChildProp->ArrayDim );
+    }
+
+    else if ( ChildProp->Class == UBoolProperty::StaticClass() )
+    {
+      u8 Bool = 0;
+      *In >> Bool;
+      *GetPropAddr<bool>( (UObject*)StructAddr, ChildProp, 0 ) = (Bool == 1);
+    }
+
+    else if ( ChildProp->Class == UNameProperty::StaticClass() )
+    {
+      do
+      {
+        idx Name = 0;
+        *In >> CINDEX( Name );
+        *GetPropAddr<idx>( (UObject*)StructAddr, ChildProp, i++ ) = Name;
+      } while ( i < ChildProp->ArrayDim );
+    }
+
+    else if ( ChildProp->Class == UObjectProperty::StaticClass() )
+    {
+      do
+      {
+        idx ObjRef = 0;
+        *In >> CINDEX( ObjRef );
+        UObject* Obj = (UObject*)LoadObject( ObjRef, 
+          ((UObjectProperty*)ChildProp)->ObjectType, NULL );
+
+        if ( ObjRef != 0 && Obj == NULL )
+        {
+          Logf( LOG_CRIT, 
+            "Can't load object '%s' for struct property '%s' in property list for object '%s'", 
+            Prop->Pkg->ResolveNameFromObjRef( ObjRef ), Prop->Name, Prop->Outer->Name );
+          return;
+        }
+
+        *GetPropAddr<UObject*>( (UObject*)StructAddr, ChildProp, i++ ) = Obj;
+      } while ( i < ChildProp->ArrayDim );
+    }
+
+    else if ( ChildProp->Class == UClassProperty::StaticClass() )
+    {
+      do
+      {
+        idx ObjRef = 0;
+        *In >> CINDEX( ObjRef );
+        UClass* Cls = (UClass*)LoadObject( ObjRef, UClass::StaticClass(), NULL );
+
+        if ( ObjRef != 0 && Cls == NULL )
+        {
+          Logf( LOG_CRIT, 
+            "Can't load class '%s' for struct property '%s' in property list for object '%s'", 
+            Prop->Pkg->ResolveNameFromObjRef( ObjRef ), Prop->Name, Prop->Outer->Name );
+          return;
+        }
+
+        *GetPropAddr<UClass*>( (UObject*)StructAddr, ChildProp, i++ ) = Cls;
+      } while ( i < ChildProp->ArrayDim );
+    }
+
+    else if ( ChildProp->Class == UStructProperty::StaticClass() )
+    {
+      for ( int i = 0; i < ChildProp->ArrayDim; i++ )
+        SetStructProperty( (UStructProperty*)ChildProp, In, i, Prop->Offset );
+    }
+
+    else if ( ChildProp->Class == UStrProperty::StaticClass() )
+    {
+      do
+      {
+        idx StringLength = 0;
+        *In >> CINDEX( StringLength );
+
+        char* String = new char[StringLength];
+        In->Read( String, StringLength );
+
+        *GetPropAddr<char*>( (UObject*)StructAddr, ChildProp, i++ ) = String;
+      } while ( i < ChildProp->ArrayDim );
+    }
+
+    else if ( ChildProp->Class != UEnum::StaticClass() )
+    {
+      Logf( LOG_WARN, "Unhandled case for StructProperty loading (Class = '%s')", ChildProp->Class->Name );
+    }
+  }
 }
 
 UCommandlet::UCommandlet()

@@ -24,8 +24,7 @@
  *========================================================================
 */
 
-#ifndef __UOBJECT__
-#define __UOBJECT__
+#pragma once
 
 #include "XArray.h"
 #include "XMemory.h"
@@ -388,30 +387,15 @@ class DLL_EXPORT UObject
   void ReadConfigProperties();
 
   // Property getters
-  inline u8       GetByteProperty  ( UByteProperty* Prop, int Idx = 0 );
-  inline int      GetIntProperty   ( UIntProperty* Prop, int Idx = 0 );
-  inline bool     GetBoolProperty  ( UBoolProperty* Prop );
-  inline float    GetFloatProperty ( UFloatProperty* Prop, int Idx = 0 );
-  inline UObject* GetObjProperty   ( UObjectProperty* Prop, int Idx = 0 );
-  inline idx      GetNameProperty  ( UNameProperty* Prop, int Idx = 0 );
-  inline UClass*  GetClassProperty ( UClassProperty* Prop, int Idx = 0 );
-  inline void*    GetStructProperty( UStructProperty* Prop, int Idx = 0 );
-  inline const char* GetStrProperty( UStrProperty* Prop, int Idx = 0 );
-  template <class T> inline Array<T>* GetArrayProperty( UArrayProperty* Prop, int Idx );
+  template <class T> inline T GetProperty( UProperty* Prop, int Idx );
   UProperty* FindProperty( const char* PropName );
 
   // Property setters
-  inline void SetByteProperty ( UByteProperty* Prop, u8 NewVal, int Idx = 0 );
-  inline void SetIntProperty  ( UIntProperty* Prop, int NewVal, int Idx = 0 );
-  inline void SetBoolProperty ( UBoolProperty* Prop, bool NewVal );
-  inline void SetFloatProperty( UFloatProperty* Prop, float NewVal, int Idx = 0 );
-  inline void SetObjProperty  ( UObjectProperty* Prop, UObject* NewVal, int Idx = 0 );
-  inline void SetNameProperty ( UNameProperty* Prop, idx NewVal, int Idx = 0 );
-  inline void SetClassProperty( UClassProperty* Prop, UClass* NewVal, int Idx = 0 );
-  inline void SetStructProperty( UStructProperty* Prop, FPackageFileIn* In, int Idx = 0, u32 Offset = 0 );
-  inline void SetStrProperty  ( UStrProperty* Prop, const char* NewVal, int Idx = 0 );
+  template<class T> inline void SetProperty( UProperty* Prop, T NewVal, int Idx = 0 );
   template<class T> inline void SetArrayProperty
     ( UArrayProperty* ArrayProp, FPackageFileIn* In, int Idx, u8 ByteSize, u8 NumElem );
+  void SetStructProperty( UStructProperty* Prop, FPackageFileIn* In, 
+    int Idx = 0, u32 Offset = 0);
 
   static bool StaticInit();
   static bool StaticExit();
@@ -445,6 +429,14 @@ class DLL_EXPORT UObject
   UField*     Field;    // All fields relevant to this object (points to Class->Children)
   FPackageFileIn* PkgFile; // Only relevant when loading
   bool bLoading;
+
+  struct FDefaultProperty
+  {
+    UProperty* Prop;
+    int Idx;
+  };
+
+  Array<FDefaultProperty>* DefaultProperties; // List of default properties to be written
 
   // I think this was originally here to "hide" sensitive info for objects.
   // This was due to the fact that C++ property offsets *HAVE* to match up
@@ -500,4 +492,3 @@ class DLL_EXPORT UCommandlet : public UObject
   bool    ForceInt;
 };
 
-#endif
