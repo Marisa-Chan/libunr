@@ -185,8 +185,9 @@ class DLL_EXPORT UPackage : public UObject
   const char*     GetName();
   const char*     GetFilePath();
   const char*     GetFileName();
+  const char*     GetFullObjName( idx ObjRef );
   int             GetPackageVer();
-  
+
   int FindName( const char* Name );
   
   // Name resolution
@@ -200,7 +201,7 @@ class DLL_EXPORT UPackage : public UObject
   static bool StaticInit();
   static void StaticExit( bool bCrashExit = false );
   static UPackage* StaticLoadPackage( const char* Filepath );
-      
+       
 protected:    
   String Path;
   Array<FNameEntry>* Names;

@@ -118,11 +118,13 @@ UObject::UObject()
   Class = NULL;
   Pkg = NULL;
   RefCnt = 1;
+  DefaultProperties = new Array<FDefaultProperty>();
 }
 
 //TODO: write destructor
 UObject::~UObject()
 {
+  delete DefaultProperties;
 }
 
 bool UObject::ExportToFile( const char* Dir, const char* Type )
@@ -321,6 +323,9 @@ void UObject::ReadDefaultProperties()
     if ( IsArray && PropType != PROP_Bool && PropType != PROP_Struct )
       ArrayIdx = ReadArrayIndex( PkgFile );
 
+    // Add to default properties list
+    DefaultProperties->PushBack( { Prop, ArrayIdx } );
+
     if ( PropType == PROP_Byte )
     {
       u8 Value = 0;
@@ -375,6 +380,7 @@ void UObject::ReadDefaultProperties()
     {
       idx ObjRef = 0;
       *PkgFile >> CINDEX( ObjRef );
+      (*DefaultProperties)[DefaultProperties->Size()-1].ObjRef = ObjRef;
  
       if ( Prop )
       {
@@ -570,6 +576,7 @@ void UObject::ReadDefaultProperties()
       if ( IsArray )
         ArrayIdx = ReadArrayIndex( PkgFile );
 
+      DefaultProperties->PushBack( { Prop, ArrayIdx } );
 
       if ( StructProp )
       {
@@ -722,6 +729,38 @@ void UObject::ReadConfigProperties()
       delete Category;
     }
   }
+}
+
+const char* UObject::GetFullName()
+{
+  Stack<const char*> Parts;
+
+  const char* Part = Name;
+  size_t Len = strlen( Name );
+
+  // Get all names into a stack
+  FExport* Exp = Export;
+  while ( Exp->Group != 0 )
+  {
+    Parts.Push( "." );
+    Parts.Push( Part );
+    Part = Pkg->ResolveNameFromObjRef( Exp->Group );
+    Len += strlen( Part ) + 1;
+    Exp = Pkg->GetExport( CalcObjRefValue( Exp->Group ) ); // Groups can't be imports...right?
+  }
+
+  // Now pop them and add to a string
+  char* FullName = new char[Len+1];
+  while( 1 )
+  {
+    strcat( FullName, Part );
+    if ( Parts.Size() == 0 )
+      break;
+
+    Part = Parts.Top();
+    Parts.Pop();
+  }
+  return FullName;
 }
 
 UProperty* UObject::FindProperty( const char* PropName )

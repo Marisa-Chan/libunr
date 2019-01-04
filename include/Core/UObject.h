@@ -385,6 +385,7 @@ class DLL_EXPORT UObject
   bool ParentsIsA( UClass* ClassType );
   void ReadDefaultProperties();  
   void ReadConfigProperties();
+  const char* GetFullName();
 
   // Property getters
   template <class T> inline T GetProperty( UProperty* Prop, int Idx );
@@ -434,6 +435,7 @@ class DLL_EXPORT UObject
   {
     UProperty* Prop;
     int Idx;
+    idx ObjRef; // for objects
   };
 
   Array<FDefaultProperty>* DefaultProperties; // List of default properties to be written
