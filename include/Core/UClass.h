@@ -205,6 +205,8 @@ class DLL_EXPORT UClass : public UState
   bool     NativeNeedsPkgLoad;
   bool     bLinkedChildren;
 
+  size_t DefPropListOffset;
+
 private:
   char* CreateDefaultObjectName();
 };

@@ -243,6 +243,9 @@ void UObject::ReadDefaultProperties()
   int RealSize = 0;
   bool bIsDescription = false;
 
+  // For script exporting
+  Class->DefPropListOffset = PkgFile->Tell();
+
   while( 1 )
   {
     *PkgFile >> CINDEX( PropNameIdx );
