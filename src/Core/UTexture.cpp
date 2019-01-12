@@ -150,7 +150,7 @@ void UTexture::Load()
   }
 }
 
-// TODO: Export textures besides TEXF_P8
+// TODO: Export textures besides TEXF_P8 (S3TC, etc etc)
 // TODO: Export to formats besides .bmp
 bool UTexture::ExportToFile( const char* Dir, const char* Type )
 {
