@@ -144,6 +144,19 @@ void UObject::Load()
   if ( Flags & RF_HasStack )
   {
     // Load stack info
+    idx Node;
+    idx StateNode;
+    u64 ProbeMask;
+    u32 LatentAction;
+    idx Off;
+
+    *PkgFile >> CINDEX( Node );
+    *PkgFile >> CINDEX( StateNode );
+    *PkgFile >> ProbeMask;
+    *PkgFile >> LatentAction;
+
+    if ( Node != 0 )
+      *PkgFile >> Off;
   }
  
   // TODO: For UE2, Classes DO have a property list
