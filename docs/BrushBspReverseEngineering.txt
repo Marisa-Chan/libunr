@@ -5,6 +5,9 @@ any of these formats in detail.
 UShock is a level viewer that has had RE work done on the level format, 
 but the methods of RE are questionable and the code is not very clean.
 
+All information was discovered through analyzing hex dumps of various
+maps from various versions and various games.
+
 ---------------------------------------------------------------------
 Level
 ---------------------------------------------------------------------
@@ -14,23 +17,24 @@ should never have more than 1 Level object. A Level object contains the
 following:
 
 - Property list (seems to only have None?)
+- Number of actors
 - Number of actors (higher than version 61?) OR ???
-- Number of actors (higher than version 61?) OR ???
-- Actor list
-- Protocol
-- Unknown BYTE
+- Actor list (Object References) [can contain zeros, these count too]
+- Protocol ["unreal" or "deusex" for example]
+- Unknown WORD (if less than 62?) OR Unknown BYTE
 - Map (always Index?)
+- Unknown WORD (if less than 62?) OR Unknown BYTE
 - Unknown BYTE
-- Unknown BYTE
-ort
-- Unknown DWORD
-- Unknown DWORD
+- Port (WORD)
+- Unknown DWORD (flags?)
+- Unknown DWORD (more flags?)
 - Checksum? (CRC?)
 - Unknown DWORD
 - Unknown DWORD
 - Unknown DWORD
 - Unknown DWORD
 - Unknown WORD
+- Unknown BYTE (if Version 60)
 
 ---------------------------------------------------------------------
 Brush
