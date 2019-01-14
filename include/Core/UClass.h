@@ -26,8 +26,8 @@
 #pragma once
 
 #include "Core/FConfig.h"
-#include "XArray.h"
-#include "XString.h"
+#include <libxstl/XArray.h>
+#include <libxstl/XString.h>
 #include "Core/UObject.h"
 
 using namespace xstl;

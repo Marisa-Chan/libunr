@@ -29,7 +29,7 @@
 
 #pragma once
 
-#include "XMemory.h"
+#include <libxstl/XMemory.h>
 #include "Core/UObject.h"
 #include "Core/UPackage.h"
 #include "Core/USound.h"

@@ -33,8 +33,8 @@
 #include <unistd.h>
 #include <string.h>
 
-#include "XTypes.h"
-#include "XStream.h"
+#include <libxstl/XTypes.h>
+#include <libxstl/XStream.h>
 
 #if defined LIBUNR_LINUX
   #include <sys/types.h>
