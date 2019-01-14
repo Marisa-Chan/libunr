@@ -20,27 +20,30 @@ following:
 - Number of actors
 - Number of actors (higher than version 61?) OR ???
 - Actor list (Object References) [can contain zeros, these count too]
-- Protocol ["unreal" or "deusex" for example]
-- Unknown WORD (if less than 62?) OR Unknown BYTE
-- Map (always Index?)
-- Unknown WORD (if less than 62?) OR Unknown BYTE
-- Unknown BYTE
-- Port (WORD)
-- Unknown DWORD (flags?)
-- Unknown DWORD (more flags?)
-- Checksum? (CRC?)
-- Unknown DWORD
-- Unknown DWORD
-- Unknown DWORD
-- Unknown DWORD
-- Unknown WORD
-- Unknown BYTE (if Version 60)
+- "URL"
+  - Protocol (String) ["unreal" or "deusex" for example]
+  - Host (String)
+  - Map (String) [always Index?]
+  - Portal? (String) [always zero?]
+  - Unknown BYTE (Options array maybe?)
+  - Port (INT)
+  - bValid? (BYTE)
+- Unknown data of variable length follows
+  - (Try saving maps without this data and see what happens?)
 
 ---------------------------------------------------------------------
 Brush
 ---------------------------------------------------------------------
 All brushes seem to contain property lists that describe their information
 in well enough detail. This could be used for exporting to T3D and the like.
+
+---------------------------------------------------------------------
+Model
+---------------------------------------------------------------------
+Models seem to be the objects used to store polygon and BSP data
+
+A Model object contains the following:
+- 
 
 ---------------------------------------------------------------------
 BspSurfs

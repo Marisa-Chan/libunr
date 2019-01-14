@@ -80,6 +80,7 @@ typedef i32 idx;
 #define PKG_VER_UB_099  42
 
 // Unreal
+#define PKG_VER_UN_V60 60
 #define PKG_VER_UN_200 61
 #define PKG_VER_UN_219 61 // is that right?
 #define PKG_VER_UN_220 63
