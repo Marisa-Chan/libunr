@@ -285,7 +285,7 @@ void UObject::ReadDefaultProperties()
       {
         if ( Outer )
           Logf( LOG_CRIT, "Property '%s' in '%s.%s.%s' does not exist",
-            PropName, Pkg->Name, Outer->Name, Name );
+            PropName, Outer->Pkg->Name, Outer->Name, Name );
         else
           Logf( LOG_CRIT, "Property '%s' in '%s.%s' does not exist",
             PropName, Pkg->Name, Name );
