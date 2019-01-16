@@ -6,7 +6,9 @@ UShock is a level viewer that has had RE work done on the level format,
 but the methods of RE are questionable and the code is not very clean.
 
 All information was discovered through analyzing hex dumps of various
-maps from various versions and various games.
+maps from various versions and various games as well as by guessing based on
+the contents of the public headers and occasionally UShock source (on the rare
+chance anything in there actually lined up with what's inside of the package)
 
 ---------------------------------------------------------------------
 Level
