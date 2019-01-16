@@ -18,9 +18,13 @@ following:
 
 - Property list (seems to only have None?)
 - Number of actors
-- Number of actors (higher than version 67?) OR ???
+- Number of actors (higher than version 67?) OR Max number of actors?
 - Actor list (Object References) [can contain zeros, these count too]
-- "URL"
+  - I wonder how much smaller levels can be and how much faster they'll load
+    without all these stupid zeros in...
+
+- "URL" (this one was really a huge guess just by seeing the "unreal" and
+  "Index.unr" strings by remembering that they were also in Unreal.ini))
   - Protocol (String) ["unreal" or "deusex" for example]
   - Host (String)
   - Map (String) [always Index?]
