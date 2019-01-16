@@ -882,6 +882,7 @@ void UClass::Load()
     ClassConfig = GGameConfig; 
 
   SuperClass = SafeCast<UClass>( SuperField );
+  NativeNeedsPkgLoad = false;
 }
 
 void UClass::PostLoad()
@@ -925,6 +926,7 @@ void UClass::PostLoad()
     if ( ( ClassFlags & CLASS_Config ) ) 
 //      Default->ReadConfigProperties();
 
+    DefPropListOffset = PkgFile->Tell();
     Default->PkgFile = PkgFile;
     Default->ReadDefaultProperties();
     Default->PkgFile = NULL;

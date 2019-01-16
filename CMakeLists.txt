@@ -12,11 +12,63 @@ set (UNR_VER_MINOR 2)
 set (UNR_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 set (UNR_INC ${UNR_ROOT}/include)
 set (UNR_SRC ${UNR_ROOT}/src)
-set (XSTL_ROOT  ${UNR_ROOT}/../xstl)
-set (XSTL_INC   ${XSTL_ROOT}/include)
+
+#Symlink Macro
+macro(install_symlink filepath sympath)
+    install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${filepath} ${sympath})")
+    install(CODE "message(\"-- Created symlink: ${sympath} -> ${filepath}\")")
+endmacro(install_symlink)
+
+#System Include Dir
+if ( WIN32 )
+  set (SYS_INC_PATH C:\\MinGW\\include)
+  message(${SYS_INC_PATH})
+else()
+  set (SYS_INC_PATH /usr/include)
+endif()
+
 set (TARGET_PLATFORM "Linux" CACHE STRING "The target platform that is being built for") 
 
 option( BUILD32 "Build32" OFF )
+
+#Check for libxstl, Use <> by default, if not found, use ../xstl
+
+#Headers
+set (XSTL_INC   "${SYS_INC_PATH}/libxstl")
+
+if( NOT EXISTS ${XSTL_INC} )
+    set (XSTL_INC   "${UNR_ROOT}/../xstl/include")
+
+    if( NOT EXISTS ${XSTL_INC} )
+    message( FATAL_ERROR "Libunr Requires libxstl: library headers not found in ${SYS_INC_PATH}/libxstl or ../xstl/include" )
+    endif()
+
+endif()
+
+#DLL/SO
+
+#64-bit
+if ( NOT BUILD32 )
+    find_library( XSTL_LIB_PATH 
+    NAMES xstl libxstl 
+    HINTS "/usr/local/lib64/libxstl" "/usr/lib64/libxstl" "C:\\Program Files\\libxstl" "${UNR_ROOT}/../xstl/" 
+    )
+endif()
+
+#32-bit
+if ( BUILD32 )
+find_library( XSTL_LIB_PATH 
+NAMES xstl libxstl 
+HINTS "/usr/local/lib32/libxstl" "/usr/lib32/libxstl" "C:\\Program Files (x86)\\libxstl" "${UNR_ROOT}/../xstl" 
+)
+endif()
+
+if( NOT XSTL_LIB_PATH )
+    message( FATAL_ERROR "Libunr Requires libxstl: library file not found!" )
+endif()
+
+add_library( xstl SHARED IMPORTED )
+set_target_properties( xstl PROPERTIES IMPORTED_LOCATION "${XSTL_LIB_PATH}" )
 
 if ( TARGET_PLATFORM STREQUAL "Windows" )
   add_definitions("-DLIBUNR_WIN32" "-Wno-invalid-offsetof")
@@ -70,7 +122,7 @@ set (SOURCES ${UNR_SRC}/Core/FConfig.cpp
 
 )
 
-include_directories (${UNR_INC} ${XSTL_INC} /usr/include)
+include_directories (${UNR_INC} ${XSTL_INC})
 add_definitions("-std=c++11" "-DXSTL_ARRAY_STD" "-DXSTL_STRING_STD"
   "-DXSTL_FILESTREAM_STD" "-DXSTL_STACK_STD" 
   "-DINSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"" )
@@ -80,7 +132,7 @@ set_source_files_properties( tags PROPERTIES GENERATED true )
 add_custom_target( tags COMMAND ctags --c++-kinds=+p --fields=+iaS --extra=+q
  --language-force=C++ --recurse=yes . WORKING_DIRECTORY ${UNR_ROOT} )
 add_library( unr SHARED ${SOURCES} tags )
-target_link_libraries(unr "xstl")
+target_link_libraries(unr xstl)
 
 # Debug symbols & optimization levels
 if ( CMAKE_BUILD_TYPE STREQUAL "Debug" )
@@ -95,14 +147,22 @@ endif()
 
 # 32 bit support + install targets
 if ( BUILD32 )
+
   add_definitions("-m32")
   set_target_properties (unr PROPERTIES LINK_FLAGS "-m32")
-  if ( TARGET_PLATFORM STREQUAL "Linux" )
-    install(TARGETS unr DESTINATION lib32)
+  if ( TARGET_PLATFORM STREQUAL "Windows" )
+    install(TARGETS unr DESTINATION "${WINDOWS_32_INSTALL_PATH}\\libunr")
+  elseif ( TARGET_PLATFORM STREQUAL "Linux" )
+    install(TARGETS unr DESTINATION lib32/libunr)
   endif()
+
 else()
-  if ( TARGET_PLATFORM STREQUAL "Linux" )
-    install(TARGETS unr DESTINATION lib)
-  endif()
+
+    if ( TARGET_PLATFORM STREQUAL "Windows" )
+        install(TARGETS unr DESTINATION libunr)
+    elseif ( TARGET_PLATFORM STREQUAL "Linux" )
+        install(TARGETS unr DESTINATION lib64/libunr)
+    endif()
+
 endif()
 

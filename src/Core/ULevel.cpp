@@ -25,9 +25,35 @@
 
 #include "Core/ULevel.h"
 
+FURL::FURL()
+{
+}
+
+DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& Ar, FURL& URL )
+{
+  Ar >> Protocol;
+  Ar >> Host;
+  Ar >> Map;
+  Ar >> Portal;
+
+  u8 _Unknown0;
+  Ar >> _Unknown0;
+
+  Ar >> Port;
+
+  int Valid;
+  Ar >> Valid;
+  bValid = (Valid == 1);
+
+  return Ar;
+}
+
 ULevelBase::ULevelBase()
   : UObject()
 {
+  NetDriver = NULL;
+  Engine = NULL;
+  DemoRecDriver = NULL;
 }
 
 ULevelBase::~ULevelBase()
@@ -37,9 +63,40 @@ ULevelBase::~ULevelBase()
 ULevel::ULevel()
   : ULevelBase()
 {
+  Model = NULL;
 }
 
 ULevel::~ULevel()
 {
+}
+
+void ULevelBase::Load()
+{
+  Super::Load();
+
+  int NumActors = 0;
+  int _Unknown0 = 0;
+
+  *PkgFile >> NumActors;
+  *PkgFile >> _Unknown0;
+
+  Actors.Reserve( NumActors );
+  for ( int i = 0; i < NumActors; i++ )
+  {
+    idx ActorObjRef = 0;
+    *PkgFile >> CINDEX( ActorObjRef );
+
+    Actors.PushBack( (UActor*)LoadObject( ActorObjRef, NULL, NULL ) );
+  }
+
+  *PkgFile >> URL;
+}
+
+void ULevel::Load()
+{
+  Super::Load();
+
+  // What is all of this crap after the ULevelBase stuff?
+  // Can't find a consistent lead on what anything is here...
 }
 

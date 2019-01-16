@@ -25,17 +25,70 @@
 
 #pragma once
 
-#include "Core/UObject.h"
+#include "Core/UClass.h"
+#include "Core/UEngine.h"
+#include "Core/UModel.h"
+#include "Core/UNet.h"
+
+class DLL_EXPORT FReachSpec
+{
+public:
+  FReachSpec();
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& Ar, FReachSpec& ReachSpec );
+  friend FPackageFileOut& operator<<( FPackageFileOut& Ar, FReachSpec& ReachSpec );
+
+  int Distance;
+  AActor* Start;
+  AActor* End;
+  int CollisionRadius;
+  int CollisionHeight;
+  int ReachFlags;
+  u8  bPruned;
+};
+
+struct DLL_EXPORT FURL
+{
+  FURL();
+
+  String Protocol;
+  String Host;
+  String Map;
+  String Portal;
+  Array<String> Op;
+  int    Port;
+  bool   bValid;
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& Ar, FURL& URL );
+};
 
 class ULevelBase : public UObject
 {
   DECLARE_NATIVE_ABSTRACT_CLASS( ULevelBase, UObject, CLASS_NoExport, Engine )
   ULevelBase();
+
+  Array<AActor*> Actors;
+
+  virtual void Load();
+
+  UNetDriver* NetDriver;
+  UEngine*    Engine;
+  FURL        URL;
+  UNetDriver* DemoRecDriver; // do we need this?
 };
 
 class ULevel : public ULevelBase
 {
   DECLARE_NATIVE_CLASS( ULevel, ULevelBase, CLASS_NoExport, Engine )
+  EXPORTABLE()
   ULevel();
+
+  virtual void Load();
+
+  Array<FReachSpec> ReachSpecs;
+  UModel* Model;
+  UTextBuffer* TextBlocks[16];
+  double TimeSeconds;
+  Map<String,String> TravelInfo;
 };
 

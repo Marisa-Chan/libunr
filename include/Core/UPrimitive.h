@@ -33,6 +33,7 @@ class UPrimitive : public UObject
   DECLARE_NATIVE_CLASS( UPrimitive, UObject, CLASS_NoExport, Engine )
 
   UPrimitive();
+  virtual void Load();
 
   FBox BoundingBox;
   FSphere BoundingSphere;

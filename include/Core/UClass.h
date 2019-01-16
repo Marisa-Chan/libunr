@@ -26,8 +26,8 @@
 #pragma once
 
 #include "Core/FConfig.h"
-#include "XArray.h"
-#include "XString.h"
+#include <libxstl/XArray.h>
+#include <libxstl/XString.h>
 #include "Core/UObject.h"
 
 using namespace xstl;
@@ -204,6 +204,8 @@ class DLL_EXPORT UClass : public UState
   FConfig* ClassConfig;
   bool     NativeNeedsPkgLoad;
   bool     bLinkedChildren;
+
+  size_t DefPropListOffset;
 
 private:
   char* CreateDefaultObjectName();

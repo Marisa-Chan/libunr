@@ -23,7 +23,7 @@
  *========================================================================
 */
 
-#include "XMemory.h"
+#include <libxstl/XMemory.h>
 #include "Core/UClass.h"
 #include "Core/UMath.h"
 #include "Core/UObject.h"
