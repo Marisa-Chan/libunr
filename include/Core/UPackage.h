@@ -43,8 +43,6 @@ using namespace xstl;
 class DLL_EXPORT FPackageFileIn : public FileStreamIn
 {
 public:
-  
-
   int Ver;
   UPackage* Pkg;
 };
@@ -73,6 +71,13 @@ public:
 };
 
 #define CINDEX(val) (*(FCompactIndex*)&val)
+
+/*-----------------------------------------------------------------------------
+ * FString
+ * A string stored in a package
+-----------------------------------------------------------------------------*/
+FPackageFileIn&  operator>>( FPackageFileIn& In, String& Str );
+FPackageFileOut& operator<<( FPackageFileOut& Out, String& Str );
 
 /*-----------------------------------------------------------------------------
  * FExport
