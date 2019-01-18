@@ -17,25 +17,11 @@
 \*========================================================================*/
 
 /*========================================================================
- * UPrimitive.cpp - Primitive that can be rendered and collided with
+ * UMath.cpp - Math functions
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#include "Core/UPrimitive.h"
+#include "UMath.h"
 
-UPrimitive::UPrimitive()
-  : UObject()
-{
-}
-
-UPrimitive::~UPrimitive()
-{
-}
-
-void UPrimitive::Load()
-{
-  Super::Load();
-  *PkgFile >> BoundingBox >> BoundingSphere;
-}

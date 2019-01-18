@@ -96,7 +96,28 @@ void ULevel::Load()
 {
   Super::Load();
 
-  // What is all of this crap after the ULevelBase stuff?
-  // Can't find a consistent lead on what anything is here...
+  idx ObjRef;
+  *PkgFile >> CINDEX( ObjRef );
+  Model = (UModel*)LoadObject( ObjRef, UModel::StaticClass(), this );
+
+  idx ReachSpecsLength;
+  *PkgFile >> CINDEX( ReachSpecsLength );
+  ReachSpecs.Resize( ReachSpecsLength );
+
+  for ( int i = 0; i < ReachSpecsLength; i++ )
+    *PkgFile >> ReachSpecs[i];
+
+  *PkgFile >> TimeSeconds;
+
+  // TODO: What is this?
+  u8 _Unknown[3];
+  PkgFile->Read( &Unknown, 3 );
+
+  // Unused for now...
+  idx TextBuffer0;
+  *PkgFile >> CINDEX( TextBuffer0 );
+
+  // TODO: ???
+  //PkgFile->Read( &Unknown, 10 );
 }
 

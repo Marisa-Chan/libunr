@@ -26,17 +26,38 @@
 #pragma once
 
 #include "Core/FUtil.h"
+#include "Core/UPackage.h"
 
 struct FVector
 {
   float X;
   float Y;
   float Z;
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FVector& Vector )
+  {
+    In >> Vector.X >> Vector.Y >> Vector.Z;
+  }
+
+  friend FPackageFileOut& operator<<( FPackageFileOut& Out, FVector& Vector )
+  {
+    return Out << Vector.X << Vector.Y << Vector.Z;
+  }
 };
 
 struct FPlane : public FVector
 {
   float W;
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FPlane& Plane )
+  {
+    return In >> (FVector&)Plane >> Plane.W;
+  }
+
+  friend FPackageFileOut& operator<<( FPackageFileOut& Out, FPlane& Plane )
+  {
+    return Out << (FVector&)Plane << Plane.W;
+  }
 };
 
 struct FQuat
@@ -45,6 +66,16 @@ struct FQuat
   float Y;
   float Z;
   float W;
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FQuat& Quat )
+  {
+    return In >> Quat.X >> Quat.Y >> Quat.Z >> Quat.W;
+  }
+
+  friend FPackageFileOut& operator<<( FPackageFileOut& Out, FQuat& Quat )
+  {
+    return Out << Quat.X << Quat.Y << Quat.Z << Quat.W;
+  }
 };
 
 struct FRotator
@@ -52,6 +83,16 @@ struct FRotator
   int Pitch;
   int Yaw;
   int Roll;
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FRotator& Rotator )
+  {
+    return In >> Rotator.Pitch >> Rotator.Yaw >> Rotator.Roll;
+  }
+
+  friend FPackageFileOut& operator<<( FPackageFileOut& Out, FRotator& Rotator )
+  {
+    return Out << Rotator.Pitch << Rotator.Yaw << Rotator.Roll;
+  }
 };
 
 struct FBox
@@ -59,10 +100,35 @@ struct FBox
   FVector Min;
   FVector Max;
   u8      IsValid;
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FBox& Box )
+  {
+    return In >> Box.Min >> Box.Max >> IsValid;
+  }
+
+  friend FPackageFileOut& operator<<( FPackageFileOut& Out, FBox& Box )
+  {
+    return Out << Box.Min << Box.Max << IsValid;
+  }
 };
 
 struct FSphere : public FPlane
 {
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FSphere& Sphere )
+  {
+    if ( In.Ver <= PKG_VER_UN_200 )
+      return In >> (FVector&)Sphere;
+    else
+      return In >> (FPlane&)Sphere;
+  }
+
+  friend FPackageFileOut& operator<<( FPackageFileOut& Out, FSphere& Sphere )
+  {
+    if ( Out.Ver <= PKG_VER_UN_200 )
+      return Out << (FVector&)Sphere;
+    else
+      return Out << (FPlane&)Sphere;
+  }
 };
 
 struct FCoords
@@ -71,6 +137,16 @@ struct FCoords
   FVector XAxis;
   FVector YAxis;
   FVector ZAxis;
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FCoords& Coords )
+  {
+    return In >> Coords.Origin >> Coords.XAxis >> Coords.YAxis >> Coords.ZAxis;
+  }
+
+  friend FPackageFileOut& operator<<( FPackageFileOut& Out, FCoords& Coords )
+  {
+    return Out << Coords.Origin << Coords.XAxis << Coords.YAxis << Coords.ZAxis;
+  }
 };
 
 struct FScale
@@ -89,5 +165,15 @@ struct FScale
   };
 
   ESheerAxis SheerAxis;
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FScale& Scale )
+  {
+    return In >> Scale >> SheerRate >> (u8)SheerAxis;
+  }
+
+  friend FPackageFileOut& operator<<( FPackageFileOut& Out, FScale& Scale )
+  {
+    return Out << Scale << SheerRate << (u8)SheerAxis;
+  }
 };
 

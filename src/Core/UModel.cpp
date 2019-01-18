@@ -34,4 +34,9 @@ UModel::~UModel()
 {
 }
 
+void UModel::Load()
+{
+  Super::Load();
 
+
+}

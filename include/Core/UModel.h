@@ -70,7 +70,14 @@ class DLL_EXPORT FBspNode
 {
 public:
   FBspNode();
-  friend FPackageFileIn& operator>>( FPackageFileIn& Ar, FBspNode& BspNode );
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FBspNode& BspNode )
+  {
+    In >> Plane >> ZoneMask >> NodeFlags >> CINDEX( iVertPool );
+    In >> CINDEX( iSurf ) >> CINDEX( iBack ) >> CINDEX( iFront ) >> CINDEX( iPlane );
+    In >> CINDEX( iCollisionBound ) >> CINDEX( iRenderBound ) >> iZone[0] >> iZone[1];
+    In >> NumVertices >> iLeaf[0] >> iLeaf[1];
+    return In;
+  }
 
   FPlane Plane;
   u64    ZoneMask;
