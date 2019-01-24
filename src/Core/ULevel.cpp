@@ -23,29 +23,46 @@
  *========================================================================
 */
 
+#include "Core/UClass.h"
 #include "Core/ULevel.h"
+#include "Actors/AActor.h"
 
-FURL::FURL()
+DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FReachSpec& RS )
 {
+  In >> RS.Distance;
+  
+  idx ObjRef;
+  In >> CINDEX( ObjRef );
+  RS.Start = (AActor*)UObject::StaticLoadObject( In.Pkg, ObjRef, AActor::StaticClass(), NULL );
+
+  In >> CINDEX( ObjRef );
+  RS.End = (AActor*)UObject::StaticLoadObject( In.Pkg, ObjRef, AActor::StaticClass(), NULL );
+
+  In >> RS.CollisionRadius;
+  In >> RS.CollisionHeight;
+  In >> RS.ReachFlags;
+  In >> RS.bPruned;
+  
+  return In;
 }
 
-DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& Ar, FURL& URL )
+DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FURL& URL )
 {
-  Ar >> Protocol;
-  Ar >> Host;
-  Ar >> Map;
-  Ar >> Portal;
+  In >> URL.Protocol;
+  In >> URL.Host;
+  In >> URL.Map;
+  In >> URL.Portal;
 
   u8 _Unknown0;
-  Ar >> _Unknown0;
+  In >> _Unknown0;
 
-  Ar >> Port;
+  In >> URL.Port;
 
   int Valid;
-  Ar >> Valid;
-  bValid = (Valid == 1);
+  In >> Valid;
+  URL.bValid = (Valid == 1);
 
-  return Ar;
+  return In;
 }
 
 ULevelBase::ULevelBase()
@@ -86,7 +103,7 @@ void ULevelBase::Load()
     idx ActorObjRef = 0;
     *PkgFile >> CINDEX( ActorObjRef );
 
-    Actors.PushBack( (UActor*)LoadObject( ActorObjRef, NULL, NULL ) );
+    Actors.PushBack( (AActor*)LoadObject( ActorObjRef, NULL, NULL ) );
   }
 
   *PkgFile >> URL;
@@ -111,13 +128,21 @@ void ULevel::Load()
 
   // TODO: What is this?
   u8 _Unknown[3];
-  PkgFile->Read( &Unknown, 3 );
+  PkgFile->Read( &_Unknown, 3 );
 
   // Unused for now...
   idx TextBuffer0;
   *PkgFile >> CINDEX( TextBuffer0 );
 
   // TODO: ???
-  //PkgFile->Read( &Unknown, 10 );
+  //PkgFile->Read( &_Unknown, 10 );
 }
+
+bool ULevel::ExportToFile( const char* Dir, const char* Type )
+{
+  return false;
+}
+
+IMPLEMENT_NATIVE_CLASS( ULevelBase );
+IMPLEMENT_NATIVE_CLASS( ULevel );
 

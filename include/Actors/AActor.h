@@ -25,10 +25,8 @@
 
 #pragma once
 
-#include "Core/ULevel.h"
 #include "Core/UMath.h"
 #include "Core/UMesh.h"
-#include "Core/UModel.h"
 #include "Core/URender.h"
 #include "Core/USkelAnim.h"
 #include "Core/UObject.h"
@@ -186,7 +184,7 @@ class AActor : public UObject
 
   // Major actor properties
   ALevelInfo* Level;
-  ULevel*     XLevel;
+  class ULevel* XLevel;
   idx         Tag;
   idx         Event;
   AActor*     Target;
@@ -256,7 +254,7 @@ class AActor : public UObject
   UTexture* Skin;
   UMesh*    Mesh;
   UMesh*    ShadowMesh;
-  UModel*   Brush;
+  class UModel*   Brush;
   float     DrawScale;
   FVector   PrePivot;
   float     ScaleGlow;

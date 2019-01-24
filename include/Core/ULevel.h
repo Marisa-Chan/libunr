@@ -25,18 +25,15 @@
 
 #pragma once
 
+#include <libxstl/XMap.h>
 #include "Core/UClass.h"
 #include "Core/UEngine.h"
 #include "Core/UModel.h"
 #include "Core/UNet.h"
 
-class DLL_EXPORT FReachSpec
+struct DLL_EXPORT FReachSpec
 {
-public:
-  FReachSpec();
-
-  friend FPackageFileIn& operator>>( FPackageFileIn& Ar, FReachSpec& ReachSpec );
-  friend FPackageFileOut& operator<<( FPackageFileOut& Ar, FReachSpec& ReachSpec );
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FReachSpec& RS );
 
   int Distance;
   AActor* Start;
@@ -49,7 +46,7 @@ public:
 
 struct DLL_EXPORT FURL
 {
-  FURL();
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FURL& URL );
 
   String Protocol;
   String Host;
@@ -58,8 +55,6 @@ struct DLL_EXPORT FURL
   Array<String> Op;
   int    Port;
   bool   bValid;
-
-  friend FPackageFileIn& operator>>( FPackageFileIn& Ar, FURL& URL );
 };
 
 class ULevelBase : public UObject

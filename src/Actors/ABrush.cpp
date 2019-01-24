@@ -23,6 +23,9 @@
  *========================================================================
 */
 
+#include "Core/UClass.h"
+#include "Actors/ABrush.h"
+
 ABrush::ABrush()
   : AActor()
 {
@@ -32,7 +35,22 @@ ABrush::~ABrush()
 {
 }
 
+AMover::AMover()
+  : ABrush()
+{
+}
+
+AMover::~AMover()
+{
+}
+
+bool ABrush::ExportToFile( const char* Dir, const char* Type )
+{
+  return false;
+}
+
 IMPLEMENT_NATIVE_CLASS( ABrush );
+IMPLEMENT_NATIVE_CLASS( AMover );
 
 BEGIN_PROPERTY_LINK( ABrush, 9 )
   LINK_NATIVE_PROPERTY( ABrush, CsgOper );

@@ -84,7 +84,16 @@ UObject* UObject::StaticConstructObject( const char* InName, UClass* InClass, UO
   Out->Flags = InExport->ObjectFlags;
   Out->Class = InClass;
   Out->Field = InClass->Default == NULL ? NULL : InClass->Default->Field;
- 
+
+  if ( InPkg )
+    InPkg->AddRef();
+
+  if ( InOuter )
+    InOuter->AddRef();
+
+  if ( InClass )
+    InClass->AddRef();
+
   // Add to object
   ObjectPool->PushBack( Out );
 
@@ -118,13 +127,24 @@ UObject::UObject()
   Class = NULL;
   Pkg = NULL;
   RefCnt = 1;
-  DefaultProperties = new Array<FDefaultProperty>();
+
+  if ( USystem::IsEditor() )
+    DefaultProperties = new Array<FDefaultProperty>(); 
 }
 
-//TODO: write destructor
 UObject::~UObject()
 {
-  delete DefaultProperties;
+  if ( Outer )
+    Outer->DelRef();
+
+  if ( Class )
+    Class->DelRef();
+
+  if ( Pkg )
+    Pkg->DelRef();
+
+  if ( USystem::IsEditor() )
+    delete DefaultProperties;
 }
 
 bool UObject::ExportToFile( const char* Dir, const char* Type )
@@ -337,7 +357,8 @@ void UObject::ReadDefaultProperties()
       ArrayIdx = ReadArrayIndex( PkgFile );
 
     // Add to default properties list
-    DefaultProperties->PushBack( { Prop, ArrayIdx } );
+    if ( USystem::IsEditor() )
+      DefaultProperties->PushBack( { Prop, ArrayIdx } );
 
     if ( PropType == PROP_Byte )
     {

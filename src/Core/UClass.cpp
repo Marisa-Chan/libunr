@@ -789,28 +789,7 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
 
   // Write default properties
   const char* const DefPropStr = "defaultproperties\r\n{\r\n";
-  char Buf[256] = { 0 };
-  Out->Write( (char*)DefPropStr, strlen( DefPropStr ) );
-
-  for ( int i = 0; i < Default->DefaultProperties->Size(); i++ )
-  {
-    UProperty* Prop = (*Default->DefaultProperties)[i].Prop;
-    int Idx = (*Default->DefaultProperties)[i].Idx;
-  
-    size_t BufLen = 0;
-    if ( Prop->Class != UArrayProperty::StaticClass() )
-    {
-      if ( Prop->ArrayDim > 1 )
-        BufLen = snprintf( Buf, sizeof( Buf ), "\t%s(%i)=", Prop->Name, Idx );
-      else
-        BufLen = snprintf( Buf, sizeof( Buf ), "\t%s=", Prop->Name );
-    }
-
-    BufLen += Prop->FormatForScript( Buf, sizeof( Buf ), Default, Idx );
-    Out->Write( Buf, BufLen > sizeof( Buf ) ? sizeof( Buf ) : BufLen );
-    xstl::Set( Buf, 0, sizeof( Buf ) );
-  }
-
+  // TODO:
   Out->Write( (char*)"}\r\n", 3 );
 
   Out->Close();

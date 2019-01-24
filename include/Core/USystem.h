@@ -54,15 +54,16 @@ class DLL_EXPORT USystem : public USubsystem
 
   bool PromptForGameInfo();
   bool PromptForDeviceInfo();
-
+  
   // Global methods
-  static bool StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC );
+  static bool StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool InIsEditor );
   static const char* GetLibunrIniPath();
   static const char* GetDefaultLibunrIniPath();
   static bool CopyFile( const char* OrigFile, const char* NewFile );
   static bool FileExists( const char* Filename );
   static void RealPath( const char* Path, char* FullPath, size_t FullPathSize );
   static bool MakeDir( const char* Path );
+  static bool IsEditor();
 #if defined __linux__ || __unix__
   static const char* GetHomeDir();
 #endif
@@ -84,8 +85,11 @@ class DLL_EXPORT USystem : public USubsystem
 protected:
   GamePromptCallback DoGamePrompt;
   DevicePromptCallback DoDevicePrompt;
+
+  // Runtime
+  static bool bIsEditor;
 };
 
 extern USystem* GSystem;
-DLL_EXPORT bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC );
+DLL_EXPORT bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool bIsEditor );
 

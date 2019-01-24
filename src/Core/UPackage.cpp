@@ -151,10 +151,10 @@ DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, String& Str )
   In >> CINDEX( Size );
 
   Str.Reserve( Size-1 );
-  for ( int i = 0; i < Size-1; i++ )
+  for ( int i = 0; i < Size; i++ )
   {
     char C = '\0';
-    In >> C;
+    In.Read( &C, 1 );
 
     if ( C == '\0' )
       break;
@@ -168,8 +168,8 @@ DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, String& Str )
 DLL_EXPORT FPackageFileOut& operator<<( FPackageFileOut& Out, String& Str )
 {
   size_t Length = Str.Length();
-  In << CINDEX( Length );
-  In.Write( Str.Data(), Length+1 );
+  Out << CINDEX( Length );
+  Out.Write( Str.Data(), Length+1 );
   return Out;
 }
 

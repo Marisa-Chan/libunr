@@ -35,24 +35,6 @@ AActor::~AActor()
 {
 }
 
-ABrush::ABrush()
-  : AActor()
-{
-}
-
-ABrush::~ABrush()
-{
-}
-
-AMover::AMover()
-  : ABrush()
-{
-}
-
-AMover::~AMover()
-{
-}
-
 AMenu::AMenu()
   : AActor()
 {
@@ -144,14 +126,12 @@ ATrigger::~ATrigger()
 }
 
 IMPLEMENT_NATIVE_CLASS( AActor );
-IMPLEMENT_NATIVE_CLASS( ABrush );
 IMPLEMENT_NATIVE_CLASS( ACarcass );
 IMPLEMENT_NATIVE_CLASS( ADecoration );
 IMPLEMENT_NATIVE_CLASS( AInfo );
 IMPLEMENT_NATIVE_CLASS( AInterpolationPoint );
 IMPLEMENT_NATIVE_CLASS( AKeypoint );
 IMPLEMENT_NATIVE_CLASS( AMenu );
-IMPLEMENT_NATIVE_CLASS( AMover );
 IMPLEMENT_NATIVE_CLASS( AProjectile );
 IMPLEMENT_NATIVE_CLASS( ASpawnNotify );
 IMPLEMENT_NATIVE_CLASS( ATriggers );

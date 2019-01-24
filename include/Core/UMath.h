@@ -36,12 +36,18 @@ struct FVector
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FVector& Vector )
   {
-    In >> Vector.X >> Vector.Y >> Vector.Z;
+    In >> Vector.X; 
+    In >> Vector.Y;
+    In >> Vector.Z;
+    return In;
   }
 
   friend FPackageFileOut& operator<<( FPackageFileOut& Out, FVector& Vector )
   {
-    return Out << Vector.X << Vector.Y << Vector.Z;
+    Out << Vector.X;
+    Out << Vector.Y;
+    Out << Vector.Z;
+    return Out;
   }
 };
 
@@ -51,12 +57,16 @@ struct FPlane : public FVector
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FPlane& Plane )
   {
-    return In >> (FVector&)Plane >> Plane.W;
+    In >> (FVector&)Plane;
+    In >> Plane.W;
+    return In;
   }
 
   friend FPackageFileOut& operator<<( FPackageFileOut& Out, FPlane& Plane )
   {
-    return Out << (FVector&)Plane << Plane.W;
+    Out << (FVector&)Plane;
+    Out << Plane.W;
+    return Out;
   }
 };
 
@@ -69,12 +79,20 @@ struct FQuat
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FQuat& Quat )
   {
-    return In >> Quat.X >> Quat.Y >> Quat.Z >> Quat.W;
+    In >> Quat.X;
+    In >> Quat.Y; 
+    In >> Quat.Z; 
+    In >> Quat.W;
+    return In;
   }
 
   friend FPackageFileOut& operator<<( FPackageFileOut& Out, FQuat& Quat )
   {
-    return Out << Quat.X << Quat.Y << Quat.Z << Quat.W;
+    Out << Quat.X; 
+    Out << Quat.Y;
+    Out << Quat.Z;
+    Out << Quat.W;
+    return Out;
   }
 };
 
@@ -86,12 +104,18 @@ struct FRotator
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FRotator& Rotator )
   {
-    return In >> Rotator.Pitch >> Rotator.Yaw >> Rotator.Roll;
+    In >> Rotator.Pitch;
+    In >> Rotator.Yaw;
+    In >> Rotator.Roll;
+    return In;
   }
 
   friend FPackageFileOut& operator<<( FPackageFileOut& Out, FRotator& Rotator )
   {
-    return Out << Rotator.Pitch << Rotator.Yaw << Rotator.Roll;
+    Out << Rotator.Pitch;
+    Out << Rotator.Yaw;
+    Out << Rotator.Roll;
+    return Out;
   }
 };
 
@@ -103,12 +127,18 @@ struct FBox
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FBox& Box )
   {
-    return In >> Box.Min >> Box.Max >> IsValid;
+    In >> Box.Min;
+    In >> Box.Max;
+    In >> Box.IsValid;
+    return In;
   }
 
   friend FPackageFileOut& operator<<( FPackageFileOut& Out, FBox& Box )
   {
-    return Out << Box.Min << Box.Max << IsValid;
+    Out << Box.Min;
+    Out << Box.Max;
+    Out << Box.IsValid;
+    return Out;
   }
 };
 
@@ -168,12 +198,18 @@ struct FScale
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FScale& Scale )
   {
-    return In >> Scale >> SheerRate >> (u8)SheerAxis;
+    In >> Scale.Scale;
+    In >> Scale.SheerRate;
+    In >> (u8&)Scale.SheerAxis;
+    return In;
   }
 
   friend FPackageFileOut& operator<<( FPackageFileOut& Out, FScale& Scale )
   {
-    return Out << Scale << SheerRate << (u8)SheerAxis;
+    Out << Scale.Scale;
+    Out << Scale.SheerRate;
+    Out << (u8&)Scale.SheerAxis;
+    return Out;
   }
 };
 
