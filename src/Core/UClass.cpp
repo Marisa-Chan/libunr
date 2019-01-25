@@ -28,6 +28,7 @@
 #include "Core/UProperty.h"
 #include "Core/UScript.h"
 #include "Core/USystem.h"
+#include "Core/UObjGetSet.h"
 
 UTextBuffer::UTextBuffer()
   : UObject()
@@ -777,6 +778,7 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
   Filename->Append( Pkg->ResolveNameFromIdx( Export->ObjectName ) );
   Filename->Append( ".uc" ); // Scripts won't get exported to any other type
  
+  // Write script text
   FileStreamOut* Out = new FileStreamOut();
   if ( Out->Open( *Filename ) != 0 )
   {
@@ -784,6 +786,12 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
     return false;
   }
   Out->Write( ScriptText->Text->Data(), ScriptText->Text->Size() );
+
+  // Write default properties
+  const char* const DefPropStr = "defaultproperties\r\n{\r\n";
+  // TODO:
+  Out->Write( (char*)"}\r\n", 3 );
+
   Out->Close();
   delete Out;
   delete Filename;
@@ -897,6 +905,7 @@ void UClass::PostLoad()
     if ( ( ClassFlags & CLASS_Config ) ) 
 //      Default->ReadConfigProperties();
 
+    DefPropListOffset = PkgFile->Tell();
     Default->PkgFile = PkgFile;
     Default->ReadDefaultProperties();
     Default->PkgFile = NULL;

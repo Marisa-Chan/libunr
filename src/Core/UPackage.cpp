@@ -143,6 +143,37 @@ DLL_EXPORT FPackageFileOut& operator<<( FPackageFileOut& Out, FCompactIndex& Ind
 }
 
 /*-----------------------------------------------------------------------------
+ * FString
+-----------------------------------------------------------------------------*/
+DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, String& Str )
+{
+  idx Size = 0;
+  In >> CINDEX( Size );
+
+  Str.Reserve( Size-1 );
+  for ( int i = 0; i < Size; i++ )
+  {
+    char C = '\0';
+    In.Read( &C, 1 );
+
+    if ( C == '\0' )
+      break;
+
+    Str += C;
+  }
+
+  return In;
+}
+
+DLL_EXPORT FPackageFileOut& operator<<( FPackageFileOut& Out, String& Str )
+{
+  size_t Length = Str.Length();
+  Out << CINDEX( Length );
+  Out.Write( Str.Data(), Length+1 );
+  return Out;
+}
+
+/*-----------------------------------------------------------------------------
  * FExport
 -----------------------------------------------------------------------------*/
 FPackageFileIn& operator>>( FPackageFileIn& In, FExport& Export )

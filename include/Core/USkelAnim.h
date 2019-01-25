@@ -23,6 +23,8 @@
  *========================================================================
 */
 
+#pragma once
+
 #include "Core/UObject.h"
 #include "Core/UMath.h"
 

@@ -25,6 +25,7 @@
 
 #include "Core/UProperty.h"
 #include "Core/UPackage.h"
+#include "Core/UObjGetSet.h"
 
 u8 UProperty::PropertySizes[8] = { 1, 2, 4, 12, 16, 1, 2, 4 };
 

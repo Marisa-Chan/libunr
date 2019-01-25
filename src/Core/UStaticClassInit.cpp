@@ -43,6 +43,7 @@
 #include "Core/UViewport.h"
 
 #include "Actors/AActor.h"
+#include "Actors/ABrush.h"
 #include "Actors/ADecal.h"
 #include "Actors/ADynamicZoneInfo.h"
 #include "Actors/AGameInfo.h"
@@ -216,8 +217,6 @@ bool UObject::StaticInit()
       IMPLEMENT_NATIVE_CLASS( UState );
         IMPLEMENT_NATIVE_CLASS( UClass );
   IMPLEMENT_NATIVE_CLASS( ULanguage );
-  IMPLEMENT_NATIVE_CLASS( ULevelBase );
-    IMPLEMENT_NATIVE_CLASS( ULevel );
   IMPLEMENT_NATIVE_CLASS( UMusic );
   IMPLEMENT_NATIVE_CLASS( UNetConnection );
   IMPLEMENT_NATIVE_CLASS( UPackage );
@@ -225,7 +224,6 @@ bool UObject::StaticInit()
     IMPLEMENT_NATIVE_CLASS( UViewport );
   IMPLEMENT_NATIVE_CLASS( UPrimitive );
     IMPLEMENT_NATIVE_CLASS( UMesh );
-    IMPLEMENT_NATIVE_CLASS( UModel );
     IMPLEMENT_NATIVE_CLASS( USound );
   IMPLEMENT_NATIVE_CLASS( USkeletalMesh );
   IMPLEMENT_NATIVE_CLASS( USkeletalMeshInstance );

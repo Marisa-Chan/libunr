@@ -25,17 +25,65 @@
 
 #pragma once
 
-#include "Core/UObject.h"
+#include <libxstl/XMap.h>
+#include "Core/UClass.h"
+#include "Core/UEngine.h"
+#include "Core/UModel.h"
+#include "Core/UNet.h"
+
+struct DLL_EXPORT FReachSpec
+{
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FReachSpec& RS );
+
+  int Distance;
+  AActor* Start;
+  AActor* End;
+  int CollisionRadius;
+  int CollisionHeight;
+  int ReachFlags;
+  u8  bPruned;
+};
+
+struct DLL_EXPORT FURL
+{
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FURL& URL );
+
+  String Protocol;
+  String Host;
+  String Map;
+  String Portal;
+  Array<String> Op;
+  int    Port;
+  bool   bValid;
+};
 
 class ULevelBase : public UObject
 {
   DECLARE_NATIVE_ABSTRACT_CLASS( ULevelBase, UObject, CLASS_NoExport, Engine )
   ULevelBase();
+
+  Array<AActor*> Actors;
+
+  virtual void Load();
+
+  UNetDriver* NetDriver;
+  UEngine*    Engine;
+  FURL        URL;
+  UNetDriver* DemoRecDriver; // do we need this?
 };
 
 class ULevel : public ULevelBase
 {
   DECLARE_NATIVE_CLASS( ULevel, ULevelBase, CLASS_NoExport, Engine )
+  EXPORTABLE()
   ULevel();
+
+  virtual void Load();
+
+  Array<FReachSpec> ReachSpecs;
+  UModel* Model;
+  UTextBuffer* TextBlocks[16];
+  double TimeSeconds;
+  Map<String,String> TravelInfo;
 };
 

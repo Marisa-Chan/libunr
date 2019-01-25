@@ -28,6 +28,7 @@
 #include "Core/UPackage.h"
 
 USystem* GSystem = NULL;
+bool USystem::bIsEditor = false;
 
 USubsystem::USubsystem()
 {
@@ -146,7 +147,12 @@ bool USystem::PromptForGameInfo()
   return true;
 }
 
-bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC )
+bool USystem::IsEditor()
+{
+  return bIsEditor;
+}
+
+bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool InIsEditor )
 {
   // Create global system
   GSystem = new USystem();
@@ -155,6 +161,7 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC )
   // Set callbacks
   GSystem->DoGamePrompt = GPC;
   GSystem->DoDevicePrompt = DPC;
+  bIsEditor = InIsEditor;
 
   // Read libunr ini and get game specific details
   GLibunrConfig = new FConfig();
@@ -523,9 +530,9 @@ const char* USystem::GetHomeDir()
 }
 #endif
 
-bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC )
+bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool bIsEditor )
 {
-  if ( UNLIKELY( !USystem::StaticInit( GPC, DPC ) ) )
+  if ( UNLIKELY( !USystem::StaticInit( GPC, DPC, bIsEditor ) ) )
   {
     Logf( LOG_CRIT, "USystem::StaticInit() failed!" );
     return false;

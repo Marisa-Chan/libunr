@@ -107,6 +107,7 @@ set (SOURCES ${UNR_SRC}/Core/FConfig.cpp
              ${UNR_SRC}/Core/UTexture.cpp
              ${UNR_SRC}/Core/UViewport.cpp
              ${UNR_SRC}/Actors/AActor.cpp
+             ${UNR_SRC}/Actors/ABrush.cpp
              ${UNR_SRC}/Actors/ADecal.cpp
              ${UNR_SRC}/Actors/ADynamicZoneInfo.cpp
              ${UNR_SRC}/Actors/AGameInfo.cpp
@@ -124,7 +125,7 @@ set (SOURCES ${UNR_SRC}/Core/FConfig.cpp
 
 include_directories (${UNR_INC} ${XSTL_INC})
 add_definitions("-std=c++11" "-DXSTL_ARRAY_STD" "-DXSTL_STRING_STD"
-  "-DXSTL_FILESTREAM_STD" "-DXSTL_STACK_STD" 
+  "-DXSTL_FILESTREAM_STD" "-DXSTL_STACK_STD" "-DXSTL_MAP_STD" 
   "-DINSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"" )
 message(STATUS "Install prefix: " ${CMAKE_INSTALL_PREFIX})
 add_definitions ("-Wno-attributes")
