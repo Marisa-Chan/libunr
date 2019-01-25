@@ -25,10 +25,10 @@
 
 #pragma once
 
-#include "XArray.h"
-#include "XFileStream.h"
-#include "XStack.h"
-#include "XString.h"
+#include <libxstl/XArray.h>
+#include <libxstl/XFileStream.h>
+#include <libxstl/XStack.h>
+#include <libxstl/XString.h>
 
 #include "Core/UObject.h"
 

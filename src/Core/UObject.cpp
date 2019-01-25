@@ -143,7 +143,19 @@ void UObject::Load()
 {
   if ( Flags & RF_HasStack )
   {
-    // Load stack info
+    idx Node;
+    idx StateNode;
+    u64 ProbeMask;
+    u32 LatentAction;
+    idx Off;
+
+    *PkgFile >> CINDEX( Node );
+    *PkgFile >> CINDEX( StateNode );
+    *PkgFile >> ProbeMask;
+    *PkgFile >> LatentAction;
+
+    if ( Node != 0 )
+      *PkgFile >> Off;
   }
  
   // TODO: For UE2, Classes DO have a property list
@@ -772,7 +784,17 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
       {
         UClass* ClsIter = (*ClassPool)[i];
         if ( ClsIter->Hash == ObjNameHash )
-          return ClsIter;
+        {
+          // Does it need to be loaded?
+          if ( !(ClsIter->ClassFlags & CLASS_NoExport) && ClsIter->NativeNeedsPkgLoad )
+          {
+            // Yup, load it in place
+            ClsIter->PreLoad();
+            ClsIter->Load();
+            ClsIter->PostLoad();
+          }
+        }
+        return ClsIter;
       }
     }
 
@@ -924,6 +946,12 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
         return NULL;
       }
     }
+  }
+  else if ( !(ObjClass->ClassFlags & CLASS_NoExport) && ObjClass->NativeNeedsPkgLoad )
+  {
+    ObjClass->PreLoad();
+    ObjClass->Load();
+    ObjClass->PostLoad();
   }
 
   UObject* Obj = NULL;

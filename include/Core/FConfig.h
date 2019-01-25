@@ -26,8 +26,8 @@
 #pragma once
 
 #include "Core/FUtil.h"
-#include "XArray.h"
-#include "XFileStream.h"
+#include <libxstl/XArray.h>
+#include <libxstl/XFileStream.h>
 
 using namespace xstl;
 class UObject;

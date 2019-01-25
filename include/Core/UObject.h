@@ -26,9 +26,9 @@
 
 #pragma once
 
-#include "XArray.h"
-#include "XMemory.h"
-#include "XStream.h"
+#include <libxstl/XArray.h>
+#include <libxstl/XMemory.h>
+#include <libxstl/XStream.h>
 #include "Core/FUtil.h"
 
 using namespace xstl;

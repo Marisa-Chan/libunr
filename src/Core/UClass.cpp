@@ -853,6 +853,7 @@ void UClass::Load()
     ClassConfig = GGameConfig; 
 
   SuperClass = SafeCast<UClass>( SuperField );
+  NativeNeedsPkgLoad = false;
 }
 
 void UClass::PostLoad()
