@@ -281,7 +281,7 @@ public: \
       Logf( LOG_CRIT, "%s::StaticCreateClass() failed!", TEXT(cls) ); \
       return false; \
     } \
-    if ( !( clsflags & CLASS_NoExport ) ) \
+    if ( !( (clsflags) & CLASS_NoExport ) ) \
     { \
       if ( !StaticLinkNativeProperties() ) \
       { \
