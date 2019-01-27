@@ -103,7 +103,7 @@ void ULevelBase::Load()
     idx ActorObjRef = 0;
     *PkgFile >> CINDEX( ActorObjRef );
 
-    Actors.PushBack( (AActor*)LoadObject( ActorObjRef, NULL, NULL ) );
+    Actors.PushBack( (AActor*)LoadObject( ActorObjRef, NULL, NULL, true ) );
   }
 
   *PkgFile >> URL;

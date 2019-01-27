@@ -399,7 +399,7 @@ class DLL_EXPORT UObject
 
   static bool StaticInit();
   static bool StaticExit();
-  static UObject* StaticLoadObject( UPackage* ObjPkg, const char* InName, UClass* ObjClass, 
+  static UObject* StaticLoadObject( UPackage* ObjPkg, const char* ObjName, UClass* ObjClass, 
     UObject* InOuter, bool bLoadClassNow = false );
   static UObject* StaticLoadObject( UPackage* ObjPkg, idx ObjRef, UClass* ObjClass, 
     UObject* InOuter, bool bLoadClassNow = false );

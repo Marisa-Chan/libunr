@@ -179,21 +179,23 @@ class DLL_EXPORT UPackage : public UObject
   virtual bool Load( const char* File );
   virtual bool Save( const char* File = NULL );
   virtual void Close();
-  
+ 
+  virtual FImport* GetImport( size_t Index );
+  virtual FExport* GetExport( size_t Index );
+
   UPackageHeader* GetHeader();
   FNameEntry*     GetNameEntry( size_t Index );
-  FImport*        GetImport( size_t Index );
-  FExport*        GetExport( size_t Index );
+  FNameEntry*     GetNameEntryByObjRef( int ObjRef );
+  FExport*        GetExportByName( size_t Name );
   FExport*        GetClassExport( const char* ExportName );
   Array<FExport>* GetExportTable();
   Array<FImport>* GetImportTable();
-  const char*     GetName();
   const char*     GetFilePath();
   const char*     GetFileName();
   const char*     GetFullObjName( idx ObjRef );
-  int             GetPackageVer();
+  size_t          GetPackageVer();
 
-  int FindName( const char* Name );
+  size_t FindName( const char* Name );
   
   // Name resolution
   const char* ResolveNameFromIdx( idx Index );

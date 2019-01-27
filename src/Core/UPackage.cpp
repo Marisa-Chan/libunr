@@ -401,6 +401,17 @@ FNameEntry* UPackage::GetNameEntry( size_t Index )
   return NULL;
 }
 
+FNameEntry* UPackage::GetNameEntryByObjRef( int ObjRef )
+{
+  int Index = CalcObjRefValue( ObjRef );
+  if ( ObjRef < 0 )
+    Index = (*Imports)[Index].ObjectName;
+  else if ( ObjRef > 0 )
+    Index = (*Exports)[Index].ObjectName;
+
+  return &(*Names)[Index];
+}
+
 FImport* UPackage::GetImport( size_t Index )
 {
   if ( LIKELY( Index >= 0 ) )
@@ -413,6 +424,18 @@ FExport* UPackage::GetExport( size_t Index )
 {
   if ( LIKELY( Index >= 0 ) )
     return &(*Exports)[Index];
+
+  return NULL;
+}
+
+FExport* UPackage::GetExportByName( size_t Name )
+{
+  for ( size_t i = 0; i < Exports->Size() && i != MAX_SIZE; i++ )
+  {
+    FExport* Export = &(*Exports)[i];
+    if ( Export->ObjectName == Name )
+      return Export;
+  }
 
   return NULL;
 }
@@ -466,6 +489,18 @@ const char* UPackage::GetFilePath()
 const char* UPackage::GetFileName()
 {
   return Name;
+}
+
+size_t UPackage::FindName( const char* Name )
+{
+  FHash NameHash = FnvHashString( Name );
+  for ( size_t i = 0; i < Names->Size() && i != MAX_SIZE; i++ )
+  {
+    if ( (*Names)[i].Hash == NameHash )
+      return i;
+  }
+  
+  return MAX_SIZE;
 }
 
 const char* UPackage::ResolveNameFromIdx( idx Index )
@@ -545,6 +580,7 @@ UPackage* UPackage::StaticLoadPackage( const char* PkgName )
     }
  
     Pkg->Name = StringDup( PkgName );
+    Pkg->Hash = FnvHashString( PkgName );
     Packages->PushBack( Pkg );
   }
 

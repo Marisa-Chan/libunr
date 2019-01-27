@@ -83,8 +83,19 @@ UObject* UObject::StaticConstructObject( const char* InName, UClass* InClass, UO
   Out->Outer = InOuter;
   Out->Flags = InExport->ObjectFlags;
   Out->Class = InClass;
-  Out->Field = InClass->Default == NULL ? NULL : InClass->Default->Field;
+  Out->Field = InClass->Children;
  
+  // Copy property data from Default object
+  if ( !(InClass->ClassFlags & CLASS_NoExport) )
+  {
+    if ( UNLIKELY( InClass->Default == NULL ) )
+    {
+      Logf( LOG_CRIT, "Can't construct object '%s.%s'; Default object missing for class '%s'",
+          InPkg->Name, InName, InClass->Name );
+      GSystem->Exit( -1 );
+    } 
+  }
+
   // Add to object
   ObjectPool->PushBack( Out );
 
@@ -156,7 +167,7 @@ void UObject::Load()
     *PkgFile >> LatentAction;
 
     if ( Node != 0 )
-      *PkgFile >> Off;
+      *PkgFile >> CINDEX( Off );
   }
  
   // TODO: For UE2, Classes DO have a property list
@@ -757,6 +768,30 @@ UObject* UObject::LoadObject( idx ObjRef, UClass* ObjClass, UObject* InOuter, bo
   return StaticLoadObject( Pkg, ObjRef, ObjClass, InOuter, bLoadClassNow );
 }
 
+UObject* UObject::StaticLoadObject( UPackage* Pkg, const char* ObjName, UClass* ObjClass,
+  UObject* InOuter, bool bLoadClassNow )
+{
+  FExport* Export = Pkg->GetExportByName( Pkg->FindName( ObjName ) );
+  if ( UNLIKELY( Export == NULL ) )
+  {
+    Logf( LOG_WARN, "Can't load object '%s.%s', object does not exist", Pkg->Name, ObjName );
+    return NULL;
+  }
+
+  // FIXME: I don't like how we're checking for class types
+  // Type checking
+  FNameEntry* ClassName = Pkg->GetNameEntryByObjRef( Export->Class );
+  if ( UNLIKELY( ObjClass->Hash != ClassName->Hash && 
+        ( ObjClass == UClass::StaticClass() && ClassName->Hash != FnvHashString("None") ) ) )
+  {
+    Logf( LOG_WARN, "Object '%s.%s' was expected to be of type '%s' but was '%s'",
+        Pkg->Name, ObjName, ObjClass->Name, ClassName->Data );
+    return NULL;
+  }
+
+  return StaticLoadObject( Pkg, Export, ObjClass, InOuter, bLoadClassNow );
+}
+
 UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass, 
   UObject* InOuter, bool bLoadClassNow )
 {
@@ -901,6 +936,25 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
 
   if ( UNLIKELY( ObjExport == NULL ) )
   {
+    // Stupid package remap stuff...
+    if ( UNLIKELY( ObjPkg->Hash == FnvHashString( "UnrealI" ) ) )
+    {
+      ObjPkg = UPackage::StaticLoadPackage( "UnrealShare" );
+      if ( UNLIKELY( ObjPkg == NULL ) )
+        goto Error;
+
+      return StaticLoadObject( ObjPkg, ObjName, ObjClass, InOuter, bLoadClassNow );
+    }
+    else if ( UNLIKELY( ObjPkg->Hash == FnvHashString( "UnrealShare" ) ) )
+    {
+      ObjPkg = UPackage::StaticLoadPackage( "UnrealI" );
+      if ( UNLIKELY( ObjPkg == NULL ) )
+        goto Error;
+
+      return StaticLoadObject( ObjPkg, ObjName, ObjClass, InOuter, bLoadClassNow );
+    }
+
+  Error:
     Logf( LOG_CRIT, "Can't load object '%s.%s', object does not exist", ObjPkgName, ObjName );
     return NULL;
   }
@@ -951,7 +1005,7 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
       }
     }
   }
-  else if ( !(ObjClass->ClassFlags & CLASS_NoExport) && ObjClass->NativeNeedsPkgLoad )
+  if ( !(ObjClass->ClassFlags & CLASS_NoExport) && ObjClass->NativeNeedsPkgLoad )
   {
     ObjClass->PreLoad();
     ObjClass->Load();
