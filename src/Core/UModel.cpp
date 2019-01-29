@@ -77,8 +77,8 @@ DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FBspNode& BN )
   In >> CINDEX( BN.iPlane );
   In >> CINDEX( BN.iCollisionBound ); 
   In >> CINDEX( BN.iRenderBound );
-  In >> BN.iZone[0];
-  In >> BN.iZone[1];
+  In >> CINDEX( BN.iZone[0] );
+  In >> CINDEX( BN.iZone[1] );
   In >> BN.NumVertices;
   In >> BN.iLeaf[0];
   In >> BN.iLeaf[1];

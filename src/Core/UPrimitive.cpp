@@ -34,3 +34,11 @@ UPrimitive::~UPrimitive()
 {
 }
 
+void UPrimitive::Load()
+{
+  Super::Load();
+
+  *PkgFile >> BoundingBox;
+  *PkgFile >> BoundingSphere;
+}
+
