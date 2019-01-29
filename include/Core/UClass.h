@@ -208,6 +208,7 @@ class DLL_EXPORT UClass : public UState
   size_t DefPropListOffset;
 
 private:
+  UObject* CreateDefaultObject();
   char* CreateDefaultObjectName();
 };
 

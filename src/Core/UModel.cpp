@@ -64,6 +64,7 @@ DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FPoly& P )
   return In;
 }
 
+// This is probably broken
 DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FBspNode& BN )
 {
   In >> BN.Plane;

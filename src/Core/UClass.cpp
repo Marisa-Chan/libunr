@@ -755,9 +755,10 @@ UClass::UClass( const char* ClassName, u32 Flags, UClass* InSuperClass,
   SuperClass = InSuperClass;
   SuperField = InSuperClass;
   Constructor = NativeCtor;
-  Default = NULL;
   NativeNeedsPkgLoad = true;
   StructSize = InStructSize;
+
+  Default = CreateDefaultObject();
 }
 
 UClass::~UClass()
@@ -885,13 +886,12 @@ void UClass::PostLoad()
     if ( !bLinkedChildren )
       LinkSuperClassChildren();
 
-    // Construct default object
-    
-    Default = CreateObject();
-    Default->Name  = StringDup( Name );
+    // Setup default object
+    if ( Default == NULL )
+      Default = CreateDefaultObject(); 
+
     Default->Pkg   = Pkg;
     Default->PkgFile = PkgFile;
-    Default->Class = this;
     Default->Field = Children;
 
     AddRef();
@@ -925,10 +925,17 @@ UObject* UClass::CreateObject()
   return Constructor( StructSize );
 }
 
+UObject* UClass::CreateDefaultObject()
+{
+  Default = CreateObject();
+  Default->Name = StringDup( Name );
+  Default->Class = this;
+}
+
 char* UClass::CreateDefaultObjectName()
 {
-  char* DefObjName = (char*)Malloc( 1024 );
-  memset( DefObjName, 0, 1024 );
+  char* DefObjName = new char[1024];
+  xstl::Set( DefObjName, 0, 1024 );
   strcat( DefObjName, "Default" );
   strcat( DefObjName, Name );
   return DefObjName;

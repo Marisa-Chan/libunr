@@ -74,7 +74,7 @@ struct DLL_EXPORT FPoly
 
 class DLL_EXPORT UPolys : public UObject
 {
-  DECLARE_NATIVE_CLASS( UPolys, UObject, CLASS_RuntimeStatic, Engine )
+  DECLARE_NATIVE_CLASS( UPolys, UObject, CLASS_RuntimeStatic | CLASS_NoExport, Engine )
   UPolys();
 
   virtual void Load();

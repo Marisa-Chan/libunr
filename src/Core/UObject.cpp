@@ -211,12 +211,24 @@ bool UObject::IsA( UClass* ClassType )
     if ( UNLIKELY( Cls->Class != UClass::StaticClass() ) )
     {
       Logf( LOG_CRIT, "CLASS SUPERFIELD IS NOT A UCLASS INSTANCE!!!" );
-      // Add some exit thing here
+      GSystem->Exit( -1 );
     }
 
     if ( Cls == ClassType )
       return true;
   }
+  return false;
+}
+
+bool UObject::IsA( char* ClassName, FHash& ClassHash )
+{
+  if ( strnicmp( ClassName, "None", 4 ) == 0 )
+    ClassHash = FnvHashString( "Class" );
+
+  UClass* Cls = FindClass( ClassHash );
+  if ( Cls != NULL )
+    return IsA( Cls );
+
   return false;
 }
 
@@ -229,6 +241,21 @@ bool UObject::ParentsIsA( UClass* ClassType )
   }
 
   return false;
+}
+
+UClass* UObject::FindClass( FHash& ClassHash )
+{
+  if ( ClassHash == FnvHashString("None") )
+    return UClass::StaticClass();
+
+  for ( size_t i = 0; i < ClassPool->Size() && i < MAX_SIZE; i++ )
+  {
+    UClass* Cls = (*ClassPool)[i];
+    if ( Cls->Hash == ClassHash )
+      return Cls;
+  }
+
+  return NULL;
 }
 
 static int ReadArrayIndex( FPackageFileIn* PkgFile )
@@ -778,17 +805,6 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, const char* ObjName, UClass* 
     return NULL;
   }
 
-  // FIXME: I don't like how we're checking for class types
-  // Type checking
-  FNameEntry* ClassName = Pkg->GetNameEntryByObjRef( Export->Class );
-  if ( UNLIKELY( ObjClass->Hash != ClassName->Hash && 
-        ( ObjClass == UClass::StaticClass() && ClassName->Hash != FnvHashString("None") ) ) )
-  {
-    Logf( LOG_WARN, "Object '%s.%s' was expected to be of type '%s' but was '%s'",
-        Pkg->Name, ObjName, ObjClass->Name, ClassName->Data );
-    return NULL;
-  }
-
   return StaticLoadObject( Pkg, Export, ObjClass, InOuter, bLoadClassNow );
 }
 
@@ -1005,6 +1021,18 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
       }
     }
   }
+
+  // Type checking
+  FNameEntry* ClassName = ObjPkg->GetNameEntryByObjRef( ObjExport->Class );
+  UClass* ClassType = FindClass( ClassName->Hash );
+  
+  if ( UNLIKELY( !ClassType->Default->IsA( ObjClass ) ) )
+  {
+    Logf( LOG_WARN, "Object '%s.%s' was expected to be of type '%s' but was '%s'",
+        ObjPkg->Name, ObjName, ObjClass->Name, ClassName->Data );
+    return NULL;
+  }
+
   if ( !(ObjClass->ClassFlags & CLASS_NoExport) && ObjClass->NativeNeedsPkgLoad )
   {
     ObjClass->PreLoad();

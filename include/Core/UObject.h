@@ -382,9 +382,11 @@ class DLL_EXPORT UObject
   void DelRef();
 
   bool IsA( UClass* ClassType );
+  bool IsA( char* ClassName, FHash& ClassHash );
   bool ParentsIsA( UClass* ClassType );
-  void ReadDefaultProperties();  
+  void ReadDefaultProperties(); 
   void ReadConfigProperties();
+  static UClass* FindClass( FHash& ClassHash );
 
   // Property getters
   template <class T> inline T GetProperty( UProperty* Prop, int Idx );

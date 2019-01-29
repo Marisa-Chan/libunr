@@ -122,6 +122,8 @@ bool UObject::StaticInit()
   Result &= UAnimationNotify::StaticClassInit();
   Result &= UAudioSubsystem::StaticClassInit();
   Result &= UBitmap::StaticClassInit();
+  Result &= UBspNodes::StaticClassInit();
+  Result &= UBspSurfs::StaticClassInit();
     Result &= UTexture::StaticClassInit();
       Result &= UScriptedTexture::StaticClassInit();
   Result &= UCanvas::StaticClassInit();
@@ -139,6 +141,7 @@ bool UObject::StaticInit()
   Result &= UStaticLightData::StaticClassInit();
   Result &= UMusic::StaticClassInit();
   Result &= UPalette::StaticClassInit();
+  Result &= UPolys::StaticClassInit();
   Result &= UPrimitive::StaticClassInit();
     Result &= UMesh::StaticClassInit();
     Result &= UModel::StaticClassInit();
@@ -148,6 +151,8 @@ bool UObject::StaticInit()
   Result &= URenderDevice::StaticClassInit();
   Result &= URenderIterator::StaticClassInit();
   Result &= USkeletalMeshInstance::StaticClassInit();
+  Result &= UVectors::StaticClassInit();
+  Result &= UVerts::StaticClassInit();
       
   // Init actor classes
   Result &= AActor::StaticClassInit();
