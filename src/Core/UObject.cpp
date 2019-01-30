@@ -454,13 +454,6 @@ void UObject::ReadDefaultProperties()
           SetProperty<idx>( Prop, Name, ArrayIdx );
       }
     }
-    else if ( PropType == PROP_String )
-    {
-      // TODO: Crash here
-      Logf( LOG_WARN, "StringProperty loading in UObject::ReadDefaultProperties() is stubbed" );
-      Logf( LOG_WARN, "  Info: (Package = '%s', Class = '%s', Object = '%s', Property = '%s')",
-            Pkg->Name, Class->Name, Name, Prop->Name );
-    }
     else if ( PropType == PROP_Class )
     {
       idx ObjRef = 0;
@@ -637,10 +630,13 @@ void UObject::ReadDefaultProperties()
         SetStructProperty( StructProp, PkgFile, ArrayIdx );
       }
     }
-    else if ( PropType == PROP_Ascii )
+    else if ( PropType == PROP_Ascii || PropType == PROP_String )
     {
       idx StrLength = 0;
-      *PkgFile >> CINDEX( StrLength );
+      if ( LIKELY( PropType == PROP_Ascii ) )
+        *PkgFile >> CINDEX( StrLength );
+      else
+        StrLength = RealSize;
 
       char* NewStr = new char[StrLength]; // Serialized length includes null terminator
       PkgFile->Read( NewStr, StrLength );
@@ -648,15 +644,21 @@ void UObject::ReadDefaultProperties()
       if ( Prop )
       {
         if ( Prop->Class != UStrProperty::StaticClass() )
+        {
           Logf( LOG_CRIT, "Default property expected 'StrProperty', but got '%s'", Prop->Class->Name );
+          delete NewStr;
+        }
         else
-          SetProperty<char*>( Prop, NewStr, ArrayIdx );
+        {
+          String* RealNewStr = new String( NewStr, StrLength - 1 );
+          SetProperty<String*>( Prop, RealNewStr, ArrayIdx );
+        }
       }
 
       if ( bIsDescription )
       {
         UProperty* PropThis = (UProperty*)this;
-        PropThis->Description = StringDup( NewStr );
+        PropThis->Description = NewStr;
       }
     }
   }
