@@ -164,8 +164,6 @@ bool UObject::StaticInit()
     Result &= AHUD::StaticClassInit();
     Result &= AHUDOverlay::StaticClassInit();
     Result &= AInfo::StaticClassInit();
-    Result &= AKeypoint::StaticClassInit();
-      Result &= AInterpolationPoint::StaticClassInit();
       Result &= AGameInfo::StaticClassInit();
       Result &= AReplicationInfo::StaticClassInit();
         Result &= AGameReplicationInfo::StaticClassInit();
@@ -174,6 +172,9 @@ bool UObject::StaticInit()
       Result &= AZoneInfo::StaticClassInit();
         Result &= ADynamicZoneInfo::StaticClassInit();
         Result &= ALevelInfo::StaticClassInit();
+    Result &= AKeypoint::StaticClassInit();
+      Result &= AInterpolationPoint::StaticClassInit();
+    Result &= ALight::StaticClassInit();
     Result &= AInventory::StaticClassInit();
       Result &= AWeapon::StaticClassInit();
     Result &= AInventoryAttachment::StaticClassInit();
@@ -186,6 +187,7 @@ bool UObject::StaticInit()
       Result &= ATeleporter::StaticClassInit();
     Result &= APawn::StaticClassInit();
       Result &= APlayerPawn::StaticClassInit();
+        Result &= ACamera::StaticClassInit();
     Result &= AProjectile::StaticClassInit();
     Result &= ASpawnNotify::StaticClassInit();
     Result &= ATriggers::StaticClassInit();

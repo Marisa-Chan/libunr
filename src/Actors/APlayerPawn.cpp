@@ -35,7 +35,20 @@ APlayerPawn::~APlayerPawn()
 {
 }
 
+ACamera::ACamera()
+  : APlayerPawn()
+{
+}
+
+ACamera::~ACamera()
+{
+}
+
+IMPLEMENT_NATIVE_CLASS( ACamera );
 IMPLEMENT_NATIVE_CLASS( APlayerPawn );
+
+BEGIN_PROPERTY_LINK( ACamera, 0 )
+END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( APlayerPawn, 150 )
   LINK_NATIVE_PROPERTY( APlayerPawn, Player );

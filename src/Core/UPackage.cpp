@@ -342,6 +342,7 @@ bool UPackage::Load( const char* File )
     return false;
   
   FPackageFileIn* PackageFile = (FPackageFileIn*)Stream;
+  PackageFile->Pkg = this;
 
   // read in the header
   *PackageFile >> Header;

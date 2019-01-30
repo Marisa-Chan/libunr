@@ -189,3 +189,11 @@ class DLL_EXPORT APlayerPawn : public APawn
   class ALadderTrigger*         ActiveLadder;
 };
 
+class ACamera : public APlayerPawn
+{
+  DECLARE_NATIVE_CLASS( ACamera, APlayerPawn, CLASS_Transient, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  ACamera();
+};
+

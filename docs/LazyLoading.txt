@@ -7,8 +7,8 @@ Lazy loading is necesary when it comes to loading classes. When loading a
 class directly, it should not be loaded lazily. For example, if Core.Object is
 being loaded in UObject::StaticInit(), then it should be fully loaded.
 
-However, if a class has a child object (for example, a function) that has a
-child object which is a subclass of the class being loaded, then it should be
+However, if a class has a child object (for example, a function) which is a 
+subclass of the class being loaded, then it should be
 loaded lazily. To elaborate:
   - Engine.Actor has a function TriggerEvent()
   - TriggerEvent() has parameters of type Action, Actor, and Pawn

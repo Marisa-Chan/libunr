@@ -580,6 +580,23 @@ class AInterpolationPoint : public AKeypoint
   AInterpolationPoint* Next;
 };
 
+class ALight : public AActor
+{
+  DECLARE_NATIVE_CLASS( ALight, AActor, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  ALight();
+
+  struct ShadowMoverInfo
+  {
+    class AMover* Mover;
+    Array<int>* BspSurfs;
+  };
+
+  Array<idx>* ShadowMoverTags;
+  Array<ShadowMoverInfo>* MoverShadowSurfs;
+};
+
 class AMutator : public AActor
 {
   DECLARE_NATIVE_CLASS( AMutator, AActor, 0, Engine )

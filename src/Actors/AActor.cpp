@@ -89,6 +89,15 @@ AInterpolationPoint::~AInterpolationPoint()
 {
 }
 
+ALight::ALight()
+  : AActor()
+{
+}
+
+ALight::~ALight()
+{
+}
+
 AProjectile::AProjectile()
   : AActor()
 {
@@ -131,6 +140,7 @@ IMPLEMENT_NATIVE_CLASS( ADecoration );
 IMPLEMENT_NATIVE_CLASS( AInfo );
 IMPLEMENT_NATIVE_CLASS( AInterpolationPoint );
 IMPLEMENT_NATIVE_CLASS( AKeypoint );
+IMPLEMENT_NATIVE_CLASS( ALight );
 IMPLEMENT_NATIVE_CLASS( AMenu );
 IMPLEMENT_NATIVE_CLASS( AProjectile );
 IMPLEMENT_NATIVE_CLASS( ASpawnNotify );
@@ -189,6 +199,11 @@ BEGIN_PROPERTY_LINK( AInfo, 0 )
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( AKeypoint, 0 )
+END_PROPERTY_LINK()
+
+BEGIN_PROPERTY_LINK( ALight, 2 )
+  LINK_NATIVE_PROPERTY( ALight, ShadowMoverTags );
+  LINK_NATIVE_PROPERTY( ALight, MoverShadowSurfs );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( AInterpolationPoint, 10 )
