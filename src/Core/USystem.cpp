@@ -83,8 +83,44 @@ const char* USystem::ResolvePath( const char* PkgName )
     }
   }
 
-  if ( !GoodPath )
+  if ( UNLIKELY( !GoodPath ) )
+  {
+#ifndef LIBUNR_WIN32
+    char FullPath[4096];
+    DIR* dir;
+    struct dirent* ent;
+
+    // Didn't find the package but that could be due to case sensitivity
+    for ( int i = 0; i < Paths.Size(); i++ )
+    {
+      String* PathIter = Paths[i]; 
+      size_t Asterisk = PathIter->FindFirstOf( '*' );
+      String RealPath = PathIter->Substr( 0, Asterisk );
+
+      String FullPkgName( PkgName );
+      FullPkgName += PathIter->Substr( Asterisk + 1 );
+
+      dir = opendir( RealPath.Data() );
+      if ( dir != NULL )
+      {
+        while ((ent = readdir(dir)) != NULL)
+        {
+          if ( UNLIKELY( ent->d_name[0] == '.' ) )
+            continue;
+
+          if ( stricmp( ent->d_name, FullPkgName.Data() ) == 0 )
+          {
+            RealPath += ent->d_name;
+            return StringDup( RealPath.Data() );
+          }
+        }
+      }
+      closedir(dir);
+    }
+#endif
     perror("ResolvePath");
+  }
+
   return GoodPath;
 }
 

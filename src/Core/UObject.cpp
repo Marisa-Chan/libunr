@@ -653,6 +653,7 @@ void UObject::ReadDefaultProperties()
           String* RealNewStr = new String( NewStr, StrLength - 1 );
           SetProperty<String*>( Prop, RealNewStr, ArrayIdx );
         }
+
       }
 
       if ( bIsDescription )

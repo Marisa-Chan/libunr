@@ -743,6 +743,7 @@ UClass::UClass()
 {
   Constructor = NULL;
   StructSize = 0;
+  bLinkedChildren = false;
 }
 
 UClass::UClass( const char* ClassName, u32 Flags, UClass* InSuperClass, 
@@ -757,6 +758,7 @@ UClass::UClass( const char* ClassName, u32 Flags, UClass* InSuperClass,
   Constructor = NativeCtor;
   NativeNeedsPkgLoad = true;
   StructSize = InStructSize;
+  bLinkedChildren = false;
 
   Default = CreateDefaultObject();
 }
