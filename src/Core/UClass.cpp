@@ -972,6 +972,10 @@ void UClass::LinkSuperClassChildren()
       if ( SuperClass->SuperClass == NULL )
         SuperClass->SetSuperClassProperties();
 
+    // Apparently a child class can call this before it's parent class?
+    if ( UNLIKELY( !SuperClass->bLinkedChildren ) )
+      SuperClass->LinkSuperClassChildren();
+
     // Get last child
     UField* Iter = Children;
     if ( Iter != NULL )
