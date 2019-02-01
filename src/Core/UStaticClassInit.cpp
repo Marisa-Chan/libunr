@@ -195,6 +195,11 @@ bool UObject::StaticInit()
     Result &= ATriggers::StaticClassInit();
       Result &= ATrigger::StaticClassInit();
 
+  // Load base actor class
+  AActor::StaticClass()->PreLoad();
+  AActor::StaticClass()->Load();
+  AActor::StaticClass()->PostLoad();
+
   return Result;
 }
 
