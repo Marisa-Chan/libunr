@@ -17,33 +17,23 @@
 \*========================================================================*/
 
 /*========================================================================
- * USkelAnim.h - Skeletal Animation Classes
+ * USkelMesh.cpp - Skeletal Mesh functionality
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
 #include "Core/UClass.h"
-#include "Core/USkelAnim.h"
+#include "Core/USkelMesh.h"
 
-UAnimation::UAnimation()
-  : UObject()
+USkeletalMesh::USkeletalMesh()
+  : ULodMesh()
 {
 }
 
-UAnimation::~UAnimation()
+USkeletalMesh::~USkeletalMesh()
 {
 }
 
-USkeletalMeshInstance::USkeletalMeshInstance()
-  : UObject()
-{
-}
-
-USkeletalMeshInstance::~USkeletalMeshInstance()
-{
-}
-
-IMPLEMENT_NATIVE_CLASS( UAnimation );
-IMPLEMENT_NATIVE_CLASS( USkeletalMeshInstance );
+IMPLEMENT_NATIVE_CLASS( USkeletalMesh );
 

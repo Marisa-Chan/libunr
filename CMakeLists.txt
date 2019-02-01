@@ -89,6 +89,7 @@ set (SOURCES ${UNR_SRC}/Core/FConfig.cpp
              ${UNR_SRC}/Core/UConsole.cpp
              ${UNR_SRC}/Core/UEngine.cpp
              ${UNR_SRC}/Core/ULocale.cpp
+             ${UNR_SRC}/Core/ULodMesh.cpp
              ${UNR_SRC}/Core/ULevel.cpp
              ${UNR_SRC}/Core/UMesh.cpp
              ${UNR_SRC}/Core/UModel.cpp
@@ -101,6 +102,7 @@ set (SOURCES ${UNR_SRC}/Core/FConfig.cpp
              ${UNR_SRC}/Core/UProperty.cpp
              ${UNR_SRC}/Core/URender.cpp
              ${UNR_SRC}/Core/USkelAnim.cpp
+             ${UNR_SRC}/Core/USkelMesh.cpp
              ${UNR_SRC}/Core/USound.cpp
              ${UNR_SRC}/Core/UStaticClassInit.cpp
              ${UNR_SRC}/Core/USystem.cpp

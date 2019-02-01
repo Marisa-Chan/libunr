@@ -27,17 +27,9 @@
 
 #include "Core/UObject.h"
 #include "Core/UMath.h"
+#include "Core/USkelMesh.h"
 
 class AActor;
-
-class USkeletalMesh : public UObject
-{
-  DECLARE_NATIVE_CLASS( USkeletalMesh, UObject, CLASS_NoExport, Engine )
-
-  USkeletalMesh();
-
-  // TODO: Fill out variables when we get to implementing this
-};
 
 class UAnimation : public UObject
 {

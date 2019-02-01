@@ -1015,7 +1015,7 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
     // If not, then we need to load it
     if ( UNLIKELY( ObjClass == NULL ) )
     {
-      ObjClass = (UClass*)StaticLoadObject( ObjPkg, ObjExport->Class, UClass::StaticClass(), NULL );
+      ObjClass = (UClass*)StaticLoadObject( ObjPkg, ObjExport->Class, UClass::StaticClass(), NULL, true );
       if ( UNLIKELY( ObjClass == NULL ) )
       {
         Logf( LOG_CRIT, "Can't load object '%s.%s', cannot load class", 
@@ -1028,7 +1028,18 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
   // Type checking
   FNameEntry* ClassName = ObjPkg->GetNameEntryByObjRef( ObjExport->Class );
   UClass* ClassType = FindClass( ClassName->Hash );
-  
+  if ( UNLIKELY( ClassType == NULL ) )
+  {
+    // Load the actual type that it is
+    ClassType = (UClass*)StaticLoadObject( ObjPkg, ObjExport->Class, UClass::StaticClass(), NULL, true );
+    if ( UNLIKELY( ClassType == NULL ) )
+    {
+      Logf( LOG_WARN, "Can't load object '%s.%s', cannot load class",
+          ObjPkg->Name, ObjName );
+      return NULL;
+    }
+  }
+
   if ( UNLIKELY( !ClassType->Default->IsA( ObjClass ) ) )
   {
     Logf( LOG_WARN, "Object '%s.%s' was expected to be of type '%s' but was '%s'",

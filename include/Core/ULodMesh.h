@@ -17,33 +17,22 @@
 \*========================================================================*/
 
 /*========================================================================
- * USkelAnim.h - Skeletal Animation Classes
+ * ULodMesh.h - "Level of Detail" Mesh Class
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#include "Core/UClass.h"
-#include "Core/USkelAnim.h"
+#pragma once
 
-UAnimation::UAnimation()
-  : UObject()
+#include "Core/UMesh.h"
+
+class ULodMesh : public UMesh
 {
-}
+  DECLARE_NATIVE_CLASS( ULodMesh, UMesh, CLASS_NoExport, Engine )
 
-UAnimation::~UAnimation()
-{
-}
+  ULodMesh();
 
-USkeletalMeshInstance::USkeletalMeshInstance()
-  : UObject()
-{
-}
-
-USkeletalMeshInstance::~USkeletalMeshInstance()
-{
-}
-
-IMPLEMENT_NATIVE_CLASS( UAnimation );
-IMPLEMENT_NATIVE_CLASS( USkeletalMeshInstance );
+  // TODO:
+};
 

@@ -17,33 +17,22 @@
 \*========================================================================*/
 
 /*========================================================================
- * USkelAnim.h - Skeletal Animation Classes
+ * USkelMesh.h - Skeletal Mesh Classes
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#include "Core/UClass.h"
-#include "Core/USkelAnim.h"
+#pragma once
 
-UAnimation::UAnimation()
-  : UObject()
+#include "Core/ULodMesh.h"
+
+class USkeletalMesh : public ULodMesh
 {
-}
+  DECLARE_NATIVE_CLASS( USkeletalMesh, ULodMesh, CLASS_NoExport, Engine )
 
-UAnimation::~UAnimation()
-{
-}
+  USkeletalMesh();
 
-USkeletalMeshInstance::USkeletalMeshInstance()
-  : UObject()
-{
-}
-
-USkeletalMeshInstance::~USkeletalMeshInstance()
-{
-}
-
-IMPLEMENT_NATIVE_CLASS( UAnimation );
-IMPLEMENT_NATIVE_CLASS( USkeletalMeshInstance );
+  // TODO: Fill out variables when we get to implementing this
+};
 

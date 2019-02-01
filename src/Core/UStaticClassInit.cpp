@@ -144,6 +144,8 @@ bool UObject::StaticInit()
   Result &= UPolys::StaticClassInit();
   Result &= UPrimitive::StaticClassInit();
     Result &= UMesh::StaticClassInit();
+      Result &= ULodMesh::StaticClassInit();
+        Result &= USkeletalMesh::StaticClassInit();
     Result &= UModel::StaticClassInit();
   Result &= UPlayer::StaticClassInit();
     Result &= UViewport::StaticClassInit();
@@ -196,7 +198,6 @@ bool UObject::StaticInit()
   return Result;
 }
 
-  IMPLEMENT_NATIVE_CLASS( UAnimation );
   IMPLEMENT_NATIVE_CLASS( UAnimationNotify );
   IMPLEMENT_NATIVE_CLASS( UCanvas );
   IMPLEMENT_NATIVE_CLASS( UClient );
@@ -231,19 +232,13 @@ bool UObject::StaticInit()
   IMPLEMENT_NATIVE_CLASS( UPrimitive );
     IMPLEMENT_NATIVE_CLASS( UMesh );
     IMPLEMENT_NATIVE_CLASS( USound );
-  IMPLEMENT_NATIVE_CLASS( USkeletalMesh );
-  IMPLEMENT_NATIVE_CLASS( USkeletalMeshInstance );
-  IMPLEMENT_NATIVE_CLASS( USubsystem );
+    IMPLEMENT_NATIVE_CLASS( USubsystem );
     IMPLEMENT_NATIVE_CLASS( UAudioSubsystem );
     IMPLEMENT_NATIVE_CLASS( UEngine );
     IMPLEMENT_NATIVE_CLASS( UNetDriver );
         IMPLEMENT_NATIVE_CLASS( USystem );
   IMPLEMENT_NATIVE_CLASS( UTextBuffer );
  
-  IMPLEMENT_NATIVE_CLASS( AHUD );
-  IMPLEMENT_NATIVE_CLASS( AHUDOverlay );
-  IMPLEMENT_NATIVE_CLASS( ADynamicZoneInfo );
-
 BEGIN_PROPERTY_LINK( UAnimationNotify, 5 )
   LINK_NATIVE_ARRAY   ( UAnimationNotify, AnimationNotify );
   LINK_NATIVE_PROPERTY( UAnimationNotify, NumNotifies );

@@ -23,6 +23,7 @@
  *========================================================================
 */
 
+#include "Core/UClass.h"
 #include "Actors/ADynamicZoneInfo.h"
 
 ADynamicZoneInfo::ADynamicZoneInfo()
@@ -33,4 +34,6 @@ ADynamicZoneInfo::ADynamicZoneInfo()
 ADynamicZoneInfo::~ADynamicZoneInfo()
 {
 }
+
+IMPLEMENT_NATIVE_CLASS( ADynamicZoneInfo );
 

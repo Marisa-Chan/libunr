@@ -23,6 +23,7 @@
  *========================================================================
 */
 
+#include "Core/UClass.h"
 #include "Actors/AHUD.h"
 
 AHUD::AHUD()
@@ -42,4 +43,7 @@ AHUDOverlay::AHUDOverlay()
 AHUDOverlay::~AHUDOverlay()
 {
 }
+
+IMPLEMENT_NATIVE_CLASS( AHUD );
+IMPLEMENT_NATIVE_CLASS( AHUDOverlay );
 
