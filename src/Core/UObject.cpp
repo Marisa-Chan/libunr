@@ -1036,6 +1036,9 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
     return NULL;
   }
 
+  // Type checks out
+  ObjClass = ClassType;
+
   if ( !(ObjClass->ClassFlags & CLASS_NoExport) && ObjClass->NativeNeedsPkgLoad )
   {
     ObjClass->PreLoad();
