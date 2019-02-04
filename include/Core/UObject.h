@@ -342,13 +342,8 @@ bool cls::StaticLinkNativeProperties() \
   if ( SuperPropList == NULL ) \
     return false; \
  \
-  if ( StaticInitNativePropList( numprop + SuperPropList->Num ) ) \
+  if ( StaticInitNativePropList( numprop ) ) \
   { \
-    xstl::Copy( StaticNativePropList->Properties, \
-                sizeof( FNativePropertyLink ) * SuperPropList->Num, \
-                SuperPropList->Properties, \
-                sizeof( FNativePropertyLink ) * SuperPropList->Num ); \
-    StaticNativePropList->Added = SuperPropList->Added;
 
 #define END_PROPERTY_LINK() \
     return true; \
