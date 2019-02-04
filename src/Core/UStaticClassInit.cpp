@@ -29,6 +29,7 @@
 #include "Core/UCanvas.h"
 #include "Core/UConsole.h"
 #include "Core/UEngine.h"
+#include "Core/UFire.h"
 #include "Core/ULocale.h"
 #include "Core/ULevel.h"
 #include "Core/UMesh.h"
@@ -125,6 +126,12 @@ bool UObject::StaticInit()
   Result &= UBspNodes::StaticClassInit();
   Result &= UBspSurfs::StaticClassInit();
     Result &= UTexture::StaticClassInit();
+      Result &= UFractalTexture::StaticClassInit();
+        Result &= UFireTexture::StaticClassInit();
+        Result &= UWaterTexture::StaticClassInit();
+          Result &= UWaveTexture::StaticClassInit();
+          Result &= UWetTexture::StaticClassInit();
+        Result &= UIceTexture::StaticClassInit();
       Result &= UScriptedTexture::StaticClassInit();
   Result &= UCanvas::StaticClassInit();
   Result &= UClient::StaticClassInit();

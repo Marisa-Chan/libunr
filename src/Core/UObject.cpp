@@ -258,24 +258,32 @@ UClass* UObject::FindClass( FHash& ClassHash )
   return NULL;
 }
 
+// Antonio's docs seemed to leave out the important detail that these 
+// are stored in big endian, not little endian (need to see what indices
+// >= 16384 look like)
 static int ReadArrayIndex( FPackageFileIn* PkgFile )
 {
   u8 ArrayIdx[4] = { 0, 0 ,0 ,0 };
   *PkgFile >> ArrayIdx[0];
   if ( ArrayIdx[0] >= 128 )
   {
-    *PkgFile >> ArrayIdx[1];
-    if ( (ArrayIdx[1] & 0x80) != 0 && *((u16*)&ArrayIdx[0]) >= 16384 )
+    ArrayIdx[1] = ArrayIdx[0];
+    *PkgFile >> ArrayIdx[0];
+    ArrayIdx[1] &= ~0x80;
+
+    // TODO: This whole chunk is probably wrong, but I can't find
+    // any examples that get to 16384 (make one!)
+    if ( *((u16*)&ArrayIdx[0]) >= 16384 )
     {
-      *PkgFile >> ArrayIdx[2];
-      *PkgFile >> ArrayIdx[3];
+      ArrayIdx[3] = ArrayIdx[1];
+      ArrayIdx[2] = ArrayIdx[0];
       ArrayIdx[3] &= ~0xC0;
-    }
-    else
-    {
-      ArrayIdx[1] &= ~0x80;
+
+      *PkgFile >> ArrayIdx[1];
+      *PkgFile >> ArrayIdx[0];
     }
   }
+
 
   int Idx = *((int*)&ArrayIdx);
   return Idx;
@@ -616,7 +624,6 @@ void UObject::ReadDefaultProperties()
 
       if ( IsArray )
         ArrayIdx = ReadArrayIndex( PkgFile );
-
 
       if ( StructProp )
       {

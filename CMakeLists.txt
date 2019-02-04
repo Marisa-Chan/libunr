@@ -88,6 +88,7 @@ set (SOURCES ${UNR_SRC}/Core/FConfig.cpp
              ${UNR_SRC}/Core/UClass.cpp
              ${UNR_SRC}/Core/UConsole.cpp
              ${UNR_SRC}/Core/UEngine.cpp
+             ${UNR_SRC}/Core/UFire.cpp
              ${UNR_SRC}/Core/ULocale.cpp
              ${UNR_SRC}/Core/ULodMesh.cpp
              ${UNR_SRC}/Core/ULevel.cpp
