@@ -114,6 +114,35 @@ bool UObject::StaticInit()
   UObject::StaticClass()->Load();
   UObject::StaticClass()->PostLoad();
 
+  // Mark the object system as bootstrapped
+  bStaticBootstrapped = true;
+
+  // All previously created classes need their properties linked with Object
+  ULanguage::StaticClass()->LinkSuperClassChildren();
+  UPackage::StaticClass()->LinkSuperClassChildren();
+  UTextBuffer::StaticClass()->LinkSuperClassChildren();
+  UField::StaticClass()->LinkSuperClassChildren();
+  UConst::StaticClass()->LinkSuperClassChildren();
+  UEnum::StaticClass()->LinkSuperClassChildren();
+  UProperty::StaticClass()->LinkSuperClassChildren();
+  UByteProperty::StaticClass()->LinkSuperClassChildren();
+  UIntProperty::StaticClass()->LinkSuperClassChildren();
+  UBoolProperty::StaticClass()->LinkSuperClassChildren();
+  UFloatProperty::StaticClass()->LinkSuperClassChildren();
+  UObjectProperty::StaticClass()->LinkSuperClassChildren();
+  UClassProperty::StaticClass()->LinkSuperClassChildren();
+  UNameProperty::StaticClass()->LinkSuperClassChildren();
+  UStringProperty::StaticClass()->LinkSuperClassChildren();
+  UArrayProperty::StaticClass()->LinkSuperClassChildren();
+  UStructProperty::StaticClass()->LinkSuperClassChildren();
+  UStrProperty::StaticClass()->LinkSuperClassChildren();
+  UMapProperty::StaticClass()->LinkSuperClassChildren();
+  UFixedArrayProperty::StaticClass()->LinkSuperClassChildren();
+  UStruct::StaticClass()->LinkSuperClassChildren();
+  UFunction::StaticClass()->LinkSuperClassChildren();
+  UState::StaticClass()->LinkSuperClassChildren();
+  UClass::StaticClass()->LinkSuperClassChildren();
+
   Result &= USubsystem::StaticClassInit();
   Result &= UCommandlet::StaticClassInit();
   Result &= USystem::StaticClassInit();

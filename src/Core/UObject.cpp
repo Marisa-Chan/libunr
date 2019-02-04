@@ -62,6 +62,7 @@ Array<UObject*>* UObject::ObjectPool = NULL;
 Array<UClass*>*  UObject::ClassPool = NULL;
 Array<FNativePropertyList*>* UObject::NativePropertyLists = NULL;
 Array<UFunction*>* UObject::NativeFunctions = NULL;
+bool UObject::bStaticBootstrapped = false;
 
 IMPLEMENT_NATIVE_CLASS( UObject );
 IMPLEMENT_NATIVE_CLASS( UCommandlet );

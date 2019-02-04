@@ -761,6 +761,11 @@ UClass::UClass( const char* ClassName, u32 Flags, UClass* InSuperClass,
   bLinkedChildren = false;
 
   Default = CreateDefaultObject();
+  if ( UNLIKELY( bStaticBootstrapped && (Flags & CLASS_NoExport) ) )
+  {
+    LinkSuperClassChildren();
+    Default->Field = Children;
+  }
 }
 
 UClass::~UClass()

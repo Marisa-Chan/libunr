@@ -460,6 +460,8 @@ class DLL_EXPORT UObject
 protected:
   int RefCnt;
   size_t OldPkgFileOffset;
+
+  static bool bStaticBootstrapped;
 };
 
 template <class T> T* SafeCast( UObject* Obj )
