@@ -317,39 +317,31 @@ void UObject::ReadDefaultProperties()
     ArrayIdx = 0;
     bIsDescription = false;
 
-    // Support for 227j property descriptions
-    if ( strnicmp( PropName, "Description", 11 ) == 0 && IsA( UProperty::StaticClass() ) )
+    Prop = FindProperty( PropName );
+
+    // Read the actual value of the properties even if they don't exist
+    // We don't want to totally fail if some property just doesn't exist
+    // Instead, the value will just go unused (because nothing is there to use it)
+    if ( !Prop )
     {
-      bIsDescription = true;
+      if ( Outer )
+        Logf( LOG_CRIT, "Property '%s' in '%s.%s.%s' does not exist",
+          PropName, Pkg->Name, Outer->Name, Name );
+      else
+        Logf( LOG_CRIT, "Property '%s' in '%s.%s' does not exist",
+          PropName, Pkg->Name, Name );
     }
-    else
+
+    else if ( Prop->Offset == MAX_UINT32 )
     {
-      Prop = FindProperty( PropName );
-
-      // Read the actual value of the properties even if they don't exist
-      // We don't want to totally fail if some property just doesn't exist
-      // Instead, the value will just go unused (because nothing is there to use it)
-      if ( !Prop )
-      {
-        if ( Outer )
-          Logf( LOG_CRIT, "Property '%s' in '%s.%s.%s' does not exist",
+      if ( Outer )
+        Logf( LOG_WARN, "Property '%s' in '%s.%s.%s' has no native component",
             PropName, Pkg->Name, Outer->Name, Name );
-        else
-          Logf( LOG_CRIT, "Property '%s' in '%s.%s' does not exist",
+      else
+        Logf( LOG_WARN, "Property '%s' in '%s.%s' has no native component",
             PropName, Pkg->Name, Name );
-      }
 
-      else if ( Prop->Offset == MAX_UINT32 )
-      {
-        if ( Outer )
-          Logf( LOG_WARN, "Property '%s' in '%s.%s.%s' has no native component",
-              PropName, Pkg->Name, Outer->Name, Name );
-        else
-          Logf( LOG_WARN, "Property '%s' in '%s.%s' has no native component",
-              PropName, Pkg->Name, Name );
-
-        Prop = NULL;
-      }
+      Prop = NULL;
     }
 
     *PkgFile >> InfoByte;
@@ -662,12 +654,6 @@ void UObject::ReadDefaultProperties()
           SetProperty<String*>( Prop, RealNewStr, ArrayIdx );
         }
 
-      }
-
-      if ( bIsDescription )
-      {
-        UProperty* PropThis = (UProperty*)this;
-        PropThis->Description = NewStr;
       }
     }
   }

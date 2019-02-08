@@ -35,6 +35,7 @@ class UMesh : public UPrimitive
 
   UMesh();
 
+  bool bCurvyMesh;
   // TODO:
 };
 

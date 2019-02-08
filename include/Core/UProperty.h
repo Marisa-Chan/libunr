@@ -39,7 +39,7 @@ enum EPropertyType
   PROP_Array   = 0x9,
   PROP_Struct  = 0xa,
   PROP_Vector  = 0xb, // Vector and Rotator properties are not distinct property types
-  PROP_Rotator = 0xc, // They use the StructProperty type
+  PROP_Rotator = 0xc, // They use the StructProperty type (unless they don't in UE2)
   PROP_Ascii   = 0xd,
   PROP_Map     = 0xe,
   PROP_FixArr  = 0xf,
@@ -49,6 +49,7 @@ enum EPropertyType
 class DLL_EXPORT UProperty : public UField
 {
   DECLARE_NATIVE_ABSTRACT_CLASS( UProperty, UField, CLASS_NoExport, Core )
+
   UProperty();
   UProperty( int InNameIdx );
 
@@ -61,7 +62,7 @@ class DLL_EXPORT UProperty : public UField
   // Instance variables
   u32 Offset; // Offset into the owner, giving the location of the value
   UClass* GlobalClass; // When reading globalconfig vars, use this
-  char*   Description; // Property description introduced in 227j
+  String* Description; // Property description introduced in 227j
 
   // Static variables
   static u8 PropertySizes[8];
@@ -156,5 +157,4 @@ class DLL_EXPORT UFixedArrayProperty : public UProperty
   DECLARE_NATIVE_CLASS( UFixedArrayProperty, UProperty, CLASS_NoExport, Core )
   virtual void Load();
 };
-
 

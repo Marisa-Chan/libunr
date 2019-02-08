@@ -117,6 +117,11 @@ bool UObject::StaticInit()
   // Mark the object system as bootstrapped
   bStaticBootstrapped = true;
 
+  // (The only reason we have to do this is because Unreal does it, 
+  // lets not do this if we add custom stuff in the future, it's not very elegant)
+  // Expose the description property
+  EXPOSE_PROPERTY( UProperty, Description, UStrProperty, sizeof(String*) );
+
   // All previously created classes need their properties linked with Object
   ULanguage::StaticClass()->LinkSuperClassChildren();
   UPackage::StaticClass()->LinkSuperClassChildren();
@@ -179,7 +184,12 @@ bool UObject::StaticInit()
   Result &= UPalette::StaticClassInit();
   Result &= UPolys::StaticClassInit();
   Result &= UPrimitive::StaticClassInit();
+
+    // Once again, please don't do this if we add new variables for
+    // a drop in Core.u or Engine.u replacement
     Result &= UMesh::StaticClassInit();
+    EXPOSE_PROPERTY( UMesh, bCurvyMesh, UBoolProperty, 1 );
+
       Result &= ULodMesh::StaticClassInit();
         Result &= USkeletalMesh::StaticClassInit();
     Result &= UModel::StaticClassInit();

@@ -350,8 +350,30 @@ bool cls::StaticLinkNativeProperties() \
   } \
   return false; \
 }
+
 #define EXPOSE_TO_USCRIPT() \
   static bool StaticLinkNativeProperties(); 
+
+// There's like two properties in all of UE1 that actually need this...
+#define EXPOSE_PROPERTY(cls, prop, ptype, size) \
+  { \
+    UClass* ExpCls = cls::StaticClass(); \
+    ptype* ExpProp = (ptype*)ptype::StaticClass()->CreateObject(); \
+    ExpProp->ArrayDim = 1; \
+    ExpProp->ElementSize = size; \
+    ExpProp->PropertyFlags = CPF_Native; \
+    ExpProp->Outer = ExpCls; \
+    ExpProp->Offset = OFFSET_OF( cls, prop ); \
+    ExpProp->Next = ExpCls->Children; \
+    ExpProp->Name = TEXT( prop ); \
+    ExpProp->Hash = FnvHashString( ExpProp->Name ); \
+    ExpProp->Flags = RF_Native; \
+    ExpProp->RefCnt = 1; \
+    ExpProp->Class = ptype::StaticClass(); \
+    ObjectPool->PushBack( ExpProp ); \
+    ExpCls->Children = ExpProp; \
+    ExpCls->Default->Field = ExpCls->Children; \
+  }
 
 #define EXPORTABLE() \
   virtual bool ExportToFile( const char* Dir, const char* Type );
