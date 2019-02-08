@@ -391,6 +391,7 @@ class DLL_EXPORT UObject
   UObject();
 
   UObject* LoadObject( idx ObjRef, UClass* ObjClass, UObject* InOuter, bool bLoadClassNow = false );
+  UObject* Clone();
   virtual void PreLoad();
   virtual void Load();
   virtual void PostLoad();

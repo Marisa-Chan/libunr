@@ -303,9 +303,6 @@ void UObject::ReadDefaultProperties()
   int RealSize = 0;
   bool bIsDescription = false;
 
-  // For script exporting
-  Class->DefPropListOffset = PkgFile->Tell();
-
   while( 1 )
   {
     *PkgFile >> CINDEX( PropNameIdx );
@@ -785,6 +782,20 @@ UProperty* UObject::FindProperty( const char* PropName )
   }
 
   return NULL;
+}
+
+// This will probably be a major source of garbage-collection 
+// (or memory corruption) woes later in the future...
+UObject* UObject::Clone()
+{
+  UObject* ClonedObj = Class->Constructor( Class->StructSize );
+
+  // MAKE SURE STRUCTSIZE IS SAFE!!!
+  if ( LIKELY( ClonedObj != NULL ) )
+    xstl::Copy( ClonedObj, Class->StructSize, this, Class->StructSize );
+
+  Class->AddRef();
+  return ClonedObj;
 }
 
 UObject* UObject::LoadObject( idx ObjRef, UClass* ObjClass, UObject* InOuter, bool bLoadClassNow )

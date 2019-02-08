@@ -929,12 +929,15 @@ bool UClass::IsNative()
 
 UObject* UClass::CreateObject()
 {
-  return Constructor( StructSize );
+  if ( ClassFlags & CLASS_NoExport )
+    return Constructor( StructSize );
+  else
+    return Default->Clone();
 }
 
 UObject* UClass::CreateDefaultObject()
 {
-  Default = CreateObject();
+  Default = Constructor( StructSize );
   Default->Name = StringDup( Name );
   Default->Class = this;
 }
