@@ -183,7 +183,7 @@ struct FZoneProperties
 {
   class AZoneInfo* ZoneInfo;
   float LastRenderTime;
-  u32   Connectivity;
+  u64   Connectivity;
   u64   Visibility;
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FZoneProperties& ZP );

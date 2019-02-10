@@ -112,7 +112,6 @@ DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FZoneProperties& ZP )
   In >> CINDEX( ObjRef );
   ZP.ZoneInfo = (AZoneInfo*)UObject::StaticLoadObject( In.Pkg, ObjRef, AZoneInfo::StaticClass(), NULL );
 
-  In >> ZP.LastRenderTime;
   In >> ZP.Connectivity;
   In >> ZP.Visibility;
 
