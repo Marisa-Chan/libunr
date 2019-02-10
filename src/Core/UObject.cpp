@@ -639,7 +639,7 @@ void UObject::ReadDefaultProperties()
       if ( StrLength > 0 )
       {
         NewStr = new char[StrLength]; // Serialized length includes null terminator
-        PkgFile->Read( NewStr, StrLength );
+        PkgFile->Read( NewStr, StrLength-- );
       }
 
       if ( Prop )
@@ -651,7 +651,7 @@ void UObject::ReadDefaultProperties()
         }
         else
         {
-          String* RealNewStr = NewStr ? new String( NewStr, StrLength - 1 ) : NULL;
+          String* RealNewStr = new String( NewStr, StrLength );
           SetProperty<String*>( Prop, RealNewStr, ArrayIdx );
         }
       }
