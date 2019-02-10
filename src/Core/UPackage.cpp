@@ -150,16 +150,19 @@ DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, String& Str )
   idx Size = 0;
   In >> CINDEX( Size );
 
-  Str.Reserve( Size-1 );
-  for ( int i = 0; i < Size; i++ )
+  if ( Size > 0 )
   {
-    char C = '\0';
-    In.Read( &C, 1 );
+    Str.Reserve( Size-1 );
+    for ( int i = 0; i < Size; i++ )
+    {
+      char C = '\0';
+      In.Read( &C, 1 );
 
-    if ( C == '\0' )
-      break;
+      if ( C == '\0' )
+        break;
 
-    Str += C;
+      Str += C;
+    }
   }
 
   return In;
