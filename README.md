@@ -47,9 +47,28 @@ code into other projects, the use of ideas that UE4 implements in other projects
 
 # Building #
 
-TODO
+1) Install CMake 3.7 and git
+
+2) Download/Build XSTL (eXtenstible Standard Template Library)
+	- Currently, there are no binaries, pull from the repo and build here -> https://Xaleros@bitbucket.org/Xaleros/xstl.git
+
+3) Pull this repo with the following command
+	- git clone https://Xaleros@bitbucket.org/Xaleros/libunr.git
+
+4) Run, in the root folder, the following command
+	- cmake .
+	- make
+
+5) Install the library somewhere
+	- for windows users, drag libxstl.dll and libunr.dll where ever your application is
+	- for linux users, run "sudo make install" after
+
+6) (optional) Download a program to use this library with
+	- Libunr UCC (lucc) can be found here -> https://bitbucket.org/Xaleros/lucc/
 
 # Installing #
 	
+TODO
+
 # Licensing #
 	GNU General Public License v3
