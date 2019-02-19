@@ -149,7 +149,7 @@ class AGameInfo : public AInfo
   bool bShowRecoilAnimations;
   bool bCastShadow;
   bool bDecoShadows;
-  bool bCastProjectShadows;
+  bool bCastProjectorShadows;
   bool bUseRealtimeShadow;
   bool bNoWalkInAir;
   bool bProjectorDecals;

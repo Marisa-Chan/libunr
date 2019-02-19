@@ -141,7 +141,7 @@ BEGIN_PROPERTY_LINK( AGameInfo, 110 )
   LINK_NATIVE_PROPERTY( AGameInfo, bShowRecoilAnimations );
   LINK_NATIVE_PROPERTY( AGameInfo, bCastShadow );
   LINK_NATIVE_PROPERTY( AGameInfo, bDecoShadows );
-  LINK_NATIVE_PROPERTY( AGameInfo, bCastProjectShadows );
+  LINK_NATIVE_PROPERTY( AGameInfo, bCastProjectorShadows );
   LINK_NATIVE_PROPERTY( AGameInfo, bUseRealtimeShadow );
   LINK_NATIVE_PROPERTY( AGameInfo, bNoWalkInAir ); 
   LINK_NATIVE_PROPERTY( AGameInfo, bProjectorDecals );
