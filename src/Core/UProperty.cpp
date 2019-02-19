@@ -150,7 +150,7 @@ void UBoolProperty::Load()
 
 void UBoolProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal )
 {
-  bool DefValCast = DefVal ? true : false;
+  bool DefValCast = (DefVal & 0xFF) ? true : false;
   bool Val = Obj->GetProperty<bool>( this, Idx );
   if ( Val != DefValCast )
     snprintf( Buf, BufSz, "%s", Val ? "True" : "False" );
