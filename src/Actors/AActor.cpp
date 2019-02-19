@@ -256,7 +256,7 @@ BEGIN_PROPERTY_LINK( ATrigger, 12 )
   LINK_NATIVE_PROPERTY( ATrigger, TriggerActor2 );
 END_PROPERTY_LINK()
 
-BEGIN_PROPERTY_LINK( AActor, 221 )
+BEGIN_PROPERTY_LINK( AActor, 222 )
   LINK_NATIVE_PROPERTY( AActor, bStatic );
   LINK_NATIVE_PROPERTY( AActor, bHidden );
   LINK_NATIVE_PROPERTY( AActor, bNoDelete );
@@ -364,6 +364,7 @@ BEGIN_PROPERTY_LINK( AActor, 221 )
   LINK_NATIVE_PROPERTY( AActor, LastRandomTime );
   LINK_NATIVE_PROPERTY( AActor, LastRenderedTime );
   LINK_NATIVE_PROPERTY( AActor, ActorRenderColor );
+  LINK_NATIVE_PROPERTY( AActor, ActorGUnlitColor );
   LINK_NATIVE_PROPERTY( AActor, CollisionOverride );
   LINK_NATIVE_PROPERTY( AActor, MeshInstance );
   LINK_NATIVE_PROPERTY( AActor, RelativeLocation );
@@ -372,7 +373,7 @@ BEGIN_PROPERTY_LINK( AActor, 221 )
   LINK_NATIVE_PROPERTY( AActor, MeshDataPtr );
   LINK_NATIVE_PROPERTY( AActor, DrawScale3D );
   LINK_NATIVE_PROPERTY( AActor, ProjectorList );
-  LINK_NATIVE_PROPERTY( AActor, InitialNetProperties );
+  LINK_NATIVE_PROPERTY( AActor, NetInitialProperties );
   LINK_NATIVE_PROPERTY( AActor, RealTouching );
   LINK_NATIVE_PROPERTY( AActor, MultiTimers );
   LINK_NATIVE_PROPERTY( AActor, Physics );

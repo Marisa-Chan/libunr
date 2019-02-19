@@ -157,7 +157,6 @@ UStruct::UStruct()
   TextPos = 0;
   ScriptSize = 0;
   ScriptCode = NULL;
-  NativeSize = 0;
   StructSize = 0;
   LabelTable = new Array<FScriptLabel>();
   bFinalizedLoad = false;
@@ -173,7 +172,6 @@ UStruct::UStruct( size_t InNativeSize )
   TextPos = 0;
   ScriptSize = 0;
   ScriptCode = NULL;
-  NativeSize = InNativeSize;
   StructSize = 0;
   LabelTable = new Array<FScriptLabel>();
   bFinalizedLoad = false;
@@ -796,9 +794,49 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
   Out->Write( ScriptText->Text->Data(), ScriptText->Text->Size() );
 
   // Write default properties
-  const char* const DefPropStr = "defaultproperties\r\n{\r\n";
-  // TODO:
-  Out->Write( (char*)"}\r\n", 3 );
+  char ValueBuf[512] = { 0 };
+  String DefProp;
+  Out->Write( (char*)"defaultproperties\r\n{\r\n", 22 );
+  for ( UField* Iter = Default->Field; Iter != NULL; Iter = Iter->Next )
+  {
+    if ( Iter->IsA( UProperty::StaticClass() ) )
+    {
+      UProperty* PropIter = (UProperty*)Iter;
+      for ( int i = 0; i < PropIter->ArrayDim; i++ )
+      {
+        if ( LIKELY( !(PropIter->PropertyFlags & (CPF_Native|CPF_Const) ) ) )
+        {
+          // Get default property from super class
+          // Again, won't work on big endian...
+          size_t DefValue = 0;
+          if ( SuperClass != NULL && PropIter->Outer != this )
+            DefValue = SuperClass->Default->GetProperty<size_t>( PropIter, i );
+
+          PropIter->GetText( ValueBuf, sizeof(ValueBuf), Default, i, DefValue );
+
+          if ( ValueBuf[0] != '\0' )
+          {
+            DefProp += '\t';
+            DefProp += PropIter->Name;
+            if ( PropIter->ArrayDim > 1 )
+            {
+              DefProp += '[';
+              DefProp += String( i );
+              DefProp += ']';
+            }
+            DefProp += '=';
+            DefProp += ValueBuf;
+            DefProp += "\r\n";
+
+            Out->Write( DefProp.Data(), DefProp.Size() );
+            DefProp.Erase();
+            ValueBuf[0] = '\0';
+          }
+        }
+      }
+    }
+  }
+  Out->Write( (char*)"}\r\n\r\n", 5 );
 
   Out->Close();
   delete Out;
@@ -813,6 +851,8 @@ void UClass::Load()
 
   if ( !bLoading )
     return;
+
+  DefPropQueue.Push( this );
 
   *PkgFile >> ClassFlags;
   PkgFile->Read( ClassGuid, sizeof( ClassGuid ) );
@@ -901,7 +941,6 @@ void UClass::PostLoad()
     Default->PkgFile = PkgFile;
     Default->Field = Children;
 
-    AddRef();
     if ( LIKELY( Children ) )
       Children->AddRef();
 
@@ -909,13 +948,24 @@ void UClass::PostLoad()
     // While we should enforce that a config property is never in the property
     // list when saving packages, we will read the config property first before
     // overriding it with the property in the list
-    if ( ( ClassFlags & CLASS_Config ) ) 
+//    if ( ( ClassFlags & CLASS_Config ) ) 
 //      Default->ReadConfigProperties();
 
     DefPropListOffset = PkgFile->Tell();
-    Default->PkgFile = PkgFile;
-    Default->ReadDefaultProperties();
-    Default->PkgFile = NULL;
+
+    // Default properties must be read in the proper class loading order
+    if ( DefPropQueue.Front() == this )
+    {
+      UClass* QueuedClass;
+      while ( (QueuedClass = DefPropQueue.Front()) != NULL )
+      {
+        int OldOffset = QueuedClass->Default->PkgFile->Tell();
+        QueuedClass->Default->PkgFile->Seek( QueuedClass->DefPropListOffset, Begin );
+        QueuedClass->Default->ReadDefaultProperties();
+        QueuedClass->Default->PkgFile = NULL;
+        DefPropQueue.Pop();
+      }
+    }
 
     Super::PostLoad();
   }
@@ -1000,4 +1050,6 @@ void UClass::LinkSuperClassChildren()
     bLinkedChildren = true;
   }
 }
+
+Queue<UClass*> UClass::DefPropQueue;
 

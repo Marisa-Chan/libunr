@@ -149,7 +149,7 @@ BEGIN_PROPERTY_LINK( ULevelSummary, 6 )
   LINK_NATIVE_PROPERTY( ULevelSummary, LevelEnterText );
 END_PROPERTY_LINK()
 
-BEGIN_PROPERTY_LINK( ALevelInfo, 72 )
+BEGIN_PROPERTY_LINK( ALevelInfo, 74 )
   LINK_NATIVE_PROPERTY( ALevelInfo, TimeDilation );
   LINK_NATIVE_PROPERTY( ALevelInfo, TimeSeconds );
   LINK_NATIVE_PROPERTY( ALevelInfo, Year );
@@ -196,6 +196,7 @@ BEGIN_PROPERTY_LINK( ALevelInfo, 72 )
   LINK_NATIVE_PROPERTY( ALevelInfo, WhiteTexture );
   LINK_NATIVE_PROPERTY( ALevelInfo, TemplateLightTex );
   LINK_NATIVE_PROPERTY( ALevelInfo, HubStackLevel );
+  LINK_NATIVE_PROPERTY( ALevelInfo, LevelAction );
   LINK_NATIVE_PROPERTY( ALevelInfo, NetMode );
   LINK_NATIVE_PROPERTY( ALevelInfo, ComputerName );
   LINK_NATIVE_PROPERTY( ALevelInfo, EngineVersion );
@@ -214,6 +215,7 @@ BEGIN_PROPERTY_LINK( ALevelInfo, 72 )
   LINK_NATIVE_PROPERTY( ALevelInfo, SpawnNotify );
   LINK_NATIVE_PROPERTY( ALevelInfo, FootprintManager );
   LINK_NATIVE_PROPERTY( ALevelInfo, ObjList );
+  LINK_NATIVE_PROPERTY( ALevelInfo, DynamicZonesList );
   LINK_NATIVE_PROPERTY( ALevelInfo, ReplicationTarget );
   LINK_NATIVE_PROPERTY( ALevelInfo, MaxCommonRadius );
   LINK_NATIVE_PROPERTY( ALevelInfo, MaxCommonHeight );

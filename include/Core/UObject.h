@@ -384,6 +384,7 @@ bool cls::StaticLinkNativeProperties() \
 -----------------------------------------------------------------------------*/
 class DLL_EXPORT UObject
 {
+public:
   DECLARE_NATIVE_CLASS_BASE( UObject, UObject, CLASS_Abstract, Core )
   EXPOSE_TO_USCRIPT()
   // not really exportable, but just so all subclasses can have export called generically
@@ -449,14 +450,6 @@ class DLL_EXPORT UObject
   UField*     Field;    // All fields relevant to this object (points to Class->Children)
   FPackageFileIn* PkgFile; // Only relevant when loading
   bool bLoading;
-
-  struct FDefaultProperty
-  {
-    UProperty* Prop;
-    int Idx;
-  };
-
-  Array<FDefaultProperty>* DefaultProperties; // List of default properties to be written
 
   // I think this was originally here to "hide" sensitive info for objects.
   // This was due to the fact that C++ property offsets *HAVE* to match up

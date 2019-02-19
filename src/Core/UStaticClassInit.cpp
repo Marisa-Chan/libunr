@@ -237,6 +237,7 @@ bool UObject::StaticInit()
       Result &= APlayerPawn::StaticClassInit();
         Result &= ACamera::StaticClassInit();
     Result &= AProjectile::StaticClassInit();
+    Result &= AProjector::StaticClassInit();
     Result &= ASpawnNotify::StaticClassInit();
     Result &= ATriggers::StaticClassInit();
       Result &= ATrigger::StaticClassInit();

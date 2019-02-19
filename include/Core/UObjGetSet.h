@@ -49,7 +49,7 @@ template <class T> inline T UObject::GetProperty( UProperty* Prop, int Idx )
 template <> inline UObject* UObject::GetProperty<UObject*>( UProperty* Prop, int Idx )
 {
   UObject* Out = *GetPropAddr<UObject*>( this, Prop, Idx );
-  if ( !Out->IsA( UObject::StaticClass() ) )
+  if ( Out && !Out->IsA( UObject::StaticClass() ) )
   {
     // Maybe make a config way for this check to be optional? Could get very slow
     Logf( LOG_CRIT, "OBJECT PROPERTY DOES NOT POINT TO AN OBJECT!!!" );
@@ -61,7 +61,7 @@ template <> inline UObject* UObject::GetProperty<UObject*>( UProperty* Prop, int
 template<> inline UClass* UObject::GetProperty<UClass*>( UProperty* Prop, int Idx )
 {
   UClass* Out = *GetPropAddr<UClass*>( this, Prop, Idx );
-  if ( Out->StaticClass() != UClass::StaticClass() )
+  if ( Out && Out->StaticClass() != UClass::StaticClass() )
   {
     // see GetObjProperty for same comment
     Logf( LOG_CRIT, "CLASS PROPERTY DOES NOT POINT TO A CLASS!!!" );

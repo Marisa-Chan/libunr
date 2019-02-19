@@ -111,6 +111,7 @@ class AActor : public UObject
   bool bIsFrobable;
   float RandomDelayTime, RandomValue, LastRandomTime, LastRenderedTime;
   FColor ActorRenderColor;
+  FColor ActorGUnlitColor;
   UPrimitive* CollisionOverride;
   USkeletalMeshInstance* MeshInstance;
   FVector RelativeLocation;
@@ -119,7 +120,7 @@ class AActor : public UObject
   void* MeshDataPtr;
   FVector DrawScale3D;
   Array<AProjector*>* ProjectorList;
-  void* InitialNetProperties;
+  void* NetInitialProperties;
   Array<AActor*>* RealTouching;
 
   struct MultiTimerType

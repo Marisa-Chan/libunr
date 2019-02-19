@@ -25,13 +25,10 @@
 
 #pragma once
 
-// #include <istream>
-// #include <stddef.h>
-// #include <stdint.h>
-// #include <stdio.h>
-// #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <float.h>
+#include <math.h>
 
 #include <libxstl/XTypes.h>
 #include <libxstl/XStream.h>
@@ -154,7 +151,8 @@ static inline FHash FnvHash( const void* Data, size_t Len )
   FHash Hash;
   Hash.FnvHash[FNV1A_HASH] = Hash.FnvHash[FNV1_HASH] = FNV_BASIS;
 
-  for (int i = 0; i < Len; i++) {
+  for (int i = 0; i < Len; i++) 
+  {
     Hash.FnvHash[FNV1A_HASH] ^= ((u8*)Data)[i];
     Hash.FnvHash[FNV1A_HASH] *= FNV_PRIME;
 
@@ -170,7 +168,8 @@ static inline FHash FnvHashString( const char* Data )
   Hash.FnvHash[FNV1A_HASH] = Hash.FnvHash[FNV1_HASH] = FNV_BASIS;
 
   int Len = strlen( Data );
-  for (int i = 0; i < Len; i++) {
+  for (int i = 0; i < Len; i++) 
+  {
     u8 ConvData = isalpha( Data[i] ) ? toupper( Data[i] ) : Data[i];
     Hash.FnvHash[FNV1A_HASH] ^= ConvData;
     Hash.FnvHash[FNV1A_HASH] *= FNV_PRIME;

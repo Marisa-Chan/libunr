@@ -25,9 +25,10 @@
 
 #pragma once
 
-#include "Core/FConfig.h"
 #include <libxstl/XArray.h>
 #include <libxstl/XString.h>
+#include <libxstl/XQueue.h>
+#include "Core/FConfig.h"
 #include "Core/UObject.h"
 
 using namespace xstl;
@@ -210,5 +211,6 @@ class DLL_EXPORT UClass : public UState
 private:
   UObject* CreateDefaultObject();
   char* CreateDefaultObjectName();
+  static Queue<UClass*> DefPropQueue;
 };
 

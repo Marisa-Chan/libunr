@@ -119,6 +119,7 @@ set (SOURCES ${UNR_SRC}/Core/FConfig.cpp
              ${UNR_SRC}/Actors/ANavigationPoint.cpp
              ${UNR_SRC}/Actors/APawn.cpp
              ${UNR_SRC}/Actors/APlayerPawn.cpp
+             ${UNR_SRC}/Actors/AProjector.cpp
              ${UNR_SRC}/Actors/AReplicationInfo.cpp
              ${UNR_SRC}/Actors/AStatLog.cpp
              ${UNR_SRC}/Actors/AWeapon.cpp
@@ -128,8 +129,8 @@ set (SOURCES ${UNR_SRC}/Core/FConfig.cpp
 
 include_directories (${UNR_INC} ${XSTL_INC})
 add_definitions("-std=c++11" "-DXSTL_ARRAY_STD" "-DXSTL_STRING_STD"
-  "-DXSTL_FILESTREAM_STD" "-DXSTL_STACK_STD" "-DXSTL_MAP_STD" 
-  "-DINSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"" )
+  "-DXSTL_FILESTREAM_STD" "-DXSTL_STACK_STD" "-DXSTL_MAP_STD"
+  "-DXSTL_QUEUE_STD" "-DINSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"" )
 message(STATUS "Install prefix: " ${CMAKE_INSTALL_PREFIX})
 add_definitions ("-Wno-attributes")
 set_source_files_properties( tags PROPERTIES GENERATED true )

@@ -17,48 +17,43 @@
 \*========================================================================*/
 
 /*========================================================================
- * AProjector.h - Projects textures onto surfaces
+ * AProjector.cpp - Projector class implementation
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#pragma once
+#include "Core/UClass.h"
+#include "Actors/AProjector.h"
 
-#include "AActor.h"
-
-class AProjector : public AActor
+AProjector::AProjector()
+  : AActor()
 {
-  DECLARE_NATIVE_CLASS( AProjector, AActor, 0, Engine )
-  EXPOSE_TO_USCRIPT()
+}
 
-  AProjector();
+AProjector::~AProjector()
+{
+}
 
-  void AttachPrjDecal();
-  void DeattachPrjDecal();
-  void AttachActor( AActor* Other );
-  void DeattachActor( AActor* Other );
-  void DeattachAllActors();
+IMPLEMENT_NATIVE_CLASS( AProjector );
 
-  FPlane FrustrumPlanes[6];
-  Array<AActor*> DecalActors;
-  Array<int>     DecalNodes;
-  FBox           Box;
-  FVector        VisBox[8];
-  void*          TexData;
-
-  UTexture* ProjectTexture;
-  float MaxDistance, ProjectorScale;
-  ERenderStyle ProjectStyle;
-  u8 FOV;
-
-  bool bProjectActors;
-  bool bProjectBSPBackfaces;
-  bool bProjectMeshBackfaces;
-  bool bProjectBSP;
-  bool bGradualFade;
-  bool bUseBetterActorAttach;
-  bool bHasAttached;
-  bool bProjecting;
-};
+BEGIN_PROPERTY_LINK( AProjector, 17 )
+  LINK_NATIVE_ARRAY   ( AProjector, FrustrumPlanes );
+  LINK_NATIVE_PROPERTY( AProjector, DecalActors );
+  LINK_NATIVE_PROPERTY( AProjector, DecalNodes );
+  LINK_NATIVE_PROPERTY( AProjector, Box );
+  LINK_NATIVE_ARRAY   ( AProjector, VisBox );
+  LINK_NATIVE_PROPERTY( AProjector, TexData );
+  LINK_NATIVE_PROPERTY( AProjector, ProjectTexture );
+  LINK_NATIVE_PROPERTY( AProjector, ProjectStyle );
+  LINK_NATIVE_PROPERTY( AProjector, FOV );
+  LINK_NATIVE_PROPERTY( AProjector, bProjectActors );
+  LINK_NATIVE_PROPERTY( AProjector, bProjectBSPBackfaces );
+  LINK_NATIVE_PROPERTY( AProjector, bProjectMeshBackfaces );
+  LINK_NATIVE_PROPERTY( AProjector, bProjectBSP );
+  LINK_NATIVE_PROPERTY( AProjector, bGradualFade );
+  LINK_NATIVE_PROPERTY( AProjector, bUseBetterActorAttach );
+  LINK_NATIVE_PROPERTY( AProjector, bHasAttached );
+  LINK_NATIVE_PROPERTY( AProjector, bProjecting );
+END_PROPERTY_LINK()
 

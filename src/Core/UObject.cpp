@@ -303,6 +303,13 @@ void UObject::ReadDefaultProperties()
   int RealSize = 0;
   bool bIsDescription = false;
 
+  // Copy property values from SuperClass default object
+  if ( LIKELY( Class->SuperClass != NULL ) )
+    xstl::Copy( PtrAdd( this, UObject::StaticClass()->StructSize ),
+                Class->SuperClass->StructSize - UObject::StaticClass()->StructSize,
+                PtrAdd( Class->SuperClass->Default, UObject::StaticClass()->StructSize ),
+                Class->SuperClass->StructSize - UObject::StaticClass()->StructSize );
+
   while( 1 )
   {
     *PkgFile >> CINDEX( PropNameIdx );
@@ -344,7 +351,7 @@ void UObject::ReadDefaultProperties()
     *PkgFile >> InfoByte;
     PropType = InfoByte & 0x0F;
     SizeByte = (InfoByte & 0x70) >> 4;
-    IsArray  = InfoByte & 0x80;
+    IsArray  = (InfoByte & 0x80) >> 7;
 
     if ( SizeByte > 4 && PropType != PROP_Struct )
     {

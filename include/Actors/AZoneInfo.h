@@ -324,6 +324,7 @@ class ALevelInfo : public AZoneInfo
   UTexture* WhiteTexture;
   UTexture* TemplateLightTex;
   int       HubStackLevel;
+
   enum ELevelAction
   {
     LEVACT_None,
@@ -362,7 +363,8 @@ class ALevelInfo : public AZoneInfo
   bool bCheckWalkSurfaces;
   ASpawnNotify* SpawnNotify;
   UClass* FootprintManager;
-  UObject* ObjList;
+  Array<UObject*>* ObjList;
+  class ADynamicZoneInfo* DynamicZonesList;
   APlayerPawn* ReplicationTarget;
 
   int MaxCommonRadius;

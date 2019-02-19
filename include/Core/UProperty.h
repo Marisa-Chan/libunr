@@ -68,13 +68,17 @@ class DLL_EXPORT UProperty : public UField
   static u8 PropertySizes[8];
   
   virtual void Load();
+  virtual void GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal = 0 );
   u32 GetNativeOffset( const char* ClassName, const char* PropName );
 };
 
 class DLL_EXPORT UByteProperty : public UProperty
 {
   DECLARE_NATIVE_CLASS( UByteProperty, UProperty, CLASS_NoExport, Core )
+
   virtual void Load();
+  virtual void GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal = 0 );
+
   UEnum* Enum;
 };
 
@@ -82,24 +86,28 @@ class DLL_EXPORT UIntProperty : public UProperty
 {
   DECLARE_NATIVE_CLASS( UIntProperty, UProperty, CLASS_NoExport, Core )
   virtual void Load();
+  virtual void GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal = 0 );
 };
 
 class DLL_EXPORT UBoolProperty : public UProperty
 {
   DECLARE_NATIVE_CLASS( UBoolProperty, UProperty, CLASS_NoExport, Core )
   virtual void Load();
+  virtual void GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal = 0 );
 };
 
 class DLL_EXPORT UFloatProperty : public UProperty
 {
   DECLARE_NATIVE_CLASS( UFloatProperty, UProperty, CLASS_NoExport, Core )
   virtual void Load();
+  virtual void GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal = 0 );
 };
 
 class DLL_EXPORT UObjectProperty : public UProperty
 {
   DECLARE_NATIVE_CLASS( UObjectProperty, UProperty, CLASS_NoExport, Core )
   virtual void Load();
+  virtual void GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal = 0 );
   UClass* ObjectType;
 };
 
@@ -107,6 +115,7 @@ class DLL_EXPORT UNameProperty : public UProperty
 {
   DECLARE_NATIVE_CLASS( UNameProperty, UProperty, CLASS_NoExport, Core )
   virtual void Load();
+  virtual void GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal = 0 );
 };
 
 // ?
@@ -114,12 +123,14 @@ class DLL_EXPORT UStringProperty : public UProperty
 {
   DECLARE_NATIVE_CLASS( UStringProperty, UProperty, CLASS_NoExport, Core )
   virtual void Load();
+  virtual void GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal = 0 );
 };
 
 class DLL_EXPORT UClassProperty : public UObjectProperty
 {
   DECLARE_NATIVE_CLASS( UClassProperty, UObjectProperty, CLASS_NoExport, Core )
   virtual void Load();
+  virtual void GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal = 0 );
   UClass* ClassObj;
 };
 
@@ -127,6 +138,7 @@ class DLL_EXPORT UArrayProperty : public UProperty
 {
   DECLARE_NATIVE_CLASS( UArrayProperty, UProperty, CLASS_NoExport, Core )
   virtual void Load();
+  virtual void GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal = 0 );
   UProperty* Inner;
 };
 
@@ -134,6 +146,7 @@ class DLL_EXPORT UStructProperty : public UProperty
 {
   DECLARE_NATIVE_CLASS( UStructProperty, UProperty, CLASS_NoExport, Core )
   virtual void Load();
+  virtual void GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal = 0 );
   UStruct* Struct;
 };
 
@@ -141,6 +154,7 @@ class DLL_EXPORT UStrProperty : public UProperty
 {
   DECLARE_NATIVE_CLASS( UStrProperty, UProperty, CLASS_NoExport, Core )
   virtual void Load();
+  virtual void GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal = 0 );
   int Length;
 };
 
@@ -149,6 +163,7 @@ class DLL_EXPORT UMapProperty : public UProperty
 {
   DECLARE_NATIVE_CLASS( UMapProperty, UProperty, CLASS_NoExport, Core )
   virtual void Load();
+  virtual void GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal = 0 );
 };
 
 // ?
@@ -156,5 +171,6 @@ class DLL_EXPORT UFixedArrayProperty : public UProperty
 {
   DECLARE_NATIVE_CLASS( UFixedArrayProperty, UProperty, CLASS_NoExport, Core )
   virtual void Load();
+  virtual void GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal = 0 );
 };
 

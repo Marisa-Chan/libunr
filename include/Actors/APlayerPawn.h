@@ -53,7 +53,9 @@ class DLL_EXPORT APlayerPawn : public APawn
   FVector FlashFog;
 
   class AHUD* myHUD;
-  class AScoreBoard* ScoringType;
+  class AScoreBoard* Scoring;
+  UClass* HUDType;
+  UClass* ScoringType;
 
   float   DesiredFlashScale, ConstantGlowScale, InstantFlash;
   FVector DesiredFlashFog,   ConstantGlowFog,   InstantFog;
