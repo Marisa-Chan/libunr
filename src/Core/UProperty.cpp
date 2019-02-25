@@ -130,7 +130,12 @@ void UByteProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t
   u8 DefValCast = (u8)DefVal;
   u8 Val = Obj->GetProperty<u8>( this, Idx );
   if ( Val != DefValCast )
-    snprintf( Buf, BufSz, "%i", Val );
+  {
+    if ( Enum && Val < Enum->Names.Size() )
+      snprintf( Buf, BufSz, "%s", Enum->Names[Val] );
+    else
+      snprintf( Buf, BufSz, "%i", Val );
+  }
 }
 
 size_t UByteProperty::GetGenericValue( UObject* Obj, int Idx )
