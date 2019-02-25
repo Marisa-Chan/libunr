@@ -71,6 +71,15 @@ AInfo::~AInfo()
 {
 }
 
+ASavedMove::ASavedMove()
+  : AInfo()
+{
+}
+
+ASavedMove::~ASavedMove()
+{
+}
+
 AKeypoint::AKeypoint()
   : AActor()
 {
@@ -143,6 +152,7 @@ IMPLEMENT_NATIVE_CLASS( AKeypoint );
 IMPLEMENT_NATIVE_CLASS( ALight );
 IMPLEMENT_NATIVE_CLASS( AMenu );
 IMPLEMENT_NATIVE_CLASS( AProjectile );
+IMPLEMENT_NATIVE_CLASS( ASavedMove );
 IMPLEMENT_NATIVE_CLASS( ASpawnNotify );
 IMPLEMENT_NATIVE_CLASS( ATriggers );
 IMPLEMENT_NATIVE_CLASS( ATrigger );
@@ -196,6 +206,18 @@ BEGIN_PROPERTY_LINK( ASpawnNotify, 2 )
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( AInfo, 0 )
+END_PROPERTY_LINK()
+
+BEGIN_PROPERTY_LINK( ASavedMove, 9 )
+  LINK_NATIVE_PROPERTY( ASavedMove, NextMove );
+  LINK_NATIVE_PROPERTY( ASavedMove, TimeStamp );
+  LINK_NATIVE_PROPERTY( ASavedMove, Delta );
+  LINK_NATIVE_PROPERTY( ASavedMove, DodgeMove );
+  LINK_NATIVE_PROPERTY( ASavedMove, bRun );
+  LINK_NATIVE_PROPERTY( ASavedMove, bDuck );
+  LINK_NATIVE_PROPERTY( ASavedMove, bPressedJump );
+  LINK_NATIVE_PROPERTY( ASavedMove, bSent );
+  LINK_NATIVE_PROPERTY( ASavedMove, bIsReducedCrouch );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( AKeypoint, 0 )

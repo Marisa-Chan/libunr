@@ -216,6 +216,7 @@ bool UObject::StaticInit()
       Result &= AReplicationInfo::StaticClassInit();
         Result &= AGameReplicationInfo::StaticClassInit();
         Result &= APlayerReplicationInfo::StaticClassInit();
+      Result &= ASavedMove::StaticClassInit();
       Result &= AStatLog::StaticClassInit();
       Result &= AZoneInfo::StaticClassInit();
         Result &= ADynamicZoneInfo::StaticClassInit();

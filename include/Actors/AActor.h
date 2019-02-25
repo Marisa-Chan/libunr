@@ -553,6 +553,24 @@ class AInfo : public AActor
   AInfo();
 };
 
+class ASavedMove : public AInfo
+{
+  DECLARE_NATIVE_CLASS( ASavedMove, AInfo, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  ASavedMove();
+
+  class ASavedMove* NextMove;
+  float TimeStamp;
+  float Delta;
+  EDodgeDir DodgeMove;
+  bool bRun;
+  bool bDuck;
+  bool bPressedJump;
+  bool bSent;
+  bool bIsReducedCrouch;
+};
+
 class AKeypoint : public AActor
 {
   DECLARE_NATIVE_CLASS( AKeypoint, AActor, CLASS_Abstract, Engine )
