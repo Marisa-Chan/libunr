@@ -28,6 +28,12 @@
 #include "Core/FUtil.h"
 #include "Core/UPackage.h"
 
+// Floating point math functions
+inline bool FltEqual( float A, float B )
+{
+  return fabsf( A - B ) <= FLT_MIN;
+}
+
 struct FVector
 {
   float X;

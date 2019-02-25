@@ -79,6 +79,11 @@ void UProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t Def
   return;
 }
 
+size_t UProperty::GetGenericValue( UObject* Obj, int Idx )
+{
+  return MAX_SIZE;
+}
+
 u32 UProperty::GetNativeOffset( const char* ClassName, const char* PropName )
 {
   FNativePropertyList* NativePropList = NULL;
@@ -128,6 +133,11 @@ void UByteProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t
     snprintf( Buf, BufSz, "%i", Val );
 }
 
+size_t UByteProperty::GetGenericValue( UObject* Obj, int Idx )
+{
+  return (size_t)Obj->GetProperty<u8>( this, Idx );
+}
+
 void UIntProperty::Load()
 {
   Super::Load();
@@ -142,6 +152,11 @@ void UIntProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t 
     snprintf( Buf, BufSz, "%i", Val );
 }
 
+size_t UIntProperty::GetGenericValue( UObject* Obj, int Idx )
+{
+  return (size_t)Obj->GetProperty<int>( this, Idx );
+
+}
 void UBoolProperty::Load()
 {
   Super::Load();
@@ -156,6 +171,11 @@ void UBoolProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t
     snprintf( Buf, BufSz, "%s", Val ? "True" : "False" );
 }
 
+size_t UBoolProperty::GetGenericValue( UObject* Obj, int Idx )
+{
+  return (size_t)Obj->GetProperty<bool>( this, Idx );
+}
+
 void UFloatProperty::Load()
 {
   Super::Load();
@@ -164,10 +184,18 @@ void UFloatProperty::Load()
 
 void UFloatProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal )
 {
-  float DefValCast = (float)DefVal;
+  float DefValCast;
+  *(int*)&DefValCast = DefVal;
   float Val = Obj->GetProperty<float>( this, Idx );
-  if ( fabs( Val - DefValCast ) >= FLT_EPSILON )
+  if ( !FltEqual( Val, DefValCast ) )
     snprintf( Buf, BufSz, "%f", Val );
+}
+
+size_t UFloatProperty::GetGenericValue( UObject* Obj, int Idx )
+{
+  float Value = Obj->GetProperty<float>( this, Idx );
+  size_t GenericValue = *((size_t*)&Value);
+  return GenericValue;
 }
 
 void UNameProperty::Load()
@@ -184,10 +212,15 @@ void UNameProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t
     snprintf( Buf, BufSz, "\"%s\"", Val->Data );
 }
 
+size_t UNameProperty::GetGenericValue( UObject* Obj, int Idx )
+{
+  return (size_t)Obj->GetProperty<idx>( this, Idx );
+}
+
 void UStrProperty::Load()
 {
   Super::Load();
-  ElementSize = sizeof( char* );
+  ElementSize = sizeof( String* );
 }
 
 void UStrProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal )
@@ -196,6 +229,11 @@ void UStrProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t 
   String* Val = Obj->GetProperty<String*>( this, Idx );
   if ( Val && (DefValCast == NULL || *Val == *DefValCast) )
     snprintf( Buf, BufSz, "\"%s\"", Val->Data() );
+}
+
+size_t UStrProperty::GetGenericValue( UObject* Obj, int Idx )
+{
+  return (size_t)Obj->GetProperty<String*>( this, Idx );
 }
 
 void UStringProperty::Load()
@@ -209,6 +247,11 @@ void UStringProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size
   String* Val = Obj->GetProperty<String*>( this, Idx );
   if ( DefValCast == NULL || (Val && *Val == *DefValCast) )
     snprintf( Buf, BufSz, "\"%s\"", Val->Data() );
+}
+
+size_t UStringProperty::GetGenericValue( UObject* Obj, int Idx )
+{
+  return (size_t)Obj->GetProperty<String*>( this, Idx );
 }
 
 void UObjectProperty::Load()
@@ -229,6 +272,11 @@ void UObjectProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size
     snprintf( Buf, BufSz, "%s'%s.%s'", Val->Class->Name, Val->Pkg->Name, Val->Name );
 }
 
+size_t UObjectProperty::GetGenericValue( UObject* Obj, int Idx )
+{
+  return (size_t)Obj->GetProperty<UObject*>( this, Idx );
+}
+
 void UClassProperty::Load()
 {
   Super::Load();
@@ -245,6 +293,11 @@ void UClassProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_
   UClass* Val = Obj->GetProperty<UClass*>( this, Idx );
   if ( Val && Val != DefValCast )
     snprintf( Buf, BufSz, "Class'%s.%s'", Val->Pkg->Name, Val->Name );
+}
+
+size_t UClassProperty::GetGenericValue( UObject* Obj, int Idx )
+{
+  return (size_t)Obj->GetProperty<UClass*>( this, Idx );
 }
 
 void UStructProperty::Load()
@@ -300,6 +353,11 @@ void UStructProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size
   } */
 }
 
+size_t UStructProperty::GetGenericValue( UObject* Obj, int Idx )
+{
+  return (size_t)Obj->GetProperty<UStruct*>( this, Idx );
+}
+
 void UArrayProperty::Load()
 {
   Super::Load();
@@ -313,6 +371,12 @@ void UArrayProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_
 {
 }
 
+size_t UArrayProperty::GetGenericValue( UObject* Obj, int Idx )
+{
+  // Arrays are templated so we can't really deduce it's type here
+  return (size_t)Obj->GetProperty<void*>( this, Idx );
+}
+
 void UFixedArrayProperty::Load()
 {
   Super::Load();
@@ -324,6 +388,11 @@ void UFixedArrayProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, 
 {
 }
 
+size_t UFixedArrayProperty::GetGenericValue( UObject* Obj, int Idx )
+{
+  return MAX_SIZE-1;
+}
+
 void UMapProperty::Load()
 {
   Super::Load();
@@ -333,6 +402,11 @@ void UMapProperty::Load()
 
 void UMapProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal )
 {
+}
+
+size_t UMapProperty::GetGenericValue( UObject* Obj, int Idx )
+{
+  return MAX_SIZE-2;
 }
 
 UByteProperty::~UByteProperty()

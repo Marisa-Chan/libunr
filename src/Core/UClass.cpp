@@ -804,13 +804,13 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
       UProperty* PropIter = (UProperty*)Iter;
       for ( int i = 0; i < PropIter->ArrayDim; i++ )
       {
-        if ( LIKELY( !(PropIter->PropertyFlags & (CPF_Native|CPF_Const) ) ) )
+        if ( LIKELY( !(PropIter->PropertyFlags & CPF_Native) ) )
         {
           // Get default property from super class
           // Again, won't work on big endian...
           size_t DefValue = 0;
           if ( SuperClass != NULL && PropIter->Outer != this )
-            DefValue = SuperClass->Default->GetProperty<size_t>( PropIter, i );
+            DefValue = PropIter->GetGenericValue( SuperClass->Default, i );
 
           PropIter->GetText( ValueBuf, sizeof(ValueBuf), Default, i, DefValue );
 
