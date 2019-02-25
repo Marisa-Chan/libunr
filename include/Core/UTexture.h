@@ -191,7 +191,34 @@ class DLL_EXPORT UTexture : public UBitmap
   USound* HitSound;
 
   // Surface flags
+  bool bInvisible;
   bool bMasked;
+  bool bTransparent;
+  bool bNotSolid;
+  bool bEnvironment;
+  bool bSemisolid;
+  bool bModulate;
+  bool bFakeBackdrop;
+  bool bTwoSided;
+  bool bAutoUPan;
+  bool bAutoVPan;
+  bool bNoSmooth;
+  bool bBigWavy;
+  bool bSmallWavy;
+  bool bWaterWavy;
+  bool bLowShadowDetail;
+  bool bNoMerge;
+  bool bAlphaBlend;
+  bool bUseHeightMap;
+  bool bDirtyShadows;
+  bool bHighLedge;
+  bool bSpecialLit;
+  bool bGouraud;
+  bool bUnlit;
+  bool bHighShadowDetail;
+  bool bPortal;
+  bool bMirrored;
+  bool bX2, bX3, bX4, bX5, bX6, bX7;
 
   // Texture flags
   bool bHighColorQuality;

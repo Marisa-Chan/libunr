@@ -94,8 +94,8 @@ UTexture::UTexture()
   // USound* FootstepSound[6]
   // USound* HitSound;
   
-  bHighColorQuality = true;
-  bHighTextureQuality = true;
+  bHighColorQuality = false;
+  bHighTextureQuality = false;
   bRealtime = false;
   bParametric = false;
   bRealtimeChanged = false;
@@ -319,7 +319,7 @@ BEGIN_PROPERTY_LINK( UBitmap, 11 )
   LINK_NATIVE_ARRAY( UBitmap, InternalTime );
 END_PROPERTY_LINK()
 
-BEGIN_PROPERTY_LINK( UTexture, 33 )
+BEGIN_PROPERTY_LINK( UTexture, 65 )
   LINK_NATIVE_PROPERTY( UTexture, BumpMap );
   LINK_NATIVE_PROPERTY( UTexture, DetailTexture );
   LINK_NATIVE_PROPERTY( UTexture, MacroTexture );
@@ -331,7 +331,39 @@ BEGIN_PROPERTY_LINK( UTexture, 33 )
   LINK_NATIVE_PROPERTY( UTexture, MipMult );
   LINK_NATIVE_ARRAY   ( UTexture, FootstepSound );
   LINK_NATIVE_PROPERTY( UTexture, HitSound );
+  LINK_NATIVE_PROPERTY( UTexture, bInvisible );
   LINK_NATIVE_PROPERTY( UTexture, bMasked );
+  LINK_NATIVE_PROPERTY( UTexture, bTransparent );
+  LINK_NATIVE_PROPERTY( UTexture, bNotSolid );
+  LINK_NATIVE_PROPERTY( UTexture, bEnvironment );
+  LINK_NATIVE_PROPERTY( UTexture, bSemisolid );
+  LINK_NATIVE_PROPERTY( UTexture, bModulate );
+  LINK_NATIVE_PROPERTY( UTexture, bFakeBackdrop );
+  LINK_NATIVE_PROPERTY( UTexture, bTwoSided );
+  LINK_NATIVE_PROPERTY( UTexture, bAutoUPan );
+  LINK_NATIVE_PROPERTY( UTexture, bAutoVPan );
+  LINK_NATIVE_PROPERTY( UTexture, bNoSmooth );
+  LINK_NATIVE_PROPERTY( UTexture, bBigWavy );
+  LINK_NATIVE_PROPERTY( UTexture, bSmallWavy );
+  LINK_NATIVE_PROPERTY( UTexture, bWaterWavy );
+  LINK_NATIVE_PROPERTY( UTexture, bLowShadowDetail );
+  LINK_NATIVE_PROPERTY( UTexture, bNoMerge );
+  LINK_NATIVE_PROPERTY( UTexture, bAlphaBlend );
+  LINK_NATIVE_PROPERTY( UTexture, bUseHeightMap );
+  LINK_NATIVE_PROPERTY( UTexture, bDirtyShadows );
+  LINK_NATIVE_PROPERTY( UTexture, bHighLedge );
+  LINK_NATIVE_PROPERTY( UTexture, bSpecialLit );
+  LINK_NATIVE_PROPERTY( UTexture, bGouraud );
+  LINK_NATIVE_PROPERTY( UTexture, bUnlit );
+  LINK_NATIVE_PROPERTY( UTexture, bHighShadowDetail );
+  LINK_NATIVE_PROPERTY( UTexture, bPortal );
+  LINK_NATIVE_PROPERTY( UTexture, bMirrored );
+  LINK_NATIVE_PROPERTY( UTexture, bX2 );
+  LINK_NATIVE_PROPERTY( UTexture, bX3 );
+  LINK_NATIVE_PROPERTY( UTexture, bX4 );
+  LINK_NATIVE_PROPERTY( UTexture, bX5 );
+  LINK_NATIVE_PROPERTY( UTexture, bX6 );
+  LINK_NATIVE_PROPERTY( UTexture, bX7 );
   LINK_NATIVE_PROPERTY( UTexture, bHighColorQuality );
   LINK_NATIVE_PROPERTY( UTexture, bHighTextureQuality );
   LINK_NATIVE_PROPERTY( UTexture, bRealtime );
