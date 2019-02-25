@@ -122,6 +122,7 @@ set (SOURCES ${UNR_SRC}/Core/FConfig.cpp
              ${UNR_SRC}/Actors/AProjector.cpp
              ${UNR_SRC}/Actors/AReplicationInfo.cpp
              ${UNR_SRC}/Actors/AStatLog.cpp
+             ${UNR_SRC}/Actors/ATimeDemo.cpp
              ${UNR_SRC}/Actors/AWeapon.cpp
              ${UNR_SRC}/Actors/AZoneInfo.cpp
 

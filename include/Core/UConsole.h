@@ -49,6 +49,7 @@ class DLL_EXPORT UConsole : public UObject
   float MsgTime;
   String* MsgText[64];
   String* MsgPRINames[64];
+  idx MsgType[64];
   APlayerReplicationInfo* MsgPlayer[64];
   float MsgTick[64];
   int BorderSize;

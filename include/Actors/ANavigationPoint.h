@@ -79,6 +79,20 @@ class ANavigationPoint : public AActor
   bool bNoStrafeTo;
 };
 
+class ALiftExit : public ANavigationPoint
+{
+  DECLARE_NATIVE_CLASS( ALiftExit, ANavigationPoint, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  ALiftExit();
+
+  idx LiftTag;
+  class AMover* MyLift;
+  idx LiftTrigger;
+  class ATrigger* RecommendedTrigger;
+  float LastTriggerTime;
+};
+
 class APlayerStart : public ANavigationPoint
 {
   DECLARE_NATIVE_CLASS( APlayerStart, ANavigationPoint, 0, Engine )

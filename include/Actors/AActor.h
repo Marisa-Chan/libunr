@@ -520,8 +520,8 @@ class ADecoration : public AActor
   USound* PushSound;
   int     NumLandings;
   UClass* Contents;
-  UClass* Contents2;
-  UClass* Contents3;
+  UClass* Content2;
+  UClass* Content3;
   USound* EndPushSound;
 
   AActor* Shadow;

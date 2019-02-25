@@ -35,6 +35,15 @@ ANavigationPoint::~ANavigationPoint()
 {
 }
 
+ALiftExit::ALiftExit()
+  : ANavigationPoint()
+{
+}
+
+ALiftExit::~ALiftExit()
+{
+}
+
 APlayerStart::APlayerStart()
   : ANavigationPoint()
 {
@@ -54,6 +63,7 @@ ATeleporter::~ATeleporter()
 }
 
 IMPLEMENT_NATIVE_CLASS( ANavigationPoint );
+IMPLEMENT_NATIVE_CLASS( ALiftExit );
 IMPLEMENT_NATIVE_CLASS( APlayerStart );
 IMPLEMENT_NATIVE_CLASS( ATeleporter );
 
@@ -87,6 +97,14 @@ BEGIN_PROPERTY_LINK( ANavigationPoint, 30 )
   LINK_NATIVE_PROPERTY( ANavigationPoint, bOneWayPath );
   LINK_NATIVE_PROPERTY( ANavigationPoint, bAutoBuilt );
   LINK_NATIVE_PROPERTY( ANavigationPoint, bNoStrafeTo );
+END_PROPERTY_LINK()
+
+BEGIN_PROPERTY_LINK( ALiftExit, 5 )
+  LINK_NATIVE_PROPERTY( ALiftExit, LiftTag );
+  LINK_NATIVE_PROPERTY( ALiftExit, MyLift );
+  LINK_NATIVE_PROPERTY( ALiftExit, LiftTrigger );
+  LINK_NATIVE_PROPERTY( ALiftExit, RecommendedTrigger );
+  LINK_NATIVE_PROPERTY( ALiftExit, LastTriggerTime );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( APlayerStart, 4 )

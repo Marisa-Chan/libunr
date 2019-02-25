@@ -55,6 +55,7 @@
 #include "Actors/APlayerPawn.h"
 #include "Actors/AProjector.h"
 #include "Actors/AStatLog.h"
+#include "Actors/ATimeDemo.h"
 #include "Actors/AWeapon.h"
 #include "Actors/AZoneInfo.h"
 
@@ -218,6 +219,7 @@ bool UObject::StaticInit()
         Result &= APlayerReplicationInfo::StaticClassInit();
       Result &= ASavedMove::StaticClassInit();
       Result &= AStatLog::StaticClassInit();
+      Result &= ATimeDemo::StaticClassInit();
       Result &= AZoneInfo::StaticClassInit();
         Result &= ADynamicZoneInfo::StaticClassInit();
         Result &= ALevelInfo::StaticClassInit();
@@ -232,6 +234,7 @@ bool UObject::StaticInit()
     Result &= AMenu::StaticClassInit();
     Result &= ANavigationPoint::StaticClassInit();
       Result &= AInventorySpot::StaticClassInit();
+      Result &= ALiftExit::StaticClassInit();
       Result &= APlayerStart::StaticClassInit();
       Result &= ATeleporter::StaticClassInit();
     Result &= APawn::StaticClassInit();
@@ -254,7 +257,6 @@ bool UObject::StaticInit()
   IMPLEMENT_NATIVE_CLASS( UAnimationNotify );
   IMPLEMENT_NATIVE_CLASS( UCanvas );
   IMPLEMENT_NATIVE_CLASS( UClient );
-    IMPLEMENT_NATIVE_CLASS( UConsole );
   IMPLEMENT_NATIVE_CLASS( UField );
     IMPLEMENT_NATIVE_CLASS( UConst );
     IMPLEMENT_NATIVE_CLASS( UEnum );
@@ -299,50 +301,6 @@ BEGIN_PROPERTY_LINK( UAnimationNotify, 5 )
   LINK_NATIVE_PROPERTY( UAnimationNotify, bInitialized );
   LINK_NATIVE_PROPERTY( UAnimationNotify, bErrorOccured );
 END_PROPERTY_LINK()
-
-BEGIN_PROPERTY_LINK( UConsole, 40 )
-  LINK_NATIVE_PROPERTY( UConsole, vtblOut );
-  LINK_NATIVE_PROPERTY( UConsole, Viewport );
-  LINK_NATIVE_PROPERTY( UConsole, HistoryTop );
-  LINK_NATIVE_PROPERTY( UConsole, HistoryBot );
-  LINK_NATIVE_PROPERTY( UConsole, HistoryCur );
-  LINK_NATIVE_PROPERTY( UConsole, TypedStr );
-  LINK_NATIVE_ARRAY   ( UConsole, History );
-  LINK_NATIVE_PROPERTY( UConsole, Scrollback );
-  LINK_NATIVE_PROPERTY( UConsole, NumLines );
-  LINK_NATIVE_PROPERTY( UConsole, TopLine );
-  LINK_NATIVE_PROPERTY( UConsole, TextLines );
-  LINK_NATIVE_PROPERTY( UConsole, MsgTime );
-  LINK_NATIVE_ARRAY   ( UConsole, MsgText );
-  LINK_NATIVE_ARRAY   ( UConsole, MsgPRINames );
-  LINK_NATIVE_ARRAY   ( UConsole, MsgPlayer );
-  LINK_NATIVE_ARRAY   ( UConsole, MsgTick );
-  LINK_NATIVE_PROPERTY( UConsole, BorderSize );
-  LINK_NATIVE_PROPERTY( UConsole, ConsoleLines );
-  LINK_NATIVE_PROPERTY( UConsole, BorderLines );
-  LINK_NATIVE_PROPERTY( UConsole, BorderPixels );
-  LINK_NATIVE_PROPERTY( UConsole, ConsolePos );
-  LINK_NATIVE_PROPERTY( UConsole, ConsoleDest );
-  LINK_NATIVE_PROPERTY( UConsole, FrameX );
-  LINK_NATIVE_PROPERTY( UConsole, FrameY );
-  LINK_NATIVE_PROPERTY( UConsole, ConBackground );
-  LINK_NATIVE_PROPERTY( UConsole, Border );
-  LINK_NATIVE_PROPERTY( UConsole, bNoStuff );
-  LINK_NATIVE_PROPERTY( UConsole, bTyping );
-  LINK_NATIVE_PROPERTY( UConsole, bTimeDemo );
-  LINK_NATIVE_PROPERTY( UConsole, TimeDemo );
-  LINK_NATIVE_PROPERTY( UConsole, bNoDrawWorld );
-  LINK_NATIVE_PROPERTY( UConsole, TypingOffset );
-  LINK_NATIVE_PROPERTY( UConsole, GlobalConsoleKey );
-  LINK_NATIVE_PROPERTY( UConsole, GlobalWindowKey );
-  LINK_NATIVE_PROPERTY( UConsole, LoadingMessage );
-  LINK_NATIVE_PROPERTY( UConsole, SavingMessage );
-  LINK_NATIVE_PROPERTY( UConsole, ConnectingMessage );
-  LINK_NATIVE_PROPERTY( UConsole, PausedMessage );
-  LINK_NATIVE_PROPERTY( UConsole, PrecachingMessage );
-  LINK_NATIVE_PROPERTY( UConsole, bValidKeyEvent );
-END_PROPERTY_LINK()
-
 
 BEGIN_PROPERTY_LINK( USkeletalMeshInstance, 20 )
   LINK_NATIVE_PROPERTY( USkeletalMeshInstance, SpaceBases );

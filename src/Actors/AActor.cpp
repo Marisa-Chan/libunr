@@ -168,8 +168,8 @@ BEGIN_PROPERTY_LINK( ADecoration, 14 )
   LINK_NATIVE_PROPERTY( ADecoration, PushSound );
   LINK_NATIVE_PROPERTY( ADecoration, NumLandings );
   LINK_NATIVE_PROPERTY( ADecoration, Contents );
-  LINK_NATIVE_PROPERTY( ADecoration, Contents2 );
-  LINK_NATIVE_PROPERTY( ADecoration, Contents3 );
+  LINK_NATIVE_PROPERTY( ADecoration, Content2 );
+  LINK_NATIVE_PROPERTY( ADecoration, Content3 );
   LINK_NATIVE_PROPERTY( ADecoration, EndPushSound );
   LINK_NATIVE_PROPERTY( ADecoration, Shadow );
 END_PROPERTY_LINK()
