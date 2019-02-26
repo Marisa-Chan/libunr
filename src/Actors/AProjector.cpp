@@ -37,7 +37,7 @@ AProjector::~AProjector()
 
 IMPLEMENT_NATIVE_CLASS( AProjector );
 
-BEGIN_PROPERTY_LINK( AProjector, 17 )
+BEGIN_PROPERTY_LINK( AProjector, 19 )
   LINK_NATIVE_ARRAY   ( AProjector, FrustrumPlanes );
   LINK_NATIVE_PROPERTY( AProjector, DecalActors );
   LINK_NATIVE_PROPERTY( AProjector, DecalNodes );
@@ -45,6 +45,8 @@ BEGIN_PROPERTY_LINK( AProjector, 17 )
   LINK_NATIVE_ARRAY   ( AProjector, VisBox );
   LINK_NATIVE_PROPERTY( AProjector, TexData );
   LINK_NATIVE_PROPERTY( AProjector, ProjectTexture );
+  LINK_NATIVE_PROPERTY( AProjector, MaxDistance );
+  LINK_NATIVE_PROPERTY( AProjector, ProjectorScale );
   LINK_NATIVE_PROPERTY( AProjector, ProjectStyle );
   LINK_NATIVE_PROPERTY( AProjector, FOV );
   LINK_NATIVE_PROPERTY( AProjector, bProjectActors );
