@@ -572,7 +572,7 @@ void UStruct::Load()
   }
 
   // Calculate struct size
-  if ( LIKELY( !(Flags & RF_Native) ) )
+  if ( !(Flags & RF_Native) || StructSize == 0 )
   {
     if ( SuperField != NULL && SuperField->IsA( UStruct::StaticClass() ) )
       StructSize = ((UStruct*)SuperField)->StructSize;
@@ -585,7 +585,7 @@ void UStruct::Load()
         if ( !(Prop->PropertyFlags & CPF_Native) )
           Prop->Offset = StructSize;
 
-        StructSize += Prop->ElementSize;
+        StructSize += (Prop->ElementSize * Prop->ArrayDim);
       }
     }
   }
