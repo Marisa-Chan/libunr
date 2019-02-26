@@ -807,7 +807,6 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
         if ( LIKELY( !(PropIter->PropertyFlags & CPF_Native) ) )
         {
           // Get default property from super class
-          // Again, won't work on big endian...
           size_t DefValue = 0;
           if ( SuperClass != NULL && PropIter->Outer != this )
             DefValue = PropIter->GetGenericValue( SuperClass->Default, i );

@@ -318,11 +318,8 @@ void UStructProperty::Load()
 
 void UStructProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal )
 {
-/*  UObject* DefValCast = (UObject*)DefVal;
-  UObject* Val = Obj->GetProperty<UObject*>( this, Idx );
-  
-  UStruct* DefMem = DefValCast->GetProperty<UStruct*>( this, Idx );
-  UStruct* ValMem = Val->GetProperty<UStruct*>( this, Idx );
+  UStruct* DefMem = (UStruct*)DefMem;
+  UStruct* ValMem = Obj->GetProperty<UStruct*>( this, Idx );
 
   char InnerBuf[128] = { 0 };
 
@@ -335,27 +332,33 @@ void UStructProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size
       UProperty* Prop = (UProperty*)Iter;
       for ( int i = 0; i < Prop->ArrayDim; i++ )
       {
-        // This won't work on big endian...
-        size_t InnerDefVal = DefMem->GetProperty<size_t>( this, i );
+        size_t InnerDefVal = Prop->GetGenericValue( DefMem, i );
         Prop->GetText( InnerBuf, sizeof( InnerBuf ), ValMem, i, InnerDefVal );
 
+        int NameLen  = strlen( Prop->Name ) + 1;
         int InnerLen = strlen( InnerBuf ) + 1;
-        if ( UNLIKELY( InnerLen > BufSz ) )
+  
+        if ( InnerLen > 1 )
         {
-          Logf( LOG_WARN, "UStructProperty::GetText() truncated: Struct = '%s', Property = '%s'",
-              Name, Prop->Name );
-          return;
-        }
+          if ( UNLIKELY( (NameLen + InnerLen) > BufSz ) )
+          {
+            Logf( LOG_WARN, "UStructProperty::GetText() truncated: Struct = '%s', Property = '%s'",
+                Name, Prop->Name );
+            return;
+          }
 
-        strncat( Buf, InnerBuf, BufSz );
-        strncat( Buf, ",", BufSz );
-        Buf += InnerLen;
+          strncat( Buf, Prop->Name, BufSz );
+          strncat( Buf, "=", BufSz );
+          strncat( Buf, InnerBuf, BufSz );
+          strncat( Buf, ",", BufSz );
+          Buf += InnerLen;
+        }
       }
     }
     // Snip off the last comma
-    *Buf = '\0';
+    *--Buf = '\0';
     strncat( Buf, ")", BufSz );
-  } */
+  }
 }
 
 size_t UStructProperty::GetGenericValue( UObject* Obj, int Idx )
