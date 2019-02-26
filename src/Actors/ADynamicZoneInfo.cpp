@@ -37,3 +37,17 @@ ADynamicZoneInfo::~ADynamicZoneInfo()
 
 IMPLEMENT_NATIVE_CLASS( ADynamicZoneInfo );
 
+BEGIN_PROPERTY_LINK( ADynamicZoneInfo, 11 )
+  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, NextDynamicZone );
+  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, ZoneAreaType );
+  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, BoxMin );
+  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, BoxMax );
+  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, CylinderSize );
+  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, SphereSize );
+  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, MatchOnlyZone );
+  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, bUseRelativeToRotation );
+  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, bMovesForceTouchUpdate );
+  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, bUpdateTouchers );
+  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, OldPose );
+END_PROPERTY_LINK()
+
