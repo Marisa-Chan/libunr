@@ -842,7 +842,7 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
       }
     }
   }
-  Out->Write( (char*)"}\r\n\r\n", 5 );
+  Out->Write( (char*)"}\r\n", 3 );
 
   Out->Close();
   delete Out;
