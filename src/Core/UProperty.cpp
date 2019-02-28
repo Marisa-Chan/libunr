@@ -318,12 +318,12 @@ void UStructProperty::Load()
 
 void UStructProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal )
 {
-  UStruct* DefMem = (UStruct*)DefMem;
+  UStruct* DefMem = (UStruct*)DefVal;
   UStruct* ValMem = Obj->GetProperty<UStruct*>( this, Idx );
 
   char InnerBuf[128] = { 0 };
 
-  if ( !xstl::Compare( ValMem, DefMem, Struct->StructSize ) )
+  if ( DefMem == NULL || !xstl::Compare( ValMem, DefMem, Struct->StructSize ) )
   {
     strcat( Buf++, "(" );
     BufSz--;
@@ -332,7 +332,7 @@ void UStructProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size
       UProperty* Prop = (UProperty*)Iter;
       for ( int i = 0; i < Prop->ArrayDim; i++ )
       {
-        size_t InnerDefVal = Prop->GetGenericValue( DefMem, i );
+        size_t InnerDefVal = DefMem ? Prop->GetGenericValue( DefMem, i ) : 0;
         Prop->GetText( InnerBuf, sizeof( InnerBuf ), ValMem, i, InnerDefVal );
 
         int NameLen  = strlen( Prop->Name ) + 1;
