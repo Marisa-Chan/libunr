@@ -110,7 +110,7 @@ UTexture::UTexture()
   MaxFrameRate = 0.f;
   Accumulator = 0.f;
   
-  CompFormat = TEXF_P8;
+  DecompFormat = TEXF_P8;
 }
 
 UTexture::~UTexture()
@@ -319,7 +319,7 @@ BEGIN_PROPERTY_LINK( UBitmap, 11 )
   LINK_NATIVE_ARRAY( UBitmap, InternalTime );
 END_PROPERTY_LINK()
 
-BEGIN_PROPERTY_LINK( UTexture, 65 )
+BEGIN_PROPERTY_LINK( UTexture, 67 )
   LINK_NATIVE_PROPERTY( UTexture, BumpMap );
   LINK_NATIVE_PROPERTY( UTexture, DetailTexture );
   LINK_NATIVE_PROPERTY( UTexture, MacroTexture );
@@ -380,12 +380,13 @@ BEGIN_PROPERTY_LINK( UTexture, 65 )
   LINK_NATIVE_PROPERTY( UTexture, MaxFrameRate );
   LINK_NATIVE_PROPERTY( UTexture, Accumulator );
   LINK_NATIVE_PROPERTY( UTexture, Mips );
-  LINK_NATIVE_PROPERTY( UTexture, CompMips );
-  LINK_NATIVE_PROPERTY( UTexture, CompFormat );
+  LINK_NATIVE_PROPERTY( UTexture, DecompMips );
+  LINK_NATIVE_PROPERTY( UTexture, DecompFormat );
   LINK_NATIVE_PROPERTY( UTexture, SurfaceType );
   LINK_NATIVE_PROPERTY( UTexture, UClampMode );
   LINK_NATIVE_PROPERTY( UTexture, VClampMode );
   LINK_NATIVE_PROPERTY( UTexture, PaletteTransform );
+  LINK_NATIVE_PROPERTY( UTexture, TextureHandle );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( UScriptedTexture, 13 )

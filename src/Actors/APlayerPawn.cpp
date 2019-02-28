@@ -50,7 +50,7 @@ IMPLEMENT_NATIVE_CLASS( APlayerPawn );
 BEGIN_PROPERTY_LINK( ACamera, 0 )
 END_PROPERTY_LINK()
 
-BEGIN_PROPERTY_LINK( APlayerPawn, 152 )
+BEGIN_PROPERTY_LINK( APlayerPawn, 153 )
   LINK_NATIVE_PROPERTY( APlayerPawn, Player );
   LINK_NATIVE_PROPERTY( APlayerPawn, Password );
   LINK_NATIVE_PROPERTY( APlayerPawn, DodgeClickTimer );
@@ -64,6 +64,7 @@ BEGIN_PROPERTY_LINK( APlayerPawn, 152 )
   LINK_NATIVE_PROPERTY( APlayerPawn, ViewTarget );
   LINK_NATIVE_PROPERTY( APlayerPawn, FlashScale );
   LINK_NATIVE_PROPERTY( APlayerPawn, FlashFog );
+  LINK_NATIVE_PROPERTY( APlayerPawn, CurrentFlashFog );
   LINK_NATIVE_PROPERTY( APlayerPawn, myHUD );
   LINK_NATIVE_PROPERTY( APlayerPawn, Scoring );
   LINK_NATIVE_PROPERTY( APlayerPawn, HUDType );

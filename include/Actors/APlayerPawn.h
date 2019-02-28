@@ -51,6 +51,7 @@ class DLL_EXPORT APlayerPawn : public APawn
   AActor* ViewTarget;
   FVector FlashScale;
   FVector FlashFog;
+  FVector CurrentFlashFog;
 
   class AHUD* myHUD;
   class AScoreBoard* Scoring;

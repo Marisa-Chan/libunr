@@ -238,14 +238,15 @@ class DLL_EXPORT UTexture : public UBitmap
   float Accumulator;
   
   Array<FMipmap> Mips;
-  Array<FMipmap> CompMips;
-  ETextureFormat CompFormat;
+  Array<FMipmap> DecompMips;
+  ETextureFormat DecompFormat;
 
   ESurfaceType SurfaceType;
   EUClampMode  UClampMode;
   EVClampMode  VClampMode;
 
   FColor PaletteTransform;
+  void*  TextureHandle; // ???
   
   virtual void Load();
 };
