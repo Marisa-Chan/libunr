@@ -572,7 +572,7 @@ void UStruct::Load()
   }
 
   // Calculate struct size
-  if ( !(Flags & RF_Native) || StructSize == 0 )
+  if ( !(ObjectFlags & RF_Native) || StructSize == 0 )
   {
     if ( SuperField != NULL && SuperField->IsA( UStruct::StaticClass() ) )
       StructSize = ((UStruct*)SuperField)->StructSize;
@@ -802,6 +802,13 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
     if ( Iter->IsA( UProperty::StaticClass() ) )
     {
       UProperty* PropIter = (UProperty*)Iter;
+      if ( UNLIKELY( PropIter->Offset & 0x80000000 ) )
+      {
+        Logf( LOG_WARN, "Bad offset for property '%s' (Offset = %x)",
+              PropIter->Name, PropIter->Offset );
+        continue;
+      }
+
       for ( int i = 0; i < PropIter->ArrayDim; i++ )
       {
         if ( LIKELY( !(PropIter->PropertyFlags & CPF_Native) ) )
@@ -973,7 +980,7 @@ void UClass::PostLoad()
 bool UClass::IsNative()
 {
   // NOTE: this is NOT checking class flags
-  return (Flags & RF_Native) != 0;
+  return (ObjectFlags & RF_Native) != 0;
 }
 
 UObject* UClass::CreateObject()
