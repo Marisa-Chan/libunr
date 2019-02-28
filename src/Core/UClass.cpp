@@ -963,8 +963,9 @@ void UClass::PostLoad()
     if ( DefPropQueue.Front() == this )
     {
       UClass* QueuedClass;
-      while ( (QueuedClass = DefPropQueue.Front()) != NULL )
+      while ( DefPropQueue.Size() > 0 )
       {
+        QueuedClass = DefPropQueue.Front();
         int OldOffset = QueuedClass->Default->PkgFile->Tell();
         QueuedClass->Default->PkgFile->Seek( QueuedClass->DefPropListOffset, Begin );
         QueuedClass->Default->ReadDefaultProperties();
