@@ -321,12 +321,12 @@ void UStructProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size
   UStruct* DefMem = (UStruct*)DefVal;
   UStruct* ValMem = Obj->GetProperty<UStruct*>( this, Idx );
 
+  char* BufPtr = Buf;
   char InnerBuf[128] = { 0 };
 
+  // Check if it's worth writing anything at all
   if ( DefMem == NULL || !xstl::Compare( ValMem, DefMem, Struct->StructSize ) )
   {
-    strcat( Buf++, "(" );
-    BufSz--;
     for ( UField* Iter = Struct->Children; Iter != NULL; Iter = Iter->Next )
     {
       UProperty* Prop = SafeCast<UProperty>( Iter );
@@ -343,6 +343,14 @@ void UStructProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size
   
         if ( InnerLen > 1 )
         {
+          // Write the first parenthesis
+          if ( Buf[0] == '\0' )
+          {
+            strcat( BufPtr++, "(" );
+            BufSz--;
+          }
+
+          // Try not to buffer overflow
           if ( UNLIKELY( (NameLen + InnerLen) > BufSz ) )
           {
             Logf( LOG_WARN, "UStructProperty::GetText() truncated: Struct = '%s', Property = '%s'",
@@ -350,17 +358,23 @@ void UStructProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size
             return;
           }
 
-          strncat( Buf, Prop->Name, BufSz );
-          strncat( Buf, "=", BufSz );
-          strncat( Buf, InnerBuf, BufSz );
-          strncat( Buf, ",", BufSz );
-          Buf += InnerLen;
+          // Write text to buffer
+          strncat( BufPtr, Prop->Name, BufSz );
+          strncat( BufPtr, "=", BufSz );
+          strncat( BufPtr, InnerBuf, BufSz );
+          strncat( BufPtr, ",", BufSz );
+          BufPtr += NameLen + InnerLen;
+
+          InnerBuf[0] = '\0';
         }
       }
     }
-    // Snip off the last comma
-    *--Buf = '\0';
-    strncat( Buf, ")", BufSz );
+    // Snip off the last comma only if we actually wrote anything
+    if ( *Buf != '\0' )
+    {
+      *--BufPtr = '\0';
+      strncat( BufPtr, ")", BufSz );
+    }
   }
 }
 
