@@ -82,7 +82,7 @@ UObject* UObject::StaticConstructObject( const char* InName, UClass* InClass, UO
   Out->Index = ObjectPool->Size();
   Out->RefCnt = 1;
   Out->Outer = InOuter;
-  Out->Flags = InExport->ObjectFlags;
+  Out->ObjectFlags = InExport->ObjectFlags;
   Out->Class = InClass;
   Out->Field = InClass->Children;
  
@@ -125,7 +125,7 @@ UObject::UObject()
   Export = NULL;
   NameIdx = -1;
   NextObj = NULL;
-  Flags = 0;
+  ObjectFlags = 0;
   Outer = NULL;
   Class = NULL;
   Pkg = NULL;
@@ -153,7 +153,7 @@ void UObject::PreLoad()
 
 void UObject::Load()
 {
-  if ( Flags & RF_HasStack )
+  if ( ObjectFlags & RF_HasStack )
   {
     // Load stack info
     idx Node;
@@ -1270,7 +1270,7 @@ bool UObject::StaticLinkNativeProperties()
   {
     LINK_NATIVE_ARRAY( UObject, ObjectInternal );
     LINK_NATIVE_PROPERTY( UObject, Outer );
-    LINK_NATIVE_PROPERTY( UObject, Flags );
+    LINK_NATIVE_PROPERTY( UObject, ObjectFlags );
     LINK_NATIVE_PROPERTY( UObject, Name );
     LINK_NATIVE_PROPERTY( UObject, Class );
     return true;

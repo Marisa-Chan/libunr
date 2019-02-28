@@ -67,7 +67,7 @@ void UProperty::Load()
   if ( PropertyFlags & CPF_Net )
     *PkgFile >> ReplicationOffset;
   
-  if ( Outer->Flags & RF_Native )
+  if ( Outer->ObjectFlags & RF_Native )
     Offset = GetNativeOffset( Outer->Name, Name );
 
   if ( Outer->Class == UClass::StaticClass() && PropertyFlags & CPF_GlobalConfig )
@@ -329,7 +329,10 @@ void UStructProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size
     BufSz--;
     for ( UField* Iter = Struct->Children; Iter != NULL; Iter = Iter->Next )
     {
-      UProperty* Prop = (UProperty*)Iter;
+      UProperty* Prop = SafeCast<UProperty>( Iter );
+      if ( UNLIKELY( Prop == NULL ) )
+        continue; 
+
       for ( int i = 0; i < Prop->ArrayDim; i++ )
       {
         size_t InnerDefVal = DefMem ? Prop->GetGenericValue( DefMem, i ) : 0;

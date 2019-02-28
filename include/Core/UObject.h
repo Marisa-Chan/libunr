@@ -322,7 +322,7 @@ public: \
     } \
     ObjectClass->Export = ObjectClass->Pkg->GetClassExport( ObjectClass->Name ); \
     ObjectClass->Export->Obj = ObjectClass; \
-    ObjectClass->Flags = ObjectClass->Export->ObjectFlags; \
+    ObjectClass->ObjectFlags = ObjectClass->Export->ObjectFlags; \
     return true; \
   }
  
@@ -367,7 +367,7 @@ bool cls::StaticLinkNativeProperties() \
     ExpProp->Next = ExpCls->Children; \
     ExpProp->Name = TEXT( prop ); \
     ExpProp->Hash = FnvHashString( ExpProp->Name ); \
-    ExpProp->Flags = RF_Native; \
+    ExpProp->ObjectFlags = RF_Native; \
     ExpProp->RefCnt = 1; \
     ExpProp->Class = ptype::StaticClass(); \
     ObjectPool->PushBack( ExpProp ); \
@@ -445,7 +445,7 @@ public:
   UPackage*   Pkg;      // Package this object was loaded from
   FExport*    Export;   // Export struct from the package of this object
   UObject*    Outer;    // Object that this object resides in
-  u32         Flags;    // Object flags
+  u32         ObjectFlags;
   UClass*     Class;    // Class of this object
   UField*     Field;    // All fields relevant to this object (points to Class->Children)
   FPackageFileIn* PkgFile; // Only relevant when loading
