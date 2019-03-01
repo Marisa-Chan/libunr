@@ -74,7 +74,7 @@ void UProperty::Load()
     GlobalClass = (UClass*)Outer;
 }
 
-void UProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal )
+void UProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
 {
   return;
 }
@@ -125,7 +125,7 @@ void UByteProperty::Load()
   ElementSize = 1;
 }
 
-void UByteProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal )
+void UByteProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
 {
   u8 DefValCast = (u8)DefVal;
   u8 Val = Obj->GetProperty<u8>( this, Idx );
@@ -149,7 +149,7 @@ void UIntProperty::Load()
   ElementSize = 4;
 }
 
-void UIntProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal )
+void UIntProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
 {
   int DefValCast = (int)DefVal;
   int Val = Obj->GetProperty<int>( this, Idx );
@@ -168,7 +168,7 @@ void UBoolProperty::Load()
   ElementSize = sizeof( bool );
 }
 
-void UBoolProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal )
+void UBoolProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
 {
   bool DefValCast = (DefVal & 0xFF) ? true : false;
   bool Val = Obj->GetProperty<bool>( this, Idx );
@@ -187,7 +187,7 @@ void UFloatProperty::Load()
   ElementSize = 4;
 }
 
-void UFloatProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal )
+void UFloatProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
 {
   float DefValCast;
   *(int*)&DefValCast = DefVal;
@@ -209,10 +209,11 @@ void UNameProperty::Load()
   ElementSize = 4;
 }
 
-void UNameProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal )
+void UNameProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
 {
-  FNameEntry* DefValCast = Pkg->GetNameEntry( (idx)DefVal );
-  FNameEntry* Val = Pkg->GetNameEntry( Obj->GetProperty<idx>( this, Idx ) );
+  idx ValIdx = Obj->GetProperty<idx>( this, Idx );
+  FNameEntry* DefValCast = Package->GetNameEntry( DefVal );
+  FNameEntry* Val = Package->GetNameEntry( ValIdx );
   if ( Val->Hash != DefValCast->Hash )
     snprintf( Buf, BufSz, "\"%s\"", Val->Data );
 }
@@ -228,7 +229,7 @@ void UStrProperty::Load()
   ElementSize = sizeof( String* );
 }
 
-void UStrProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal )
+void UStrProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
 {
   String* DefValCast = (String*)DefVal;
   String* Val = Obj->GetProperty<String*>( this, Idx );
@@ -246,7 +247,7 @@ void UStringProperty::Load()
   Super::Load();
 }
 
-void UStringProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal )
+void UStringProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
 {
   String* DefValCast = (String*)DefVal;
   String* Val = Obj->GetProperty<String*>( this, Idx );
@@ -269,7 +270,7 @@ void UObjectProperty::Load()
   ObjectType = (UClass*)LoadObject( ObjTypeIdx, UClass::StaticClass(), Outer );
 }
 
-void UObjectProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal )
+void UObjectProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
 {
   UObject* DefValCast = (UObject*)DefVal;
   UObject* Val = Obj->GetProperty<UObject*>( this, Idx );
@@ -292,7 +293,7 @@ void UClassProperty::Load()
   ClassObj = (UClass*)LoadObject( ClassIdx, UClass::StaticClass(), Outer );
 }
 
-void UClassProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal )
+void UClassProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
 {
   UClass* DefValCast = (UClass*)DefVal;
   UClass* Val = Obj->GetProperty<UClass*>( this, Idx );
@@ -316,7 +317,7 @@ void UStructProperty::Load()
   ElementSize = Struct->StructSize;
 }
 
-void UStructProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal )
+void UStructProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
 {
   UStruct* DefMem = (UStruct*)DefVal;
   UStruct* ValMem = Obj->GetProperty<UStruct*>( this, Idx );
@@ -336,7 +337,7 @@ void UStructProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size
       for ( int i = 0; i < Prop->ArrayDim; i++ )
       {
         size_t InnerDefVal = DefMem ? Prop->GetGenericValue( DefMem, i ) : 0;
-        Prop->GetText( InnerBuf, sizeof( InnerBuf ), ValMem, i, InnerDefVal );
+        Prop->GetText( InnerBuf, sizeof( InnerBuf ), ValMem, i, InnerDefVal, Obj->Pkg );
 
         int NameLen  = strlen( Prop->Name ) + 1;
         int InnerLen = strlen( InnerBuf ) + 1;
@@ -392,7 +393,7 @@ void UArrayProperty::Load()
   Inner = (UProperty*)LoadObject( InnerIdx, NULL, Outer );
 }
 
-void UArrayProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal )
+void UArrayProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
 {
 }
 
@@ -409,7 +410,7 @@ void UFixedArrayProperty::Load()
   exit( -1 ); // <- can we not do this
 }
 
-void UFixedArrayProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal )
+void UFixedArrayProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
 {
 }
 
@@ -425,7 +426,7 @@ void UMapProperty::Load()
   exit( -1 ); // <- can we not do this
 }
 
-void UMapProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal )
+void UMapProperty::GetText( char* Buf, int BufSz, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
 {
 }
 

@@ -818,7 +818,7 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
           if ( SuperClass != NULL && PropIter->Outer != this )
             DefValue = PropIter->GetGenericValue( SuperClass->Default, i );
 
-          PropIter->GetText( ValueBuf, sizeof(ValueBuf), Default, i, DefValue );
+          PropIter->GetText( ValueBuf, sizeof(ValueBuf), Default, i, DefValue, Pkg );
 
           if ( ValueBuf[0] != '\0' )
           {
