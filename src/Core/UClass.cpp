@@ -583,8 +583,18 @@ void UStruct::Load()
       {
         UProperty* Prop = (UProperty*)ChildIter;
         if ( !(Prop->PropertyFlags & CPF_Native) )
-          Prop->Offset = StructSize;
+        {
+          // UPak.SpaceMarine has this cool thing where the struct MarineSound
+          // contains a variable of type SpaceMarine, the class actually being loaded.
+          // Because of that, the struct doesn't finish loading until it gets to this
+          // point, but the struct property VoiceList will have an element size of 0.
+          // As a result, SaluteTarget and VoiceList end up having the same Offset value.
+          // Needless to say, this causes problems when accessing both variables.
+          if ( Prop->Class == UStructProperty::StaticClass() )
+            Prop->ElementSize = ((UStructProperty*)Prop)->Struct->StructSize;
 
+          Prop->Offset = StructSize;
+        }
         StructSize += (Prop->ElementSize * Prop->ArrayDim);
       }
     }
@@ -879,7 +889,7 @@ void UClass::Load()
     *PkgFile >> Dep.Deep;
     *PkgFile >> Dep.ScriptTextCRC;
     
-    Dependencies.PushBack( Dep );
+    //Dependencies.PushBack( Dep );
   }
   
   // I don't actually know what these are for
