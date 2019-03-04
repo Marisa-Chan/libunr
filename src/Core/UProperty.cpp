@@ -406,23 +406,43 @@ void UArrayProperty::Load()
 
 void UArrayProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
 {
-/*  Array<u8>* DefGenericArray = (Array<u8>*)DefVal;
   Array<u8>* GenericArray = (Array<u8>*)GetGenericValue( Obj, Idx );
- 
-  // We're gonna have to cheat the system a bit by writing all values like they're properties
-  // since dynamic arrays are written in that way
+  if ( GenericArray == NULL )
+    return;
+
+  // Since dynamic arrays have their values printed one per line, but technically count
+  // as one property themselves, we have to cheat by writing the name and value for
+  // each value that is different
+  String InnerBuf;
+  Array<u8>* DefGenericArray = (Array<u8>*)DefVal;
   for ( size_t i = 0; i < GenericArray->Size() && i != MAX_SIZE; i++ )
   {
-    size_t* DefValAddr = (size_t*)PtrAdd( DefGenericArray->Data(), Inner->ElementSize*i );
-    size_t* ValAddr    = (size_t*)PtrAdd( GenericArray->Data(), Inner->ElementSize*i );
+    size_t DefValArray = 0;
+    if ( i < DefGenericArray->Size() )
+      DefValArray = *(size_t*)PtrAdd( DefGenericArray->Data(), Inner->ElementSize*i );
 
-    Inner->GetText( InnerBuf, ValAddr, 0, *DefValAddr, Package );
+    size_t* ValAddr = (size_t*)PtrAdd( GenericArray->Data(), Inner->ElementSize*i );
+
+    Inner->GetText( InnerBuf, (UObject*)ValAddr, 0, DefValArray, Package );
     if ( InnerBuf.Length() > 0 )
     {
-      InnerBuf
+      Buf += '\t';
+      Buf += Name;
+      if ( ArrayDim > 1 )
+      {
+        Buf += '[';
+        Buf += String( Idx );
+        Buf += ']';
+      }
+      Buf += '(';
+      Buf += String( (u64)i );
+      Buf += ")=";
+      Buf += InnerBuf;
+      Buf += "\r\n";
+      
+      InnerBuf.Erase();
     }
   }
-  */
 }
 
 size_t UArrayProperty::GetGenericValue( UObject* Obj, int Idx )
