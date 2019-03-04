@@ -804,7 +804,7 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
   Out->Write( ScriptText->Text->Data(), ScriptText->Text->Size() );
 
   // Write default properties
-  char ValueBuf[512] = { 0 };
+  String ValueBuf;
   String DefProp;
   Out->Write( (char*)"defaultproperties\r\n{\r\n", 22 );
   for ( UField* Iter = Default->Field; Iter != NULL; Iter = Iter->Next )
@@ -828,9 +828,9 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
           if ( SuperClass != NULL && PropIter->Outer != this )
             DefValue = PropIter->GetGenericValue( SuperClass->Default, i );
 
-          PropIter->GetText( ValueBuf, sizeof(ValueBuf), Default, i, DefValue, Pkg );
+          PropIter->GetText( ValueBuf, Default, i, DefValue, Pkg );
 
-          if ( ValueBuf[0] != '\0' )
+          if ( ValueBuf.Length() > 0 )
           {
             DefProp += '\t';
             DefProp += PropIter->Name;
@@ -844,9 +844,9 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
             DefProp += ValueBuf;
             DefProp += "\r\n";
 
-            Out->Write( DefProp.Data(), DefProp.Size() );
+            Out->Write( DefProp.Data(), DefProp.Length() );
             DefProp.Erase();
-            ValueBuf[0] = '\0';
+            ValueBuf.Erase();
           }
         }
       }
