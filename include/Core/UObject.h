@@ -438,7 +438,7 @@ public:
   static Array<UFunction*>* NativeFunctions;
 
   FHash       Hash;     // Hash of this object
-  const char* Name;     // Name of this object
+  const char* Name;     // Name of this object (This type does not match script by design)
   int         Index;    // Index of the object in object pool
   idx         NameIdx;  // Name index in the packages name table
   UObject*    NextObj;  // The next object in the list

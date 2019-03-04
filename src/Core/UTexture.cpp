@@ -58,15 +58,6 @@ void UPalette::Load()
 UBitmap::UBitmap()
   : UObject()
 {
-  Format = TEXF_P8;
-  UBits = 0;
-  VBits = 0;
-  USize = 0;
-  VSize = 0;
-  UClamp = 0;
-  VClamp = 0;
-  InternalTime[0] = 0;
-  InternalTime[1] = 0;
 }
 
 UBitmap::~UBitmap()
@@ -80,37 +71,6 @@ void UBitmap::Load()
 UTexture::UTexture()
   : UBitmap()
 {
-  BumpMap = NULL;
-  DetailTexture = NULL;
-  MacroTexture = NULL;
-  
-  Diffuse   = 1.f;
-  Specular  = 0.f;
-  Alpha     = 0.f;
-  DrawScale = 1.f;
-  Friction  = 0.f;
-  MipMult   = 1.f;
-  
-  // USound* FootstepSound[6]
-  // USound* HitSound;
-  
-  bHighColorQuality = false;
-  bHighTextureQuality = false;
-  bRealtime = false;
-  bParametric = false;
-  bRealtimeChanged = false;
-  bHasComp = false;
-  bFractical = false;
-  
-  AnimNext = NULL;
-  AnimCurrent = NULL;
-  PrimeCount = 0;
-  PrimeCurrent = 0;
-  MinFrameRate = 0.f;
-  MaxFrameRate = 0.f;
-  Accumulator = 0.f;
-  
-  DecompFormat = TEXF_P8;
 }
 
 UTexture::~UTexture()
