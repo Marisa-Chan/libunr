@@ -47,3 +47,41 @@ class UNetDriver : public USubsystem
   // TODO:
 };
 
+class USecurityData : public UObject
+{
+  DECLARE_NATIVE_CLASS( USecurityData, UObject, CLASS_Config, Engine )
+  USecurityData();
+
+  struct BanEntry
+  {
+    String* ClientIP;
+    String* ClientName;
+    String* ClientID;
+    String* ClientIdentNr;
+    int IPStart;
+    int IPEnd;
+  };
+
+  struct TempBanEntry
+  {
+    String* ClientName;
+    String* ClientID;
+    String* ClientIdentNr;
+    int IPAddress;
+  };
+
+  struct ClientLogEntry
+  {
+    String* PlayerNames;
+    String* PlayerIP;
+    String* ClientID;
+    String* ClientIdentNr;
+    int IPAddress;
+  };
+
+  Array<BanEntry>* BanList;
+  Array<TempBanEntry> TempBanEntry;
+  Array<ClientLogEntry> LogList;
+  int MaxIPLogLen;
+};
+
