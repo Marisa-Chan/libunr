@@ -546,6 +546,12 @@ void UStruct::Load()
   if ( UNLIKELY( !bLoading ) )
     return;
 
+  if ( !(ObjectFlags & RF_Native) || StructSize == 0 )
+  {
+    if ( SuperField != NULL && SuperField->IsA( UStruct::StaticClass() ) )
+      StructSize = ((UStruct*)SuperField)->StructSize;
+  }
+
   idx ScriptTextIdx = MAX_UINT32;
   idx ChildIdx = MAX_UINT32;
   idx FriendlyNameIdx = MAX_UINT32;
@@ -574,9 +580,6 @@ void UStruct::Load()
   // Calculate struct size
   if ( !(ObjectFlags & RF_Native) || StructSize == 0 )
   {
-    if ( SuperField != NULL && SuperField->IsA( UStruct::StaticClass() ) )
-      StructSize = ((UStruct*)SuperField)->StructSize;
-
     for ( UField* ChildIter = Children; ChildIter != NULL; ChildIter = ChildIter->Next )
     {
       if ( ChildIter->IsA( UProperty::StaticClass() ) )

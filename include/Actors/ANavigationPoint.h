@@ -93,6 +93,10 @@ class ALiftExit : public ANavigationPoint
   float LastTriggerTime;
 };
 
+class ALiftCenter : public ANavigationPoint
+{
+};
+
 class APlayerStart : public ANavigationPoint
 {
   DECLARE_NATIVE_CLASS( APlayerStart, ANavigationPoint, 0, Engine )
