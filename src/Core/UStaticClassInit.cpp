@@ -199,6 +199,7 @@ bool UObject::StaticInit()
   Result &= URenderBase::StaticClassInit();
   Result &= URenderDevice::StaticClassInit();
   Result &= URenderIterator::StaticClassInit();
+  Result &= USecurityData::StaticClassInit();
   Result &= USkeletalMeshInstance::StaticClassInit();
   Result &= UVectors::StaticClassInit();
   Result &= UVerts::StaticClassInit();
@@ -280,7 +281,6 @@ bool UObject::StaticInit()
         IMPLEMENT_NATIVE_CLASS( UClass );
   IMPLEMENT_NATIVE_CLASS( ULanguage );
   IMPLEMENT_NATIVE_CLASS( UMusic );
-  IMPLEMENT_NATIVE_CLASS( UNetConnection );
   IMPLEMENT_NATIVE_CLASS( UPackage );
   IMPLEMENT_NATIVE_CLASS( UPlayer );
     IMPLEMENT_NATIVE_CLASS( UViewport );
@@ -290,8 +290,7 @@ bool UObject::StaticInit()
     IMPLEMENT_NATIVE_CLASS( USubsystem );
     IMPLEMENT_NATIVE_CLASS( UAudioSubsystem );
     IMPLEMENT_NATIVE_CLASS( UEngine );
-    IMPLEMENT_NATIVE_CLASS( UNetDriver );
-        IMPLEMENT_NATIVE_CLASS( USystem );
+    IMPLEMENT_NATIVE_CLASS( USystem );
   IMPLEMENT_NATIVE_CLASS( UTextBuffer );
  
 BEGIN_PROPERTY_LINK( UAnimationNotify, 5 )

@@ -833,7 +833,10 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
           if ( PropIter->Class == UArrayProperty::StaticClass() )
           {
             if ( ValueBuf.Length() > 0 )
+            {
               Out->Write( ValueBuf.Data(), ValueBuf.Length() );
+              ValueBuf.Erase();
+            }
             
             continue;
           }

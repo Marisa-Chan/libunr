@@ -406,7 +406,7 @@ void UArrayProperty::Load()
 
 void UArrayProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
 {
-  Array<u8>* GenericArray = (Array<u8>*)GetGenericValue( Obj, Idx );
+  ArrayNoType* GenericArray = (ArrayNoType*)GetGenericValue( Obj, Idx );
   if ( GenericArray == NULL )
     return;
 
@@ -414,11 +414,13 @@ void UArrayProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal,
   // as one property themselves, we have to cheat by writing the name and value for
   // each value that is different
   String InnerBuf;
-  Array<u8>* DefGenericArray = (Array<u8>*)DefVal;
-  for ( size_t i = 0; i < GenericArray->Size() && i != MAX_SIZE; i++ )
+  ArrayNoType* DefGenericArray = (ArrayNoType*)DefVal;
+
+  size_t Num = GenericArray->CountElements( Inner->ElementSize );
+  for ( size_t i = 0; i < Num && i != MAX_SIZE; i++ )
   {
     size_t DefValArray = 0;
-    if ( i < DefGenericArray->Size() )
+    if ( DefGenericArray && i < DefGenericArray->Size() )
       DefValArray = *(size_t*)PtrAdd( DefGenericArray->Data(), Inner->ElementSize*i );
 
     size_t* ValAddr = (size_t*)PtrAdd( GenericArray->Data(), Inner->ElementSize*i );

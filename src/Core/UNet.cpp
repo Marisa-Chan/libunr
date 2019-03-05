@@ -23,6 +23,8 @@
  *========================================================================
 */
 
+#include "Core/UPackage.h"
+#include "Core/UClass.h"
 #include "Core/UNet.h"
 
 UNetConnection::UNetConnection()
@@ -42,4 +44,24 @@ UNetDriver::UNetDriver()
 UNetDriver::~UNetDriver()
 {
 }
+
+USecurityData::USecurityData()
+  : UObject()
+{
+}
+
+USecurityData::~USecurityData()
+{
+}
+
+IMPLEMENT_NATIVE_CLASS( UNetConnection );
+IMPLEMENT_NATIVE_CLASS( UNetDriver );
+IMPLEMENT_NATIVE_CLASS( USecurityData );
+
+BEGIN_PROPERTY_LINK( USecurityData, 4 )
+  LINK_NATIVE_PROPERTY( USecurityData, BanList );
+  LINK_NATIVE_PROPERTY( USecurityData, TempBanList );
+  LINK_NATIVE_PROPERTY( USecurityData, LogList );
+  LINK_NATIVE_PROPERTY( USecurityData, MaxIPLogLen );
+END_PROPERTY_LINK()
 

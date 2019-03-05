@@ -50,6 +50,7 @@ class UNetDriver : public USubsystem
 class USecurityData : public UObject
 {
   DECLARE_NATIVE_CLASS( USecurityData, UObject, CLASS_Config, Engine )
+  EXPOSE_TO_USCRIPT()
   USecurityData();
 
   struct BanEntry
@@ -80,8 +81,8 @@ class USecurityData : public UObject
   };
 
   Array<BanEntry>* BanList;
-  Array<TempBanEntry> TempBanEntry;
-  Array<ClientLogEntry> LogList;
+  Array<TempBanEntry>* TempBanList;
+  Array<ClientLogEntry>* LogList;
   int MaxIPLogLen;
 };
 
