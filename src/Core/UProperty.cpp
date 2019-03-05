@@ -416,16 +416,16 @@ void UArrayProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal,
   String InnerBuf;
   ArrayNoType* DefGenericArray = (ArrayNoType*)DefVal;
 
-  size_t Num = GenericArray->CountElements( Inner->ElementSize );
+  size_t Num = GenericArray->Size();
   for ( size_t i = 0; i < Num && i != MAX_SIZE; i++ )
   {
-    size_t DefValArray = 0;
+    void* DefValAddr = 0;
     if ( DefGenericArray && i < DefGenericArray->Size() )
-      DefValArray = *(size_t*)PtrAdd( DefGenericArray->Data(), Inner->ElementSize*i );
+      DefValAddr = (*DefGenericArray)[i];
 
-    size_t* ValAddr = (size_t*)PtrAdd( GenericArray->Data(), Inner->ElementSize*i );
+    void* ValAddr = (*GenericArray)[i];
 
-    Inner->GetText( InnerBuf, (UObject*)ValAddr, 0, DefValArray, Package );
+    Inner->GetText( InnerBuf, (UObject*)ValAddr, 0, (size_t)DefValAddr, Package );
     if ( InnerBuf.Length() > 0 )
     {
       Buf += '\t';
