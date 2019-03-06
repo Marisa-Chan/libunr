@@ -228,7 +228,7 @@ public: \
   } \
   void* operator new( size_t sz, size_t ObjSize ) \
   { \
-    void* Mem = xstl::Malloc( sz + ObjSize ); \
+    void* Mem = xstl::Malloc( ObjSize ); \
     xstl::Set( Mem, 0, ObjSize ); \
     return Mem; \
   } \
