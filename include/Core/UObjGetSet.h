@@ -128,26 +128,28 @@ template<class T> inline
 void UObject::SetArrayProperty( UArrayProperty* Prop, FPackageFileIn* In, int Idx,
   u8 ByteSize, u8 NumElem )
 {
-  Array<T>* ArrayAddr = GetProperty<Array<T>*>( Prop, Idx );
-  ArrayAddr->Reserve( NumElem );
+  Array<T>* Arr = new Array<T>();
+  Arr->Reserve( NumElem );
 
   while ( ByteSize && NumElem )
   {
     T Value;
     *In >> Value;
-    ArrayAddr->PushBack( Value );
+    Arr->PushBack( Value );
 
     NumElem--;
     ByteSize -= sizeof(T);
   }
+
+  *GetPropAddr<Array<T>*>( this, Prop, Idx ) = Arr;
 }
 
 template<> inline
 void UObject::SetArrayProperty<bool>( UArrayProperty* Prop, FPackageFileIn* In, int Idx,
   u8 ByteSize, u8 NumElem )
 {
-  Array<bool>* ArrayAddr = GetProperty<Array<bool>*>( Prop, Idx );
-  ArrayAddr->Reserve( NumElem );
+  Array<bool>* Arr = new Array<bool>();
+  Arr->Reserve( NumElem );
 
   while ( ByteSize && NumElem )
   {
@@ -156,37 +158,41 @@ void UObject::SetArrayProperty<bool>( UArrayProperty* Prop, FPackageFileIn* In, 
     *In >> Value;
 
     bValue = Value;
-    ArrayAddr->PushBack( bValue );
+    Arr->PushBack( bValue );
 
     NumElem--;
     ByteSize -= sizeof(idx);
   }
+
+  *GetPropAddr<Array<bool>*>( this, Prop, Idx ) = Arr;
 }
 
 template<> inline
 void UObject::SetArrayProperty<idx>( UArrayProperty* Prop, FPackageFileIn* In, int Idx,
   u8 ByteSize, u8 NumElem )
 {
-  Array<idx>* ArrayAddr = GetProperty<Array<idx>*>( Prop, Idx );
-  ArrayAddr->Reserve( NumElem );
+  Array<idx>* Arr = new Array<idx>();
+  Arr->Reserve( NumElem );
 
   while ( ByteSize && NumElem )
   {
     idx Value;
     *In >> CINDEX( Value );
-    ArrayAddr->PushBack( Value );
+    Arr->PushBack( Value );
 
     NumElem--;
     ByteSize -= sizeof(idx);
   }
+
+  *GetPropAddr<Array<idx>*>( this, Prop, Idx ) = Arr;
 }
 
 template<> inline
 void UObject::SetArrayProperty<String*>( UArrayProperty* Prop, FPackageFileIn* In, int Idx,
   u8 ByteSize, u8 NumElem )
 {
-  Array<String*>* ArrayAddr = GetProperty<Array<String*>*>( Prop, Idx );
-  ArrayAddr->Reserve( NumElem );
+  Array<String*>* Arr = new Array<String*>();  
+  Arr->Reserve( NumElem );
 
   // TODO: Properly check ByteSize
   while ( NumElem )
@@ -199,8 +205,10 @@ void UObject::SetArrayProperty<String*>( UArrayProperty* Prop, FPackageFileIn* I
     Str->Resize( StringLength );
 
     In->Read( Str->Data(), StringLength );
-    ArrayAddr->PushBack( Str );
+    Arr->PushBack( Str );
     NumElem--;
   }
+
+  *GetPropAddr<Array<String*>*>( this, Prop, Idx ) = Arr;
 }
 

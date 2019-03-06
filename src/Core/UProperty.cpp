@@ -113,6 +113,11 @@ u32 UProperty::GetNativeOffset( const char* ClassName, const char* PropName )
   return Offset;
 }
 
+void UProperty::ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num )
+{
+  Logf( LOG_WARN, "Default ArrayProperty contains '%s'", Class->Name );
+}
+
 void UByteProperty::Load()
 {
   Super::Load();
@@ -143,6 +148,11 @@ size_t UByteProperty::GetGenericValue( UObject* Obj, int Idx )
   return (size_t)Obj->GetProperty<u8>( this, Idx );
 }
 
+void UByteProperty::ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num )
+{
+  Obj->SetArrayProperty<u8>( (UArrayProperty*)Outer, In, Idx, RealSize, Num );
+}
+
 void UIntProperty::Load()
 {
   Super::Load();
@@ -162,6 +172,12 @@ size_t UIntProperty::GetGenericValue( UObject* Obj, int Idx )
   return (size_t)Obj->GetProperty<int>( this, Idx );
 
 }
+
+void UIntProperty::ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num )
+{
+  Obj->SetArrayProperty<int>( (UArrayProperty*)Outer, In, Idx, RealSize, Num );
+}
+
 void UBoolProperty::Load()
 {
   Super::Load();
@@ -179,6 +195,11 @@ void UBoolProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal, 
 size_t UBoolProperty::GetGenericValue( UObject* Obj, int Idx )
 {
   return (size_t)Obj->GetProperty<bool>( this, Idx );
+}
+
+void UBoolProperty::ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num )
+{
+  Obj->SetArrayProperty<bool>( (UArrayProperty*)Outer, In, Idx, RealSize, Num );
 }
 
 void UFloatProperty::Load()
@@ -201,6 +222,11 @@ size_t UFloatProperty::GetGenericValue( UObject* Obj, int Idx )
   float Value = Obj->GetProperty<float>( this, Idx );
   size_t GenericValue = *((size_t*)&Value);
   return GenericValue;
+}
+
+void UFloatProperty::ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num )
+{
+  Obj->SetArrayProperty<float>( (UArrayProperty*)Outer, In, Idx, RealSize, Num );
 }
 
 void UNameProperty::Load()
@@ -227,6 +253,11 @@ size_t UNameProperty::GetGenericValue( UObject* Obj, int Idx )
   return (size_t)Obj->GetProperty<idx>( this, Idx );
 }
 
+void UNameProperty::ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num )
+{
+  Obj->SetArrayProperty<idx>( (UArrayProperty*)Outer, In, Idx, RealSize, Num );
+}
+
 void UStrProperty::Load()
 {
   Super::Load();
@@ -250,6 +281,11 @@ size_t UStrProperty::GetGenericValue( UObject* Obj, int Idx )
   return (size_t)Obj->GetProperty<String*>( this, Idx );
 }
 
+void UStrProperty::ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num )
+{
+  Obj->SetArrayProperty<String*>( (UArrayProperty*)Outer, In, Idx, RealSize, Num );
+}
+
 void UStringProperty::Load()
 {
   Super::Load();
@@ -270,6 +306,11 @@ void UStringProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal
 size_t UStringProperty::GetGenericValue( UObject* Obj, int Idx )
 {
   return (size_t)Obj->GetProperty<String*>( this, Idx );
+}
+
+void UStringProperty::ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num )
+{
+  Obj->SetArrayProperty<String*>( (UArrayProperty*)Outer, In, Idx, RealSize, Num );
 }
 
 void UObjectProperty::Load()
@@ -400,8 +441,10 @@ void UArrayProperty::Load()
 
   idx InnerIdx;
   *PkgFile >> CINDEX( InnerIdx );
-  Inner = (UProperty*)LoadObject( InnerIdx, NULL, Outer );
+  Inner = (UProperty*)LoadObject( InnerIdx, NULL, this );
   Inner->Offset = 0;
+
+  ElementSize = sizeof( ArrayNoType* );
 }
 
 void UArrayProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
@@ -455,7 +498,6 @@ size_t UArrayProperty::GetGenericValue( UObject* Obj, int Idx )
 
 void UFixedArrayProperty::Load()
 {
-  Super::Load();
   Logf( LOG_CRIT, "Go pop '%s' in UTPT and see how to load a FixedArrayProperty", Pkg->Name );
   exit( -1 ); // <- can we not do this
 }
@@ -471,7 +513,6 @@ size_t UFixedArrayProperty::GetGenericValue( UObject* Obj, int Idx )
 
 void UMapProperty::Load()
 {
-  Super::Load();
   Logf( LOG_CRIT, "Go pop '%s' in UTPT and see how to load a MapProperty", Pkg->Name );
   exit( -1 ); // <- can we not do this
 }

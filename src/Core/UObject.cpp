@@ -303,13 +303,6 @@ void UObject::ReadDefaultProperties()
   int RealSize = 0;
   bool bIsDescription = false;
 
-  // Copy property values from SuperClass default object
-  if ( LIKELY( Class->SuperClass != NULL ) )
-    xstl::Copy( PtrAdd( this, UObject::StaticClass()->StructSize ),
-                Class->SuperClass->StructSize - UObject::StaticClass()->StructSize,
-                PtrAdd( Class->SuperClass->Default, UObject::StaticClass()->StructSize ),
-                Class->SuperClass->StructSize - UObject::StaticClass()->StructSize );
-
   while( 1 )
   {
     *PkgFile >> CINDEX( PropNameIdx );
@@ -492,74 +485,7 @@ void UObject::ReadDefaultProperties()
       u8 NumElem  = 0;
       *PkgFile >> NumElem;
 
-      // I reeeeeeally hate not using switch/case here
-      if ( ArrayProp->Inner->Class == UByteProperty::StaticClass() )
-      {
-        *GetArrayPropAddr<u8>( this, ArrayProp, ArrayIdx ) = new Array<u8>();
-        SetArrayProperty<u8>( ArrayProp, PkgFile, ArrayIdx, RealSize, NumElem );
-      }
-      else if ( ArrayProp->Inner->Class == UIntProperty::StaticClass() )
-      {
-        *GetArrayPropAddr<int>( this, ArrayProp, ArrayIdx ) = new Array<int>();
-        SetArrayProperty<int>( ArrayProp, PkgFile, ArrayIdx, RealSize, NumElem );
-      }
-      else if ( ArrayProp->Inner->Class == UIntProperty::StaticClass() )
-      {
-        *GetArrayPropAddr<bool>( this, ArrayProp, ArrayIdx ) = new Array<bool>();
-        SetArrayProperty<bool>( ArrayProp, PkgFile, ArrayIdx, RealSize, NumElem );
-      }
-      else if ( ArrayProp->Inner->Class == UFloatProperty::StaticClass() )
-      {
-        *GetArrayPropAddr<float>( this, ArrayProp, ArrayIdx ) = new Array<float>();
-        SetArrayProperty<float>( ArrayProp, PkgFile, ArrayIdx, RealSize, NumElem );
-      }
-      else if ( ArrayProp->Inner->Class == UObjectProperty::StaticClass() )
-      {
-        Logf( LOG_WARN, "Default ArrayProperty contains Objects" );
-      }
-      else if ( ArrayProp->Inner->Class == UNameProperty::StaticClass() )
-      {
-        *GetArrayPropAddr<idx>( this, ArrayProp, ArrayIdx ) = new Array<idx>();
-        SetArrayProperty<idx>( ArrayProp, PkgFile, ArrayIdx, RealSize, NumElem );
-      }
-      else if ( ArrayProp->Inner->Class == UStringProperty::StaticClass() )
-      {
-        Logf( LOG_WARN, "Default ArrayProperty contains Strings (but not ascii???)" );
-      }
-      else if ( ArrayProp->Inner->Class == UClassProperty::StaticClass() )
-      {
-        Logf( LOG_WARN, "Default ArrayProperty contains Classes" );
-      }
-      else if ( ArrayProp->Inner->Class == UArrayProperty::StaticClass() )
-      {
-        Logf( LOG_WARN, "Default ArrayProperty contains Arrays" );
-      }
-      else if ( ArrayProp->Inner->Class == UStructProperty::StaticClass() )
-      {
-        Logf( LOG_WARN, "Default ArrayProperty contains Structs" );
-      }
-      else if ( ArrayProp->Inner->Class == UStrProperty::StaticClass() )
-      {
-        *GetArrayPropAddr<String*>( this, ArrayProp, ArrayIdx ) = new Array<String*>();
-        SetArrayProperty<String*>( ArrayProp, PkgFile, ArrayIdx, RealSize, NumElem );
-      }
-      else if ( ArrayProp->Inner->Class == UMapProperty::StaticClass() )
-      {      
-        Logf( LOG_WARN, "Default ArrayProperty contains Maps" );
-      }
-      else if ( ArrayProp->Inner->Class == UFixedArrayProperty::StaticClass() )
-      {
-        Logf( LOG_WARN, "Default ArrayProperty contains FixedArrays" );
-      }
-/*    else if ( ArrayProp->Inner->Class == ULongProperty::StaticClass() )
-      {
-        *GetArrayPropAddr<i64>( this, ArrayProp, ArrayIdx ) = new Array<i64>();
-        SetArrayProperty<i64>( ArrayProp, PkgFile, ArrayIdx, ByteSize, NumElem );
-      }*/
-      else
-      {
-        Logf( LOG_CRIT, "Default ArrayProperty contains unknown type '%x'", PropType );
-      }
+      ArrayProp->Inner->ReadDynamicArrayProperty( this, PkgFile, ArrayIdx, RealSize, NumElem );
     }
     else if ( PropType == PROP_Struct )
     {

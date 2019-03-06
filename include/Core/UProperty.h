@@ -70,6 +70,7 @@ class DLL_EXPORT UProperty : public UField
   virtual void Load();
   virtual void GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal = 0, UPackage* Package = NULL );
   virtual size_t GetGenericValue( UObject* Obj, int Idx );
+  virtual void ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num );
   u32 GetNativeOffset( const char* ClassName, const char* PropName );
 };
 
@@ -80,6 +81,7 @@ class DLL_EXPORT UByteProperty : public UProperty
   virtual void Load();
   virtual void GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal = 0, UPackage* Package = NULL );
   virtual size_t GetGenericValue( UObject* Obj, int Idx );
+  virtual void ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num );
 
   UEnum* Enum;
 };
@@ -89,7 +91,9 @@ class DLL_EXPORT UIntProperty : public UProperty
   DECLARE_NATIVE_CLASS( UIntProperty, UProperty, CLASS_NoExport, Core )
   virtual void Load();
   virtual void GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal = 0, UPackage* Package = NULL );
-  virtual size_t GetGenericValue( UObject* Obj, int Idx );
+  virtual size_t GetGenericValue( UObject* Obj, int Idx );  
+  virtual void ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num );
+
 };
 
 class DLL_EXPORT UBoolProperty : public UProperty
@@ -98,6 +102,7 @@ class DLL_EXPORT UBoolProperty : public UProperty
   virtual void Load();
   virtual void GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal = 0, UPackage* Package = NULL );
   virtual size_t GetGenericValue( UObject* Obj, int Idx );
+  virtual void ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num );
 };
 
 class DLL_EXPORT UFloatProperty : public UProperty
@@ -106,6 +111,8 @@ class DLL_EXPORT UFloatProperty : public UProperty
   virtual void Load();
   virtual size_t GetGenericValue( UObject* Obj, int Idx );
   virtual void GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal = 0, UPackage* Package = NULL );
+  virtual void ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num );
+
 };
 
 class DLL_EXPORT UObjectProperty : public UProperty
@@ -114,6 +121,7 @@ class DLL_EXPORT UObjectProperty : public UProperty
   virtual void Load();
   virtual void GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal = 0, UPackage* Package = NULL );
   virtual size_t GetGenericValue( UObject* Obj, int Idx );
+
   UClass* ObjectType;
 };
 
@@ -123,6 +131,7 @@ class DLL_EXPORT UNameProperty : public UProperty
   virtual void Load();
   virtual void GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal = 0, UPackage* Package = NULL );
   virtual size_t GetGenericValue( UObject* Obj, int Idx );
+  virtual void ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num );
 };
 
 // ?
@@ -132,6 +141,7 @@ class DLL_EXPORT UStringProperty : public UProperty
   virtual void Load();
   virtual void GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal = 0, UPackage* Package = NULL );
   virtual size_t GetGenericValue( UObject* Obj, int Idx );
+  virtual void ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num );
 };
 
 class DLL_EXPORT UClassProperty : public UObjectProperty
@@ -167,6 +177,8 @@ class DLL_EXPORT UStrProperty : public UProperty
   virtual void Load();
   virtual void GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal = 0, UPackage* Package = NULL );
   virtual size_t GetGenericValue( UObject* Obj, int Idx );
+  virtual void ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num );
+
   int Length;
 };
 
