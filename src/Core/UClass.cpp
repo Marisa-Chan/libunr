@@ -833,19 +833,15 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
 
           PropIter->GetText( ValueBuf, Default, i, DefValue, Pkg );
 
-          if ( PropIter->Class == UArrayProperty::StaticClass() )
+          if ( ValueBuf.Length() > 0 )
           {
-            if ( ValueBuf.Length() > 0 )
+            if ( PropIter->Class == UArrayProperty::StaticClass() )
             {
               Out->Write( ValueBuf.Data(), ValueBuf.Length() );
               ValueBuf.Erase();
+              continue;
             }
-            
-            continue;
-          }
 
-          if ( ValueBuf.Length() > 0 )
-          {
             DefProp += '\t';
             DefProp += PropIter->Name;
             if ( PropIter->ArrayDim > 1 )

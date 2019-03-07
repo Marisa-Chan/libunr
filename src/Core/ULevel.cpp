@@ -25,6 +25,7 @@
 
 #include "Core/UClass.h"
 #include "Core/ULevel.h"
+#include "Core/UProperty.h"
 #include "Actors/AActor.h"
 
 DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FReachSpec& RS )
@@ -103,7 +104,9 @@ void ULevelBase::Load()
     idx ActorObjRef = 0;
     *PkgFile >> CINDEX( ActorObjRef );
 
-    Actors.PushBack( (AActor*)LoadObject( ActorObjRef, NULL, NULL, true ) );
+    // Don't load garbage zeroes
+    if ( ActorObjRef != 0 )
+      Actors.PushBack( (AActor*)LoadObject( ActorObjRef, NULL, NULL, true ) );
   }
 
   *PkgFile >> URL;
@@ -140,7 +143,96 @@ void ULevel::Load()
 
 bool ULevel::ExportToFile( const char* Dir, const char* Type )
 {
-  return false;
+  String* Filename = new String( Dir );
+#if defined LIBUNR_WIN32
+  Filename->ReplaceChars( '\\', '/' );
+#endif
+  if ( Filename->Back() != '/' )
+    Filename->Append( "/" );
+
+  Filename->Append( Pkg->Name );
+  Filename->Append( ".t3d" ); // Levels won't get exported to any other type
+ 
+  FileStreamOut* Out = new FileStreamOut();
+  if ( Out->Open( *Filename ) != 0 )
+  {
+    Logf( LOG_WARN, "Failed to export level to file '%s'", Filename->Data() );
+    return false;
+  }
+
+  // Write beginning map
+  Out->Write( (char*)"Begin Map\r\n", 11 );
+
+  // Loop through all actors
+  String ActorBuf;
+  String ValueBuf;
+  for ( size_t i = 0; i < Actors.Size() && i != MAX_SIZE; i++ )
+  {
+    AActor* Actor = Actors[i];
+
+    // Write begin actor
+    ActorBuf += "Begin Actor Class=";
+    ActorBuf += Actor->Class->Name;
+    ActorBuf += " Name=";
+    ActorBuf += Actor->Name;
+    ActorBuf += "\r\n";
+    Out->Write( ActorBuf.Data(), ActorBuf.Length() );
+
+    // Write actor properties
+    ActorBuf.Erase();
+    for ( UField* Iter = Actor->Field; Iter != NULL; Iter = Iter->Next )
+    {
+      UProperty* Prop = SafeCast<UProperty>( Iter );
+      if ( Prop != NULL )
+      {
+        if ( UNLIKELY( Prop->Offset & 0x80000000 ) )
+        {
+          Logf( LOG_WARN, "Bad offset for property '%s' (Offset = %x)",
+              Prop->Name, Prop->Offset );
+          continue;
+        }
+
+        for ( int j = 0; j < Prop->ArrayDim; j++ )
+        {
+          if ( !(Prop->PropertyFlags & (CPF_Native|CPF_Const) ) )
+          {
+            // Get default property of this class
+            size_t DefValue = Prop->GetGenericValue( Actor->Class->Default, j );
+            Prop->GetText( ValueBuf, Actor, j, DefValue, Actor->Pkg );
+
+            if ( ValueBuf.Length() > 0 )
+            {
+              if ( Prop->Class == UArrayProperty::StaticClass() )
+              {
+                Out->Write( ValueBuf.Data(), ValueBuf.Length() );
+                ValueBuf.Erase();
+                continue;
+              }
+
+              ActorBuf += '\t';
+              ActorBuf += Prop->Name;
+              if ( Prop->ArrayDim > 1 )
+              {
+                ActorBuf += '(';
+                ActorBuf += String( j );
+                ActorBuf += ')';
+              }
+              ActorBuf += '=';
+              ActorBuf += ValueBuf;
+              ActorBuf += "\r\n";
+
+              Out->Write( ActorBuf.Data(), ActorBuf.Length() );
+              ActorBuf.Erase();
+              ValueBuf.Erase();
+            }
+          }
+        }
+      }
+    }
+
+    // Write end actor
+    Out->Write( (char*)"End Actor\r\n", 11 );
+  }
 }
 
 IMPLEMENT_NATIVE_CLASS( ULevelBase );
