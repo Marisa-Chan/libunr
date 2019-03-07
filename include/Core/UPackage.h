@@ -86,17 +86,17 @@ FPackageFileOut& operator<<( FPackageFileOut& Out, String& Str );
 -----------------------------------------------------------------------------*/
 struct DLL_EXPORT FExport
 {
-  idx Class;
-  idx Super;
-  u32 Group;
-  idx ObjectName;
-  u32 ObjectFlags;
-  idx SerialSize;
-  idx SerialOffset;
+  idx Class;        // Object reference to Class
+  idx Super;        // Object reference to Parent
+  u32 Group;        // Object reference to Package/Group
+  idx ObjectName;   // Name index to Object Name
+  u32 ObjectFlags;  // Object flags
+  idx SerialSize;   // Compact index to size inside file
+  idx SerialOffset; // Compact index to offset (if SerialSize>0)
   
-  UObject* Obj;
-  int Index;
-  bool bNeedsFullLoad;
+  UObject* Obj;        // Pointer to object (if loading/already loaded)
+  int Index;           // Index in Export Table
+  bool bNeedsFullLoad; // Does this object need a full load?
 
   void Read( FPackageFileIn& Pkg );
 };
@@ -108,10 +108,10 @@ struct DLL_EXPORT FExport
 -----------------------------------------------------------------------------*/
 struct DLL_EXPORT FImport
 {
-  idx ClassPackage;
-  idx ClassName;
-  int Package;
-  idx ObjectName;
+  idx ClassPackage; // Name index to Package name of Class
+  idx ClassName;    // Name index to Class Name
+  int Package;      // Object reference to Package of object
+  idx ObjectName;   // Name index to Object Name
   
   void Read( FPackageFileIn& Pkg );
 };
