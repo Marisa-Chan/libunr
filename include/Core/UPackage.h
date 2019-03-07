@@ -192,7 +192,7 @@ class DLL_EXPORT UPackage : public UObject
   Array<FImport>* GetImportTable();
   const char*     GetFilePath();
   const char*     GetFileName();
-  const char*     GetFullObjName( idx ObjRef );
+  String*         GetFullObjName( FExport* ObjExp );
   size_t          GetPackageVer();
 
   size_t FindName( const char* Name );

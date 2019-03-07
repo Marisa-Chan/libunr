@@ -495,6 +495,37 @@ const char* UPackage::GetFileName()
   return Name;
 }
 
+String* UPackage::GetFullObjName( FExport* ObjExp )
+{
+  // Get all names into a stack
+  Stack<char*>* Names = new Stack<char*>();
+  FExport* Exp = ObjExp;
+
+  Names->Push( GetNameEntry( Exp->ObjectName )->Data );
+  while ( Exp->Group != 0 )
+  {
+    Exp = GetExport( Exp->Group-1 );
+    Names->Push( GetNameEntry( Exp->ObjectName )->Data );
+  };
+
+  Names->Push( (char*)Name );
+
+  // Concat all names to a string
+  static String* ObjName = new String();
+  ObjName->Erase();
+  while ( Names->Size() > 0 )
+  {
+    (*ObjName) += Names->Top();
+    (*ObjName) += '.';
+    Names->Pop();
+  }
+
+  if ( ObjName->Length() > 0 )
+    ObjName->PopBack();
+
+  return ObjName;
+}
+
 size_t UPackage::FindName( const char* Name )
 {
   FHash NameHash = FnvHashString( Name );

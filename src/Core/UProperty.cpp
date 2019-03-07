@@ -331,9 +331,10 @@ void UObjectProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal
   {
     Buf += Val->Class->Name;
     Buf += '\'';
-    Buf += Val->Pkg->Name;
-    Buf += '.';
-    Buf += Val->Name;
+    
+    String* FullName = Val->Pkg->GetFullObjName( Val->Export );
+    Buf += (FullName) ? *FullName : "<NULL>";
+
     Buf += '\'';
   }
 }
