@@ -1005,9 +1005,8 @@ void UClass::PostLoad()
         DefPropQueue.Pop();
       }
     }
-
-    Super::PostLoad();
   }
+  Super::PostLoad();
 }
 
 bool UClass::IsNative()

@@ -29,6 +29,7 @@
 #include <libxstl/XArray.h>
 #include <libxstl/XMemory.h>
 #include <libxstl/XStream.h>
+#include <libxstl/XStack.h>
 #include "Core/FUtil.h"
 
 using namespace xstl;
@@ -470,7 +471,7 @@ public:
 
 protected:
   int RefCnt;
-  size_t OldPkgFileOffset;
+  Stack<size_t>* OldPkgFileOffsets;
 
   static bool bStaticBootstrapped;
 };

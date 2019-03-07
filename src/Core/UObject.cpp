@@ -130,11 +130,13 @@ UObject::UObject()
   Class = NULL;
   Pkg = NULL;
   RefCnt = 1;
+  OldPkgFileOffsets = new Stack<size_t>();
 }
 
 //TODO: write destructor
 UObject::~UObject()
 {
+  delete OldPkgFileOffsets;
 }
 
 bool UObject::ExportToFile( const char* Dir, const char* Type )
@@ -145,7 +147,7 @@ bool UObject::ExportToFile( const char* Dir, const char* Type )
 void UObject::PreLoad()
 {
   PkgFile = Pkg->GetStream();
-  OldPkgFileOffset = PkgFile->Tell();
+  OldPkgFileOffsets->Push( PkgFile->Tell() );
   PkgFile->Seek( Export->SerialOffset, Begin );
   Export->bNeedsFullLoad = false;
   bLoading = true;
@@ -181,9 +183,8 @@ void UObject::Load()
 
 void UObject::PostLoad()
 {
-  PkgFile->Seek( OldPkgFileOffset, Begin );
-  OldPkgFileOffset = 0;
-  PkgFile = NULL;
+  PkgFile->Seek( OldPkgFileOffsets->Top(), Begin );
+  OldPkgFileOffsets->Pop();
   bLoading = false;
 }
 
