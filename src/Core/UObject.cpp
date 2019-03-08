@@ -188,6 +188,11 @@ void UObject::PostLoad()
   bLoading = false;
 }
 
+void UObject::PostDefaultLoad()
+{
+  // For setting any values in the default object after it's been initialized
+}
+
 void UObject::AddRef()
 {
   RefCnt++;
@@ -329,7 +334,6 @@ void UObject::ReadDefaultProperties()
         Logf( LOG_CRIT, "Property '%s' in '%s.%s' does not exist",
           PropName, Pkg->Name, Name );
     }
-
     else if ( Prop->Offset == MAX_UINT32 )
     {
       if ( Outer )
@@ -340,6 +344,17 @@ void UObject::ReadDefaultProperties()
             PropName, Pkg->Name, Name );
 
       Prop = NULL;
+    }
+    else
+    {
+      // Since classes share property objects, this is really only a hint to an
+      // exporter that it's even worth checking to see if this property should be
+      // exported to text, not a guarantee that it has been modified. This works
+      // out for things like "Tag" in Actor where the property value is different
+      // from it's SuperClass value, but doesn't need to be recorded since that value
+      // will always be the name of the script being exported while simultaneously 
+      // covering that the Tag value be written when exporting a level.
+      Prop->PropertyFlags |= CPF_NeedsExport;
     }
 
     *PkgFile >> InfoByte;

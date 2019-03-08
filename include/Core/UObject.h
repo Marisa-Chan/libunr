@@ -113,6 +113,7 @@ enum EPropertyFlags
   CPF_OnDemand     = 0x00100000, // Object or dynamic array loaded on demand only.
   CPF_New          = 0x00200000, // Automatically create inner object.
   CPF_NeedCtorLink = 0x00400000, // Fields need construction/destruction.
+  CPF_NeedsExport  = 0x00800000, // Object has set this property during ReadDefaultProperties
 
   // Combinations of flags.
   CPF_ParmFlags           = CPF_OptionalParm | CPF_Parm | CPF_OutParm | CPF_SkipParm | 
@@ -397,6 +398,7 @@ public:
   virtual void PreLoad();
   virtual void Load();
   virtual void PostLoad();
+  virtual void PostDefaultLoad();
 
   void AddRef();
   void DelRef();

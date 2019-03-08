@@ -35,6 +35,11 @@ AActor::~AActor()
 {
 }
 
+void AActor::PostDefaultLoad()
+{
+  Tag = Class->Export->ObjectName;
+}
+
 AMenu::AMenu()
   : AActor()
 {

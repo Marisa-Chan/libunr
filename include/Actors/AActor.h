@@ -49,6 +49,7 @@ class AActor : public UObject
   EXPOSE_TO_USCRIPT()
 
   AActor();
+  virtual void PostDefaultLoad();
 
   // Flags
   bool bStatic, bHidden, bNoDelete, bAnimFinished, bAnimLoop;

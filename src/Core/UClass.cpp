@@ -824,14 +824,11 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
 
       for ( int i = 0; i < PropIter->ArrayDim; i++ )
       {
-        if ( LIKELY( !(PropIter->PropertyFlags & CPF_Native) ) )
+        if ( PropIter->PropertyFlags & CPF_NeedsExport )
         {
           // Get default property from super class
-          size_t DefValue = 0;
-          if ( SuperClass != NULL && PropIter->Outer != this )
-            DefValue = PropIter->GetGenericValue( SuperClass->Default, i );
-
-          PropIter->GetText( ValueBuf, Default, i, DefValue, Pkg );
+          UObject* DefObj = (PropIter->Outer == this) ? NULL : SuperClass->Default;
+          PropIter->GetText( ValueBuf, Default, DefObj, i );
 
           if ( ValueBuf.Length() > 0 )
           {
@@ -998,6 +995,7 @@ void UClass::PostLoad()
 
         QueuedClass->Default->ReadDefaultProperties();
         QueuedClass->Default->PkgFile = NULL;
+        QueuedClass->Default->PostDefaultLoad();
         DefPropQueue.Pop();
       }
     }
