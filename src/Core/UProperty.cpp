@@ -74,14 +74,15 @@ void UProperty::Load()
     GlobalClass = (UClass*)Outer;
 }
 
-void UProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
+void UProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
 {
   return;
 }
 
-size_t UProperty::GetGenericValue( UObject* Obj, int Idx )
+void UProperty::GetTextContainer( String& Buf, UObject* ObjMem, UObject* DefMem, 
+  UPackage* ObjPkg, UPackage* DefPkg, int Idx )
 {
-  return MAX_SIZE;
+  GetText( Buf, ObjMem, DefMem, Idx );
 }
 
 u32 UProperty::GetNativeOffset( const char* ClassName, const char* PropName )
@@ -130,22 +131,17 @@ void UByteProperty::Load()
   ElementSize = 1;
 }
 
-void UByteProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
+void UByteProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
 {
-  u8 DefValCast = (u8)DefVal;
+  u8 DefVal = (Default) ? Default->GetProperty<u8>( this, Idx ) : 0;
   u8 Val = Obj->GetProperty<u8>( this, Idx );
-  if ( Val != DefValCast )
+  if ( Val != DefVal )
   {
     if ( Enum && Val < Enum->Names.Size() )
       Buf += Enum->Names[Val];
     else
       Buf += String( (int)Val );
   }
-}
-
-size_t UByteProperty::GetGenericValue( UObject* Obj, int Idx )
-{
-  return (size_t)Obj->GetProperty<u8>( this, Idx );
 }
 
 void UByteProperty::ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num )
@@ -159,18 +155,12 @@ void UIntProperty::Load()
   ElementSize = 4;
 }
 
-void UIntProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
+void UIntProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
 {
-  int DefValCast = (int)DefVal;
+  int DefVal = (Default) ? Default->GetProperty<int>( this, Idx ) : 0;
   int Val = Obj->GetProperty<int>( this, Idx );
-  if ( Val != DefValCast )
+  if ( Val != DefVal )
     Buf += String( Val );
-}
-
-size_t UIntProperty::GetGenericValue( UObject* Obj, int Idx )
-{
-  return (size_t)Obj->GetProperty<int>( this, Idx );
-
 }
 
 void UIntProperty::ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num )
@@ -184,17 +174,12 @@ void UBoolProperty::Load()
   ElementSize = sizeof( bool );
 }
 
-void UBoolProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
+void UBoolProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
 {
-  bool DefValCast = (DefVal & 0xFF) ? true : false;
+  bool DefVal = (Default) ? Default->GetProperty<bool>( this, Idx ) : 0;
   bool Val = Obj->GetProperty<bool>( this, Idx );
-  if ( Val != DefValCast )
+  if ( Val != DefVal )
     Buf += ( Val ? "True" : "False" );
-}
-
-size_t UBoolProperty::GetGenericValue( UObject* Obj, int Idx )
-{
-  return (size_t)Obj->GetProperty<bool>( this, Idx );
 }
 
 void UBoolProperty::ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num )
@@ -208,20 +193,12 @@ void UFloatProperty::Load()
   ElementSize = 4;
 }
 
-void UFloatProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
+void UFloatProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
 {
-  float DefValCast;
-  *(int*)&DefValCast = DefVal;
+  float DefVal = (Default) ? Default->GetProperty<float>( this, Idx ) : 0;
   float Val = Obj->GetProperty<float>( this, Idx );
-  if ( !FltEqual( Val, DefValCast ) )
+  if ( !FltEqual( Val, DefVal ) )
     Buf += String( Val );
-}
-
-size_t UFloatProperty::GetGenericValue( UObject* Obj, int Idx )
-{
-  float Value = Obj->GetProperty<float>( this, Idx );
-  size_t GenericValue = *((size_t*)&Value);
-  return GenericValue;
 }
 
 void UFloatProperty::ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num )
@@ -235,12 +212,13 @@ void UNameProperty::Load()
   ElementSize = 4;
 }
 
-void UNameProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
+void UNameProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
 {
+  idx DefIdx = (Default) ? Default->GetProperty<idx>( this, Idx ) : 0;
   idx ValIdx = Obj->GetProperty<idx>( this, Idx );
-  FNameEntry* DefValCast = Package->GetNameEntry( DefVal );
-  FNameEntry* Val = Package->GetNameEntry( ValIdx );
-  if ( Val->Hash != DefValCast->Hash )
+  FNameEntry* DefVal = (Default) ? Default->Pkg->GetNameEntry( DefIdx ) : Obj->Pkg->GetNameEntry( 0 );
+  FNameEntry* Val = Obj->Pkg->GetNameEntry( ValIdx );
+  if ( Val->Hash != DefVal->Hash )
   {
     Buf += '"';
     Buf += Val->Data;
@@ -248,9 +226,18 @@ void UNameProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal, 
   }
 }
 
-size_t UNameProperty::GetGenericValue( UObject* Obj, int Idx )
+void UNameProperty::GetTextContainer( String& Buf, UObject* ObjMem, UObject* DefMem, UPackage* ObjPkg, UPackage* DefPkg, int Idx )
 {
-  return (size_t)Obj->GetProperty<idx>( this, Idx );
+  idx DefIdx = (DefMem) ? DefMem->GetProperty<idx>( this, Idx ) : 0;
+  idx ValIdx = ObjMem->GetProperty<idx>( this, Idx );
+  FNameEntry* DefVal = (DefPkg) ? DefPkg->GetNameEntry( DefIdx ) : ObjPkg->GetNameEntry( 0 );
+  FNameEntry* Val = ObjPkg->GetNameEntry( ValIdx );
+  if ( Val->Hash != DefVal->Hash )
+  {
+    Buf += '"';
+    Buf += Val->Data;
+    Buf += '"';
+  }
 }
 
 void UNameProperty::ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num )
@@ -264,21 +251,16 @@ void UStrProperty::Load()
   ElementSize = sizeof( String* );
 }
 
-void UStrProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
+void UStrProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
 {
-  String* DefValCast = (String*)DefVal;
+  String* DefVal = (Default) ? Default->GetProperty<String*>( this, Idx ) : NULL;
   String* Val = Obj->GetProperty<String*>( this, Idx );
-  if ( Val && Val->Length() > 0 && (DefValCast == NULL || *Val == *DefValCast) )
+  if ( Val && Val->Length() > 0 && (DefVal == NULL || *Val != *DefVal) )
   {
     Buf += '"';
     Buf += Val->Data();
     Buf += '"';
   }
-}
-
-size_t UStrProperty::GetGenericValue( UObject* Obj, int Idx )
-{
-  return (size_t)Obj->GetProperty<String*>( this, Idx );
 }
 
 void UStrProperty::ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num )
@@ -289,23 +271,19 @@ void UStrProperty::ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, i
 void UStringProperty::Load()
 {
   Super::Load();
+  ElementSize = sizeof( String* );
 }
 
-void UStringProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
+void UStringProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
 {
-  String* DefValCast = (String*)DefVal;
+  String* DefVal = (Default) ? Default->GetProperty<String*>( this, Idx ) : NULL;
   String* Val = Obj->GetProperty<String*>( this, Idx );
-  if ( Val && Val->Length() > 0 && (DefValCast == NULL || *Val == *DefValCast) )
+  if ( Val && Val->Length() > 0 && (DefVal == NULL || *Val != *DefVal) )
   {
     Buf += '"';
     Buf += Val->Data();
     Buf += '"';
   }
-}
-
-size_t UStringProperty::GetGenericValue( UObject* Obj, int Idx )
-{
-  return (size_t)Obj->GetProperty<String*>( this, Idx );
 }
 
 void UStringProperty::ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num )
@@ -323,11 +301,11 @@ void UObjectProperty::Load()
   ObjectType = (UClass*)LoadObject( ObjTypeIdx, UClass::StaticClass(), Outer );
 }
 
-void UObjectProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
+void UObjectProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
 {
-  UObject* DefValCast = (UObject*)DefVal;
+  UObject* DefVal = (Default) ? Default->GetProperty<UObject*>( this, Idx ) : NULL;
   UObject* Val = Obj->GetProperty<UObject*>( this, Idx );
-  if ( Val && Val != DefValCast )
+  if ( Val && Val != DefVal )
   {
     Buf += Val->Class->Name;
     Buf += '\'';
@@ -337,11 +315,6 @@ void UObjectProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal
 
     Buf += '\'';
   }
-}
-
-size_t UObjectProperty::GetGenericValue( UObject* Obj, int Idx )
-{
-  return (size_t)Obj->GetProperty<UObject*>( this, Idx );
 }
 
 void UClassProperty::Load()
@@ -354,11 +327,11 @@ void UClassProperty::Load()
   ClassObj = (UClass*)LoadObject( ClassIdx, UClass::StaticClass(), Outer );
 }
 
-void UClassProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
+void UClassProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
 {
-  UClass* DefValCast = (UClass*)DefVal;
+  UClass* DefVal = (Default) ? Default->GetProperty<UClass*>( this, Idx ) : NULL;
   UClass* Val = Obj->GetProperty<UClass*>( this, Idx );
-  if ( Val && Val != DefValCast )
+  if ( Val && Val != DefVal )
   {
     Buf += "Class'";
     Buf += Val->Pkg->Name;
@@ -366,11 +339,6 @@ void UClassProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal,
     Buf += Val->Name;
     Buf += '\'';
   }
-}
-
-size_t UClassProperty::GetGenericValue( UObject* Obj, int Idx )
-{
-  return (size_t)Obj->GetProperty<UClass*>( this, Idx );
 }
 
 void UStructProperty::Load()
@@ -384,9 +352,9 @@ void UStructProperty::Load()
   ElementSize = Struct->StructSize;
 }
 
-void UStructProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
+void UStructProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
 {
-  UStruct* DefMem = (UStruct*)DefVal;
+  UStruct* DefMem = (Default) ? Default->GetProperty<UStruct*>( this, Idx ) : NULL;
   UStruct* ValMem = Obj->GetProperty<UStruct*>( this, Idx );
 
   String InnerBuf;
@@ -394,6 +362,9 @@ void UStructProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal
   // Check if it's worth writing anything at all
   if ( DefMem == NULL || !xstl::Compare( ValMem, DefMem, Struct->StructSize ) )
   {
+    UPackage* ObjPkg = Obj->Pkg;
+        UPackage* DefPkg = (Default) ? Default->Pkg : NULL;
+
     for ( UField* Iter = Struct->Children; Iter != NULL; Iter = Iter->Next )
     {
       UProperty* Prop = SafeCast<UProperty>( Iter );
@@ -402,8 +373,7 @@ void UStructProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal
 
       for ( int i = 0; i < Prop->ArrayDim; i++ )
       {
-        size_t InnerDefVal = DefMem ? Prop->GetGenericValue( DefMem, i ) : 0;
-        Prop->GetText( InnerBuf, ValMem, i, InnerDefVal, Obj->Pkg );
+        Prop->GetTextContainer( InnerBuf, ValMem, DefMem, ObjPkg, DefPkg, i );
 
         if ( InnerBuf.Length() > 0 )
         {
@@ -431,11 +401,6 @@ void UStructProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal
   }
 }
 
-size_t UStructProperty::GetGenericValue( UObject* Obj, int Idx )
-{
-  return (size_t)Obj->GetProperty<UStruct*>( this, Idx );
-}
-
 void UArrayProperty::Load()
 {
   Super::Load();
@@ -448,9 +413,9 @@ void UArrayProperty::Load()
   ElementSize = sizeof( ArrayNoType* );
 }
 
-void UArrayProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
+void UArrayProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
 {
-  ArrayNoType* GenericArray = (ArrayNoType*)GetGenericValue( Obj, Idx );
+  ArrayNoType* GenericArray = Obj->GetProperty<ArrayNoType*>( this, Idx );
   if ( GenericArray == NULL )
     return;
 
@@ -458,8 +423,10 @@ void UArrayProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal,
   // as one property themselves, we have to cheat by writing the name and value for
   // each value that is different
   String InnerBuf;
-  ArrayNoType* DefGenericArray = (ArrayNoType*)DefVal;
+  ArrayNoType* DefGenericArray = (Default) ? Default->GetProperty<ArrayNoType*>( this, Idx ) : NULL;
 
+  UPackage* ObjPkg = Obj->Pkg;
+  UPackage* DefPkg = (Default) ? Default->Pkg : NULL;
   size_t Num = GenericArray->Size();
   for ( size_t i = 0; i < Num && i != MAX_SIZE; i++ )
   {
@@ -468,8 +435,8 @@ void UArrayProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal,
       DefValAddr = (*DefGenericArray)[i];
 
     void* ValAddr = (*GenericArray)[i];
+    Inner->GetTextContainer( InnerBuf, (UObject*)ValAddr, (UObject*)DefValAddr, ObjPkg, DefPkg, 0 );
 
-    Inner->GetText( InnerBuf, (UObject*)ValAddr, 0, (size_t)DefValAddr, Package );
     if ( InnerBuf.Length() > 0 )
     {
       Buf += '\t';
@@ -491,25 +458,14 @@ void UArrayProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal,
   }
 }
 
-size_t UArrayProperty::GetGenericValue( UObject* Obj, int Idx )
-{
-  // Arrays are templated so we can't really deduce it's type here
-  return (size_t)Obj->GetProperty<void*>( this, Idx );
-}
-
 void UFixedArrayProperty::Load()
 {
   Logf( LOG_CRIT, "Go pop '%s' in UTPT and see how to load a FixedArrayProperty", Pkg->Name );
   exit( -1 ); // <- can we not do this
 }
 
-void UFixedArrayProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
+void UFixedArrayProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
 {
-}
-
-size_t UFixedArrayProperty::GetGenericValue( UObject* Obj, int Idx )
-{
-  return MAX_SIZE-1;
 }
 
 void UMapProperty::Load()
@@ -518,13 +474,8 @@ void UMapProperty::Load()
   exit( -1 ); // <- can we not do this
 }
 
-void UMapProperty::GetText( String& Buf, UObject* Obj, int Idx, size_t DefVal, UPackage* Package )
+void UMapProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
 {
-}
-
-size_t UMapProperty::GetGenericValue( UObject* Obj, int Idx )
-{
-  return MAX_SIZE-2;
 }
 
 UByteProperty::~UByteProperty()

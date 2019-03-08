@@ -194,11 +194,10 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
 
         for ( int j = 0; j < Prop->ArrayDim; j++ )
         {
-          if ( !(Prop->PropertyFlags & (CPF_Native|CPF_Const) ) )
+          if ( !(Prop->PropertyFlags & CPF_NeedsExport) )
           {
             // Get default property of this class
-            size_t DefValue = Prop->GetGenericValue( Actor->Class->Default, j );
-            Prop->GetText( ValueBuf, Actor, j, DefValue, Actor->Pkg );
+            Prop->GetText( ValueBuf, Actor, Actor->Class->Default, j );
 
             if ( ValueBuf.Length() > 0 )
             {
