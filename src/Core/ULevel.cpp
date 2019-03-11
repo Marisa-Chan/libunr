@@ -133,15 +133,31 @@ void ULevel::Load()
   *PkgFile >> TimeSeconds;
 
   // TODO: What is this?
-  u8 _Unknown[3];
+  u8 _Unknown[16];
   PkgFile->Read( &_Unknown, 3 );
 
   // Unused for now...
   idx TextBuffer0;
   *PkgFile >> CINDEX( TextBuffer0 );
 
-  // TODO: ???
-  //PkgFile->Read( &_Unknown, 10 );
+  // ???
+  // On version 60, there seems to be 9 bytes, on 61, there's 11,
+  // otherwise, I've only seen 10. They're always zeros, but what even
+  // is this crap?
+/*  int ReadNum;
+  switch (PkgFile->Ver)
+  {
+    case 60:
+      ReadNum = 9;
+      break;
+    case 61:
+      ReadNum = 11;
+      break;
+    default:
+      ReadNum = 10;
+  }
+  PkgFile->Read( &_Unknown, ReadNum );
+*/
 }
 
 bool ULevel::ExportToFile( const char* Dir, const char* Type )
