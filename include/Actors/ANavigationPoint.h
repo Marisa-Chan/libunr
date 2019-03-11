@@ -33,6 +33,7 @@ class ANavigationPoint : public AActor
   EXPOSE_TO_USCRIPT()
 
   ANavigationPoint();
+  virtual void PostDefaultLoad();
 
   // NavigationPoint variables
   idx OwnerTeam;

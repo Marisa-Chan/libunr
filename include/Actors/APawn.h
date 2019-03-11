@@ -35,6 +35,7 @@ class APawn : public AActor
   EXPOSE_TO_USCRIPT()
 
   APawn();
+  virtual void PostDefaultLoad();
 
   bool bBehindView;
   bool bIsPlayer;

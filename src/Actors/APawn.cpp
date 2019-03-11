@@ -23,8 +23,9 @@
  *========================================================================
 */
 
-#include "Core/UClass.h"
 #include "Actors/APawn.h"
+#include "Core/UClass.h"
+#include "Core/UProperty.h"
 
 APawn::APawn()
   : AActor()
@@ -33,6 +34,21 @@ APawn::APawn()
 
 APawn::~APawn()
 {
+}
+
+void APawn::PostDefaultLoad()
+{
+  Super::PostDefaultLoad();
+  if ( !GSystem->bEnhancedRuntime )
+  {
+    UProperty* PropFootRegion = FindProperty("FootRegion");
+    UProperty* PropHeadRegion = FindProperty("HeadRegion");
+
+    // These can never be set by the user in the editor, but official Engine.u
+    // does not mark these as editconst
+    PropFootRegion->PropertyFlags |= CPF_EditConst;
+    PropHeadRegion->PropertyFlags |= CPF_EditConst;
+  }
 }
 
 IMPLEMENT_NATIVE_CLASS( APawn );

@@ -69,6 +69,7 @@ class DLL_EXPORT USystem : public USubsystem
 #endif
 
   // libunr specific
+  bool bEnhancedRuntime;
   bool bLogRefCntZero;
   const char* RenderDevice;
   const char* AudioDevice;

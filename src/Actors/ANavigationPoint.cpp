@@ -25,6 +25,7 @@
 
 #include "Actors/ANavigationPoint.h"
 #include "Core/UClass.h"
+#include "Core/UProperty.h"
 
 ANavigationPoint::ANavigationPoint()
   : AActor()
@@ -33,6 +34,23 @@ ANavigationPoint::ANavigationPoint()
 
 ANavigationPoint::~ANavigationPoint()
 {
+}
+
+void ANavigationPoint::PostDefaultLoad()
+{
+  Super::PostDefaultLoad();
+  if ( !GSystem->bEnhancedRuntime )
+  {
+    UProperty* PropPrunedPaths   = FindProperty("PrunedPaths");
+    UProperty* PropUpstreamPaths = FindProperty("upstreamPaths");
+    UProperty* PropPaths         = FindProperty("Paths");
+
+    // These can never be set by the user in the editor, but official Engine.u
+    // does not mark these as editconst
+    PropPrunedPaths->PropertyFlags   |= CPF_EditConst;
+    PropUpstreamPaths->PropertyFlags |= CPF_EditConst;
+    PropPaths->PropertyFlags         |= CPF_EditConst;
+  }
 }
 
 ALiftExit::ALiftExit()
