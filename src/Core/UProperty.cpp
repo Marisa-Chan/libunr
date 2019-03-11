@@ -217,7 +217,15 @@ void UNameProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Id
   idx DefIdx = (Default) ? Default->GetProperty<idx>( this, Idx ) : 0;
   idx ValIdx = Obj->GetProperty<idx>( this, Idx );
   FNameEntry* DefVal = (Default) ? Default->Pkg->GetNameEntry( DefIdx ) : Obj->Pkg->GetNameEntry( 0 );
-  FNameEntry* Val = Obj->Pkg->GetNameEntry( ValIdx );
+  FNameEntry* Val;
+
+  // FIXME: Is there an easier way to check this?
+  // In this case, it is very likely that the value in the object has not changed from the default
+  if ( Default && (Default->Pkg != Obj->Pkg) && (Default->Pkg == Obj->Class->Pkg) && DefIdx == ValIdx )
+    return;
+  else
+    Val = Obj->Pkg->GetNameEntry( ValIdx );
+
   if ( Val->Hash != DefVal->Hash )
   {
     Buf += '"';
