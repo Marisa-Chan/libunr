@@ -171,7 +171,6 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
   Out->Printf( "Begin Map\r\n" );
 
   // Loop through all actors
-  String ActorBuf;
   String ValueBuf;
   for ( size_t i = 0; i < Actors.Size() && i != MAX_SIZE; i++ )
   {
@@ -186,7 +185,6 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
     Out->Printf("Begin Actor Class=%s Name=%s\r\n", Actor->Class->Name, Actor->Name );
 
     // Write actor properties
-    ActorBuf.Erase();
     for ( UField* Iter = Actor->Field; Iter != NULL; Iter = Iter->Next )
     {
       UProperty* Prop = SafeCast<UProperty>( Iter );
@@ -199,8 +197,10 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
           continue;
         }
 
-        if ( (Prop->ObjectFlags & RF_TagExp) && 
-           (!(Prop->PropertyFlags & CPF_Const) || (Prop->PropertyFlags & (CPF_Edit|CPF_ExportObject)) ) )
+        if ( (Prop->ObjectFlags & RF_TagExp) && (
+            !(Prop->PropertyFlags & (CPF_Const|CPF_EditConst)) || 
+             (Prop->PropertyFlags & (CPF_Edit|CPF_ExportObject)) 
+           ))
         {
           for ( int j = 0; j < Prop->ArrayDim; j++ )
           {
