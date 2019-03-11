@@ -366,6 +366,45 @@ void UModel::Load()
     idx ObjRef;
     *PkgFile >> CINDEX( ObjRef );
     Polys = (UPolys*)LoadObject( ObjRef, UPolys::StaticClass(), this );
+
+    if ( PkgFile->Ver <= PKG_VER_UN_200 )
+      return;
+
+    *PkgFile >> CINDEX( Num );
+    LightMap.Resize( Num );
+    for ( int i = 0; i < Num; i++ )
+      *PkgFile >> LightMap[i];
+
+    *PkgFile >> CINDEX( Num );
+    LightBits.Resize( Num );
+    for ( int i = 0; i < Num; i++ )
+      *PkgFile >> LightBits[i];
+
+    *PkgFile >> CINDEX( Num );
+    Bounds.Resize( Num );
+    for ( int i = 0; i < Num; i++ )
+      *PkgFile >> Bounds[i];
+
+    *PkgFile >> CINDEX( Num );
+    LeafHulls.Resize( Num );
+    for ( int i = 0; i < Num; i++ )
+      *PkgFile >> LeafHulls[i];
+
+    *PkgFile >> CINDEX( Num );
+    Leaves.Resize( Num );
+    for ( int i = 0; i < Num; i++ )
+      *PkgFile >> Leaves[i];
+
+    *PkgFile >> CINDEX( Num );
+    Lights.Resize( Num );
+    for ( int i = 0; i < Num; i++ )
+    {
+      *PkgFile >> CINDEX( ObjRef );
+      Lights[i] = (AActor*)LoadObject( ObjRef, AActor::StaticClass(), this ); // why Actor class and not Light?
+    }
+
+    *PkgFile >> (u32&)RootOutside;
+    *PkgFile >> (u32&)Linked;
   }
 }
 

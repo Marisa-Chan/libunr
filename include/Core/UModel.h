@@ -271,6 +271,9 @@ class DLL_EXPORT UModel : public UPrimitive
   Array<FLeaf> Leaves;
   Array<AActor*> Lights;
 
+  bool RootOutside;
+  bool Linked;
+  int MoverLink;
   int NumSharedSides;
   int NumZones;
   FZoneProperties Zones[MAX_ZONES];
