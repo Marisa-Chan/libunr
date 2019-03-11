@@ -168,7 +168,7 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
   Pkg->Name = "MyLevel";
 
   // Write beginning map
-  Out->Write( (char*)"Begin Map\r\n", 11 );
+  Out->Printf( "Begin Map\r\n" );
 
   // Loop through all actors
   String ActorBuf;
@@ -183,12 +183,7 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
       continue;
 
     // Write begin actor
-    ActorBuf += "Begin Actor Class=";
-    ActorBuf += Actor->Class->Name;
-    ActorBuf += " Name=";
-    ActorBuf += Actor->Name;
-    ActorBuf += "\r\n";
-    Out->Write( ActorBuf.Data(), ActorBuf.Length() );
+    Out->Printf("Begin Actor Class=%s Name=%s\r\n", Actor->Class->Name, Actor->Name );
 
     // Write actor properties
     ActorBuf.Erase();
