@@ -261,11 +261,11 @@ void UPolys::ExportToLevelText( FileStreamOut* Out )
       Out->Printf(" Item=%s", Pkg->GetNameEntry( Poly.ItemName )->Data );
     if ( Poly.Texture != NULL )
     {
-      String* TexName = Pkg->GetFullObjName( Poly.Texture->Export );
-      Out->Printf(" Texture=%s", TexName );
+      String* TexName = Poly.Texture->Pkg->GetFullObjName( Poly.Texture->Export );
+      Out->Printf(" Texture=%s", TexName->Data() );
     }
     if ( Poly.PolyFlags != 0 )
-      Out->Printf( "Flags=%i", Poly.PolyFlags );
+      Out->Printf( " Flags=%i", Poly.PolyFlags );
     if ( Poly.iLink != -1 )
       Out->Printf(" Link=%i", Poly.iLink );
     Out->Printf("\r\n");
