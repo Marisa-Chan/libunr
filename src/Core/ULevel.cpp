@@ -29,6 +29,7 @@
 #include "Actors/AActor.h"
 #include "Actors/ABrush.h"
 #include "Actors/ANavigationPoint.h"
+#include "Actors/APlayerPawn.h"
 
 DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FReachSpec& RS )
 {
@@ -175,6 +176,10 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
   for ( size_t i = 0; i < Actors.Size() && i != MAX_SIZE; i++ )
   {
     AActor* Actor = Actors[i];
+      
+    // Don't export camera actors
+    if ( Actor->Class == ACamera::StaticClass() )
+      continue;
 
     // Write begin actor
     ActorBuf += "Begin Actor Class=";
@@ -220,7 +225,7 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
                 Brush->ExportToLevelText( Out );
               }
               else if ( Prop->Class == UObjectProperty::StaticClass() &&
-                        ((UObjectProperty*)Prop)->ObjectType->IsA( ANavigationPoint::StaticClass() ) )
+                        ((UObjectProperty*)Prop)->ObjectType->ClassIsA( ANavigationPoint::StaticClass() ) )
               {
                 continue;
               }

@@ -185,6 +185,7 @@ class DLL_EXPORT UClass : public UState
   virtual void Load();
   virtual void PostLoad();
 
+  bool ClassIsA( UClass* ClassType );
   bool IsNative();
   UObject* CreateObject();
   void SetSuperClassProperties();

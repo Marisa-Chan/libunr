@@ -993,6 +993,22 @@ void UClass::PostLoad()
   Super::PostLoad();
 }
 
+bool UClass::ClassIsA( UClass* ClassType )
+{
+  for ( UClass* Cls = this; Cls != NULL; Cls = Cls->SuperClass )
+  {
+    if ( UNLIKELY( Cls->Class != UClass::StaticClass() ) )
+    {
+      Logf( LOG_CRIT, "CLASS SUPERFIELD IS NOT A UCLASS INSTANCE!!!" );
+      GSystem->Exit( -1 );
+    }
+
+    if ( Cls == ClassType )
+      return true;
+  }
+  return false;
+}
+
 bool UClass::IsNative()
 {
   // NOTE: this is NOT checking class flags
