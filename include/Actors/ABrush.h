@@ -34,6 +34,7 @@ class DLL_EXPORT ABrush : public AActor
   EXPORTABLE()
 
   ABrush();
+  void ExportToLevelText( FileStreamOut* Out );
 
   enum ECsgOper
   {

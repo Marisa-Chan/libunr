@@ -24,6 +24,7 @@
 */
 
 #include "Core/UClass.h"
+#include "Core/UModel.h"
 #include "Actors/ABrush.h"
 
 ABrush::ABrush()
@@ -47,6 +48,13 @@ AMover::~AMover()
 bool ABrush::ExportToFile( const char* Dir, const char* Type )
 {
   return false;
+}
+
+void ABrush::ExportToLevelText( FileStreamOut* Out )
+{
+  Out->Printf( "\r\n\tBegin Brush Name=%s\r\n", Brush->Name );
+  Brush->Polys->ExportToLevelText( Out );
+  Out->Printf( "\tEnd Brush\r\n" );
 }
 
 IMPLEMENT_NATIVE_CLASS( ABrush );

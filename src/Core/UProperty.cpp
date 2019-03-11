@@ -66,7 +66,7 @@ void UProperty::Load()
   
   if ( PropertyFlags & CPF_Net )
     *PkgFile >> ReplicationOffset;
-  
+ 
   if ( Outer->ObjectFlags & RF_Native )
     Offset = GetNativeOffset( Outer->Name, Name );
 

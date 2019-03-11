@@ -27,6 +27,8 @@
 #include "Core/ULevel.h"
 #include "Core/UProperty.h"
 #include "Actors/AActor.h"
+#include "Actors/ABrush.h"
+#include "Actors/ANavigationPoint.h"
 
 DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FReachSpec& RS )
 {
@@ -160,6 +162,10 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
     return false;
   }
 
+  // Temporarily change package name to MyLevel
+  const char* PkgName = Pkg->Name;
+  Pkg->Name = "MyLevel";
+
   // Write beginning map
   Out->Write( (char*)"Begin Map\r\n", 11 );
 
@@ -192,9 +198,10 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
           continue;
         }
 
-        for ( int j = 0; j < Prop->ArrayDim; j++ )
+        if ( (Prop->ObjectFlags & RF_TagExp) && 
+           (!(Prop->PropertyFlags & CPF_Const) || (Prop->PropertyFlags & (CPF_Edit|CPF_ExportObject)) ) )
         {
-          if ( !(Prop->PropertyFlags & CPF_NeedsExport) )
+          for ( int j = 0; j < Prop->ArrayDim; j++ )
           {
             // Get default property of this class
             Prop->GetText( ValueBuf, Actor, Actor->Class->Default, j );
@@ -207,21 +214,22 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
                 ValueBuf.Erase();
                 continue;
               }
-
-              ActorBuf += '\t';
-              ActorBuf += Prop->Name;
-              if ( Prop->ArrayDim > 1 )
+              else if ( Actor->Class == ABrush::StaticClass() && Prop->Hash == FnvHashString("Brush") )
               {
-                ActorBuf += '(';
-                ActorBuf += String( j );
-                ActorBuf += ')';
+                ABrush* Brush = (ABrush*)Actor;
+                Brush->ExportToLevelText( Out );
               }
-              ActorBuf += '=';
-              ActorBuf += ValueBuf;
-              ActorBuf += "\r\n";
+              else if ( Prop->Class == UObjectProperty::StaticClass() &&
+                        ((UObjectProperty*)Prop)->ObjectType->IsA( ANavigationPoint::StaticClass() ) )
+              {
+                continue;
+              }
 
-              Out->Write( ActorBuf.Data(), ActorBuf.Length() );
-              ActorBuf.Erase();
+              if ( Prop->ArrayDim > 1 )
+                Out->Printf( "\t%s(%i)=%s\r\n", Prop->Name, j, ValueBuf.Data() );
+              else
+                Out->Printf( "\t%s=%s\r\n", Prop->Name, ValueBuf.Data() );
+              
               ValueBuf.Erase();
             }
           }
@@ -232,6 +240,12 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
     // Write end actor
     Out->Write( (char*)"End Actor\r\n", 11 );
   }
+
+  // Write end map
+  Out->Write( (char*)"End Map\r\n", 9 );
+  Out->Close();
+
+  // Restore package name
 }
 
 IMPLEMENT_NATIVE_CLASS( ULevelBase );

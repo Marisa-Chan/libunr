@@ -354,7 +354,7 @@ void UObject::ReadDefaultProperties()
       // from it's SuperClass value, but doesn't need to be recorded since that value
       // will always be the name of the script being exported while simultaneously 
       // covering that the Tag value be written when exporting a level.
-      Prop->PropertyFlags |= CPF_NeedsExport;
+      Prop->ObjectFlags |= RF_TagExp;
     }
 
     *PkgFile >> InfoByte;

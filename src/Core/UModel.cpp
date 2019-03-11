@@ -250,6 +250,43 @@ void UPolys::Load()
     *PkgFile >> Element[i];
 }
 
+void UPolys::ExportToLevelText( FileStreamOut* Out )
+{
+  Out->Printf( "\t\tBegin PolyList\r\n" );
+  for ( int i = 0; i < Element.Size(); i++ )
+  {
+    FPoly& Poly = Element[i];
+    Out->Printf("\t\t\tBegin Polygon");
+    if ( Poly.ItemName != 0 )
+      Out->Printf(" Item=%s", Pkg->GetNameEntry( Poly.ItemName )->Data );
+    if ( Poly.Texture != NULL )
+    {
+      String* TexName = Pkg->GetFullObjName( Poly.Texture->Export );
+      Out->Printf(" Texture=%s", TexName );
+    }
+    if ( Poly.iLink != -1 )
+      Out->Printf(" Link=%i", Poly.iLink );
+    Out->Printf("\r\n");
+
+    Out->Printf("\t\t\t\tOrigin   %+013.6f,%+013.6f,%+013.6f\r\n",
+        Poly.Base.X, Poly.Base.Y, Poly.Base.Z );
+    Out->Printf("\t\t\t\tNormal   %+013.6f,%+013.6f,%+013.6f\r\n",
+        Poly.Normal.X, Poly.Normal.Y, Poly.Normal.Z );
+    Out->Printf("\t\t\t\tTextureU %+013.6f,%+013.6f,%+013.6f\r\n",
+        Poly.TextureU.X, Poly.TextureU.Y, Poly.TextureU.Z );
+    Out->Printf("\t\t\t\tTextureV %+013.6f,%+013.6f,%+013.6f\r\n",
+        Poly.TextureV.X, Poly.TextureV.Y, Poly.TextureV.Z );
+    Out->Printf("\t\t\t\tPan      U=%i V=%i\r\n", Poly.PanU, Poly.PanV );
+    
+    for ( int j = 0; j < Poly.NumVertices; j++ )
+      Out->Printf("\t\t\t\tVertex   %+013.6f,%+013.6f,%+013.6f\r\n",
+        Poly.Vertex[j].X, Poly.Vertex[j].Y, Poly.Vertex[j].Z );
+
+    Out->Printf("\t\t\tEnd Polygon\r\n");
+  }
+  Out->Printf( "\t\tEnd PolyList\r\n" );
+}
+
 UModel::UModel()
   : UPrimitive()
 {

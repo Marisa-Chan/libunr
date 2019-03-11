@@ -56,6 +56,7 @@ struct FDecal
 struct DLL_EXPORT FPoly
 {
   friend FPackageFileIn& operator>>( FPackageFileIn& Ar, FPoly& P );
+  void ExportToLevelText( FileStreamOut* Out );
 
   FVector Base;
   FVector Normal;
@@ -78,6 +79,7 @@ class DLL_EXPORT UPolys : public UObject
   UPolys();
 
   virtual void Load();
+  void ExportToLevelText( FileStreamOut* Out );
 
   Array<FPoly> Element;
 };
