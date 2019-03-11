@@ -808,8 +808,7 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
 
   // Write default properties
   String ValueBuf;
-  String DefProp;
-  Out->Write( (char*)"defaultproperties\r\n{\r\n", 22 );
+  Out->Printf( "defaultproperties\r\n{\r\n" );
   for ( UField* Iter = Default->Field; Iter != NULL; Iter = Iter->Next )
   {
     if ( Iter->IsA( UProperty::StaticClass() ) )
@@ -824,7 +823,7 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
 
       for ( int i = 0; i < PropIter->ArrayDim; i++ )
       {
-        if ( PropIter->PropertyFlags & CPF_NeedsExport )
+        if ( PropIter->ObjectFlags & RF_TagExp )
         {
           // Get default property from super class
           UObject* DefObj = (PropIter->Outer == this) ? NULL : SuperClass->Default;
@@ -839,27 +838,18 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
               continue;
             }
 
-            DefProp += '\t';
-            DefProp += PropIter->Name;
             if ( PropIter->ArrayDim > 1 )
-            {
-              DefProp += '[';
-              DefProp += String( i );
-              DefProp += ']';
-            }
-            DefProp += '=';
-            DefProp += ValueBuf;
-            DefProp += "\r\n";
+              Out->Printf( "\t%s(%i)=%s\r\n", PropIter->Name, i, ValueBuf.Data() );
+            else
+              Out->Printf( "\t%s=%s\r\n", PropIter->Name, ValueBuf.Data() );
 
-            Out->Write( DefProp.Data(), DefProp.Length() );
-            DefProp.Erase();
             ValueBuf.Erase();
           }
         }
       }
     }
   }
-  Out->Write( (char*)"}\r\n", 3 );
+  Out->Printf( "}\r\n" );
 
   Out->Close();
   delete Out;
