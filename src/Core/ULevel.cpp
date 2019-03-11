@@ -177,8 +177,9 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
   {
     AActor* Actor = Actors[i];
       
-    // Don't export camera actors
-    if ( Actor->Class == ACamera::StaticClass() )
+    // Don't export unnecessary actors
+    if ( Actor->Class == ACamera::StaticClass() || 
+        (Actor->Class->ClassFlags & CLASS_NoUserCreate) )
       continue;
 
     // Write begin actor
