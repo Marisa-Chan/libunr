@@ -39,8 +39,9 @@ A Level object contains the following:
 - TimeSeconds (float)
 - Unknown (3 bytes)
 - TextBuffer (might have camera location data? purpose is unknown)
-- Unknown (10 bytes?)
-  - It always seems like there are just zeros here
+- Unknown (???)
+  - It always seems like there are just zeros here, the number of them varies
+    per version. 9 for 60, 11 for 61, and 10 otherwise
 
 ---------------------------------------------------------------------
 Brush
