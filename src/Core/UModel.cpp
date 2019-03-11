@@ -264,6 +264,8 @@ void UPolys::ExportToLevelText( FileStreamOut* Out )
       String* TexName = Pkg->GetFullObjName( Poly.Texture->Export );
       Out->Printf(" Texture=%s", TexName );
     }
+    if ( Poly.PolyFlags != 0 )
+      Out->Printf( "Flags=%i", Poly.PolyFlags );
     if ( Poly.iLink != -1 )
       Out->Printf(" Link=%i", Poly.iLink );
     Out->Printf("\r\n");
