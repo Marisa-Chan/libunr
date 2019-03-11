@@ -498,7 +498,7 @@ const char* UPackage::GetFileName()
 String* UPackage::GetFullObjName( FExport* ObjExp )
 {
   // Get all names into a stack
-  Stack<char*>* Names = new Stack<char*>();
+  static Stack<char*>* Names = new Stack<char*>();
   FExport* Exp = ObjExp;
 
   Names->Push( GetNameEntry( Exp->ObjectName )->Data );

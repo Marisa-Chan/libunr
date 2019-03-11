@@ -220,7 +220,7 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
                 ValueBuf.Erase();
                 continue;
               }
-              else if ( Actor->Class == ABrush::StaticClass() && Prop->Hash == FnvHashString("Brush") )
+              else if ( Prop->Hash == FnvHashString("Brush") )
               {
                 ABrush* Brush = (ABrush*)Actor;
                 Brush->ExportToLevelText( Out );
@@ -228,7 +228,8 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
               else if ( Prop->Class == UObjectProperty::StaticClass() &&
                         ((UObjectProperty*)Prop)->ObjectType->ClassIsA( ANavigationPoint::StaticClass() ) )
               {
-                continue;
+                ValueBuf.Erase();
+                break;
               }
 
               if ( Prop->ArrayDim > 1 )
