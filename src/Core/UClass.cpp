@@ -978,10 +978,10 @@ void UClass::PostLoad()
 
         // Copy property values from SuperClass default object
         if ( LIKELY( SuperClass != NULL ) )
-          xstl::Copy( PtrAdd( Default, UObject::StaticClass()->StructSize ),
-                      SuperClass->StructSize - UObject::StaticClass()->StructSize,
-                      PtrAdd( SuperClass->Default, UObject::StaticClass()->StructSize ),
-                      SuperClass->StructSize - UObject::StaticClass()->StructSize );
+          xstl::Copy( PtrAdd( QueuedClass->Default, UObject::StaticClass()->StructSize ),
+                      QueuedClass->SuperClass->StructSize - UObject::StaticClass()->StructSize,
+                      PtrAdd( QueuedClass->SuperClass->Default, UObject::StaticClass()->StructSize ),
+                      QueuedClass->SuperClass->StructSize - UObject::StaticClass()->StructSize );
 
         QueuedClass->Default->ReadDefaultProperties();
         QueuedClass->Default->PkgFile = NULL;
