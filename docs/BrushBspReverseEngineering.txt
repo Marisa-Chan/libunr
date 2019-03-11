@@ -4,6 +4,8 @@ any of these formats in detail.
 
 UShock is a level viewer that has had RE work done on the level format, 
 but the methods of RE are questionable and the code is not very clean.
+Regardless, it has been somewhat useful in correlating public header
+info with what is inside the packages
 
 All information was discovered through analyzing hex dumps of various
 maps from various versions and various games.
@@ -13,9 +15,13 @@ Level
 ---------------------------------------------------------------------
 The Level object contains info about the level that is loaded. No package
 other than save files and maps should have a Level object, and these packages
-should never have more than 1 Level object. A Level object contains the
-following:
+should never have more than 1 Level object. UShock was not entirely helpful in
+figuring out this object as it seemed to just skip 7 bytes of data for
+no reason. Additionally, the Model variable did not always point to
+an object reference for a Model object. Some ad-hoc poking around
+eventually led to this current definition of the Level object.
 
+A Level object contains the following:
 - Property list (seems to only have None?)
 - Number of actors
 - Number of actors (higher than version 61?) OR ???
@@ -28,25 +34,52 @@ following:
   - Unknown BYTE (Options array maybe?)
   - Port (INT)
   - bValid? (BYTE)
-- Unknown data of variable length follows
-  - (Try saving maps without this data and see what happens?)
+- Model object (seems to contain most info out of any other Model)
+- ReachSpecs (FReachSpec array)
+- TimeSeconds (float)
+- Unknown (3 bytes)
+- TextBuffer (might have camera location data? purpose is unknown)
+- Unknown (10 bytes?)
+  - It always seems like there are just zeros here
 
 ---------------------------------------------------------------------
 Brush
 ---------------------------------------------------------------------
-All brushes seem to contain property lists that describe their information
-in well enough detail. This could be used for exporting to T3D and the like.
+All brushes seem to contain property lists that describe the information
+you'd expect to see (location, rotation, scaling, CSG mode, etc).
 
 ---------------------------------------------------------------------
 Model
 ---------------------------------------------------------------------
-Models seem to be the objects used to store polygon and BSP data
+Models seem to be the objects used to store polygon and BSP data. Most
+if not all of these assumptions were made using UShock as a reference
+and verifying their correctness in UTPT. If these assumptions led to the
+exact end of the file, then it was assumed that this is the correct format.
 
 A Model object contains the following:
-- 
+- Property list (None)
+- BoundingBox
+- BoundingSphere (FVector on ver<=61, FPlane on newer)
+- Vectors  (object if ver<=61, array otherwise)
+- Points   (object if ver<=61, array otherwise)
+- BspNodes (object if ver<=61, array otherwise)
+- BspSurfs (object if ver<=61, array otherwise)
+- Verts    (object if ver<=61, array otherwise)
+- NumSharedSides (ver>61)
+- NumZones (ver>61)
+- FZoneProperties * NumZones (ver>61)
+- Polys (object reference)
+- FLightMapIndex array
+- LightBits (BYTE array)
+- Bounds (FBox array)
+- LeafHulls (int array)
+- Leaves (FLeaf array)
+- Lights (AActor array, probably should be ALight array)
+- Unknown WORD (ver<=61)
+- RootOutside (dword bool)
+- Linked (dword bool)
 
 ---------------------------------------------------------------------
 BspSurfs
 ---------------------------------------------------------------------
-Might store the Surface properties?? Needs more investigation
 
