@@ -226,6 +226,9 @@ void UVerts::Load()
 
     for ( int i = 0; i < Num; i++ )
       *PkgFile >> (*Data)[i];
+
+    // Is this correct?
+    *PkgFile >> CINDEX( ((UModel*)Outer)->NumSharedSides );
   }
 }
 
@@ -302,10 +305,9 @@ void UModel::Load()
 {
   Super::Load();
 
+  idx Num, ObjRef;
   if ( PkgFile->Ver < PKG_VER_UT_400 )
   {
-    idx ObjRef;
-
     *PkgFile >> CINDEX( ObjRef );
     UVectors* OldVectors = (UVectors*)LoadObject( ObjRef, UVectors::StaticClass(), this );
     delete OldVectors;
@@ -326,13 +328,9 @@ void UModel::Load()
     UVerts* OldVerts = (UVerts*)LoadObject( ObjRef, UVerts::StaticClass(), this );
     delete OldVerts;
 
-    *PkgFile >> CINDEX( ObjRef );
-    Polys = (UPolys*)LoadObject( ObjRef, UPolys::StaticClass(), this );
   }
   else
   {
-    idx Num;
-
     *PkgFile >> CINDEX( Num );
     Vectors.Resize( Num );
     for ( int i = 0; i < Num; i++ )
@@ -362,50 +360,53 @@ void UModel::Load()
     *PkgFile >> NumZones;
     for ( int i = 0; i < NumZones; i++ )
       *PkgFile >> Zones[i];
-
-    idx ObjRef;
-    *PkgFile >> CINDEX( ObjRef );
-    Polys = (UPolys*)LoadObject( ObjRef, UPolys::StaticClass(), this );
-
-    if ( PkgFile->Ver <= PKG_VER_UN_200 )
-      return;
-
-    *PkgFile >> CINDEX( Num );
-    LightMap.Resize( Num );
-    for ( int i = 0; i < Num; i++ )
-      *PkgFile >> LightMap[i];
-
-    *PkgFile >> CINDEX( Num );
-    LightBits.Resize( Num );
-    for ( int i = 0; i < Num; i++ )
-      *PkgFile >> LightBits[i];
-
-    *PkgFile >> CINDEX( Num );
-    Bounds.Resize( Num );
-    for ( int i = 0; i < Num; i++ )
-      *PkgFile >> Bounds[i];
-
-    *PkgFile >> CINDEX( Num );
-    LeafHulls.Resize( Num );
-    for ( int i = 0; i < Num; i++ )
-      *PkgFile >> LeafHulls[i];
-
-    *PkgFile >> CINDEX( Num );
-    Leaves.Resize( Num );
-    for ( int i = 0; i < Num; i++ )
-      *PkgFile >> Leaves[i];
-
-    *PkgFile >> CINDEX( Num );
-    Lights.Resize( Num );
-    for ( int i = 0; i < Num; i++ )
-    {
-      *PkgFile >> CINDEX( ObjRef );
-      Lights[i] = (AActor*)LoadObject( ObjRef, AActor::StaticClass(), this ); // why Actor class and not Light?
-    }
-
-    *PkgFile >> (u32&)RootOutside;
-    *PkgFile >> (u32&)Linked;
   }
+
+  *PkgFile >> CINDEX( ObjRef );
+  Polys = (UPolys*)LoadObject( ObjRef, UPolys::StaticClass(), this );
+
+  *PkgFile >> CINDEX( Num );
+  LightMap.Resize( Num );
+  for ( int i = 0; i < Num; i++ )
+    *PkgFile >> LightMap[i];
+
+  *PkgFile >> CINDEX( Num );
+  LightBits.Resize( Num );
+  for ( int i = 0; i < Num; i++ )
+    *PkgFile >> LightBits[i];
+
+  *PkgFile >> CINDEX( Num );
+  Bounds.Resize( Num );
+  for ( int i = 0; i < Num; i++ )
+    *PkgFile >> Bounds[i];
+
+  *PkgFile >> CINDEX( Num );
+  LeafHulls.Resize( Num );
+  for ( int i = 0; i < Num; i++ )
+    *PkgFile >> LeafHulls[i];
+
+  *PkgFile >> CINDEX( Num );
+  Leaves.Resize( Num );
+  for ( int i = 0; i < Num; i++ )
+    *PkgFile >> Leaves[i];
+
+  *PkgFile >> CINDEX( Num );
+  Lights.Resize( Num );
+  for ( int i = 0; i < Num; i++ )
+  {
+    *PkgFile >> CINDEX( ObjRef );
+    Lights[i] = (AActor*)LoadObject( ObjRef, AActor::StaticClass(), this ); // why Actor class and not Light?
+  }
+
+  // What are these??? (Seems to only appear in some stock Unreal maps)
+  if ( PkgFile->Ver <= PKG_VER_UN_200 )
+  {
+    u16 _Unknown;
+    *PkgFile >> _Unknown;
+  }
+
+  *PkgFile >> (u32&)RootOutside;
+  *PkgFile >> (u32&)Linked;
 }
 
 IMPLEMENT_NATIVE_CLASS( UVectors );
