@@ -63,9 +63,19 @@ ALevelInfo::~ALevelInfo()
 {
 }
 
+AWarpZoneInfo::AWarpZoneInfo()
+  : AZoneInfo()
+{
+}
+
+AWarpZoneInfo::~AWarpZoneInfo()
+{
+}
+
 IMPLEMENT_NATIVE_CLASS( AZoneInfo );
 IMPLEMENT_NATIVE_CLASS( ULevelSummary );
 IMPLEMENT_NATIVE_CLASS( ALevelInfo );
+IMPLEMENT_NATIVE_CLASS( AWarpZoneInfo );
 
 BEGIN_PROPERTY_LINK( AZoneInfo, 70 )
   LINK_NATIVE_PROPERTY( AZoneInfo, ZoneTag );
@@ -224,5 +234,17 @@ BEGIN_PROPERTY_LINK( ALevelInfo, 74 )
   LINK_NATIVE_PROPERTY( ALevelInfo, CommonRadius );
   LINK_NATIVE_PROPERTY( ALevelInfo, HumanRadius );
   LINK_NATIVE_PROPERTY( ALevelInfo, HumanHeight );
+END_PROPERTY_LINK()
+
+BEGIN_PROPERTY_LINK( AWarpZoneInfo, 9 )
+  LINK_NATIVE_PROPERTY( AWarpZoneInfo, OtherSideURL );
+  LINK_NATIVE_PROPERTY( AWarpZoneInfo, ThisTag );
+  LINK_NATIVE_PROPERTY( AWarpZoneInfo, bNoTeleFrag );
+  LINK_NATIVE_PROPERTY( AWarpZoneInfo, iWarpZone );
+  LINK_NATIVE_PROPERTY( AWarpZoneInfo, WarpCoords );
+  LINK_NATIVE_PROPERTY( AWarpZoneInfo, OtherSideActor );
+  LINK_NATIVE_PROPERTY( AWarpZoneInfo, OtherSideLevel );
+  LINK_NATIVE_ARRAY   ( AWarpZoneInfo, Destinations );
+  LINK_NATIVE_PROPERTY( AWarpZoneInfo, NumDestinations );
 END_PROPERTY_LINK()
 

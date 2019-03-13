@@ -503,6 +503,19 @@ class AActor : public UObject
   };
 };
 
+class ABlockingActor : public AActor
+{
+  DECLARE_NATIVE_CLASS( ABlockingActor, AActor, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  ABlockingActor();
+
+  bool bBlockSubClasses;
+  Array<UClass*>* BlockingClasses;
+  Array<UClass*>* IgnoreSubClasses;
+  Array<UClass*>* ScriptBlocking;
+};
+
 class ADecoration : public AActor
 {
   DECLARE_NATIVE_CLASS( ADecoration, AActor, 0, Engine )
@@ -580,6 +593,18 @@ class AKeypoint : public AActor
   AKeypoint();
 };
 
+class ACollisionPlane : public AKeypoint
+{
+  DECLARE_NATIVE_CLASS( ACollisionPlane, AKeypoint, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  ACollisionPlane();
+
+  float CollisionBounds[4];
+  bool bBlockZeroExtent;
+  bool bBlockNonZeroExtent;
+};
+
 class AInterpolationPoint : public AKeypoint
 {
   DECLARE_NATIVE_CLASS( AInterpolationPoint, AKeypoint, 0, Engine )
@@ -615,6 +640,58 @@ class ALight : public AActor
 
   Array<idx>* ShadowMoverTags;
   Array<ShadowMoverInfo>* MoverShadowSurfs;
+};
+
+class ADynamicCorona : public ALight
+{
+  DECLARE_NATIVE_CLASS( ADynamicCorona, ALight, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  ADynamicCorona();
+
+  enum ECoronaAttenuateType
+  {
+    CATT_WorldOnly,
+    CATT_WorldNMovers,
+    CATT_Actors
+  };
+
+  bool bDirectionalCorona;
+  float MaxSize;
+  float DisplayDistance;
+  float CoronaSize;
+  float FadeOutDistance;
+  FColor CoronaColor;
+  FColor CloseDistanceColor;
+  ECoronaAttenuateType CoronaAttenuate;
+};
+
+class ASunlightCorona : public ALight
+{
+  DECLARE_NATIVE_CLASS( ASunlightCorona, ALight, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  ASunlightCorona();
+
+  struct LensFlareCastType
+  {
+    float ZDistance;
+    float Scale;
+    UTexture* LensTexture;
+    FColor LensColor;
+  };
+
+  bool bMustMatchZone;
+  bool bRenderLensFlares;
+  FColor SunlightColor;
+  float BlindingScale;
+  float BlindingFOV;
+  float MaxSkyDistance;
+  float SunFadeTimeScale;
+  UTexture* SunlightTexture;
+  LensFlareCastType LensFlares[8];
+  float FlaresDisplayFov;
+  bool bUScriptRenderHandler;
 };
 
 class AMutator : public AActor
@@ -684,6 +761,18 @@ class AProjectile : public AActor
   AActor* LastHitActor;
 };
 
+class AStaticMeshActor : public AActor
+{
+  DECLARE_NATIVE_CLASS( AStaticMeshActor, AActor, CLASS_NoUserCreate, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  AStaticMeshActor();
+
+  UStaticLightData StaticLightD;
+  bool bBuildStaticLights;
+  bool bComputeUnlitColor;
+};
+
 class ASpawnNotify : public AActor
 {
   DECLARE_NATIVE_CLASS( ASpawnNotify, AActor, 0, Engine )
@@ -733,5 +822,15 @@ class ATrigger : public ATriggers
 
   AActor* TriggerActor;
   AActor* TriggerActor2;
+};
+
+class AVisibilityNotify : public AInfo
+{
+  DECLARE_NATIVE_CLASS( AVisibilityNotify, AInfo, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  AVisibilityNotify();
+
+  AVisibilityNotify* NextNotify;
 };
 

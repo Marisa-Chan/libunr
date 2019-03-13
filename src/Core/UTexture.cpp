@@ -255,11 +255,21 @@ UScriptedTexture::~UScriptedTexture()
 {
 }
 
+UShadowBitMap::UShadowBitMap()
+  : UTexture()
+{
+}
+
+UShadowBitMap::~UShadowBitMap()
+{
+}
+
 IMPLEMENT_NATIVE_CLASS( UPalette );
 IMPLEMENT_NATIVE_CLASS( UBitmap );
 IMPLEMENT_NATIVE_CLASS( UFont );
 IMPLEMENT_NATIVE_CLASS( UTexture );
 IMPLEMENT_NATIVE_CLASS( UScriptedTexture );
+IMPLEMENT_NATIVE_CLASS( UShadowBitMap );
 
 BEGIN_PROPERTY_LINK( UPalette, 1 )
   LINK_NATIVE_ARRAY( UPalette, Colors ); 
@@ -363,5 +373,15 @@ BEGIN_PROPERTY_LINK( UScriptedTexture, 13 )
   LINK_NATIVE_PROPERTY( UScriptedTexture, LocalTime );
   LINK_NATIVE_PROPERTY( UScriptedTexture, PortalPtr );
   LINK_NATIVE_PROPERTY( UScriptedTexture, PortalInfo );
+END_PROPERTY_LINK()
+
+BEGIN_PROPERTY_LINK( UShadowBitMap, 7 )
+  LINK_NATIVE_PROPERTY( UShadowBitMap, ProjectingActor );
+  LINK_NATIVE_PROPERTY( UShadowBitMap, ProjectDirection );
+  LINK_NATIVE_PROPERTY( UShadowBitMap, Gradience );
+  LINK_NATIVE_PROPERTY( UShadowBitMap, Softness );
+  LINK_NATIVE_PROPERTY( UShadowBitMap, StaticLevel );
+  LINK_NATIVE_PROPERTY( UShadowBitMap, ShadowScale );
+  LINK_NATIVE_PROPERTY( UShadowBitMap, bIsValid );
 END_PROPERTY_LINK()
 

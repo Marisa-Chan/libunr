@@ -53,6 +53,24 @@ void ANavigationPoint::PostDefaultLoad()
   }
 }
 
+AWarpZoneMarker::AWarpZoneMarker()
+  : ANavigationPoint()
+{
+}
+
+AWarpZoneMarker::~AWarpZoneMarker()
+{
+}
+
+ALiftCenter::ALiftCenter()
+  : ANavigationPoint()
+{
+}
+
+ALiftCenter::~ALiftCenter()
+{
+}
+
 ALiftExit::ALiftExit()
   : ANavigationPoint()
 {
@@ -81,7 +99,9 @@ ATeleporter::~ATeleporter()
 }
 
 IMPLEMENT_NATIVE_CLASS( ANavigationPoint );
+IMPLEMENT_NATIVE_CLASS( AWarpZoneMarker );
 IMPLEMENT_NATIVE_CLASS( ALiftExit );
+IMPLEMENT_NATIVE_CLASS( ALiftCenter );
 IMPLEMENT_NATIVE_CLASS( APlayerStart );
 IMPLEMENT_NATIVE_CLASS( ATeleporter );
 
@@ -117,12 +137,27 @@ BEGIN_PROPERTY_LINK( ANavigationPoint, 30 )
   LINK_NATIVE_PROPERTY( ANavigationPoint, bNoStrafeTo );
 END_PROPERTY_LINK()
 
+BEGIN_PROPERTY_LINK( AWarpZoneMarker, 3 )
+  LINK_NATIVE_PROPERTY( AWarpZoneMarker, markedWarpZone );
+  LINK_NATIVE_PROPERTY( AWarpZoneMarker, TriggerActor );
+  LINK_NATIVE_PROPERTY( AWarpZoneMarker, TriggerActor2 );
+END_PROPERTY_LINK()
+
 BEGIN_PROPERTY_LINK( ALiftExit, 5 )
   LINK_NATIVE_PROPERTY( ALiftExit, LiftTag );
   LINK_NATIVE_PROPERTY( ALiftExit, MyLift );
   LINK_NATIVE_PROPERTY( ALiftExit, LiftTrigger );
   LINK_NATIVE_PROPERTY( ALiftExit, RecommendedTrigger );
   LINK_NATIVE_PROPERTY( ALiftExit, LastTriggerTime );
+END_PROPERTY_LINK()
+
+BEGIN_PROPERTY_LINK( ALiftCenter, 6 )
+  LINK_NATIVE_PROPERTY( ALiftCenter, LiftTag );
+  LINK_NATIVE_PROPERTY( ALiftCenter, MyLift );
+  LINK_NATIVE_PROPERTY( ALiftCenter, LiftTrigger );
+  LINK_NATIVE_PROPERTY( ALiftCenter, RecommendedTrigger );
+  LINK_NATIVE_PROPERTY( ALiftCenter, LastTriggerTime );
+  LINK_NATIVE_PROPERTY( ALiftCenter, MaxZDiffAdd );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( APlayerStart, 4 )

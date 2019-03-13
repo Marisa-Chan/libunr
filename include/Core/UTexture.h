@@ -332,3 +332,22 @@ class DLL_EXPORT UScriptedTexture : public UTexture
   };
 };
 
+// This is deprecated and will never be implemented. Real dynamic shadows will
+// be implemented in the renderer. This class is here simply to allow the export
+// of the ShadowBitMap.uc class
+class DLL_EXPORT UShadowBitMap : public UTexture
+{
+  DECLARE_NATIVE_CLASS( UShadowBitMap, UTexture, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  UShadowBitMap();
+
+  AActor* ProjectingActor;
+  FRotator ProjectDirection;
+  u8 Gradience;
+  u8 Softness;
+  u8 StaticLevel;
+  float ShadowScale;
+  bool bIsValid;
+};
+

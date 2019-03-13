@@ -80,6 +80,18 @@ class ANavigationPoint : public AActor
   bool bNoStrafeTo;
 };
 
+class AWarpZoneMarker : public ANavigationPoint
+{
+  DECLARE_NATIVE_CLASS( AWarpZoneMarker, ANavigationPoint, CLASS_NoUserCreate, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  AWarpZoneMarker();
+
+  class AWarpZoneInfo* markedWarpZone;
+  AActor* TriggerActor;
+  AActor* TriggerActor2;
+};
+
 class ALiftExit : public ANavigationPoint
 {
   DECLARE_NATIVE_CLASS( ALiftExit, ANavigationPoint, 0, Engine )
@@ -96,6 +108,17 @@ class ALiftExit : public ANavigationPoint
 
 class ALiftCenter : public ANavigationPoint
 {
+  DECLARE_NATIVE_CLASS( ALiftCenter, ANavigationPoint, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  ALiftCenter();
+
+  idx LiftTag;
+  class AMover* MyLift;
+  idx LiftTrigger;
+  class ATrigger* RecommendedTrigger;
+  float LastTriggerTime;
+  float MaxZDiffAdd;
 };
 
 class APlayerStart : public ANavigationPoint

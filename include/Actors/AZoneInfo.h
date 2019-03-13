@@ -376,3 +376,22 @@ class ALevelInfo : public AZoneInfo
   int HumanHeight;
 };
 
+class AWarpZoneInfo : public AZoneInfo
+{
+  DECLARE_NATIVE_CLASS( AWarpZoneInfo, AZoneInfo, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  AWarpZoneInfo();
+
+  String* OtherSideURL;
+  idx ThisTag;
+  bool bNoTeleFrag;
+
+  int            iWarpZone;
+  FCoords        WarpCoords;
+  AWarpZoneInfo* OtherSideActor;
+  UObject*       OtherSideLevel;
+  String*        Destinations[8];
+  int            NumDestinations;
+};
+

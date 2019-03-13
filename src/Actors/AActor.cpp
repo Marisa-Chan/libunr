@@ -40,6 +40,24 @@ void AActor::PostDefaultLoad()
   Tag = Class->Export->ObjectName;
 }
 
+ABlockingActor::ABlockingActor()
+  : AActor()
+{
+}
+
+ABlockingActor::~ABlockingActor()
+{
+}
+
+ACollisionPlane::ACollisionPlane()
+  : AKeypoint()
+{
+}
+
+ACollisionPlane::~ACollisionPlane()
+{
+}
+
 AMenu::AMenu()
   : AActor()
 {
@@ -112,6 +130,24 @@ ALight::~ALight()
 {
 }
 
+ADynamicCorona::ADynamicCorona()
+  : ALight()
+{
+}
+
+ADynamicCorona::~ADynamicCorona()
+{
+}
+
+ASunlightCorona::ASunlightCorona()
+  : ALight()
+{
+}
+
+ASunlightCorona::~ASunlightCorona()
+{
+}
+
 AProjectile::AProjectile()
   : AActor()
 {
@@ -127,6 +163,15 @@ ASpawnNotify::ASpawnNotify()
 }
 
 ASpawnNotify::~ASpawnNotify()
+{
+}
+
+AStaticMeshActor::AStaticMeshActor()
+  : AActor()
+{
+}
+
+AStaticMeshActor::~AStaticMeshActor()
 {
 }
 
@@ -148,9 +193,21 @@ ATrigger::~ATrigger()
 {
 }
 
+AVisibilityNotify::AVisibilityNotify()
+  : AInfo()
+{
+}
+
+AVisibilityNotify::~AVisibilityNotify()
+{
+}
+
 IMPLEMENT_NATIVE_CLASS( AActor );
+IMPLEMENT_NATIVE_CLASS( ABlockingActor );
+IMPLEMENT_NATIVE_CLASS( ACollisionPlane );
 IMPLEMENT_NATIVE_CLASS( ACarcass );
 IMPLEMENT_NATIVE_CLASS( ADecoration );
+IMPLEMENT_NATIVE_CLASS( ADynamicCorona );
 IMPLEMENT_NATIVE_CLASS( AInfo );
 IMPLEMENT_NATIVE_CLASS( AInterpolationPoint );
 IMPLEMENT_NATIVE_CLASS( AKeypoint );
@@ -158,9 +215,25 @@ IMPLEMENT_NATIVE_CLASS( ALight );
 IMPLEMENT_NATIVE_CLASS( AMenu );
 IMPLEMENT_NATIVE_CLASS( AProjectile );
 IMPLEMENT_NATIVE_CLASS( ASavedMove );
+IMPLEMENT_NATIVE_CLASS( AStaticMeshActor );
 IMPLEMENT_NATIVE_CLASS( ASpawnNotify );
+IMPLEMENT_NATIVE_CLASS( ASunlightCorona );
 IMPLEMENT_NATIVE_CLASS( ATriggers );
 IMPLEMENT_NATIVE_CLASS( ATrigger );
+IMPLEMENT_NATIVE_CLASS( AVisibilityNotify );
+
+BEGIN_PROPERTY_LINK( ABlockingActor, 4 )
+  LINK_NATIVE_PROPERTY( ABlockingActor, bBlockSubClasses );
+  LINK_NATIVE_PROPERTY( ABlockingActor, BlockingClasses );
+  LINK_NATIVE_PROPERTY( ABlockingActor, IgnoreSubClasses );
+  LINK_NATIVE_PROPERTY( ABlockingActor, ScriptBlocking );
+END_PROPERTY_LINK()
+
+BEGIN_PROPERTY_LINK( ACollisionPlane, 3 )
+  LINK_NATIVE_ARRAY   ( ACollisionPlane, CollisionBounds );
+  LINK_NATIVE_PROPERTY( ACollisionPlane, bBlockZeroExtent );
+  LINK_NATIVE_PROPERTY( ACollisionPlane, bBlockNonZeroExtent );
+END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( ADecoration, 14 )
   LINK_NATIVE_PROPERTY( ADecoration, bPushable ); 
@@ -233,6 +306,31 @@ BEGIN_PROPERTY_LINK( ALight, 2 )
   LINK_NATIVE_PROPERTY( ALight, MoverShadowSurfs );
 END_PROPERTY_LINK()
 
+BEGIN_PROPERTY_LINK( ADynamicCorona, 8 )
+  LINK_NATIVE_PROPERTY( ADynamicCorona, bDirectionalCorona );
+  LINK_NATIVE_PROPERTY( ADynamicCorona, MaxSize );
+  LINK_NATIVE_PROPERTY( ADynamicCorona, DisplayDistance );
+  LINK_NATIVE_PROPERTY( ADynamicCorona, CoronaSize );
+  LINK_NATIVE_PROPERTY( ADynamicCorona, FadeOutDistance );
+  LINK_NATIVE_PROPERTY( ADynamicCorona, CoronaColor );
+  LINK_NATIVE_PROPERTY( ADynamicCorona, CloseDistanceColor );
+  LINK_NATIVE_PROPERTY( ADynamicCorona, CoronaAttenuate );
+END_PROPERTY_LINK()
+
+BEGIN_PROPERTY_LINK( ASunlightCorona, 11 )
+  LINK_NATIVE_PROPERTY( ASunlightCorona, bMustMatchZone );
+  LINK_NATIVE_PROPERTY( ASunlightCorona, bRenderLensFlares );
+  LINK_NATIVE_PROPERTY( ASunlightCorona, SunlightColor );
+  LINK_NATIVE_PROPERTY( ASunlightCorona, BlindingScale );
+  LINK_NATIVE_PROPERTY( ASunlightCorona, BlindingFOV );
+  LINK_NATIVE_PROPERTY( ASunlightCorona, MaxSkyDistance );
+  LINK_NATIVE_PROPERTY( ASunlightCorona, SunFadeTimeScale );
+  LINK_NATIVE_PROPERTY( ASunlightCorona, SunlightTexture );
+  LINK_NATIVE_ARRAY   ( ASunlightCorona, LensFlares );
+  LINK_NATIVE_PROPERTY( ASunlightCorona, FlaresDisplayFov );
+  LINK_NATIVE_PROPERTY( ASunlightCorona, bUScriptRenderHandler );
+END_PROPERTY_LINK()
+
 BEGIN_PROPERTY_LINK( AInterpolationPoint, 10 )
   LINK_NATIVE_PROPERTY( AInterpolationPoint, Position );
   LINK_NATIVE_PROPERTY( AInterpolationPoint, RateModifier );
@@ -265,6 +363,12 @@ BEGIN_PROPERTY_LINK( AMenu, 16 )
   LINK_NATIVE_PROPERTY( AMenu, NoString );
 END_PROPERTY_LINK()
 
+BEGIN_PROPERTY_LINK( AStaticMeshActor, 3 )
+  LINK_NATIVE_PROPERTY( AStaticMeshActor, StaticLightD );
+  LINK_NATIVE_PROPERTY( AStaticMeshActor, bBuildStaticLights );
+  LINK_NATIVE_PROPERTY( AStaticMeshActor, bComputeUnlitColor );
+END_PROPERTY_LINK()
+
 BEGIN_PROPERTY_LINK( ATriggers, 0 )
 END_PROPERTY_LINK()
 
@@ -281,6 +385,10 @@ BEGIN_PROPERTY_LINK( ATrigger, 12 )
   LINK_NATIVE_PROPERTY( ATrigger, DamageThreshold );
   LINK_NATIVE_PROPERTY( ATrigger, TriggerActor );
   LINK_NATIVE_PROPERTY( ATrigger, TriggerActor2 );
+END_PROPERTY_LINK()
+
+BEGIN_PROPERTY_LINK( AVisibilityNotify, 1 )
+  LINK_NATIVE_PROPERTY( AVisibilityNotify, NextNotify );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( AActor, 222 )

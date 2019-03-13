@@ -168,6 +168,7 @@ bool UObject::StaticInit()
           Result &= UWetTexture::StaticClassInit();
         Result &= UIceTexture::StaticClassInit();
       Result &= UScriptedTexture::StaticClassInit();
+      Result &= UShadowBitMap::StaticClassInit();
   Result &= UCanvas::StaticClassInit();
   Result &= UClient::StaticClassInit();
   Result &= UConsole::StaticClassInit();
@@ -206,6 +207,7 @@ bool UObject::StaticInit()
       
   // Init actor classes
   Result &= AActor::StaticClassInit();
+    Result &= ABlockingActor::StaticClassInit();
     Result &= ABrush::StaticClassInit();
       Result &= AMover::StaticClassInit();
     Result &= ADecal::StaticClassInit();
@@ -220,13 +222,19 @@ bool UObject::StaticInit()
         Result &= APlayerReplicationInfo::StaticClassInit();
       Result &= ASavedMove::StaticClassInit();
       Result &= AStatLog::StaticClassInit();
+        Result &= AStatLogFile::StaticClassInit();
       Result &= ATimeDemo::StaticClassInit();
+      Result &= AVisibilityNotify::StaticClassInit();
       Result &= AZoneInfo::StaticClassInit();
         Result &= ADynamicZoneInfo::StaticClassInit();
         Result &= ALevelInfo::StaticClassInit();
+        Result &= AWarpZoneInfo::StaticClassInit();
     Result &= AKeypoint::StaticClassInit();
+      Result &= ACollisionPlane::StaticClassInit();
       Result &= AInterpolationPoint::StaticClassInit();
     Result &= ALight::StaticClassInit();
+      Result &= ADynamicCorona::StaticClassInit();
+      Result &= ASunlightCorona::StaticClassInit();
     Result &= AInventory::StaticClassInit();
       Result &= AWeapon::StaticClassInit();
     Result &= AInventoryAttachment::StaticClassInit();
@@ -235,14 +243,17 @@ bool UObject::StaticInit()
     Result &= AMenu::StaticClassInit();
     Result &= ANavigationPoint::StaticClassInit();
       Result &= AInventorySpot::StaticClassInit();
+      Result &= ALiftCenter::StaticClassInit();
       Result &= ALiftExit::StaticClassInit();
       Result &= APlayerStart::StaticClassInit();
       Result &= ATeleporter::StaticClassInit();
+      Result &= AWarpZoneMarker::StaticClassInit();
     Result &= APawn::StaticClassInit();
       Result &= APlayerPawn::StaticClassInit();
         Result &= ACamera::StaticClassInit();
     Result &= AProjectile::StaticClassInit();
     Result &= AProjector::StaticClassInit();
+    Result &= AStaticMeshActor::StaticClassInit();
     Result &= ASpawnNotify::StaticClassInit();
     Result &= ATriggers::StaticClassInit();
       Result &= ATrigger::StaticClassInit();
