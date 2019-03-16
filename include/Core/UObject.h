@@ -356,7 +356,7 @@ bool cls::StaticLinkNativeProperties() \
   static bool StaticLinkNativeProperties(); 
 
 // There's like two properties in all of UE1 that actually need this...
-#define EXPOSE_PROPERTY(cls, prop, ptype, size) \
+#define EXPOSE_PROPERTY(cls, prop, ptype, size, enumptype) \
   { \
     UClass* ExpCls = cls::StaticClass(); \
     ptype* ExpProp = (ptype*)ptype::StaticClass()->CreateObject(); \
@@ -371,6 +371,7 @@ bool cls::StaticLinkNativeProperties() \
     ExpProp->ObjectFlags = RF_Native; \
     ExpProp->RefCnt = 1; \
     ExpProp->Class = ptype::StaticClass(); \
+    ExpProp->PropertyType = enumptype; \
     ObjectPool->PushBack( ExpProp ); \
     ExpCls->Children = ExpProp; \
     ExpCls->Default->Field = ExpCls->Children; \
@@ -415,10 +416,8 @@ public:
 
   // Property setters
   template<class T> inline void SetProperty( UProperty* Prop, T NewVal, int Idx = 0 );
-  template<class T> inline void SetArrayProperty
-    ( UArrayProperty* ArrayProp, FPackageFileIn* In, int Idx, u8 ByteSize, u8 NumElem );
-  void SetStructProperty( UStructProperty* Prop, FPackageFileIn* In, 
-    int Idx = 0, u32 Offset = 0);
+  template<class T> inline void SetArrayProperty( UArrayProperty* ArrayProp, int Idx, u8 ByteSize, u8 NumElem );
+  void SetStructProperty( UStructProperty* Prop, int Idx = 0, u32 Offset = 0 );
 
   static bool StaticInit();
   static bool StaticExit();

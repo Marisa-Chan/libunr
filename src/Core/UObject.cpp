@@ -265,37 +265,6 @@ UClass* UObject::FindClass( FHash& ClassHash )
   return NULL;
 }
 
-// Antonio's docs seemed to leave out the important detail that these 
-// are stored in big endian, not little endian (need to see what indices
-// >= 16384 look like)
-static int ReadArrayIndex( FPackageFileIn* PkgFile )
-{
-  u8 ArrayIdx[4] = { 0, 0 ,0 ,0 };
-  *PkgFile >> ArrayIdx[0];
-  if ( ArrayIdx[0] >= 128 )
-  {
-    ArrayIdx[1] = ArrayIdx[0];
-    *PkgFile >> ArrayIdx[0];
-    ArrayIdx[1] &= ~0x80;
-
-    // TODO: This whole chunk is probably wrong, but I can't find
-    // any examples that get to 16384 (make one!)
-    if ( *((u16*)&ArrayIdx[0]) >= 16384 )
-    {
-      ArrayIdx[3] = ArrayIdx[1];
-      ArrayIdx[2] = ArrayIdx[0];
-      ArrayIdx[3] &= ~0xC0;
-
-      *PkgFile >> ArrayIdx[1];
-      *PkgFile >> ArrayIdx[0];
-    }
-  }
-
-
-  int Idx = *((int*)&ArrayIdx);
-  return Idx;
-}
-
 // TODO: Print out full names of objects for when properties don't exist
 void UObject::ReadDefaultProperties()
 {
@@ -305,9 +274,8 @@ void UObject::ReadDefaultProperties()
   u8  PropType = 0;
   u8  SizeByte = 0;
   u8  IsArray  = 0;
-  int ArrayIdx = 0;
+  int ArrayIdx;
   int RealSize = 0;
-  bool bIsDescription = false;
 
   while( 1 )
   {
@@ -316,15 +284,14 @@ void UObject::ReadDefaultProperties()
     if ( UNLIKELY( strncmp( PropName, "None", 4 ) == 0 ) )
       break;
 
-    UProperty* Prop = NULL;
-    ArrayIdx = 0;
-    bIsDescription = false;
-
-    Prop = FindProperty( PropName );
+    UProperty* Prop = FindProperty( PropName );
 
     // Read the actual value of the properties even if they don't exist
     // We don't want to totally fail if some property just doesn't exist
     // Instead, the value will just go unused (because nothing is there to use it)
+    // The only cases of failure involve Array and Struct properties since you need
+    // to access data in the property itself to find out what underlying types it
+    // contains. 
     if ( !Prop )
     {
       if ( Outer )
@@ -362,255 +329,41 @@ void UObject::ReadDefaultProperties()
     SizeByte = (InfoByte & 0x70) >> 4;
     IsArray  = (InfoByte & 0x80) >> 7;
 
-    if ( SizeByte > 4 && PropType != PROP_Struct )
+    if ( PropType != PROP_Struct )
     {
-      u8 Size8;
-      u16 Size16;
       switch( SizeByte )
       {
         case 5:
-          *PkgFile >> Size8;
-          RealSize = Size8;
+          *PkgFile >> *(u8*)&RealSize;
           break;
         case 6:
-          *PkgFile >> Size16;
-          RealSize = Size16;
+          *PkgFile >> *(u16*)&RealSize;
           break;
         case 7:
           *PkgFile >> RealSize;
           break;
       }
     }
-    else
+   
+    switch( PropType )
     {
-      RealSize = UProperty::PropertySizes[SizeByte];
+      case PROP_Bool:
+        ArrayIdx = IsArray;
+        break;
+      case PROP_Struct:
+        RealSize = InfoByte;
+        break;
+      default:
+        ArrayIdx = (IsArray) ? ReadArrayIndex( *PkgFile ) : 0;
+        break;
     }
-    
-    if ( IsArray && PropType != PROP_Bool && PropType != PROP_Struct )
-      ArrayIdx = ReadArrayIndex( PkgFile );
 
-    if ( PropType == PROP_Byte )
+    if ( !Prop->LoadDefaultPropertySafe( this, *PkgFile, PropType, RealSize, ArrayIdx ) )
     {
-      u8 Value = 0;
-      *PkgFile >> Value;
-
-      if ( Prop )
-      {
-        if ( Prop->Class != UByteProperty::StaticClass() )
-          Logf( LOG_CRIT, "Default property expected 'ByteProperty', but got '%s'", 
-            Prop->Class->Name );
-        else
-          SetProperty<u8>( Prop, Value, ArrayIdx );
-      }
-    }
-    else if ( PropType == PROP_Int )
-    {
-      int Value = 0;
-      *PkgFile >> Value;
-     
-      if ( Prop )
-      {
-        if ( Prop->Class != UIntProperty::StaticClass() )
-          Logf( LOG_CRIT, "Default property expected 'IntProperty', but got '%s'", Prop->Class->Name );
-        else
-          SetProperty<int>( Prop, Value, ArrayIdx );
-      }
-    }
-    else if ( PropType == PROP_Bool )
-    {
-      if ( Prop )
-      {
-        if ( Prop->Class != UBoolProperty::StaticClass() )
-          Logf( LOG_CRIT, "Default property expected 'BoolProperty', but got '%s'", Prop->Class->Name );
-        else
-          SetProperty<bool>( Prop, IsArray == 1 );
-      }
-    }
-    else if ( PropType == PROP_Float )
-    {
-      float Value = 0;
-      *PkgFile >> Value;
-
-      if ( Prop )
-      {
-        if ( Prop->Class != UFloatProperty::StaticClass() )
-          Logf( LOG_CRIT, "Default property expected 'FloatProperty', but got '%s'", Prop->Class->Name );
-        else
-          SetProperty<float>( Prop, Value, ArrayIdx );
-      }
-    }
-    else if ( PropType == PROP_Object )
-    {
-      idx ObjRef = 0;
-      *PkgFile >> CINDEX( ObjRef );
- 
-      if ( Prop )
-      {
-        UObjectProperty* ObjProp = SafeCast<UObjectProperty>( Prop );
-        if ( !ObjProp )
-          Logf( LOG_CRIT, "Default property expected 'ObjectProperty', but got '%s'", 
-            Prop->Class->Name );
-        else
-          SetProperty<UObject*>( ObjProp, LoadObject( ObjRef, ObjProp->ObjectType, NULL ), 
-            ArrayIdx );
-      }
-    }
-    else if ( PropType == PROP_Name )
-    {
-      idx Name = 0;
-      *PkgFile >> CINDEX( Name );
-
-      if ( Prop )
-      {
-        if ( Prop->Class != UNameProperty::StaticClass() )
-          Logf( LOG_CRIT, "Default property expected 'NameProperty', but got '%s'", Prop->Class->Name );
-        else    
-          SetProperty<idx>( Prop, Name, ArrayIdx );
-      }
-    }
-    else if ( PropType == PROP_Class )
-    {
-      idx ObjRef = 0;
-      *PkgFile >> CINDEX( ObjRef );
-
-      if ( Prop )
-      {
-        if ( Prop->Class != UClassProperty::StaticClass() )
-          Logf( LOG_CRIT, "Default property expected 'ClassProperty', but got '%s'", 
-            Prop->Class->Name );
-        else
-          SetProperty<UObject*>( Prop, LoadObject( ObjRef, UClass::StaticClass(), NULL ), 
-            ArrayIdx );
-      }
-    }
-    else if ( PropType == PROP_Array )
-    {
-      if ( !Prop )
-      {
-        Logf( LOG_CRIT, "Property does not exist, but property type is array" );
-        goto err;
-      }
-
-      UArrayProperty* ArrayProp = SafeCast<UArrayProperty>( Prop );
-      if ( !ArrayProp )
-      {
-        Logf( LOG_CRIT, "Default property expected 'ArrayProperty', but got '%s'", Prop->Class->Name );
-        goto err;
-      }
-
-      u8 NumElem  = 0;
-      *PkgFile >> NumElem;
-
-      ArrayProp->Inner->ReadDynamicArrayProperty( this, PkgFile, ArrayIdx, RealSize, NumElem );
-    }
-    else if ( PropType == PROP_Struct )
-    {
-      // TODO: Any way to get around this?
-      //
-      // If we don't have a StructProperty, then we're really screwed since
-      // structs can hold any amount of data and we won't know how much to seek
-      // ahead. We can't use the size reported by the list entry because
-      // that only accounts for final size, not the number of bytes to read
-      if ( !Prop )
-      {
-        Logf( LOG_CRIT, "Property does not exist, but property type is a struct." );
-        goto err;
-      }
-
-      UStructProperty* StructProp = SafeCast<UStructProperty>( Prop );
-      if ( !StructProp )
-      {
-        Logf( LOG_CRIT, "Default property expected 'StructProperty', but got '%s'", Prop->Class->Name );
-        goto err;
-      }
-
-      // Verify struct name
-      idx StructName = 0;
-      *PkgFile >> CINDEX( StructName );
-      
-      if ( StructName < 0 )
-        Logf( LOG_CRIT, "Bad struct name index for StructProperty '%s'", Prop->Name );
-
-      FHash StructHash = Pkg->GetNameEntry( StructName )->Hash;
-      if ( StructProp && StructProp->Struct->Hash != StructHash )
-      {
-        Logf( LOG_CRIT, "Default property expected struct type '%s', but got '%s'",
-              StructProp->Struct->Name, Pkg->ResolveNameFromIdx( StructName ) );
-        goto err;
-      }
-
-      // Verify struct size
-      int StructSize = 0;
-      if ( SizeByte > 4 )
-      {
-        switch( SizeByte )
-        {
-          case 5:
-            *PkgFile >> *(u8*)&StructSize;
-            break;
-          case 6:
-            *PkgFile >> *(u16*)&StructSize;
-            break;
-          case 7:
-            *PkgFile >> StructSize;
-            break;
-        }
-      }
-      else
-      {
-        StructSize = UProperty::PropertySizes[SizeByte];
-      }
-
-      if ( IsArray )
-        ArrayIdx = ReadArrayIndex( PkgFile );
-
-      if ( StructProp )
-      {
-        if ( StructSize > StructProp->Struct->StructSize )
-        {
-          Logf( LOG_CRIT, "StructProperty '%s' struct size too large (Expected %i, got %i)", 
-              PropName, StructProp->Struct->StructSize, StructSize );
-          goto err;
-        }
-        // Read in struct properties based on our definition that we have loaded
-        SetStructProperty( StructProp, PkgFile, ArrayIdx );
-      }
-    }
-    else if ( PropType == PROP_Ascii || PropType == PROP_String )
-    {
-      idx StrLength = 0;
-      if ( LIKELY( PropType == PROP_Ascii ) )
-        *PkgFile >> CINDEX( StrLength );
-      else
-        StrLength = RealSize;
-
-      char* NewStr = NULL;
-      if ( StrLength > 0 )
-      {
-        NewStr = new char[StrLength]; // Serialized length includes null terminator
-        PkgFile->Read( NewStr, StrLength-- );
-      }
-
-      if ( Prop )
-      {
-        if ( Prop->Class != UStrProperty::StaticClass() )
-        {
-          Logf( LOG_CRIT, "Default property expected 'StrProperty', but got '%s'", Prop->Class->Name );
-          delete NewStr;
-        }
-        else
-        {
-          String* RealNewStr = new String( NewStr, StrLength );
-          SetProperty<String*>( Prop, RealNewStr, ArrayIdx );
-        }
-      }
+      Logf( LOG_CRIT, "Cannot continue parsing defaultproperty list for object '%s'", Name );
+      return;
     }
   }
-
-  return;
-
-err:
-  Logf( LOG_CRIT, "Cannot continue parsing defaultproperty list" );
 }
 
 void UObject::ReadConfigProperties()
@@ -1056,139 +809,6 @@ int UObject::CalcObjRefValue( idx ObjRef )
     ObjRef = -ObjRef;
   
   return ObjRef - 1;
-}
-
-// Not something that should be called in the scripting environment
-// Only for defaultproperty lists
-void UObject::SetStructProperty( UStructProperty* Prop, FPackageFileIn* In, int Idx, u32 Offset )
-{
-  void* StructAddr = PtrAdd( GetProperty<UStruct*>( Prop, Idx ), Offset );
-
-  for ( UField* Child = Prop->Struct->Children; Child != NULL; Child = Child->Next )
-  {
-    // Pure structs should not have anything besides property types or enums
-    if ( !Child->IsA( UProperty::StaticClass() ) && !Child->IsA( UEnum::StaticClass() ) )
-    {
-      Logf( LOG_CRIT, "Pure struct type has a bad child type!" );
-      return;
-    }
-    
-    // Determine property type and set property
-    int i = 0;
-    UProperty* ChildProp = (UProperty*)Child;
-    if ( ChildProp->Class == UByteProperty::StaticClass() )
-    {
-      do
-      {
-        u8 Byte = 0;
-        *In >> Byte;
-        *GetPropAddr<u8>( (UObject*)StructAddr, ChildProp, i++ ) = Byte;
-      } while ( i < ChildProp->ArrayDim );
-    }
-
-    else if ( ChildProp->Class == UIntProperty::StaticClass() )
-    {
-      do
-      {
-        int Int = 0;
-        *In >> Int;
-        *GetPropAddr<int>( (UObject*)StructAddr, ChildProp, i++ ) = Int;
-      } while ( i < ChildProp->ArrayDim );
-    }
-
-    else if ( ChildProp->Class == UFloatProperty::StaticClass() )
-    {
-      do
-      {
-        float Float = 0;
-        *In >> Float;
-        *GetPropAddr<float>( (UObject*)StructAddr, ChildProp, i++ ) = Float;
-      } while ( i < ChildProp->ArrayDim );
-    }
-
-    else if ( ChildProp->Class == UBoolProperty::StaticClass() )
-    {
-      u8 Bool = 0;
-      *In >> Bool;
-      *GetPropAddr<bool>( (UObject*)StructAddr, ChildProp, 0 ) = (Bool == 1);
-    }
-
-    else if ( ChildProp->Class == UNameProperty::StaticClass() )
-    {
-      do
-      {
-        idx Name = 0;
-        *In >> CINDEX( Name );
-        *GetPropAddr<idx>( (UObject*)StructAddr, ChildProp, i++ ) = Name;
-      } while ( i < ChildProp->ArrayDim );
-    }
-
-    else if ( ChildProp->Class == UObjectProperty::StaticClass() )
-    {
-      do
-      {
-        idx ObjRef = 0;
-        *In >> CINDEX( ObjRef );
-        UObject* Obj = (UObject*)LoadObject( ObjRef, 
-          ((UObjectProperty*)ChildProp)->ObjectType, NULL );
-
-        if ( ObjRef != 0 && Obj == NULL )
-        {
-          Logf( LOG_CRIT, 
-            "Can't load object '%s' for struct property '%s' in property list for object '%s'", 
-            Prop->Pkg->ResolveNameFromObjRef( ObjRef ), Prop->Name, Prop->Outer->Name );
-          return;
-        }
-
-        *GetPropAddr<UObject*>( (UObject*)StructAddr, ChildProp, i++ ) = Obj;
-      } while ( i < ChildProp->ArrayDim );
-    }
-
-    else if ( ChildProp->Class == UClassProperty::StaticClass() )
-    {
-      do
-      {
-        idx ObjRef = 0;
-        *In >> CINDEX( ObjRef );
-        UClass* Cls = (UClass*)LoadObject( ObjRef, UClass::StaticClass(), NULL );
-
-        if ( ObjRef != 0 && Cls == NULL )
-        {
-          Logf( LOG_CRIT, 
-            "Can't load class '%s' for struct property '%s' in property list for object '%s'", 
-            Prop->Pkg->ResolveNameFromObjRef( ObjRef ), Prop->Name, Prop->Outer->Name );
-          return;
-        }
-
-        *GetPropAddr<UClass*>( (UObject*)StructAddr, ChildProp, i++ ) = Cls;
-      } while ( i < ChildProp->ArrayDim );
-    }
-
-    else if ( ChildProp->Class == UStructProperty::StaticClass() )
-    {
-      for ( int i = 0; i < ChildProp->ArrayDim; i++ )
-        SetStructProperty( (UStructProperty*)ChildProp, In, i, Prop->Offset );
-    }
-
-    else if ( ChildProp->Class == UStrProperty::StaticClass() )
-    {
-      do
-      {
-        idx StringLength = 0;
-        *In >> CINDEX( StringLength );
-
-        char* String = new char[StringLength];
-        In->Read( String, StringLength );
-
-        *GetPropAddr<char*>( (UObject*)StructAddr, ChildProp, i++ ) = String;
-      } while ( i < ChildProp->ArrayDim );
-    }
-
-    else if ( ChildProp->Class != UEnum::StaticClass() )
-    {
-      Logf( LOG_WARN, "Unhandled case for StructProperty loading (Class = '%s')", ChildProp->Class->Name );
-    }
-  }
 }
 
 UCommandlet::UCommandlet()

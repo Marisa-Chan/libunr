@@ -74,6 +74,43 @@ void UProperty::Load()
     GlobalClass = (UClass*)Outer;
 }
 
+bool UProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int RealSize, int Idx )
+{
+  void* Data = PtrAdd( ObjMem, (Offset + ( MAX(Idx,0) * ElementSize) ) );
+  size_t Num = ElementSize;
+  if ( Idx < 0 )
+    Num *= ArrayDim;
+
+  while ( Num )
+  {
+    In.Read( Data, ElementSize );
+    Data = PtrAdd( Data, ElementSize );
+    Num -= ElementSize;
+  }
+
+  return true;
+}
+
+bool UProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8 Type, int RealSize, int Idx )
+{
+  if ( this == NULL )
+  {
+    In.Seek( RealSize, Cur ); 
+    return true;
+  }
+
+  if ( Type != PropertyType )
+  {
+    Logf( LOG_CRIT, "Default property '%s' expected '%s' but got '%s'", 
+      Name, PropNames[Type], Class->Name );
+    return false;
+  }
+  else
+  {
+    return LoadDefaultProperty( ObjMem, In, RealSize, Idx );
+  }
+}
+
 void UProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
 {
   return;
@@ -114,11 +151,6 @@ u32 UProperty::GetNativeOffset( const char* ClassName, const char* PropName )
   return Offset;
 }
 
-void UProperty::ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num )
-{
-  Logf( LOG_WARN, "Default ArrayProperty contains '%s'", Class->Name );
-}
-
 void UByteProperty::Load()
 {
   Super::Load();
@@ -129,6 +161,7 @@ void UByteProperty::Load()
     Enum = (UEnum*)LoadObject( EnumType, UEnum::StaticClass(), Outer );
 
   ElementSize = 1;
+  PropertyType = PROP_Byte;
 }
 
 void UByteProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
@@ -144,15 +177,11 @@ void UByteProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Id
   }
 }
 
-void UByteProperty::ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num )
-{
-  Obj->SetArrayProperty<u8>( (UArrayProperty*)Outer, In, Idx, RealSize, Num );
-}
-
 void UIntProperty::Load()
 {
   Super::Load();
   ElementSize = 4;
+  PropertyType = PROP_Int;
 }
 
 void UIntProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
@@ -163,15 +192,24 @@ void UIntProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx
     Buf += String( Val );
 }
 
-void UIntProperty::ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num )
-{
-  Obj->SetArrayProperty<int>( (UArrayProperty*)Outer, In, Idx, RealSize, Num );
-}
-
 void UBoolProperty::Load()
 {
   Super::Load();
   ElementSize = sizeof( bool );
+  PropertyType = PROP_Bool;
+}
+
+bool UBoolProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int RealSize, int Idx )
+{
+  // BoolProperties store their value in the 'IsArray' part of the info byte.
+  // This value is passed through Idx since BoolProperties cannot stored as an array directly.
+  // However, they can be part of a struct which is in a dynamic array, in which case, read a byte
+  if ( RealSize < 0 )
+    In.Read( PtrAdd( ObjMem, Offset ), 1 );
+  else
+    *(bool*)(PtrAdd(ObjMem, Offset)) = Idx == 1;
+
+  return true;
 }
 
 void UBoolProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
@@ -182,15 +220,11 @@ void UBoolProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Id
     Buf += ( Val ? "True" : "False" );
 }
 
-void UBoolProperty::ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num )
-{
-  Obj->SetArrayProperty<bool>( (UArrayProperty*)Outer, In, Idx, RealSize, Num );
-}
-
 void UFloatProperty::Load()
 {
   Super::Load();
   ElementSize = 4;
+  PropertyType = PROP_Float;
 }
 
 void UFloatProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
@@ -201,15 +235,48 @@ void UFloatProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int I
     Buf += String( Val );
 }
 
-void UFloatProperty::ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num )
-{
-  Obj->SetArrayProperty<float>( (UArrayProperty*)Outer, In, Idx, RealSize, Num );
-}
-
 void UNameProperty::Load()
 {
   Super::Load();
   ElementSize = 4;
+  PropertyType = PROP_Name;
+}
+
+bool UNameProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int RealSize, int Idx )
+{
+  void* Data = PtrAdd( ObjMem, (Offset + ( MAX(Idx,0) * ElementSize) ) );
+  size_t Num = ElementSize;
+  if ( Idx < 0 )
+    Num *= ArrayDim;
+
+  while ( Num )
+  {
+    In >> CINDEX( *(idx*)Data );
+    Data = PtrAdd( Data, ElementSize );
+    Num -= ElementSize;
+  }
+
+  return true;
+}
+
+bool UNameProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8 Type, int RealSize, int Idx )
+{
+  if ( this == NULL )
+  {
+    idx NameIdx;
+    In >> CINDEX( NameIdx );
+    return true;
+  }
+
+  if ( Type != PropertyType )
+  {
+    Logf( LOG_CRIT, "Default property expected '%s' but got '%s'", PropNames[Type], Class->Name );
+    return false;
+  }
+  else
+  {
+    return LoadDefaultProperty( ObjMem, In, RealSize, Idx );
+  }
 }
 
 void UNameProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
@@ -248,15 +315,74 @@ void UNameProperty::GetTextContainer( String& Buf, UObject* ObjMem, UObject* Def
   }
 }
 
-void UNameProperty::ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num )
-{
-  Obj->SetArrayProperty<idx>( (UArrayProperty*)Outer, In, Idx, RealSize, Num );
-}
-
 void UStrProperty::Load()
 {
   Super::Load();
   ElementSize = sizeof( String* );
+  PropertyType = PROP_Ascii;
+}
+
+bool UStrProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int RealSize, int Idx )
+{
+  void* Data = PtrAdd( ObjMem, (Offset + ( MAX(Idx,0) * sizeof( String* )) ) );
+  size_t Num = sizeof( String* );
+  if ( Idx < 0 )
+    Num *= ArrayDim;
+  
+  while ( Num )
+  {
+    if ( RealSize < 0 )
+    {
+      String* NewStr = new String();
+      In >> *NewStr;
+      *(String**)Data = NewStr;
+    }
+    else
+    {
+      char* NewStr = new char[RealSize];
+      In.Read( NewStr, RealSize-- );
+
+      String* RealNewStr = new String( NewStr, RealSize );
+      *(String**)Data = RealNewStr;
+    }
+
+    Num -= sizeof( String* );
+    Data = PtrAdd( Data, sizeof( String* ) );
+  }
+
+  return true;
+}
+
+bool UStrProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8 Type, int RealSize, int Idx )
+{
+  if ( this == NULL )
+  {
+    if ( RealSize > 0 )
+    {
+      In.Seek( RealSize, Cur );
+    }
+    else
+    {
+      idx StrLength = 0;
+      In >> CINDEX( StrLength );
+      In.Seek( StrLength, Cur );
+    }
+    return true;
+  }
+
+  switch( Type )
+  {
+    case PROP_Ascii:
+      RealSize = -1;
+      break;
+    case PROP_String:
+      break;
+    default:
+      Logf( LOG_CRIT, "Default property expected '%s' but got 'StrProperty'", PropNames[Type] );
+      return true;
+  }
+
+  return LoadDefaultProperty( ObjMem, In, RealSize, Idx );
 }
 
 void UStrProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
@@ -271,15 +397,33 @@ void UStrProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx
   }
 }
 
-void UStrProperty::ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num )
-{
-  Obj->SetArrayProperty<String*>( (UArrayProperty*)Outer, In, Idx, RealSize, Num );
-}
-
 void UStringProperty::Load()
 {
   Super::Load();
   ElementSize = sizeof( String* );
+  PropertyType = PROP_String;
+}
+
+bool UStringProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int RealSize, int Idx )
+{
+  void* Data = PtrAdd( ObjMem, (Offset + ( MAX(Idx,0) * sizeof( String* )) ) );
+  size_t Num = sizeof( String* );
+  if ( Idx < 0 )
+    Num *= ArrayDim;
+  
+  while ( Num )
+  {
+    char* NewStr = new char[RealSize];
+    In.Read( NewStr, RealSize-- );
+
+    String* RealNewStr = new String( NewStr, RealSize );
+    *(String**)Data = RealNewStr;
+
+    Num -= sizeof( String* );
+    Data = PtrAdd( Data, sizeof( String* ) );
+  }
+
+  return true;
 }
 
 void UStringProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
@@ -294,11 +438,6 @@ void UStringProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int 
   }
 }
 
-void UStringProperty::ReadDynamicArrayProperty( UObject* Obj, FPackageFileIn* In, int Idx, int RealSize, u8 Num )
-{
-  Obj->SetArrayProperty<String*>( (UArrayProperty*)Outer, In, Idx, RealSize, Num );
-}
-
 void UObjectProperty::Load()
 {
   Super::Load();
@@ -306,7 +445,48 @@ void UObjectProperty::Load()
 
   idx ObjTypeIdx = 0;
   *PkgFile >> CINDEX( ObjTypeIdx );
-  ObjectType = (UClass*)LoadObject( ObjTypeIdx, UClass::StaticClass(), Outer );
+  ObjectType = (UClass*)LoadObject( ObjTypeIdx, UClass::StaticClass(), NULL );
+  PropertyType = PROP_Object;
+}
+
+bool UObjectProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int RealSize, int Idx )
+{
+  void* Data = PtrAdd( ObjMem, (Offset + ( MAX(Idx,0) * sizeof( UObject* ) ) ) );
+  size_t Num = sizeof( UObject* );
+  if ( Idx < 0 )
+    Num *= ArrayDim;
+  
+  idx ObjRef = 0;
+  while ( Num )
+  {
+    In >> CINDEX( ObjRef );
+    *(UObject**)Data = StaticLoadObject( In.Pkg, ObjRef, ObjectType, NULL );
+
+    Data = PtrAdd( Data, sizeof( UObject* ) );
+    Num -= sizeof( UObject* );
+  }
+
+  return true;
+}
+
+bool UObjectProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8 Type, int RealSize, int Idx )
+{
+  if ( this == NULL )
+  {
+    idx ObjRef;
+    In >> CINDEX( ObjRef );
+    return true;
+  }
+
+  if ( Type != PropertyType )
+  {
+    Logf( LOG_CRIT, "Default property expected '%s' but got '%s'", PropNames[Type], Class->Name );
+    return false;
+  }
+  else
+  {
+    return LoadDefaultProperty( ObjMem, In, RealSize, Idx );
+  }
 }
 
 void UObjectProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
@@ -332,7 +512,8 @@ void UClassProperty::Load()
 
   idx ClassIdx = 0;
   *PkgFile >> CINDEX( ClassIdx );
-  ClassObj = (UClass*)LoadObject( ClassIdx, UClass::StaticClass(), Outer );
+  ClassObj = (UClass*)LoadObject( ClassIdx, UClass::StaticClass(), NULL );
+  PropertyType = PROP_Object;
 }
 
 void UClassProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
@@ -358,6 +539,113 @@ void UStructProperty::Load()
   Struct = (UStruct*)LoadObject( StructIdx, UStruct::StaticClass(), Outer );
 
   ElementSize = Struct->StructSize;
+  PropertyType = PROP_Struct;
+}
+
+bool UStructProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int RealSize, int Idx )
+{
+  void* Data = PtrAdd( ObjMem, Offset + (MAX(Idx,0) * Struct->StructSize) );
+  size_t Num = Struct->StructSize;
+  if ( Idx < 0 )
+    Num *= ArrayDim;
+
+  UField* Child = Struct->Children;
+  while ( Num )
+  {
+    if ( !Child )
+    {
+      Data = PtrAdd( Data, Struct->StructSize );
+      Child = Struct->Children;
+    }
+
+    if ( Child->IsA( UProperty::StaticClass() ) )
+    {
+      UProperty* ChildProp = (UProperty*)Child;
+      ChildProp->LoadDefaultProperty( Data, In, -1 );
+
+      Num -= ChildProp->ElementSize * ChildProp->ArrayDim;
+    }
+    else if ( !Child->IsA( UEnum::StaticClass() ) )
+    {
+      Logf( LOG_CRIT, "Pure struct of type '%s' has a bad child type of '%s'", Struct->Name, Child->Class->Name );
+      return false;
+    }
+
+    Child = Child->Next;
+  }
+
+  return true;
+}
+
+bool UStructProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8 Type, int RealSize, int Idx )
+{
+  // Check if property exists
+  if ( this == NULL )
+  {
+    Logf( LOG_CRIT, "StructProperty referenced in default property list does not exist" );
+    return false;
+  }
+
+  // Check if type in default property list matches
+  if ( Type != PropertyType )
+  {
+    Logf( LOG_CRIT, "Default property expected '%s' but got 'StructProperty'", PropNames[Type] );
+    return false;
+  }
+
+  // Verify struct name
+  idx StructName = 0;
+  In >> CINDEX( StructName );
+  if ( StructName < 0 )
+  {
+    Logf( LOG_CRIT, "Bad struct name index for StructProperty '%s'", Name );
+    return false;
+  }
+
+  FHash StructHash = In.Pkg->GetNameEntry( StructName )->Hash;
+  if ( Struct->Hash != StructHash )
+  {
+    Logf( LOG_CRIT, "Default property expected struct type '%s' but got '%s'", 
+      In.Pkg->ResolveNameFromIdx( StructName ), Struct->Name );
+    return false;
+  }
+
+  // RealSize masquerades as the InfoByte here
+  // Yes, variable reuse/repurposing isn't a great practice
+  // No, I'm not changing it because I don't want to add another argument for one use case
+  u8 SizeByte = (RealSize & 0x70) >> 4;
+  u8 IsArray  = (RealSize & 0x80) >> 7;
+  int ArrayIdx = 0;
+
+  // Verify struct size
+  int StructSize = 0;
+  switch( SizeByte )
+  {
+    case 5:
+      In >> *(u8*)&StructSize;
+      break;
+    case 6:
+      In >> *(u16*)&StructSize;
+      break;
+    case 7:
+      In >> StructSize;
+      break;
+    default:
+      StructSize = (SizeByte>0) ? UProperty::PropertySizes[SizeByte] : 0;
+      break;
+  }
+
+  if ( IsArray )
+    ArrayIdx = ReadArrayIndex( In );
+
+  if ( StructSize > Struct->StructSize )
+  {
+    Logf( LOG_CRIT, "StructProperty '%s' struct size too large (Expected %i, got %i)", 
+      Name, Struct->StructSize, StructSize );
+    return false;
+  }
+
+  return LoadDefaultProperty( ObjMem, In, -1, ArrayIdx );
 }
 
 void UStructProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
@@ -419,6 +707,41 @@ void UArrayProperty::Load()
   Inner->Offset = 0;
 
   ElementSize = sizeof( ArrayNoType* );
+  PropertyType = PROP_Array;
+}
+
+bool UArrayProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int RealSize, int Idx )
+{
+  u8 NumElem = 0;
+  In >> NumElem;
+
+  // Maybe ArrayNoType can be modified when the type is not used?
+  Array<u8>** Arr = (Array<u8>**)PtrAdd( ObjMem, Offset + ( MAX(Idx,0) * ElementSize ) );
+  *Arr = new Array<u8>( NumElem * Inner->ElementSize );
+  (*Arr)->ElementSize = Inner->ElementSize;
+
+  void* Data = (*Arr)->Data();
+  for ( int i = 0; i < NumElem; i++ )
+    Inner->LoadDefaultProperty( Data, In, -1, i );
+
+  return true;
+}
+
+bool UArrayProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8 Type, int RealSize, int Idx )
+{
+  if ( this == NULL )
+  {
+    Logf( LOG_CRIT, "ArrayProperty referenced in default property list does not exist" );
+    return false;
+  }
+
+  if ( Type != PropertyType )
+  {
+    Logf( LOG_CRIT, "Default property expected '%s', but got 'ArrayProperty'", PropNames[Type] );
+    return false;
+  }
+  
+  return LoadDefaultProperty( ObjMem, In, RealSize, Idx );
 }
 
 void UArrayProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
@@ -472,6 +795,16 @@ void UFixedArrayProperty::Load()
   exit( -1 ); // <- can we not do this
 }
 
+bool UFixedArrayProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int RealSize, int Idx )
+{
+  return false;
+}
+
+bool UFixedArrayProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8 Type, int RealSize, int Idx )
+{
+  return false;
+}
+
 void UFixedArrayProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
 {
 }
@@ -480,6 +813,16 @@ void UMapProperty::Load()
 {
   Logf( LOG_CRIT, "Go pop '%s' in UTPT and see how to load a MapProperty", Pkg->Name );
   exit( -1 ); // <- can we not do this
+}
+
+bool UMapProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int RealSize, int Idx )
+{
+  return false;
+}
+
+bool UMapProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8 Type, int RealSize, int Idx )
+{
+  return false;
 }
 
 void UMapProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )

@@ -125,8 +125,7 @@ inline void UObject::SetProperty<UClass*>( UProperty* Prop, UClass* NewVal, int 
 }
 
 template<class T> inline
-void UObject::SetArrayProperty( UArrayProperty* Prop, FPackageFileIn* In, int Idx,
-  u8 ByteSize, u8 NumElem )
+void UObject::SetArrayProperty( UArrayProperty* Prop, int Idx, u8 ByteSize, u8 NumElem )
 {
   Array<T>* Arr = new Array<T>();
   Arr->Reserve( NumElem );
@@ -134,7 +133,7 @@ void UObject::SetArrayProperty( UArrayProperty* Prop, FPackageFileIn* In, int Id
   while ( ByteSize && NumElem )
   {
     T Value;
-    *In >> Value;
+    *PkgFile >> Value;
     Arr->PushBack( Value );
 
     NumElem--;
@@ -145,8 +144,7 @@ void UObject::SetArrayProperty( UArrayProperty* Prop, FPackageFileIn* In, int Id
 }
 
 template<> inline
-void UObject::SetArrayProperty<bool>( UArrayProperty* Prop, FPackageFileIn* In, int Idx,
-  u8 ByteSize, u8 NumElem )
+void UObject::SetArrayProperty<bool>( UArrayProperty* Prop, int Idx, u8 ByteSize, u8 NumElem )
 {
   Array<bool>* Arr = new Array<bool>();
   Arr->Reserve( NumElem );
@@ -155,7 +153,7 @@ void UObject::SetArrayProperty<bool>( UArrayProperty* Prop, FPackageFileIn* In, 
   {
     bool bValue;
     u8 Value;
-    *In >> Value;
+    *PkgFile >> Value;
 
     bValue = Value;
     Arr->PushBack( bValue );
@@ -168,8 +166,7 @@ void UObject::SetArrayProperty<bool>( UArrayProperty* Prop, FPackageFileIn* In, 
 }
 
 template<> inline
-void UObject::SetArrayProperty<idx>( UArrayProperty* Prop, FPackageFileIn* In, int Idx,
-  u8 ByteSize, u8 NumElem )
+void UObject::SetArrayProperty<idx>( UArrayProperty* Prop, int Idx, u8 ByteSize, u8 NumElem )
 {
   Array<idx>* Arr = new Array<idx>();
   Arr->Reserve( NumElem );
@@ -177,7 +174,7 @@ void UObject::SetArrayProperty<idx>( UArrayProperty* Prop, FPackageFileIn* In, i
   while ( ByteSize && NumElem )
   {
     idx Value;
-    *In >> CINDEX( Value );
+    *PkgFile >> CINDEX( Value );
     Arr->PushBack( Value );
 
     NumElem--;
@@ -188,8 +185,7 @@ void UObject::SetArrayProperty<idx>( UArrayProperty* Prop, FPackageFileIn* In, i
 }
 
 template<> inline
-void UObject::SetArrayProperty<String*>( UArrayProperty* Prop, FPackageFileIn* In, int Idx,
-  u8 ByteSize, u8 NumElem )
+void UObject::SetArrayProperty<String*>( UArrayProperty* Prop, int Idx, u8 ByteSize, u8 NumElem )
 {
   Array<String*>* Arr = new Array<String*>();  
   Arr->Reserve( NumElem );
@@ -199,16 +195,56 @@ void UObject::SetArrayProperty<String*>( UArrayProperty* Prop, FPackageFileIn* I
   {
     // Read string size
     idx StringLength = 0;
-    *In >> CINDEX( StringLength );
+    *PkgFile >> CINDEX( StringLength );
 
     String* Str = new String();
     Str->Resize( StringLength );
 
-    In->Read( Str->Data(), StringLength );
+    PkgFile->Read( Str->Data(), StringLength );
     Arr->PushBack( Str );
     NumElem--;
   }
 
   *GetPropAddr<Array<String*>*>( this, Prop, Idx ) = Arr;
+}
+
+template<> inline
+void UObject::SetArrayProperty<UStruct*>( UArrayProperty* Prop, int Idx, u8 ByteSize, u8 NumElem )
+{
+  Array<u8>* Arr = new Array<u8>();
+  UStruct* Struct = ((UStructProperty*)Prop->Inner)->Struct;
+  Arr->Reserve( NumElem * Struct->StructSize );
+
+  // Get data pointer for first element
+  void* Data = Arr->Data();
+
+  while ( NumElem )
+  {
+    // Iterate through struct's children
+    for ( UField* Child = Struct->Children; Child != NULL; Child = Child->Next )
+    {
+      UProperty* ChildProp = SafeCast<UProperty>( Child );
+      if ( ChildProp )
+      {
+        if ( ChildProp->Class == UObjectProperty::StaticClass() ||
+             ChildProp->Class == UClassProperty::StaticClass() )
+        {
+          idx ObjRef;
+          for ( int i = 0; i < ChildProp->ArrayDim; i++ )
+          {
+            *PkgFile >> ObjRef;
+            *(UObject**)Data = LoadObject( ObjRef, ((UObjectProperty*)ChildProp)->ObjectType, NULL );
+            Data = PtrAdd( Data, ChildProp->ElementSize );
+          }
+        }
+        else
+        {
+          size_t ReadNum = ChildProp->ElementSize * ChildProp->ArrayDim;
+          PkgFile->Read( Data, ReadNum );
+          Data = PtrAdd( Data, ReadNum );
+        }
+      }
+    }
+  }
 }
 

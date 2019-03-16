@@ -153,6 +153,8 @@ DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, String& Str )
   if ( Size > 0 )
   {
     Str.Reserve( Size-1 );
+    
+    // Slow but secure
     for ( int i = 0; i < Size; i++ )
     {
       char C = '\0';
@@ -174,6 +176,39 @@ DLL_EXPORT FPackageFileOut& operator<<( FPackageFileOut& Out, String& Str )
   Out << CINDEX( Length );
   Out.Write( Str.Data(), Length+1 );
   return Out;
+}
+
+/*-----------------------------------------------------------------------------
+ * Default Property Array Indices
+-----------------------------------------------------------------------------*/
+// Antonio's docs seemed to leave out the important detail that these 
+// are stored in big endian, not little endian (need to see what indices
+// >= 16384 look like)
+int ReadArrayIndex( FPackageFileIn& PkgFile )
+{
+  u8 ArrayIdx[4] = { 0, 0 ,0 ,0 };
+  PkgFile >> ArrayIdx[0];
+  if ( ArrayIdx[0] >= 128 )
+  {
+    ArrayIdx[1] = ArrayIdx[0];
+    PkgFile >> ArrayIdx[0];
+    ArrayIdx[1] &= ~0x80;
+
+    // TODO: This whole chunk is probably wrong, but I can't find
+    // any examples that get to 16384 (make one!)
+    if ( *((u16*)&ArrayIdx[0]) >= 16384 )
+    {
+      ArrayIdx[3] = ArrayIdx[1];
+      ArrayIdx[2] = ArrayIdx[0];
+      ArrayIdx[3] &= ~0xC0;
+
+      PkgFile >> ArrayIdx[1];
+      PkgFile >> ArrayIdx[0];
+    }
+  }
+
+  int Idx = *((int*)&ArrayIdx);
+  return Idx;
 }
 
 /*-----------------------------------------------------------------------------

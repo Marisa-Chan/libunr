@@ -47,6 +47,8 @@ public:
   UPackage* Pkg;
 };
 
+int ReadArrayIndex( FPackageFileIn& PkgFile );
+
 /*-----------------------------------------------------------------------------
  * FPackageFileOut
  * Keeps track of package specifics when writing a package to a file

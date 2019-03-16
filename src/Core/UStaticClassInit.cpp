@@ -121,7 +121,7 @@ bool UObject::StaticInit()
   // (The only reason we have to do this is because Unreal does it, 
   // lets not do this if we add custom stuff in the future, it's not very elegant)
   // Expose the description property
-  EXPOSE_PROPERTY( UProperty, Description, UStrProperty, sizeof(String*) );
+  EXPOSE_PROPERTY( UProperty, Description, UStrProperty, sizeof(String*), PROP_Ascii );
 
   // All previously created classes need their properties linked with Object
   ULanguage::StaticClass()->LinkSuperClassChildren();
@@ -190,7 +190,7 @@ bool UObject::StaticInit()
     // Once again, please don't do this if we add new variables for
     // a drop in Core.u or Engine.u replacement
     Result &= UMesh::StaticClassInit();
-    EXPOSE_PROPERTY( UMesh, bCurvyMesh, UBoolProperty, 1 );
+    EXPOSE_PROPERTY( UMesh, bCurvyMesh, UBoolProperty, 1, PROP_Bool );
 
       Result &= ULodMesh::StaticClassInit();
         Result &= USkeletalMesh::StaticClassInit();
