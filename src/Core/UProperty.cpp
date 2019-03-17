@@ -434,8 +434,14 @@ void UObjectProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int 
 {
   UObject* DefVal = (Default) ? Default->GetProperty<UObject*>( this, Idx ) : NULL;
   UObject* Val = Obj->GetProperty<UObject*>( this, Idx );
-  if ( Val && Val != DefVal )
+  if ( Val != DefVal )
   {
+    if ( Val == NULL )
+    {
+      Buf += "None";
+      return;
+    }
+    
     Buf += Val->Class->Name;
     Buf += '\'';
     
@@ -461,8 +467,14 @@ void UClassProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int I
 {
   UClass* DefVal = (Default) ? Default->GetProperty<UClass*>( this, Idx ) : NULL;
   UClass* Val = Obj->GetProperty<UClass*>( this, Idx );
-  if ( Val && Val != DefVal )
+  if ( Val != DefVal )
   {
+    if ( Val == NULL )
+    {
+      Buf += "None";
+      return;
+    }
+
     Buf += "Class'";
     Buf += Val->Pkg->Name;
     Buf += '.';
