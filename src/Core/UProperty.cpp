@@ -638,13 +638,6 @@ bool UStructProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In,
   if ( IsArray )
     ArrayIdx = ReadArrayIndex( In );
 
-  if ( StructSize > Struct->StructSize )
-  {
-    Logf( LOG_CRIT, "StructProperty '%s' struct size too large (Expected %i, got %i)", 
-      Name, Struct->StructSize, StructSize );
-    return false;
-  }
-
   return LoadDefaultProperty( ObjMem, In, -1, ArrayIdx );
 }
 
@@ -876,4 +869,19 @@ UMapProperty::~UMapProperty()
 
 UFixedArrayProperty::~UFixedArrayProperty()
 {}
+
+IMPLEMENT_NATIVE_CLASS( UProperty );
+  IMPLEMENT_NATIVE_CLASS( UByteProperty );
+  IMPLEMENT_NATIVE_CLASS( UIntProperty );
+  IMPLEMENT_NATIVE_CLASS( UBoolProperty );
+  IMPLEMENT_NATIVE_CLASS( UFloatProperty );
+  IMPLEMENT_NATIVE_CLASS( UObjectProperty );
+    IMPLEMENT_NATIVE_CLASS( UClassProperty );
+  IMPLEMENT_NATIVE_CLASS( UNameProperty );
+  IMPLEMENT_NATIVE_CLASS( UStringProperty );
+  IMPLEMENT_NATIVE_CLASS( UArrayProperty );
+  IMPLEMENT_NATIVE_CLASS( UStructProperty );
+  IMPLEMENT_NATIVE_CLASS( UStrProperty );
+  IMPLEMENT_NATIVE_CLASS( UMapProperty );
+  IMPLEMENT_NATIVE_CLASS( UFixedArrayProperty );
 
