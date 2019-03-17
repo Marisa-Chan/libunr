@@ -358,7 +358,19 @@ void UObject::ReadDefaultProperties()
         break;
     }
 
-    if ( !Prop->LoadDefaultPropertySafe( this, *PkgFile, PropType, RealSize, ArrayIdx ) )
+    if ( !Prop )
+    {
+      switch( PropType )
+      {
+        case PROP_Struct:
+          UStructProperty::SkipDefaultProperty( *PkgFile, RealSize );
+          break;
+        default:
+          UProperty::SkipDefaultProperty( *PkgFile, RealSize );
+          break;
+      }
+    }
+    else if ( !Prop->LoadDefaultPropertySafe( this, *PkgFile, PropType, RealSize, ArrayIdx ) )
     {
       Logf( LOG_CRIT, "Cannot continue parsing defaultproperty list for object '%s'", Name );
       return;

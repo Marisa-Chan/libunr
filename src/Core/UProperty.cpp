@@ -93,22 +93,13 @@ bool UProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int RealS
 
 bool UProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8 Type, int RealSize, int Idx )
 {
-  if ( this == NULL )
-  {
-    In.Seek( RealSize, Cur ); 
-    return true;
-  }
-
+  bool Ret = false;
   if ( Type != PropertyType )
-  {
-    Logf( LOG_CRIT, "Default property '%s' expected '%s' but got '%s'", 
-      Name, PropNames[Type], Class->Name );
-    return false;
-  }
+    Logf( LOG_CRIT, "Default property '%s' expected '%s' but got '%s'", Name, PropNames[Type], Class->Name );
   else
-  {
-    return LoadDefaultProperty( ObjMem, In, RealSize, Idx );
-  }
+    Ret = LoadDefaultProperty( ObjMem, In, RealSize, Idx );
+
+  return Ret;
 }
 
 void UProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
@@ -120,6 +111,11 @@ void UProperty::GetTextContainer( String& Buf, UObject* ObjMem, UObject* DefMem,
   UPackage* ObjPkg, UPackage* DefPkg, int Idx )
 {
   GetText( Buf, ObjMem, DefMem, Idx );
+}
+
+void UProperty::SkipDefaultProperty( FPackageFileIn& In, int RealSize )
+{
+  In.Seek( RealSize, Cur );
 }
 
 u32 UProperty::GetNativeOffset( const char* ClassName, const char* PropName )
@@ -259,26 +255,6 @@ bool UNameProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int R
   return true;
 }
 
-bool UNameProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8 Type, int RealSize, int Idx )
-{
-  if ( this == NULL )
-  {
-    idx NameIdx;
-    In >> CINDEX( NameIdx );
-    return true;
-  }
-
-  if ( Type != PropertyType )
-  {
-    Logf( LOG_CRIT, "Default property expected '%s' but got '%s'", PropNames[Type], Class->Name );
-    return false;
-  }
-  else
-  {
-    return LoadDefaultProperty( ObjMem, In, RealSize, Idx );
-  }
-}
-
 void UNameProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
 {
   idx DefIdx = (Default) ? Default->GetProperty<idx>( this, Idx ) : 0;
@@ -355,21 +331,6 @@ bool UStrProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int Re
 
 bool UStrProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8 Type, int RealSize, int Idx )
 {
-  if ( this == NULL )
-  {
-    if ( RealSize > 0 )
-    {
-      In.Seek( RealSize, Cur );
-    }
-    else
-    {
-      idx StrLength = 0;
-      In >> CINDEX( StrLength );
-      In.Seek( StrLength, Cur );
-    }
-    return true;
-  }
-
   switch( Type )
   {
     case PROP_Ascii:
@@ -469,26 +430,6 @@ bool UObjectProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int
   return true;
 }
 
-bool UObjectProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8 Type, int RealSize, int Idx )
-{
-  if ( this == NULL )
-  {
-    idx ObjRef;
-    In >> CINDEX( ObjRef );
-    return true;
-  }
-
-  if ( Type != PropertyType )
-  {
-    Logf( LOG_CRIT, "Default property expected '%s' but got '%s'", PropNames[Type], Class->Name );
-    return false;
-  }
-  else
-  {
-    return LoadDefaultProperty( ObjMem, In, RealSize, Idx );
-  }
-}
-
 void UObjectProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
 {
   UObject* DefVal = (Default) ? Default->GetProperty<UObject*>( this, Idx ) : NULL;
@@ -579,13 +520,6 @@ bool UStructProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int
 
 bool UStructProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8 Type, int RealSize, int Idx )
 {
-  // Check if property exists
-  if ( this == NULL )
-  {
-    Logf( LOG_CRIT, "StructProperty referenced in default property list does not exist" );
-    return false;
-  }
-
   // Check if type in default property list matches
   if ( Type != PropertyType )
   {
@@ -639,6 +573,38 @@ bool UStructProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In,
     ArrayIdx = ReadArrayIndex( In );
 
   return LoadDefaultProperty( ObjMem, In, -1, ArrayIdx );
+}
+
+void UStructProperty::SkipDefaultProperty( FPackageFileIn& In, int RealSize )
+{
+  idx StructName;
+  
+  u8 SizeByte = (RealSize & 0x70) >> 4;
+  u8 IsArray  = (RealSize & 0x80) >> 7;
+  int ArrayIdx = 0;
+
+  // Verify struct size
+  int StructSize = 0;
+  switch( SizeByte )
+  {
+    case 5:
+      In >> *(u8*)&StructSize;
+      break;
+    case 6:
+      In >> *(u16*)&StructSize;
+      break;
+    case 7:
+      In >> StructSize;
+      break;
+    default:
+      StructSize = (SizeByte>0) ? UProperty::PropertySizes[SizeByte] : 0;
+      break;
+  }
+
+  if ( IsArray )
+    ArrayIdx = ReadArrayIndex( In );
+
+  In.Seek( StructSize, Cur ); 
 }
 
 void UStructProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
@@ -720,23 +686,6 @@ bool UArrayProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int 
   return true;
 }
 
-bool UArrayProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8 Type, int RealSize, int Idx )
-{
-  if ( this == NULL )
-  {
-    Logf( LOG_CRIT, "ArrayProperty referenced in default property list does not exist" );
-    return false;
-  }
-
-  if ( Type != PropertyType )
-  {
-    Logf( LOG_CRIT, "Default property expected '%s', but got 'ArrayProperty'", PropNames[Type] );
-    return false;
-  }
-  
-  return LoadDefaultProperty( ObjMem, In, RealSize, Idx );
-}
-
 void UArrayProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
 {
   ArrayNoType* GenericArray = Obj->GetProperty<ArrayNoType*>( this, Idx );
@@ -793,11 +742,6 @@ bool UFixedArrayProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In,
   return false;
 }
 
-bool UFixedArrayProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8 Type, int RealSize, int Idx )
-{
-  return false;
-}
-
 void UFixedArrayProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
 {
 }
@@ -809,11 +753,6 @@ void UMapProperty::Load()
 }
 
 bool UMapProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int RealSize, int Idx )
-{
-  return false;
-}
-
-bool UMapProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8 Type, int RealSize, int Idx )
 {
   return false;
 }
