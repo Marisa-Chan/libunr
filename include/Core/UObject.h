@@ -401,6 +401,32 @@ struct DLL_EXPORT FNameEntry
 };
 
 /*-----------------------------------------------------------------------------
+ * FName
+ * An index into the global name table
+-----------------------------------------------------------------------------*/
+struct FName
+{
+  u32 Index;
+
+  FName() { Index = 0; }
+  FName( int Idx ) { Index = Idx; }
+
+  inline operator u32()
+  {
+    return Index;
+  }
+
+  inline FName operator=( int Idx )
+  {
+    Index = Idx;
+  }
+
+  operator const char*();
+  friend bool operator==( FName& A, FName& B );
+  friend bool operator!=( FName& A, FName& B );
+};
+
+/*-----------------------------------------------------------------------------
  * UObject
  * The base class of all Unreal objects
 -----------------------------------------------------------------------------*/
@@ -459,16 +485,16 @@ public:
   static Array<UFunction*>* NativeFunctions;
   static Array<FNameEntry*>* NameTable;
 
-  FHash       Hash;     // Hash of this object
-  const char* Name;     // Name of this object (TODO: Change type to FName)
-  int         Index;    // Index of the object in object pool
-  UObject*    NextObj;  // The next object in the list
-  UPackage*   Pkg;      // Package this object was loaded from
-  FExport*    Export;   // Export struct from the package of this object
-  UObject*    Outer;    // Object that this object resides in
-  u32         ObjectFlags;
-  UClass*     Class;    // Class of this object
-  UField*     Field;    // All fields relevant to this object (points to Class->Children)
+  FHash     Hash;     // Hash of this object
+  const char* Name;   // Name of this object
+  int       Index;    // Index of the object in object pool
+  UObject*  NextObj;  // The next object in the list
+  UPackage* Pkg;      // Package this object was loaded from
+  FExport*  Export;   // Export struct from the package of this object
+  UObject*  Outer;    // Object that this object resides in
+  u32       ObjectFlags;
+  UClass*   Class;    // Class of this object
+  UField*   Field;    // All fields relevant to this object (points to Class->Children)
   FPackageFileIn* PkgFile; // Only relevant when loading
   bool bLoading;
 
@@ -526,42 +552,5 @@ class DLL_EXPORT UCommandlet : public UObject
   bool    ShowErrorCount;
   bool    ShowBanner;
   bool    ForceInt;
-};
-
-/*-----------------------------------------------------------------------------
- * FName
- * An index into the global name table
------------------------------------------------------------------------------*/
-struct FName
-{
-  u32 Index;
-
-  FName() { Index = 0; }
-  FName( int Idx ) { Index = Idx; }
-
-  inline operator u32()
-  {
-    return Index;
-  }
-
-  inline operator const char*()
-  {
-    return ((*UObject::NameTable)[Index])->Data;
-  }
-
-  friend inline bool operator==( FName& A, FName& B )
-  {
-    return (A.Index == B.Index);
-  }
-
-  friend inline bool operator!=( FName& A, FName& B )
-  {
-    return (A.Index != B.Index);
-  }
-
-  inline FName operator=( int Idx )
-  {
-    Index = Idx;
-  }
 };
 

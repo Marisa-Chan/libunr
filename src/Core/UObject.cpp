@@ -126,6 +126,21 @@ FPackageFileOut& operator<<( FPackageFileOut& Out, FNameEntry& Name )
   Out << Name;
 }
 
+FName::operator const char*()
+{
+  return ((*UObject::NameTable)[Index])->Data;
+}
+
+bool operator==( FName& A, FName& B )
+{
+  return (*UObject::NameTable)[A.Index]->Hash == (*UObject::NameTable)[B.Index]->Hash;
+}
+
+bool operator!=( FName& A, FName& B )
+{
+  return (*UObject::NameTable)[A.Index]->Hash != (*UObject::NameTable)[B.Index]->Hash;
+}
+
 /*-----------------------------------------------------------------------------
  * UObject
 -----------------------------------------------------------------------------*/
