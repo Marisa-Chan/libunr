@@ -93,8 +93,6 @@ class DLL_EXPORT UProperty : public UField
   virtual bool LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int RealSize, int Idx = -1 );
   virtual bool LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8 Type, int RealSize, int Idx = -1 );
   virtual void GetText( String& Buf, UObject* Obj, UObject* Default, int Idx );
-  virtual void GetTextContainer( String& Buf, UObject* ValMem, UObject* DefMem, 
-    UPackage* ValPkg, UPackage* DefPkg, int Idx );
 
   u32 GetNativeOffset( const char* ClassName, const char* PropName );
   
@@ -149,8 +147,6 @@ class DLL_EXPORT UNameProperty : public UProperty
   virtual void Load();
   virtual bool LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int RealSize, int Idx = -1 );
   virtual void GetText( String& Buf, UObject* Obj, UObject* Default, int Idx );
-  virtual void GetTextContainer( String& Buf, UObject* ValMem, UObject* DefMem, 
-    UPackage* ValPkg, UPackage* DefPkg, int Idx );
 };
 
 // Deprecated property type, seems to be a leftover from older versions

@@ -40,17 +40,6 @@ UProperty::UProperty()
   Offset = 0;
 }
 
-UProperty::UProperty( int InNameIdx )
-  : UField()
-{
-  NameIdx = InNameIdx;
-  ArrayDim = 0;
-  ElementSize = 0;
-  PropertyFlags = 0;
-  Category = 0;
-  Offset = 0;
-}
-
 UProperty::~UProperty()
 {
 }
@@ -105,12 +94,6 @@ bool UProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8 Ty
 void UProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
 {
   return;
-}
-
-void UProperty::GetTextContainer( String& Buf, UObject* ObjMem, UObject* DefMem, 
-  UPackage* ObjPkg, UPackage* DefPkg, int Idx )
-{
-  GetText( Buf, ObjMem, DefMem, Idx );
 }
 
 void UProperty::SkipDefaultProperty( FPackageFileIn& In, int RealSize )
@@ -247,7 +230,10 @@ bool UNameProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int R
 
   while ( Num )
   {
-    In >> CINDEX( *(idx*)Data );
+    idx PkgNameIdx;
+    In >> CINDEX( PkgNameIdx );
+    *(FName*)Data = In.Pkg->GetGlobalNameIndex( PkgNameIdx );
+
     Data = PtrAdd( Data, ElementSize );
     Num -= ElementSize;
   }
@@ -257,36 +243,13 @@ bool UNameProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int R
 
 void UNameProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
 {
-  idx DefIdx = (Default) ? Default->GetProperty<idx>( this, Idx ) : 0;
-  idx ValIdx = Obj->GetProperty<idx>( this, Idx );
-  FNameEntry* DefVal = (Default) ? Default->Pkg->GetNameEntry( DefIdx ) : Obj->Pkg->GetNameEntry( 0 );
-  FNameEntry* Val;
+  FName DefVal = (Default) ? Default->GetProperty<FName>( this, Idx ) : FName( 0 );
+  FName Val    = Obj->GetProperty<FName>( this, Idx );
 
-  // FIXME: Is there an easier way to check this?
-  // In this case, it is very likely that the value in the object has not changed from the default
-  if ( Default && (Default->Pkg != Obj->Pkg) && (Default->Pkg == Obj->Class->Pkg) && DefIdx == ValIdx )
-    return;
-  else
-    Val = Obj->Pkg->GetNameEntry( ValIdx );
-
-  if ( Val->Hash != DefVal->Hash )
+  if ( DefVal != Val )
   {
     Buf += '"';
-    Buf += Val->Data;
-    Buf += '"';
-  }
-}
-
-void UNameProperty::GetTextContainer( String& Buf, UObject* ObjMem, UObject* DefMem, UPackage* ObjPkg, UPackage* DefPkg, int Idx )
-{
-  idx DefIdx = (DefMem) ? DefMem->GetProperty<idx>( this, Idx ) : 0;
-  idx ValIdx = ObjMem->GetProperty<idx>( this, Idx );
-  FNameEntry* DefVal = (DefPkg) ? DefPkg->GetNameEntry( DefIdx ) : ObjPkg->GetNameEntry( 0 );
-  FNameEntry* Val = ObjPkg->GetNameEntry( ValIdx );
-  if ( Val->Hash != DefVal->Hash )
-  {
-    Buf += '"';
-    Buf += Val->Data;
+    Buf += (const char*)Val;
     Buf += '"';
   }
 }
@@ -629,9 +592,6 @@ void UStructProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int 
   // Check if it's worth writing anything at all
   if ( DefMem == NULL || !xstl::Compare( ValMem, DefMem, Struct->StructSize ) )
   {
-    UPackage* ObjPkg = Obj->Pkg;
-        UPackage* DefPkg = (Default) ? Default->Pkg : NULL;
-
     for ( UField* Iter = Struct->Children; Iter != NULL; Iter = Iter->Next )
     {
       UProperty* Prop = SafeCast<UProperty>( Iter );
@@ -640,7 +600,7 @@ void UStructProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int 
 
       for ( int i = 0; i < Prop->ArrayDim; i++ )
       {
-        Prop->GetTextContainer( InnerBuf, ValMem, DefMem, ObjPkg, DefPkg, i );
+        Prop->GetText( InnerBuf, ValMem, DefMem, i );
 
         if ( InnerBuf.Length() > 0 )
         {
@@ -710,8 +670,6 @@ void UArrayProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int I
   String InnerBuf;
   ArrayNoType* DefGenericArray = (Default) ? Default->GetProperty<ArrayNoType*>( this, Idx ) : NULL;
 
-  UPackage* ObjPkg = Obj->Pkg;
-  UPackage* DefPkg = (Default) ? Default->Pkg : NULL;
   size_t Num = GenericArray->Size();
   for ( size_t i = 0; i < Num && i != MAX_SIZE; i++ )
   {
@@ -720,7 +678,7 @@ void UArrayProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int I
       DefValAddr = (*DefGenericArray)[i];
 
     void* ValAddr = (*GenericArray)[i];
-    Inner->GetTextContainer( InnerBuf, (UObject*)ValAddr, (UObject*)DefValAddr, ObjPkg, DefPkg, 0 );
+    Inner->GetText( InnerBuf, (UObject*)ValAddr, (UObject*)DefValAddr, 0 );
 
     if ( InnerBuf.Length() > 0 )
     {

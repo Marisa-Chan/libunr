@@ -69,6 +69,7 @@ bool UObject::StaticInit()
   ClassPool  = new Array<UClass*> ();
   NativePropertyLists = new Array<FNativePropertyList*>();
   NativeFunctions = new Array<UFunction*>();
+  NameTable = new Array<FNameEntry*>();
 
   if ( ObjectPool == NULL || ClassPool == NULL || NativePropertyLists == NULL ) 
     return false;
@@ -77,6 +78,7 @@ bool UObject::StaticInit()
   ClassPool->Reserve( 64 );
   NativePropertyLists->Reserve( 64 );
   NativeFunctions->Reserve( 4096 );
+  NameTable->Reserve( 16384 );
 
   // Create the "class" class first, everything else depends on it
   UClass::BootstrapStage1();

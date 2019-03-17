@@ -32,6 +32,9 @@
 #include "Core/UPackage.h"
 #include "Core/USystem.h"
 
+/*-----------------------------------------------------------------------------
+ * FNativePropertyList
+-----------------------------------------------------------------------------*/
 FNativePropertyList::FNativePropertyList( FHash InHash, size_t InNum )
 {
   Hash = InHash;
@@ -58,14 +61,80 @@ void FNativePropertyList::AddProperty( const char* Name, u32 Offset )
   }
 }
 
+/*-----------------------------------------------------------------------------
+ * FNameEntry
+-----------------------------------------------------------------------------*/
+FNameEntry::FNameEntry()
+{
+  xstl::Set( Data, 0, NAME_LEN );
+  Hash = ZERO_HASH;
+  Flags = 0;
+  Pkg = NULL;
+}
+
+FNameEntry::FNameEntry( const char* InStr )
+{
+  strncpy( Data, InStr, NAME_LEN );
+  Data[NAME_LEN-1] = '\0';
+  Flags = 0;
+  Hash = FnvHashString( Data );
+  Pkg = NULL;
+}
+
+FNameEntry::~FNameEntry()
+{
+  if ( Pkg )
+    Pkg->DelRef();
+}
+
+FPackageFileIn& operator>>( FPackageFileIn& In, FNameEntry& Name )
+{
+  if( In.Ver <= PKG_VER_UN_220 )
+  {
+    u8 b;
+    char* ptr = Name.Data;
+    do
+    {
+      In >> b;
+      *ptr++ = b;
+      
+    } while( b && ptr < (Name.Data + NAME_LEN ) );
+    *ptr = '\0'; // in case we ran up against the name size limit
+  }
+  else
+  {
+    int len = 0;
+    In >> CINDEX( len );
+    if( len > 0 && len < NAME_LEN )
+      In.Read( Name.Data, len );
+  }
+  In >> Name.Flags;
+  Name.Hash = FnvHashString( Name.Data );
+  Name.Pkg = In.Pkg;
+}
+
+FPackageFileOut& operator<<( FPackageFileOut& Out, FNameEntry& Name )
+{
+  Name.Data[NAME_LEN-1] = '\0'; // just in case
+  
+  if( Out.Ver > PKG_VER_UN_220 )
+  {
+    int len = strlen( Name.Data );
+    Out << CINDEX( len );
+  }
+  
+  Out << Name;
+}
+
+/*-----------------------------------------------------------------------------
+ * UObject
+-----------------------------------------------------------------------------*/
 Array<UObject*>* UObject::ObjectPool = NULL;
 Array<UClass*>*  UObject::ClassPool = NULL;
 Array<FNativePropertyList*>* UObject::NativePropertyLists = NULL;
 Array<UFunction*>* UObject::NativeFunctions = NULL;
+Array<FNameEntry*>* UObject::NameTable = NULL;
 bool UObject::bStaticBootstrapped = false;
-
-IMPLEMENT_NATIVE_CLASS( UObject );
-IMPLEMENT_NATIVE_CLASS( UCommandlet );
 
 UObject* UObject::StaticConstructObject( const char* InName, UClass* InClass, UObject* InOuter, 
   UPackage* InPkg, FExport* InExport )
@@ -76,7 +145,6 @@ UObject* UObject::StaticConstructObject( const char* InName, UClass* InClass, UO
   // Set up object properties
   Out->Pkg = InPkg;
   Out->Export = InExport;
-  Out->NameIdx = InExport->ObjectName;
   Out->Hash = FnvHashString( InName );
   Out->Name = InName;
   Out->Index = ObjectPool->Size();
@@ -123,7 +191,6 @@ UObject::UObject()
 {
   Index = -1;
   Export = NULL;
-  NameIdx = -1;
   NextObj = NULL;
   ObjectFlags = 0;
   Outer = NULL;
@@ -851,6 +918,9 @@ bool UObject::StaticLinkNativeProperties()
   }
   return false;
 }
+
+IMPLEMENT_NATIVE_CLASS( UObject );
+IMPLEMENT_NATIVE_CLASS( UCommandlet );
 
 BEGIN_PROPERTY_LINK( UCommandlet, 14 )
   LINK_NATIVE_PROPERTY( UCommandlet, HelpCmd );

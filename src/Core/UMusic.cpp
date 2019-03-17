@@ -63,7 +63,7 @@ bool UMusic::ExportToFile( const char* Dir, const char* Type )
   if ( Filename->Back() != '/' )
     Filename->Append( "/" );
 
-  Filename->Append( Pkg->ResolveNameFromIdx( NameIdx ) );
+  Filename->Append( Name );
   Filename->Append( "." );
   Filename->Append( Pkg->ResolveNameFromIdx( MusicType ) );
 

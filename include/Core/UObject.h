@@ -381,6 +381,26 @@ bool cls::StaticLinkNativeProperties() \
   virtual bool ExportToFile( const char* Dir, const char* Type );
 
 /*-----------------------------------------------------------------------------
+ * FNameEntry
+ * An entry into a name table
+-----------------------------------------------------------------------------*/
+#define NAME_LEN 64
+struct DLL_EXPORT FNameEntry
+{
+   FNameEntry();
+   FNameEntry( const char* InStr );
+  ~FNameEntry();
+  
+  friend FPackageFileIn&  operator>>( FPackageFileIn& In,  FNameEntry& Name );
+  friend FPackageFileOut& operator<<( FPackageFileOut& In, FNameEntry& Name );
+  
+  char Data[NAME_LEN];
+  int Flags;
+  FHash Hash;
+  UPackage* Pkg;
+};
+
+/*-----------------------------------------------------------------------------
  * UObject
  * The base class of all Unreal objects
 -----------------------------------------------------------------------------*/
@@ -437,11 +457,11 @@ public:
   static Array<UClass*>*  ClassPool; 
   static Array<FNativePropertyList*>* NativePropertyLists;
   static Array<UFunction*>* NativeFunctions;
+  static Array<FNameEntry*>* NameTable;
 
   FHash       Hash;     // Hash of this object
-  const char* Name;     // Name of this object (This type does not match script by design)
+  const char* Name;     // Name of this object (TODO: Change type to FName)
   int         Index;    // Index of the object in object pool
-  idx         NameIdx;  // Name index in the packages name table
   UObject*    NextObj;  // The next object in the list
   UPackage*   Pkg;      // Package this object was loaded from
   FExport*    Export;   // Export struct from the package of this object
@@ -506,5 +526,42 @@ class DLL_EXPORT UCommandlet : public UObject
   bool    ShowErrorCount;
   bool    ShowBanner;
   bool    ForceInt;
+};
+
+/*-----------------------------------------------------------------------------
+ * FName
+ * An index into the global name table
+-----------------------------------------------------------------------------*/
+struct FName
+{
+  u32 Index;
+
+  FName() { Index = 0; }
+  FName( int Idx ) { Index = Idx; }
+
+  inline operator u32()
+  {
+    return Index;
+  }
+
+  inline operator const char*()
+  {
+    return ((*UObject::NameTable)[Index])->Data;
+  }
+
+  friend inline bool operator==( FName& A, FName& B )
+  {
+    return (A.Index == B.Index);
+  }
+
+  friend inline bool operator!=( FName& A, FName& B )
+  {
+    return (A.Index != B.Index);
+  }
+
+  inline FName operator=( int Idx )
+  {
+    Index = Idx;
+  }
 };
 

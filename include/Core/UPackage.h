@@ -142,25 +142,6 @@ struct DLL_EXPORT UPackageHeader
   friend FPackageFileIn& operator>>( FPackageFileIn& In, UPackageHeader& Header );
 };
 
-/*-----------------------------------------------------------------------------
- * FNameEntry
- * A entry into a package's name table
------------------------------------------------------------------------------*/
-#define NAME_LEN 64
-struct DLL_EXPORT FNameEntry
-{
-   FNameEntry();
-   FNameEntry( const char* InStr );
-  ~FNameEntry();
-  
-  friend FPackageFileIn&  operator>>( FPackageFileIn& In,  FNameEntry& Name );
-  friend FPackageFileOut& operator<<( FPackageFileOut& In, FNameEntry& Name );
-  
-  char Data[NAME_LEN];
-  int Flags;
-  FHash Hash;
-};
-
 // Decides how packages are maintained during loading and idle states
 enum EPkgLoadOpts
 {
@@ -192,6 +173,7 @@ class DLL_EXPORT UPackage : public UObject
   FExport*        GetClassExport( const char* ExportName );
   Array<FExport>* GetExportTable();
   Array<FImport>* GetImportTable();
+  u32             GetGlobalNameIndex( u32 PkgNameIdx );
   const char*     GetFilePath();
   const char*     GetFileName();
   String*         GetFullObjName( FExport* ObjExp );
@@ -218,6 +200,7 @@ protected:
   Array<FImport>*    Imports;
   FileStream* Stream;
   UPackageHeader Header;
+  u32 NameTableStart; // The index at which this package's name table appears in the global name table
 
   // Global package variables
   static EPkgLoadOpts LoadOpts;

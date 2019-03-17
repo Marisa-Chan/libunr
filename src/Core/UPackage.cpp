@@ -272,66 +272,6 @@ FPackageFileIn& operator>>( FPackageFileIn& In, UPackageHeader& Header )
 }
 
 /*-----------------------------------------------------------------------------
- * FNameEntry
------------------------------------------------------------------------------*/
-FNameEntry::FNameEntry()
-{
-  xstl::Set( Data, 0, NAME_LEN );
-  Hash = ZERO_HASH;
-  Flags = 0;
-}
-
-FNameEntry::FNameEntry( const char* InStr )
-{
-  strncpy( Data, InStr, NAME_LEN );
-  Data[NAME_LEN-1] = '\0';
-  Flags = 0;
-  Hash = FnvHashString( Data );
-}
-
-FNameEntry::~FNameEntry()
-{
-}
-
-FPackageFileIn& operator>>( FPackageFileIn& In, FNameEntry& Name )
-{
-  if( In.Ver <= PKG_VER_UN_220 )
-  {
-    u8 b;
-    char* ptr = Name.Data;
-    do
-    {
-      In >> b;
-      *ptr++ = b;
-      
-    } while( b && ptr < (Name.Data + NAME_LEN ) );
-    *ptr = '\0'; // in case we ran up against the name size limit
-  }
-  else
-  {
-    int len = 0;
-    In >> CINDEX( len );
-    if( len > 0 && len < NAME_LEN )
-      In.Read( Name.Data, len );
-  }
-  In >> Name.Flags;
-  Name.Hash = FnvHashString( Name.Data );
-}
-
-FPackageFileOut& operator<<( FPackageFileOut& Out, FNameEntry& Name )
-{
-  Name.Data[NAME_LEN-1] = '\0'; // just in case
-  
-  if( Out.Ver > PKG_VER_UN_220 )
-  {
-    int len = strlen( Name.Data );
-    Out << CINDEX( len );
-  }
-  
-  Out << Name;
-}
-
-/*-----------------------------------------------------------------------------
  * UPackage
 -----------------------------------------------------------------------------*/
 Array<UPackage*>* UPackage::Packages = NULL;
@@ -393,10 +333,15 @@ bool UPackage::Load( const char* File )
   }
 
   // read in the name table
+  NameTableStart = NameTable->Size();
   Names->Resize( Header.NameCount );
   PackageFile->Seek( Header.NameOffset, ESeekBase::Begin );
   for ( int i = 0; i < Header.NameCount; i++ )
-    *PackageFile >> (*Names)[i];
+  {
+    FNameEntry* NameEntry = &(*Names)[i];
+    *PackageFile >> *NameEntry;
+    NameTable->PushBack( NameEntry );
+  }
   
   // read in imports
   Imports->Resize( Header.ImportCount );
@@ -513,6 +458,11 @@ FExport* UPackage::GetClassExport( const char* ExportName )
 Array<FExport>* UPackage::GetExportTable()
 {
   return Exports;
+}
+
+u32 UPackage::GetGlobalNameIndex( u32 PkgNameIdx )
+{
+  return NameTableStart + PkgNameIdx;
 }
 
 Array<FImport>* UPackage::GetImportTable()
@@ -649,8 +599,8 @@ UPackage* UPackage::StaticLoadPackage( const char* PkgName )
       return NULL;
     }
  
-    Pkg->Name = StringDup( PkgName );
-    Pkg->Hash = FnvHashString( PkgName );
+    Pkg->Name   = StringDup( PkgName );
+    Pkg->Hash   = FnvHashString( PkgName );
     Packages->PushBack( Pkg );
   }
 

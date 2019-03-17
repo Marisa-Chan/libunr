@@ -121,7 +121,7 @@ bool UTexture::ExportToFile( const char* Dir, const char* Type )
   if ( Filename->Back() != '/' )
     Filename->Append( "/" );
 
-  Filename->Append( Pkg->ResolveNameFromIdx( NameIdx ) );
+  Filename->Append( Name );
   Filename->Append( "." );
   if ( strnicmp( Type, "bmp", 3 ) != 0 )
   {
