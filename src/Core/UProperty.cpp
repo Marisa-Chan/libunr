@@ -276,7 +276,7 @@ bool UStrProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int Re
       In >> *NewStr;
       *(String**)Data = NewStr;
     }
-    else
+    else if ( RealSize > 0 )
     {
       char* NewStr = new char[RealSize];
       In.Read( NewStr, RealSize-- );

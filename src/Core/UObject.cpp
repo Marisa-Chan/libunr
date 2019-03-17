@@ -350,7 +350,7 @@ UClass* UObject::FindClass( FHash& ClassHash )
 // TODO: Print out full names of objects for when properties don't exist
 void UObject::ReadDefaultProperties()
 {
-  const char* PropName = NULL;
+  FName PropName = 0;
   idx PropNameIdx = 0;
   u8  InfoByte = 0;
   u8  PropType = 0;
@@ -362,7 +362,7 @@ void UObject::ReadDefaultProperties()
   while( 1 )
   {
     *PkgFile >> CINDEX( PropNameIdx );
-    PropName = Pkg->ResolveNameFromIdx( PropNameIdx );
+    PropName = FName( Pkg->GetGlobalNameIndex( PropNameIdx ) );
     if ( UNLIKELY( strncmp( PropName, "None", 4 ) == 0 ) )
       break;
 
@@ -423,6 +423,9 @@ void UObject::ReadDefaultProperties()
           break;
         case 7:
           *PkgFile >> RealSize;
+          break;
+        default:
+          RealSize = UProperty::PropertySizes[SizeByte];
           break;
       }
     }
