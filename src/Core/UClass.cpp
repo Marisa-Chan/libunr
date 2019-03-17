@@ -1091,3 +1091,11 @@ void UClass::LinkSuperClassChildren()
 
 Queue<UClass*> UClass::DefPropQueue;
 
+IMPLEMENT_NATIVE_CLASS( UField );
+  IMPLEMENT_NATIVE_CLASS( UConst );
+  IMPLEMENT_NATIVE_CLASS( UEnum );
+  IMPLEMENT_NATIVE_CLASS( UStruct );
+    IMPLEMENT_NATIVE_CLASS( UFunction );
+    IMPLEMENT_NATIVE_CLASS( UState );
+      IMPLEMENT_NATIVE_CLASS( UClass );
+

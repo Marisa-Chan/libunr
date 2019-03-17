@@ -115,6 +115,7 @@ set (SOURCES ${UNR_SRC}/Core/FConfig.cpp
              ${UNR_SRC}/Actors/ADynamicZoneInfo.cpp
              ${UNR_SRC}/Actors/AGameInfo.cpp
              ${UNR_SRC}/Actors/AHUD.cpp
+             ${UNR_SRC}/Actors/AInternetLink.cpp
              ${UNR_SRC}/Actors/AInventory.cpp
              ${UNR_SRC}/Actors/ANavigationPoint.cpp
              ${UNR_SRC}/Actors/APawn.cpp

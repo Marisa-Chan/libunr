@@ -49,6 +49,7 @@
 #include "Actors/ADynamicZoneInfo.h"
 #include "Actors/AGameInfo.h"
 #include "Actors/AHUD.h"
+#include "Actors/AInternetLink.h"
 #include "Actors/AInventory.h"
 #include "Actors/ANavigationPoint.h"
 #include "Actors/APawn.h"
@@ -217,6 +218,10 @@ bool UObject::StaticInit()
     Result &= AHUDOverlay::StaticClassInit();
     Result &= AInfo::StaticClassInit();
       Result &= AGameInfo::StaticClassInit();
+      Result &= AInternetInfo::StaticClassInit();
+        Result &= AInternetLink::StaticClassInit();
+          Result &= ATcpLink::StaticClassInit();
+          Result &= AUdpLink::StaticClassInit();
       Result &= AReplicationInfo::StaticClassInit();
         Result &= AGameReplicationInfo::StaticClassInit();
         Result &= APlayerReplicationInfo::StaticClassInit();
@@ -263,34 +268,22 @@ bool UObject::StaticInit()
   AActor::StaticClass()->Load();
   AActor::StaticClass()->PostLoad();
 
+  // Load IpDrv classes
+  ATcpLink::StaticClass()->PreLoad();
+  ATcpLink::StaticClass()->Load();
+  ATcpLink::StaticClass()->PostLoad();
+
+  AUdpLink::StaticClass()->PreLoad();
+  AUdpLink::StaticClass()->Load();
+  AUdpLink::StaticClass()->PostLoad();
+
   return Result;
 }
 
   IMPLEMENT_NATIVE_CLASS( UAnimationNotify );
   IMPLEMENT_NATIVE_CLASS( UCanvas );
   IMPLEMENT_NATIVE_CLASS( UClient );
-  IMPLEMENT_NATIVE_CLASS( UField );
-    IMPLEMENT_NATIVE_CLASS( UConst );
-    IMPLEMENT_NATIVE_CLASS( UEnum );
-    IMPLEMENT_NATIVE_CLASS( UProperty );
-      IMPLEMENT_NATIVE_CLASS( UByteProperty );
-      IMPLEMENT_NATIVE_CLASS( UIntProperty );
-      IMPLEMENT_NATIVE_CLASS( UBoolProperty );
-      IMPLEMENT_NATIVE_CLASS( UFloatProperty );
-      IMPLEMENT_NATIVE_CLASS( UObjectProperty );
-        IMPLEMENT_NATIVE_CLASS( UClassProperty );
-      IMPLEMENT_NATIVE_CLASS( UNameProperty );
-      IMPLEMENT_NATIVE_CLASS( UStringProperty );
-      IMPLEMENT_NATIVE_CLASS( UArrayProperty );
-      IMPLEMENT_NATIVE_CLASS( UStructProperty );
-      IMPLEMENT_NATIVE_CLASS( UStrProperty );
-      IMPLEMENT_NATIVE_CLASS( UMapProperty );
-      IMPLEMENT_NATIVE_CLASS( UFixedArrayProperty );
-    IMPLEMENT_NATIVE_CLASS( UStruct );
-      IMPLEMENT_NATIVE_CLASS( UFunction );
-      IMPLEMENT_NATIVE_CLASS( UState );
-        IMPLEMENT_NATIVE_CLASS( UClass );
-  IMPLEMENT_NATIVE_CLASS( ULanguage );
+        IMPLEMENT_NATIVE_CLASS( ULanguage );
   IMPLEMENT_NATIVE_CLASS( UMusic );
   IMPLEMENT_NATIVE_CLASS( UPackage );
   IMPLEMENT_NATIVE_CLASS( UPlayer );
