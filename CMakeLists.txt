@@ -106,6 +106,7 @@ set (SOURCES ${UNR_SRC}/Core/FConfig.cpp
              ${UNR_SRC}/Core/USkelMesh.cpp
              ${UNR_SRC}/Core/USound.cpp
              ${UNR_SRC}/Core/UStaticClassInit.cpp
+             ${UNR_SRC}/Core/UStaticMesh.cpp
              ${UNR_SRC}/Core/USystem.cpp
              ${UNR_SRC}/Core/UTexture.cpp
              ${UNR_SRC}/Core/UViewport.cpp
@@ -126,7 +127,6 @@ set (SOURCES ${UNR_SRC}/Core/FConfig.cpp
              ${UNR_SRC}/Actors/ATimeDemo.cpp
              ${UNR_SRC}/Actors/AWeapon.cpp
              ${UNR_SRC}/Actors/AZoneInfo.cpp
-
 )
 
 include_directories (${UNR_INC} ${XSTL_INC})

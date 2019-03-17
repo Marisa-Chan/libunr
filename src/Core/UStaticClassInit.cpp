@@ -39,6 +39,7 @@
 #include "Core/UProperty.h"
 #include "Core/URender.h"
 #include "Core/USound.h"
+#include "Core/UStaticMesh.h"
 #include "Core/USystem.h"
 #include "Core/UTexture.h"
 #include "Core/UViewport.h"
@@ -159,8 +160,6 @@ bool UObject::StaticInit()
   Result &= UAnimationNotify::StaticClassInit();
   Result &= UAudioSubsystem::StaticClassInit();
   Result &= UBitmap::StaticClassInit();
-  Result &= UBspNodes::StaticClassInit();
-  Result &= UBspSurfs::StaticClassInit();
     Result &= UTexture::StaticClassInit();
       Result &= UFractalTexture::StaticClassInit();
         Result &= UFireTexture::StaticClassInit();
@@ -170,6 +169,8 @@ bool UObject::StaticInit()
         Result &= UIceTexture::StaticClassInit();
       Result &= UScriptedTexture::StaticClassInit();
       Result &= UShadowBitMap::StaticClassInit();
+  Result &= UBspNodes::StaticClassInit();
+  Result &= UBspSurfs::StaticClassInit();
   Result &= UCanvas::StaticClassInit();
   Result &= UClient::StaticClassInit();
   Result &= UConsole::StaticClassInit();
@@ -195,6 +196,7 @@ bool UObject::StaticInit()
 
       Result &= ULodMesh::StaticClassInit();
         Result &= USkeletalMesh::StaticClassInit();
+      Result &= UStaticMesh::StaticClassInit();
     Result &= UModel::StaticClassInit();
   Result &= UPlayer::StaticClassInit();
     Result &= UViewport::StaticClassInit();
