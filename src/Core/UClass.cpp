@@ -738,7 +738,7 @@ FDependency::FDependency()
 // UClass
 void UClass::BootstrapStage1()
 {
-  ObjectClass = new UClass( "Class", CLASS_NoExport, NULL, 
+  ObjectClass = new UClass( 0, CLASS_NoExport, NULL, 
       sizeof(UClass), UClass::NativeConstructor );
   ObjectClass->Class = ObjectClass;
   UObject::ClassPool->PushBack( ObjectClass );
@@ -757,12 +757,12 @@ UClass::UClass()
   bLinkedChildren = false;
 }
 
-UClass::UClass( const char* ClassName, u32 Flags, UClass* InSuperClass, 
+UClass::UClass( FName ClassName, u32 Flags, UClass* InSuperClass, 
     size_t InStructSize, UObject *(*NativeCtor)(size_t) )
   : UState()
 {
-  Name = StringDup( ClassName );
-  Hash = FnvHashString( Name );
+  Name = ClassName;
+//Hash = FnvHashString( Name );
   ClassFlags = Flags;
   SuperClass = InSuperClass;
   SuperField = InSuperClass;
@@ -1026,7 +1026,7 @@ UObject* UClass::CreateObject()
 UObject* UClass::CreateDefaultObject()
 {
   Default = Constructor( StructSize );
-  Default->Name = StringDup( Name );
+  Default->Name = Name;
   Default->Class = this;
 }
 

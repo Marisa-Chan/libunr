@@ -180,8 +180,8 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
   }
 
   // Temporarily change package name to MyLevel
-  const char* PkgName = Pkg->Name;
-  Pkg->Name = "MyLevel";
+  FName PkgName = Pkg->Name;
+  Pkg->Name = Pkg->GetGlobalNameIndex( Pkg->FindName( "MyLevel" ) );
 
   // Write beginning map
   Out->Printf( "Begin Map\r\n" );
@@ -231,7 +231,7 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
                 ValueBuf.Erase();
                 continue;
               }
-              else if ( Prop->Hash == FnvHashString("Brush") )
+              else if ( Prop->Name == ABrush::StaticClass()->Name )
               {
                 ABrush* Brush = (ABrush*)Actor;
                 Brush->ExportToLevelText( Out );

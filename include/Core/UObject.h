@@ -220,6 +220,7 @@ protected: \
   static FNativePropertyList* StaticNativePropList; \
 private: \
   static constexpr const char* NativePkgName = TEXT(pkg); \
+  static const u32 StaticFlags = clsflags; \
   static size_t NativeSize; \
 public: \
   typedef supcls Super; \
@@ -243,21 +244,7 @@ public: \
   { \
     return new(ObjSize) cls(); \
   } \
-  static bool StaticCreateClass() \
-  { \
-    if (!ObjectClass) \
-    { \
-      ObjectClass = UObject::StaticAllocateClass( TEXT(cls), clsflags, Super::ObjectClass,\
-        NativeSize, NativeConstructor ); \
-      if ( ObjectClass != NULL ) \
-      { \
-        ClassPool->PushBack( ObjectClass ); \
-        return true; \
-      } \
-      return false; \
-    } \
-    return true; \
-  } \
+  static bool StaticCreateClass(); \
   static inline bool StaticInitNativePropList( size_t NumProperties ) \
   { \
     if (!StaticNativePropList) \
@@ -330,7 +317,31 @@ public: \
     ObjectClass->Export->Obj = ObjectClass; \
     ObjectClass->ObjectFlags = ObjectClass->Export->ObjectFlags; \
     return true; \
-  }
+  } \
+  bool cls::StaticCreateClass() \
+  { \
+    UPackage* ClsPkg = UPackage::StaticLoadPackage( NativePkgName ); \
+    if (!ClsPkg) \
+    { \
+      Logf( LOG_CRIT, "Package '%s' for class '%s' could not be opened", \
+        NativePkgName, TEXT(cls) ); \
+      return false; \
+    } \
+    if (!ObjectClass) \
+    { \
+      const char* ClsNameStr = TEXT(cls); \
+      FName ClsName = ClsPkg->GetGlobalNameIndex( ClsPkg->FindName( ++ClsNameStr ) ); \
+      ObjectClass = UObject::StaticAllocateClass( ClsName, StaticFlags, Super::ObjectClass,\
+        NativeSize, NativeConstructor ); \
+      if ( ObjectClass != NULL ) \
+      { \
+        ClassPool->PushBack( ObjectClass ); \
+        return true; \
+      } \
+      return false; \
+    } \
+    return true; \
+  } \
 
 #define LINK_NATIVE_PROPERTY_ALIASED(var, realvar) \
   StaticNativePropList->AddProperty(#var,OFFSET_OF(LocalClassType,realvar));
@@ -423,7 +434,8 @@ struct FName
   FName() { Index = 0; }
   FName( int Idx ) { Index = Idx; }
 
-  inline operator u32()
+  operator const char*();
+  operator u32()
   {
     return Index;
   }
@@ -433,7 +445,6 @@ struct FName
     Index = Idx;
   }
 
-  operator const char*();
   friend bool operator==( FName& A, FName& B );
   friend bool operator!=( FName& A, FName& B );
 };
@@ -485,9 +496,9 @@ public:
     UObject* InOuter, bool bLoadClassNow = false );
   static UObject* StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass* ObjClass,
     UObject* InOuter, bool bLoadClassNow = false );
-  static UObject* StaticConstructObject( const char* InName, UClass* InClass, 
+  static UObject* StaticConstructObject( FName InName, UClass* InClass, 
     UObject* InOuter, UPackage* InPkg, FExport* InExport );
-  static UClass* StaticAllocateClass( const char* ClassName, u32 Flags, UClass* SuperClass, 
+  static UClass* StaticAllocateClass( FName InName, u32 Flags, UClass* SuperClass, 
     size_t InStructSize, UObject *(*NativeCtor)(size_t) );
   static int CalcObjRefValue( idx ObjRef );
 
@@ -497,11 +508,11 @@ public:
   static Array<UFunction*>* NativeFunctions;
   static Array<FNameEntry*>* NameTable;
 
-  FHash     Hash;     // Hash of this object
-  const char* Name;   // Name of this object
+//  FHash     Hash;     // Hash of this object (TODO: Use FName)
+//  const char* Name;   // Name of this object (TODO: Use FName)
+  FName     Name;     // Name of the object stored in the global name table 
   int       Index;    // Index of the object in object pool
   UObject*  NextObj;  // The next object in the list
-  FName     NameIdx;  // Name index in the global name table
   UPackage* Pkg;      // Package this object was loaded from
   FExport*  Export;   // Export struct from the package of this object
   UObject*  Outer;    // Object that this object resides in

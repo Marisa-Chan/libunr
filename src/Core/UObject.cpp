@@ -151,7 +151,7 @@ Array<UFunction*>* UObject::NativeFunctions = NULL;
 Array<FNameEntry*>* UObject::NameTable = NULL;
 bool UObject::bStaticBootstrapped = false;
 
-UObject* UObject::StaticConstructObject( const char* InName, UClass* InClass, UObject* InOuter, 
+UObject* UObject::StaticConstructObject( FName InName, UClass* InClass, UObject* InOuter, 
   UPackage* InPkg, FExport* InExport )
 {
   // Construct object with the class constructor
@@ -160,13 +160,11 @@ UObject* UObject::StaticConstructObject( const char* InName, UClass* InClass, UO
   // Set up object properties
   Out->Pkg = InPkg;
   Out->Export = InExport;
-  Out->Hash = FnvHashString( InName );
   Out->Name = InName;
   Out->Index = ObjectPool->Size();
   Out->RefCnt = 1;
   Out->Outer = InOuter;
   Out->ObjectFlags = InExport->ObjectFlags;
-  Out->NameIdx = InPkg->GetGlobalNameIndex( InExport->ObjectName );
   Out->Class = InClass;
   Out->Field = InClass->Children;
  
@@ -188,7 +186,7 @@ UObject* UObject::StaticConstructObject( const char* InName, UClass* InClass, UO
   return Out;
 }
 
-UClass* UObject::StaticAllocateClass( const char* ClassName, u32 Flags, UClass* SuperClass, 
+UClass* UObject::StaticAllocateClass( FName ClassName, u32 Flags, UClass* SuperClass, 
     size_t InStructSize, UObject *(*NativeCtor)(size_t) )
 {
   ClassName++; // We don't want the prefix indicating object type in the name of the class
@@ -347,7 +345,6 @@ UClass* UObject::FindClass( FHash& ClassHash )
   return NULL;
 }
 
-// TODO: Print out full names of objects for when properties don't exist
 void UObject::ReadDefaultProperties()
 {
   FName PropName = 0;
@@ -371,9 +368,6 @@ void UObject::ReadDefaultProperties()
     // Read the actual value of the properties even if they don't exist
     // We don't want to totally fail if some property just doesn't exist
     // Instead, the value will just go unused (because nothing is there to use it)
-    // The only cases of failure involve Array and Struct properties since you need
-    // to access data in the property itself to find out what underlying types it
-    // contains. 
     if ( !Prop )
     {
       if ( Outer )
@@ -463,6 +457,7 @@ void UObject::ReadDefaultProperties()
   }
 }
 
+// TODO: Rewrite this awful crap...
 void UObject::ReadConfigProperties()
 {
   for( UField* FieldIter = Field; FieldIter != NULL; FieldIter = FieldIter->Next )
@@ -791,7 +786,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
 UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass* ObjClass, 
   UObject* InOuter, bool bLoadClassNow )
 {
-  const char* ObjName = ObjPkg->ResolveNameFromIdx( ObjExport->ObjectName );
+  FName ObjName = ObjPkg->GetGlobalNameIndex( ObjExport->ObjectName );
   bool bNeedsFullLoad = true;
 
   // 'None' object means NULL, don't load anything
@@ -931,7 +926,7 @@ bool UObject::StaticLinkNativeProperties()
     LINK_NATIVE_ARRAY( ObjectInternal );
     LINK_NATIVE_PROPERTY( Outer );
     LINK_NATIVE_PROPERTY( ObjectFlags );
-    LINK_NATIVE_PROPERTY_ALIASED( Name, NameIdx );
+    LINK_NATIVE_PROPERTY( Name );
     LINK_NATIVE_PROPERTY( Class );
     return true;
   }
