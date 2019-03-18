@@ -50,3 +50,4 @@ void Logf( const char* Type, const char* Str, ... )
 
   printf( "%s", Msg );
 }
+

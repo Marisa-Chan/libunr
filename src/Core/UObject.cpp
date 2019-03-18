@@ -378,19 +378,19 @@ void UObject::ReadDefaultProperties()
     {
       if ( Outer )
         Logf( LOG_CRIT, "Property '%s' in '%s.%s.%s' does not exist",
-          PropName, Pkg->Name, Outer->Name, Name );
+          (const char*)PropName, Pkg->Name, Outer->Name, Name );
       else
         Logf( LOG_CRIT, "Property '%s' in '%s.%s' does not exist",
-          PropName, Pkg->Name, Name );
+          (const char*)PropName, Pkg->Name, Name );
     }
     else if ( Prop->Offset == MAX_UINT32 )
     {
       if ( Outer )
         Logf( LOG_WARN, "Property '%s' in '%s.%s.%s' has no native component",
-            PropName, Pkg->Name, Outer->Name, Name );
+            (const char*)PropName, Pkg->Name, Outer->Name, Name );
       else
         Logf( LOG_WARN, "Property '%s' in '%s.%s' has no native component",
-            PropName, Pkg->Name, Name );
+            (const char*)PropName, Pkg->Name, Name );
 
       Prop = NULL;
     }

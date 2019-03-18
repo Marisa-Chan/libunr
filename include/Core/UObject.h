@@ -322,6 +322,11 @@ public: \
       return false; \
     } \
     ObjectClass->Export = ObjectClass->Pkg->GetClassExport( ObjectClass->Name ); \
+    if ( ObjectClass->Export == NULL ) \
+    { \
+      ObjectClass->ObjectFlags = RF_EliminateObject; \
+      return true; \
+    } \
     ObjectClass->Export->Obj = ObjectClass; \
     ObjectClass->ObjectFlags = ObjectClass->Export->ObjectFlags; \
     return true; \
