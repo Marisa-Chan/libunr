@@ -90,20 +90,25 @@ typedef i32 idx;
 #define PKG_VER_UT_432 69
 
 // Log levels
-#define LOG_INFO "I"
-#define LOG_WARN "W"
-#define LOG_ERR  "E"
-#define LOG_CRIT "!"
+#define LOG_INFO 0
+#define LOG_WARN 1
+#define LOG_ERR  2
+#define LOG_CRIT 3
+
+const char* const LogLevelStrings[] =
+{
+  "I",
+  "W",
+  "E",
+  "!"
+};
 
 // Error codes
 #define ERR_FILE_NOT_EXIST 1
 #define ERR_BAD_DATA       2
 #define ERR_FILE_CREATE    3
 
-typedef void(*DebugPrintFunc)( const char* Str, size_t Len );
-extern DebugPrintFunc DebugPrint;
-
-DLL_EXPORT void Logf( const char* Type, const char* Str, ... );
+DLL_EXPORT void Logf( int Type, const char* Str, ... );
 
 #define FNV1A_HASH 0
 #define FNV1_HASH  1

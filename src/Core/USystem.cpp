@@ -28,6 +28,7 @@
 #include "Core/UPackage.h"
 
 USystem* GSystem = NULL;
+int USystem::LogLevel = LOG_INFO;
 bool USystem::bIsEditor = false;
 
 USubsystem::USubsystem()

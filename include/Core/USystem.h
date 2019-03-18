@@ -83,6 +83,8 @@ class DLL_EXPORT USystem : public USubsystem
   String* CacheExt;
   Array<String*> Paths;
 
+  static int LogLevel;
+
 protected:
   GamePromptCallback DoGamePrompt;
   DevicePromptCallback DoDevicePrompt;

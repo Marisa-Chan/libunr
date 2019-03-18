@@ -24,14 +24,18 @@
 */
 
 #include "Core/FUtil.h"
+#include "Core/USystem.h"
 #include "stdarg.h"
 
 #define MAX_MSG_LEN  512
 #define MAX_TYPE_LEN 32
 #define MAX_LINE_LEN (MAX_MSG_LEN + MAX_TYPE_LEN - 1)
 
-void Logf( const char* Type, const char* Str, ... )
+void Logf( int Type, const char* Str, ... )
 {
+  if ( Type < USystem::LogLevel )
+    return;
+
   static char StrBuf[MAX_MSG_LEN];
   static char Msg[MAX_LINE_LEN];
   
@@ -40,11 +44,11 @@ void Logf( const char* Type, const char* Str, ... )
   vsnprintf( StrBuf, MAX_MSG_LEN, Str, vl );
   va_end( vl );
   
-  size_t MsgLen = snprintf( Msg, MAX_LINE_LEN, "[%s] %s\n", Type, StrBuf );
+  size_t MsgLen = snprintf( Msg, MAX_LINE_LEN, "[%s] %s\n", LogLevelStrings[Type], StrBuf );
   size_t WriteLen = MsgLen;
   if ( MsgLen > MAX_LINE_LEN ) 
   {
-    Logf( LOG_WARN, "Following log message exceeds maximum length" );
+    Logf( LOG_CRIT, "Following log message exceeds maximum length" );
     WriteLen = MAX_LINE_LEN;
   }
 
