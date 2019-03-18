@@ -53,7 +53,7 @@ void APawn::PostDefaultLoad()
 
 IMPLEMENT_NATIVE_CLASS( APawn );
 
-BEGIN_PROPERTY_LINK( APawn, 171 )
+BEGIN_PROPERTY_LINK( APawn, 175 )
   LINK_NATIVE_PROPERTY( APawn, bBehindView );
   LINK_NATIVE_PROPERTY( APawn, bIsPlayer );
   LINK_NATIVE_PROPERTY( APawn, bJustLanded );
@@ -90,6 +90,10 @@ BEGIN_PROPERTY_LINK( APawn, 171 )
   LINK_NATIVE_PROPERTY( APawn, bIsFemale );
   LINK_NATIVE_PROPERTY( APawn, bIsMultiSkinned );
   LINK_NATIVE_PROPERTY( APawn, bCountJumps );
+  LINK_NATIVE_PROPERTY( APawn, bAdvancedTactics );
+  LINK_NATIVE_PROPERTY( APawn, bViewTarget );
+  LINK_NATIVE_PROPERTY( APawn, SelectionMesh );
+  LINK_NATIVE_PROPERTY( APawn, SpecialMesh );
   LINK_NATIVE_PROPERTY( APawn, bEnhancedSightCheck );
   LINK_NATIVE_PROPERTY( APawn, bRepHealth );
   LINK_NATIVE_PROPERTY( APawn, bDoAutoSerpentine );

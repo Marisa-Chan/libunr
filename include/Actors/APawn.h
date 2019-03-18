@@ -74,6 +74,10 @@ class APawn : public AActor
   bool bIsFemale;
   bool bIsMultiSkinned;
   bool bCountJumps;
+  bool bAdvancedTactics;
+  bool bViewTarget;
+  String* SelectionMesh;
+  String* SpecialMesh;
 
   // 227 flags
   bool bEnhancedSightCheck;

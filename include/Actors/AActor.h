@@ -41,8 +41,9 @@ class AInventory;
 class ANavigationPoint;
 class ATrigger;
 
-// Includes state for:
-//   227j_39
+// Includes variable state for:
+//   Unreal 227j_39
+//   UT 436
 class AActor : public UObject
 {
   DECLARE_NATIVE_CLASS( AActor, UObject, CLASS_NativeReplication, Engine )
@@ -60,6 +61,9 @@ class AActor : public UObject
   bool bNetNotify, bHandleOwnCorona, bRenderMultiEnviroMaps, bWorldGeometry;
   bool bUseMeshCollision, bEditorSelectRender, bNoDynamicShadowCast;
   bool bIsInOctree, bProjectorDecal, bUseLitSprite;
+
+  // UT99 booleans
+  bool bTrailerPrePivot, bClientAnim, bSimFall, bClientDemoRecording, bClientDemoNetFunc;
 
   // Editing flags
   bool bHiddenEd, bDirectional, bSelected, bMemorized;

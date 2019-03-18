@@ -78,12 +78,14 @@ class AWeapon : public AInventory
   bool     bSplashDamage;
   bool     bCanThrow;
   bool     bRecommendSplashDamage;
+  bool     bRecommendAltSplashDamage;
   bool     bWeaponStay;
   bool     bOwnsCrosshair;
   bool     bHideWeapon;
   bool     bMeleeWeapon;
   bool     bRapidFire;
   bool     bTossedOut;
+  bool     bSpecialIcon;
   float    FiringSpeed;
 
   FVector  FireOffset;
@@ -131,5 +133,7 @@ class AWeapon : public AInventory
   UTexture* MFTexture;
   UTexture* MuzzleFlare;
   float FlareOffset;
+
+  FColor NameColor;
 };
 

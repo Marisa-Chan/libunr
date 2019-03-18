@@ -71,7 +71,7 @@ BEGIN_PROPERTY_LINK( AWeaponAttachment, 4 )
   LINK_NATIVE_PROPERTY( AWeaponAttachment, LastUpdateTime );
 END_PROPERTY_LINK()
 
-BEGIN_PROPERTY_LINK( AWeapon, 65 )
+BEGIN_PROPERTY_LINK( AWeapon, 67 )
   LINK_NATIVE_PROPERTY( AWeapon, MaxTargetRange );
   LINK_NATIVE_PROPERTY( AWeapon, AmmoName );
   LINK_NATIVE_PROPERTY( AWeapon, ReloadCount );
@@ -88,6 +88,7 @@ BEGIN_PROPERTY_LINK( AWeapon, 65 )
   LINK_NATIVE_PROPERTY( AWeapon, bSplashDamage );
   LINK_NATIVE_PROPERTY( AWeapon, bCanThrow );
   LINK_NATIVE_PROPERTY( AWeapon, bRecommendSplashDamage );
+  LINK_NATIVE_PROPERTY( AWeapon, bRecommendAltSplashDamage );
   LINK_NATIVE_PROPERTY( AWeapon, bWeaponStay );
   LINK_NATIVE_PROPERTY( AWeapon, bOwnsCrosshair );
   LINK_NATIVE_PROPERTY( AWeapon, bHideWeapon );
@@ -137,5 +138,6 @@ BEGIN_PROPERTY_LINK( AWeapon, 65 )
   LINK_NATIVE_PROPERTY( AWeapon, MFTexture );
   LINK_NATIVE_PROPERTY( AWeapon, MuzzleFlare );
   LINK_NATIVE_PROPERTY( AWeapon, FlareOffset );
+  LINK_NATIVE_PROPERTY( AWeapon, NameColor );
 END_PROPERTY_LINK()
 

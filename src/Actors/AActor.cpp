@@ -391,7 +391,7 @@ BEGIN_PROPERTY_LINK( AVisibilityNotify, 1 )
   LINK_NATIVE_PROPERTY( AVisibilityNotify, NextNotify );
 END_PROPERTY_LINK()
 
-BEGIN_PROPERTY_LINK( AActor, 222 )
+BEGIN_PROPERTY_LINK( AActor, 227 )
   LINK_NATIVE_PROPERTY( AActor, bStatic );
   LINK_NATIVE_PROPERTY( AActor, bHidden );
   LINK_NATIVE_PROPERTY( AActor, bNoDelete );
@@ -415,6 +415,11 @@ BEGIN_PROPERTY_LINK( AActor, 222 )
   LINK_NATIVE_PROPERTY( AActor, bIsInOctree );
   LINK_NATIVE_PROPERTY( AActor, bProjectorDecal );
   LINK_NATIVE_PROPERTY( AActor, bUseLitSprite );
+  LINK_NATIVE_PROPERTY( AActor, bTrailerPrePivot );
+  LINK_NATIVE_PROPERTY( AActor, bClientAnim );
+  LINK_NATIVE_PROPERTY( AActor, bSimFall );
+  LINK_NATIVE_PROPERTY( AActor, bClientDemoRecording );
+  LINK_NATIVE_PROPERTY( AActor, bClientDemoNetFunc );
   LINK_NATIVE_PROPERTY( AActor, bHiddenEd );
   LINK_NATIVE_PROPERTY( AActor, bDirectional );
   LINK_NATIVE_PROPERTY( AActor, bSelected );
