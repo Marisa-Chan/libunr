@@ -119,6 +119,8 @@ class ALiftCenter : public ANavigationPoint
   class ATrigger* RecommendedTrigger;
   float LastTriggerTime;
   float MaxZDiffAdd;
+  float MaxDist2D;
+  FVector LiftOffset;
 };
 
 class APlayerStart : public ANavigationPoint

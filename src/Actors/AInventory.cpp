@@ -58,7 +58,7 @@ IMPLEMENT_NATIVE_CLASS( AInventory );
 IMPLEMENT_NATIVE_CLASS( AInventorySpot );
 IMPLEMENT_NATIVE_CLASS( AInventoryAttachment );
 
-BEGIN_PROPERTY_LINK( AInventory, 55 )
+BEGIN_PROPERTY_LINK( AInventory, 58 )
   LINK_NATIVE_PROPERTY( AInventory, AutoSwitchPriority );
   LINK_NATIVE_PROPERTY( AInventory, InventoryGroup );
   LINK_NATIVE_PROPERTY( AInventory, bActivatable );
@@ -67,6 +67,7 @@ BEGIN_PROPERTY_LINK( AInventory, 55 )
   LINK_NATIVE_PROPERTY( AInventory, bSleepTouch );
   LINK_NATIVE_PROPERTY( AInventory, bHeldItem );
   LINK_NATIVE_PROPERTY( AInventory, bNoInventoryMarker );
+  LINK_NATIVE_PROPERTY( AInventory, bTossedOut );
   LINK_NATIVE_PROPERTY( AInventory, bRepMuzzleFlash );
   LINK_NATIVE_PROPERTY( AInventory, bRepPlayerView );
   LINK_NATIVE_PROPERTY( AInventory, bSteadyFlash3rd );
@@ -82,6 +83,8 @@ BEGIN_PROPERTY_LINK( AInventory, 55 )
   LINK_NATIVE_PROPERTY( AInventory, ItemArticle );
   LINK_NATIVE_PROPERTY( AInventory, RespawnTime );
   LINK_NATIVE_PROPERTY( AInventory, PlayerLastTouched );
+  LINK_NATIVE_PROPERTY( AInventory, PickupMessageClass );
+  LINK_NATIVE_PROPERTY( AInventory, ItemMessageClass );
   LINK_NATIVE_PROPERTY( AInventory, PlayerViewOffset );
   LINK_NATIVE_PROPERTY( AInventory, PlayerViewMesh );
   LINK_NATIVE_PROPERTY( AInventory, PlayerViewScale );

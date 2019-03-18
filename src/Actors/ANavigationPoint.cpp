@@ -151,13 +151,15 @@ BEGIN_PROPERTY_LINK( ALiftExit, 5 )
   LINK_NATIVE_PROPERTY( ALiftExit, LastTriggerTime );
 END_PROPERTY_LINK()
 
-BEGIN_PROPERTY_LINK( ALiftCenter, 6 )
+BEGIN_PROPERTY_LINK( ALiftCenter, 8 )
   LINK_NATIVE_PROPERTY( ALiftCenter, LiftTag );
   LINK_NATIVE_PROPERTY( ALiftCenter, MyLift );
   LINK_NATIVE_PROPERTY( ALiftCenter, LiftTrigger );
   LINK_NATIVE_PROPERTY( ALiftCenter, RecommendedTrigger );
   LINK_NATIVE_PROPERTY( ALiftCenter, LastTriggerTime );
   LINK_NATIVE_PROPERTY( ALiftCenter, MaxZDiffAdd );
+  LINK_NATIVE_PROPERTY( ALiftCenter, MaxDist2D );
+  LINK_NATIVE_PROPERTY( ALiftCenter, LiftOffset );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( APlayerStart, 4 )

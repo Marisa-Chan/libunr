@@ -50,7 +50,7 @@ IMPLEMENT_NATIVE_CLASS( APlayerPawn );
 BEGIN_PROPERTY_LINK( ACamera, 0 )
 END_PROPERTY_LINK()
 
-BEGIN_PROPERTY_LINK( APlayerPawn, 153 )
+BEGIN_PROPERTY_LINK( APlayerPawn, 170 )
   LINK_NATIVE_PROPERTY( APlayerPawn, Player );
   LINK_NATIVE_PROPERTY( APlayerPawn, Password );
   LINK_NATIVE_PROPERTY( APlayerPawn, DodgeClickTimer );
@@ -90,6 +90,8 @@ BEGIN_PROPERTY_LINK( APlayerPawn, 153 )
   LINK_NATIVE_PROPERTY( APlayerPawn, MyAutoAim );
   LINK_NATIVE_PROPERTY( APlayerPawn, Handedness );
   LINK_NATIVE_PROPERTY( APlayerPawn, JumpSound );
+  LINK_NATIVE_PROPERTY( APlayerPawn, LandBob );
+  LINK_NATIVE_PROPERTY( APlayerPawn, AppliedBob );
   LINK_NATIVE_PROPERTY( APlayerPawn, bAdmin );
   LINK_NATIVE_PROPERTY( APlayerPawn, bLookUpStairs );
   LINK_NATIVE_PROPERTY( APlayerPawn, bSnapToLevel );
@@ -131,6 +133,10 @@ BEGIN_PROPERTY_LINK( APlayerPawn, 153 )
   LINK_NATIVE_PROPERTY( APlayerPawn, bJustAltFired );
   LINK_NATIVE_PROPERTY( APlayerPawn, bIsTyping );
   LINK_NATIVE_PROPERTY( APlayerPawn, bFixedCamera );
+  LINK_NATIVE_PROPERTY( APlayerPawn, bBadConnectionAlert );
+  LINK_NATIVE_PROPERTY( APlayerPawn, bJumpStatus );
+  LINK_NATIVE_PROPERTY( APlayerPawn, bUpdating );
+  LINK_NATIVE_PROPERTY( APlayerPawn, bCheatsEnabled );
   LINK_NATIVE_PROPERTY( APlayerPawn, MainFOV );
   LINK_NATIVE_PROPERTY( APlayerPawn, bConsoleCommandMessage );
   LINK_NATIVE_PROPERTY( APlayerPawn, ZoomLevel );
@@ -145,6 +151,9 @@ BEGIN_PROPERTY_LINK( APlayerPawn, 153 )
   LINK_NATIVE_PROPERTY( APlayerPawn, KbdAccel );
   LINK_NATIVE_PROPERTY( APlayerPawn, bMouseSmoothing );
   LINK_NATIVE_PROPERTY( APlayerPawn, MouseSmoothThreshold );
+  LINK_NATIVE_PROPERTY( APlayerPawn, BorrowedMouseX );
+  LINK_NATIVE_PROPERTY( APlayerPawn, BorrowedMouseY );
+  LINK_NATIVE_PROPERTY( APlayerPawn, MouseZeroTime );
   LINK_NATIVE_PROPERTY( APlayerPawn, bNeverAutoSwitch );
   LINK_NATIVE_PROPERTY( APlayerPawn, bIgnoreMusicChange );
   LINK_NATIVE_PROPERTY( APlayerPawn, CameraRegion );
@@ -161,6 +170,8 @@ BEGIN_PROPERTY_LINK( APlayerPawn, 153 )
   LINK_NATIVE_PROPERTY( APlayerPawn, DistanceFogOld );
   LINK_NATIVE_PROPERTY( APlayerPawn, FogDensity );
   LINK_NATIVE_PROPERTY( APlayerPawn, FogMode );
+  LINK_NATIVE_PROPERTY( APlayerPawn, DemoViewPitch );
+  LINK_NATIVE_PROPERTY( APlayerPawn, DemoViewYaw );
   LINK_NATIVE_PROPERTY( APlayerPawn, aBaseX );
   LINK_NATIVE_PROPERTY( APlayerPawn, aBaseY );
   LINK_NATIVE_PROPERTY( APlayerPawn, aBaseZ );
@@ -178,11 +189,15 @@ BEGIN_PROPERTY_LINK( APlayerPawn, 153 )
   LINK_NATIVE_PROPERTY( APlayerPawn, aExtra0 );
   LINK_NATIVE_PROPERTY( APlayerPawn, SavedMoves );
   LINK_NATIVE_PROPERTY( APlayerPawn, FreeMoves );
+  LINK_NATIVE_PROPERTY( APlayerPawn, PendingMove );
   LINK_NATIVE_PROPERTY( APlayerPawn, CurrentTimeStamp );
   LINK_NATIVE_PROPERTY( APlayerPawn, LastUpdateTime );
   LINK_NATIVE_PROPERTY( APlayerPawn, ServerTimeStamp );
   LINK_NATIVE_PROPERTY( APlayerPawn, TimeMargin );
   LINK_NATIVE_PROPERTY( APlayerPawn, MaxTimeMargin );
+  LINK_NATIVE_PROPERTY( APlayerPawn, ClientUpdateTime );
+  LINK_NATIVE_PROPERTY( APlayerPawn, LastPlaySound );
+  LINK_NATIVE_PROPERTY( APlayerPawn, LastMessageWindow );
   LINK_NATIVE_ARRAY   ( APlayerPawn, ProgressMessage );
   LINK_NATIVE_ARRAY   ( APlayerPawn, ProgressColor );
   LINK_NATIVE_PROPERTY( APlayerPawn, ProgressTimeOut );
@@ -194,6 +209,8 @@ BEGIN_PROPERTY_LINK( APlayerPawn, 153 )
   LINK_NATIVE_PROPERTY( APlayerPawn, CantChangeNameMsg );
   LINK_NATIVE_PROPERTY( APlayerPawn, GameReplicationInfo );
   LINK_NATIVE_PROPERTY( APlayerPawn, ngWorldSecret );
+  LINK_NATIVE_PROPERTY( APlayerPawn, ngSecretSet );
+  LINK_NATIVE_PROPERTY( APlayerPawn, ReceivedSecretChecksum );
   LINK_NATIVE_PROPERTY( APlayerPawn, bRepTargetViewRotation );
   LINK_NATIVE_PROPERTY( APlayerPawn, TargetViewRotation );
   LINK_NATIVE_PROPERTY( APlayerPawn, TargetEyeHeight );

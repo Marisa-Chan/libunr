@@ -61,6 +61,7 @@ class AInventory : public AActor
   bool bSleepTouch;
   bool bHeldItem;
   bool bNoInventoryMarker;
+  bool bTossedOut;
 
   bool bRepMuzzleFlash;
   bool bRepPlayerView;
@@ -80,6 +81,8 @@ class AInventory : public AActor
   String* ItemArticle;
   float RespawnTime;
   idx   PlayerLastTouched;
+  UClass* PickupMessageClass;
+  UClass* ItemMessageClass;
 
   FVector PlayerViewOffset;
   UMesh*  PlayerViewMesh;

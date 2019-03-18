@@ -77,6 +77,8 @@ class DLL_EXPORT APlayerPawn : public APawn
   float   MyAutoAim;
   float   Handedness;
   USound* JumpSound;
+  float   LandBob;
+  float   AppliedBob;
 
   bool bAdmin;
   bool bLookUpStairs;
@@ -119,6 +121,10 @@ class DLL_EXPORT APlayerPawn : public APawn
   bool bJustAltFired;
   bool bIsTyping;
   bool bFixedCamera;
+  bool bBadConnectionAlert;
+  bool bJumpStatus;
+  bool bUpdating;
+  bool bCheatsEnabled;
   float MainFOV;
   bool bConsoleCommandMessage;
   float ZoomLevel;
@@ -133,6 +139,9 @@ class DLL_EXPORT APlayerPawn : public APawn
   float SmoothMouseX, SmoothMouseY, KbdAccel;
   bool bMouseSmoothing;
   float MouseSmoothThreshold;
+  float BorrowedMouseX;
+  float BorrowedMouseY;
+  float MouseZeroTime;
 
   bool bNeverAutoSwitch;
   bool bIgnoreMusicChange;
@@ -149,6 +158,9 @@ class DLL_EXPORT APlayerPawn : public APawn
   float FogDensity;
   int FogMode;
 
+  int DemoViewPitch;
+  int DemoViewYaw;
+
   float aBaseX, aBaseY, aBaseZ,
         aMouseX, aMouseY,
         aForward, aTurn, aStrafe, aUp,
@@ -157,11 +169,15 @@ class DLL_EXPORT APlayerPawn : public APawn
 
   class ASavedMove* SavedMoves;
   class ASavedMove* FreeMoves;
+  class ASavedMove* PendingMove;
   float CurrentTimeStamp;
   float LastUpdateTime;
   float ServerTimeStamp;
   float TimeMargin;
   float MaxTimeMargin;
+  float ClientUpdateTime;
+  float LastPlaySound;
+  float LastMessageWindow;
 
   String* ProgressMessage[5];
   FColor  ProgressColor[5];
@@ -177,6 +193,8 @@ class DLL_EXPORT APlayerPawn : public APawn
   AGameReplicationInfo* GameReplicationInfo;
 
   String* ngWorldSecret;
+  bool ngSecretSet;
+  bool ReceivedSecretChecksum;
 
   bool     bRepTargetViewRotation;
   FRotator TargetViewRotation;
