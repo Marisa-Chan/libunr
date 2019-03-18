@@ -359,7 +359,7 @@ BEGIN_PROPERTY_LINK( UTexture, 67 )
   LINK_NATIVE_PROPERTY( UTexture, TextureHandle );
 END_PROPERTY_LINK()
 
-BEGIN_PROPERTY_LINK( UScriptedTexture, 13 )
+BEGIN_PROPERTY_LINK( UScriptedTexture, 16 )
   LINK_NATIVE_PROPERTY( UScriptedTexture, bUse32BitFormat );
   LINK_NATIVE_PROPERTY( UScriptedTexture, bConstantRender );
   LINK_NATIVE_PROPERTY( UScriptedTexture, bClearScreen );
@@ -373,6 +373,9 @@ BEGIN_PROPERTY_LINK( UScriptedTexture, 13 )
   LINK_NATIVE_PROPERTY( UScriptedTexture, LocalTime );
   LINK_NATIVE_PROPERTY( UScriptedTexture, PortalPtr );
   LINK_NATIVE_PROPERTY( UScriptedTexture, PortalInfo );
+  LINK_NATIVE_PROPERTY( UScriptedTexture, Junk1 );
+  LINK_NATIVE_PROPERTY( UScriptedTexture, Junk2 );
+  LINK_NATIVE_PROPERTY( UScriptedTexture, Junk3 );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( UShadowBitMap, 7 )

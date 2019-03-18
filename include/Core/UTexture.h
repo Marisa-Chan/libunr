@@ -330,11 +330,16 @@ class DLL_EXPORT UScriptedTexture : public UTexture
     COMP_P8,
     COMP_Mono,
   };
+
+  // TODO: Make a dummy property in Object that can be pointed to crap like
+  // this to instead of wasting bytes on variables that never get touched
+  //
+  int Junk1, Junk2, Junk3;
 };
 
 // This is deprecated and will never be implemented. Real dynamic shadows will
 // be implemented in the renderer. This class is here simply to allow the export
-// of the ShadowBitMap.uc class
+// of the ShadowBitMap.uc class in 227
 class DLL_EXPORT UShadowBitMap : public UTexture
 {
   DECLARE_NATIVE_CLASS( UShadowBitMap, UTexture, 0, Engine )
