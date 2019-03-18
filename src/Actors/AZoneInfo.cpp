@@ -115,6 +115,7 @@ BEGIN_PROPERTY_LINK( AZoneInfo, 70 )
   LINK_NATIVE_PROPERTY( AZoneInfo, bDistanceFogClips );
   LINK_NATIVE_PROPERTY( AZoneInfo, bDistanceFog );
   LINK_NATIVE_PROPERTY( AZoneInfo, bZoneBasedFog );
+  LINK_NATIVE_PROPERTY( AZoneInfo, bBounceVelocity );
   LINK_NATIVE_PROPERTY( AZoneInfo, FogDistanceStart );
   LINK_NATIVE_PROPERTY( AZoneInfo, FogColor );
   LINK_NATIVE_PROPERTY( AZoneInfo, FogDistance );
@@ -159,7 +160,7 @@ BEGIN_PROPERTY_LINK( ULevelSummary, 6 )
   LINK_NATIVE_PROPERTY( ULevelSummary, LevelEnterText );
 END_PROPERTY_LINK()
 
-BEGIN_PROPERTY_LINK( ALevelInfo, 74 )
+BEGIN_PROPERTY_LINK( ALevelInfo, 76 )
   LINK_NATIVE_PROPERTY( ALevelInfo, TimeDilation );
   LINK_NATIVE_PROPERTY( ALevelInfo, TimeSeconds );
   LINK_NATIVE_PROPERTY( ALevelInfo, Year );
@@ -180,6 +181,8 @@ BEGIN_PROPERTY_LINK( ALevelInfo, 74 )
   LINK_NATIVE_PROPERTY( ALevelInfo, Pauser );
   LINK_NATIVE_PROPERTY( ALevelInfo, Summary );
   LINK_NATIVE_PROPERTY( ALevelInfo, VisibleGroups );
+  LINK_NATIVE_PROPERTY( ALevelInfo, bLowRes );
+  LINK_NATIVE_PROPERTY( ALevelInfo, bNeverPrecache );
   LINK_NATIVE_PROPERTY( ALevelInfo, bLonePlayer );
   LINK_NATIVE_PROPERTY( ALevelInfo, bBegunPlay );
   LINK_NATIVE_PROPERTY( ALevelInfo, bPlayersOnly );

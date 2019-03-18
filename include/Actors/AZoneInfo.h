@@ -75,6 +75,7 @@ class AZoneInfo : public AInfo
   bool bDestructive;
   bool bNoInventory;
   bool bMoveProjectiles;
+  bool bBounceVelocity;
 
   // Reverb
   bool bReverbZone;
@@ -295,6 +296,8 @@ class ALevelInfo : public AZoneInfo
   ULevelSummary* Summary;
   String* VisibleGroups;
 
+  bool bLowRes;
+  bool bNeverPrecache;
   bool bLonePlayer;
   bool bBegunPlay;
   bool bPlayersOnly;
