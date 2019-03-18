@@ -166,10 +166,10 @@ UObject* UObject::StaticConstructObject( const char* InName, UClass* InClass, UO
   Out->RefCnt = 1;
   Out->Outer = InOuter;
   Out->ObjectFlags = InExport->ObjectFlags;
+  Out->NameIdx = InPkg->GetGlobalNameIndex( InExport->ObjectName );
   Out->Class = InClass;
   Out->Field = InClass->Children;
  
-  // Copy property data from Default object
   if ( !(InClass->ClassFlags & CLASS_NoExport) )
   {
     if ( UNLIKELY( InClass->Default == NULL ) )
@@ -177,7 +177,7 @@ UObject* UObject::StaticConstructObject( const char* InName, UClass* InClass, UO
       Logf( LOG_CRIT, "Can't construct object '%s.%s'; Default object missing for class '%s'",
           InPkg->Name, InName, InClass->Name );
       GSystem->Exit( -1 );
-    } 
+    }
   }
 
   // Add to object
@@ -931,7 +931,7 @@ bool UObject::StaticLinkNativeProperties()
     LINK_NATIVE_ARRAY( ObjectInternal );
     LINK_NATIVE_PROPERTY( Outer );
     LINK_NATIVE_PROPERTY( ObjectFlags );
-    LINK_NATIVE_PROPERTY( Name );
+    LINK_NATIVE_PROPERTY_ALIASED( Name, NameIdx );
     LINK_NATIVE_PROPERTY( Class );
     return true;
   }

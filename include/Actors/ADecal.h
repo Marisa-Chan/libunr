@@ -38,6 +38,7 @@ class ADecal : public AActor
   bool bAttachPanningSurfs;
   bool bAttachUnlitSurfs;
   Array<int>* SurfList;
+  float LastRenderedTime;
 
   UTexture* AttachDecal( float TraceDistance, FVector* DecalDir = NULL );
   void DetachDecal();

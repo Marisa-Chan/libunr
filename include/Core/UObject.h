@@ -332,14 +332,17 @@ public: \
     return true; \
   }
 
-#define LINK_USELESS_PROPERTY(var) \
-  StaticNativePropList->AddProperty( #var, OFFSET_OF( LocalClassType, DummyVar ) );
+#define LINK_NATIVE_PROPERTY_ALIASED(var, realvar) \
+  StaticNativePropList->AddProperty(#var,OFFSET_OF(LocalClassType,realvar));
 
 #define LINK_NATIVE_PROPERTY(var) \
-  StaticNativePropList->AddProperty( #var, OFFSET_OF( LocalClassType, var ) );
-  
+  LINK_NATIVE_PROPERTY_ALIASED(var, var)
+
 #define LINK_NATIVE_ARRAY(var) \
-  StaticNativePropList->AddProperty( #var, OFFSET_OF( LocalClassType, var[0] ) );
+  LINK_NATIVE_PROPERTY_ALIASED(var, var[0])
+
+#define LINK_USELESS_PROPERTY(var) \
+  LINK_NATIVE_PROPERTY_ALIASED(var, ObjectInternal[0])
 
 #define BEGIN_PROPERTY_LINK( cls, numprop ) \
 bool cls::StaticLinkNativeProperties() \
@@ -498,6 +501,7 @@ public:
   const char* Name;   // Name of this object
   int       Index;    // Index of the object in object pool
   UObject*  NextObj;  // The next object in the list
+  FName     NameIdx;  // Name index in the global name table
   UPackage* Pkg;      // Package this object was loaded from
   FExport*  Export;   // Export struct from the package of this object
   UObject*  Outer;    // Object that this object resides in
@@ -511,7 +515,7 @@ public:
   // This was due to the fact that C++ property offsets *HAVE* to match up
   // with UScript offsets, or else the whole native/scripted setup falls
   // apart. We dynamically link native variables to scripted, so this will
-  // be unused
+  // only be used for linking to now useless native properties.
   int ObjectInternal[6];
 
   // Advanced Animation Notify
@@ -526,7 +530,6 @@ public:
 
 protected:
   int RefCnt;
-  size_t DummyVar; // For pointing now useless properties to
   Stack<size_t>* OldPkgFileOffsets;
 
   static bool bStaticBootstrapped;
