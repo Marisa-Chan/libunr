@@ -38,24 +38,24 @@ AProjector::~AProjector()
 IMPLEMENT_NATIVE_CLASS( AProjector );
 
 BEGIN_PROPERTY_LINK( AProjector, 19 )
-  LINK_NATIVE_ARRAY   ( AProjector, FrustrumPlanes );
-  LINK_NATIVE_PROPERTY( AProjector, DecalActors );
-  LINK_NATIVE_PROPERTY( AProjector, DecalNodes );
-  LINK_NATIVE_PROPERTY( AProjector, Box );
-  LINK_NATIVE_ARRAY   ( AProjector, VisBox );
-  LINK_NATIVE_PROPERTY( AProjector, TexData );
-  LINK_NATIVE_PROPERTY( AProjector, ProjectTexture );
-  LINK_NATIVE_PROPERTY( AProjector, MaxDistance );
-  LINK_NATIVE_PROPERTY( AProjector, ProjectorScale );
-  LINK_NATIVE_PROPERTY( AProjector, ProjectStyle );
-  LINK_NATIVE_PROPERTY( AProjector, FOV );
-  LINK_NATIVE_PROPERTY( AProjector, bProjectActors );
-  LINK_NATIVE_PROPERTY( AProjector, bProjectBSPBackfaces );
-  LINK_NATIVE_PROPERTY( AProjector, bProjectMeshBackfaces );
-  LINK_NATIVE_PROPERTY( AProjector, bProjectBSP );
-  LINK_NATIVE_PROPERTY( AProjector, bGradualFade );
-  LINK_NATIVE_PROPERTY( AProjector, bUseBetterActorAttach );
-  LINK_NATIVE_PROPERTY( AProjector, bHasAttached );
-  LINK_NATIVE_PROPERTY( AProjector, bProjecting );
+  LINK_NATIVE_ARRAY   ( FrustrumPlanes );
+  LINK_NATIVE_PROPERTY( DecalActors );
+  LINK_NATIVE_PROPERTY( DecalNodes );
+  LINK_NATIVE_PROPERTY( Box );
+  LINK_NATIVE_ARRAY   ( VisBox );
+  LINK_NATIVE_PROPERTY( TexData );
+  LINK_NATIVE_PROPERTY( ProjectTexture );
+  LINK_NATIVE_PROPERTY( MaxDistance );
+  LINK_NATIVE_PROPERTY( ProjectorScale );
+  LINK_NATIVE_PROPERTY( ProjectStyle );
+  LINK_NATIVE_PROPERTY( FOV );
+  LINK_NATIVE_PROPERTY( bProjectActors );
+  LINK_NATIVE_PROPERTY( bProjectBSPBackfaces );
+  LINK_NATIVE_PROPERTY( bProjectMeshBackfaces );
+  LINK_NATIVE_PROPERTY( bProjectBSP );
+  LINK_NATIVE_PROPERTY( bGradualFade );
+  LINK_NATIVE_PROPERTY( bUseBetterActorAttach );
+  LINK_NATIVE_PROPERTY( bHasAttached );
+  LINK_NATIVE_PROPERTY( bProjecting );
 END_PROPERTY_LINK()
 

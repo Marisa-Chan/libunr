@@ -925,13 +925,14 @@ int UCommandlet::Main( String* Parms )
 
 bool UObject::StaticLinkNativeProperties()
 {
+  typedef UObject LocalClassType;
   if ( StaticInitNativePropList( 5 ) )
   {
-    LINK_NATIVE_ARRAY( UObject, ObjectInternal );
-    LINK_NATIVE_PROPERTY( UObject, Outer );
-    LINK_NATIVE_PROPERTY( UObject, ObjectFlags );
-    LINK_NATIVE_PROPERTY( UObject, Name );
-    LINK_NATIVE_PROPERTY( UObject, Class );
+    LINK_NATIVE_ARRAY( ObjectInternal );
+    LINK_NATIVE_PROPERTY( Outer );
+    LINK_NATIVE_PROPERTY( ObjectFlags );
+    LINK_NATIVE_PROPERTY( Name );
+    LINK_NATIVE_PROPERTY( Class );
     return true;
   }
   return false;
@@ -941,19 +942,19 @@ IMPLEMENT_NATIVE_CLASS( UObject );
 IMPLEMENT_NATIVE_CLASS( UCommandlet );
 
 BEGIN_PROPERTY_LINK( UCommandlet, 14 )
-  LINK_NATIVE_PROPERTY( UCommandlet, HelpCmd );
-  LINK_NATIVE_PROPERTY( UCommandlet, HelpOneLiner );
-  LINK_NATIVE_PROPERTY( UCommandlet, HelpUsage );
-  LINK_NATIVE_PROPERTY( UCommandlet, HelpWebLink );
-  LINK_NATIVE_ARRAY   ( UCommandlet, HelpParm );
-  LINK_NATIVE_ARRAY   ( UCommandlet, HelpDesc );
-  LINK_NATIVE_PROPERTY( UCommandlet, LogToStdout );
-  LINK_NATIVE_PROPERTY( UCommandlet, IsServer );
-  LINK_NATIVE_PROPERTY( UCommandlet, IsClient );
-  LINK_NATIVE_PROPERTY( UCommandlet, IsEditor );
-  LINK_NATIVE_PROPERTY( UCommandlet, LazyLoad );
-  LINK_NATIVE_PROPERTY( UCommandlet, ShowErrorCount );
-  LINK_NATIVE_PROPERTY( UCommandlet, ShowBanner );
-  LINK_NATIVE_PROPERTY( UCommandlet, ForceInt );
+  LINK_NATIVE_PROPERTY( HelpCmd );
+  LINK_NATIVE_PROPERTY( HelpOneLiner );
+  LINK_NATIVE_PROPERTY( HelpUsage );
+  LINK_NATIVE_PROPERTY( HelpWebLink );
+  LINK_NATIVE_ARRAY   ( HelpParm );
+  LINK_NATIVE_ARRAY   ( HelpDesc );
+  LINK_NATIVE_PROPERTY( LogToStdout );
+  LINK_NATIVE_PROPERTY( IsServer );
+  LINK_NATIVE_PROPERTY( IsClient );
+  LINK_NATIVE_PROPERTY( IsEditor );
+  LINK_NATIVE_PROPERTY( LazyLoad );
+  LINK_NATIVE_PROPERTY( ShowErrorCount );
+  LINK_NATIVE_PROPERTY( ShowBanner );
+  LINK_NATIVE_PROPERTY( ForceInt );
 END_PROPERTY_LINK()
 

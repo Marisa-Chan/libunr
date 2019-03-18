@@ -106,83 +106,83 @@ IMPLEMENT_NATIVE_CLASS( APlayerStart );
 IMPLEMENT_NATIVE_CLASS( ATeleporter );
 
 BEGIN_PROPERTY_LINK( ANavigationPoint, 30 )
-  LINK_NATIVE_PROPERTY( ANavigationPoint, OwnerTeam );
-  LINK_NATIVE_ARRAY   ( ANavigationPoint, ProscribedPaths );
-  LINK_NATIVE_ARRAY   ( ANavigationPoint, ForcedPaths );
-  LINK_NATIVE_ARRAY   ( ANavigationPoint, UpstreamPaths );
-  LINK_NATIVE_ARRAY   ( ANavigationPoint, Paths );
-  LINK_NATIVE_ARRAY   ( ANavigationPoint, PrunedPaths );
-  LINK_NATIVE_ARRAY   ( ANavigationPoint, VisNoReachPaths );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, VisitedWeight );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, RouteCache );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, BestPathWeight );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, NextNavigationPoint );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, NextOrdered );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, PrevOrdered );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, StartPath );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, PreviousPath );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, Cost );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, ExtraCost );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, PathDescription );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, EditorData );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, ForcedPathSize );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, MaxPathDistance );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, Taken );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, bPlayerOnly );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, bEndPoint );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, bEndPointOnly );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, bSpecialCost );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, bOneWayPath );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, bAutoBuilt );
-  LINK_NATIVE_PROPERTY( ANavigationPoint, bNoStrafeTo );
+  LINK_NATIVE_PROPERTY( OwnerTeam );
+  LINK_NATIVE_ARRAY   ( ProscribedPaths );
+  LINK_NATIVE_ARRAY   ( ForcedPaths );
+  LINK_NATIVE_ARRAY   ( UpstreamPaths );
+  LINK_NATIVE_ARRAY   ( Paths );
+  LINK_NATIVE_ARRAY   ( PrunedPaths );
+  LINK_NATIVE_ARRAY   ( VisNoReachPaths );
+  LINK_NATIVE_PROPERTY( VisitedWeight );
+  LINK_NATIVE_PROPERTY( RouteCache );
+  LINK_NATIVE_PROPERTY( BestPathWeight );
+  LINK_NATIVE_PROPERTY( NextNavigationPoint );
+  LINK_NATIVE_PROPERTY( NextOrdered );
+  LINK_NATIVE_PROPERTY( PrevOrdered );
+  LINK_NATIVE_PROPERTY( StartPath );
+  LINK_NATIVE_PROPERTY( PreviousPath );
+  LINK_NATIVE_PROPERTY( Cost );
+  LINK_NATIVE_PROPERTY( ExtraCost );
+  LINK_NATIVE_PROPERTY( PathDescription );
+  LINK_NATIVE_PROPERTY( EditorData );
+  LINK_NATIVE_PROPERTY( ForcedPathSize );
+  LINK_NATIVE_PROPERTY( MaxPathDistance );
+  LINK_NATIVE_PROPERTY( Taken );
+  LINK_NATIVE_PROPERTY( bPlayerOnly );
+  LINK_NATIVE_PROPERTY( bEndPoint );
+  LINK_NATIVE_PROPERTY( bEndPointOnly );
+  LINK_NATIVE_PROPERTY( bSpecialCost );
+  LINK_NATIVE_PROPERTY( bOneWayPath );
+  LINK_NATIVE_PROPERTY( bAutoBuilt );
+  LINK_NATIVE_PROPERTY( bNoStrafeTo );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( AWarpZoneMarker, 3 )
-  LINK_NATIVE_PROPERTY( AWarpZoneMarker, markedWarpZone );
-  LINK_NATIVE_PROPERTY( AWarpZoneMarker, TriggerActor );
-  LINK_NATIVE_PROPERTY( AWarpZoneMarker, TriggerActor2 );
+  LINK_NATIVE_PROPERTY( markedWarpZone );
+  LINK_NATIVE_PROPERTY( TriggerActor );
+  LINK_NATIVE_PROPERTY( TriggerActor2 );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( ALiftExit, 5 )
-  LINK_NATIVE_PROPERTY( ALiftExit, LiftTag );
-  LINK_NATIVE_PROPERTY( ALiftExit, MyLift );
-  LINK_NATIVE_PROPERTY( ALiftExit, LiftTrigger );
-  LINK_NATIVE_PROPERTY( ALiftExit, RecommendedTrigger );
-  LINK_NATIVE_PROPERTY( ALiftExit, LastTriggerTime );
+  LINK_NATIVE_PROPERTY( LiftTag );
+  LINK_NATIVE_PROPERTY( MyLift );
+  LINK_NATIVE_PROPERTY( LiftTrigger );
+  LINK_NATIVE_PROPERTY( RecommendedTrigger );
+  LINK_NATIVE_PROPERTY( LastTriggerTime );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( ALiftCenter, 8 )
-  LINK_NATIVE_PROPERTY( ALiftCenter, LiftTag );
-  LINK_NATIVE_PROPERTY( ALiftCenter, MyLift );
-  LINK_NATIVE_PROPERTY( ALiftCenter, LiftTrigger );
-  LINK_NATIVE_PROPERTY( ALiftCenter, RecommendedTrigger );
-  LINK_NATIVE_PROPERTY( ALiftCenter, LastTriggerTime );
-  LINK_NATIVE_PROPERTY( ALiftCenter, MaxZDiffAdd );
-  LINK_NATIVE_PROPERTY( ALiftCenter, MaxDist2D );
-  LINK_NATIVE_PROPERTY( ALiftCenter, LiftOffset );
+  LINK_NATIVE_PROPERTY( LiftTag );
+  LINK_NATIVE_PROPERTY( MyLift );
+  LINK_NATIVE_PROPERTY( LiftTrigger );
+  LINK_NATIVE_PROPERTY( RecommendedTrigger );
+  LINK_NATIVE_PROPERTY( LastTriggerTime );
+  LINK_NATIVE_PROPERTY( MaxZDiffAdd );
+  LINK_NATIVE_PROPERTY( MaxDist2D );
+  LINK_NATIVE_PROPERTY( LiftOffset );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( APlayerStart, 4 )
-  LINK_NATIVE_PROPERTY( APlayerStart, TeamNumber );
-  LINK_NATIVE_PROPERTY( APlayerStart, bSinglePlayerStart );
-  LINK_NATIVE_PROPERTY( APlayerStart, bCoopStart );
-  LINK_NATIVE_PROPERTY( APlayerStart, bEnabled );
+  LINK_NATIVE_PROPERTY( TeamNumber );
+  LINK_NATIVE_PROPERTY( bSinglePlayerStart );
+  LINK_NATIVE_PROPERTY( bCoopStart );
+  LINK_NATIVE_PROPERTY( bEnabled );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( ATeleporter, 14 )
-  LINK_NATIVE_PROPERTY( ATeleporter, URL );
-  LINK_NATIVE_PROPERTY( ATeleporter, ProductRequired );
-  LINK_NATIVE_PROPERTY( ATeleporter, bChangesVelocity );
-  LINK_NATIVE_PROPERTY( ATeleporter, bChangesYaw );
-  LINK_NATIVE_PROPERTY( ATeleporter, bReversesX );
-  LINK_NATIVE_PROPERTY( ATeleporter, bReversesY );
-  LINK_NATIVE_PROPERTY( ATeleporter, bReversesZ );
-  LINK_NATIVE_PROPERTY( ATeleporter, bEnabled );
-  LINK_NATIVE_PROPERTY( ATeleporter, TargetVelocity );
-  LINK_NATIVE_PROPERTY( ATeleporter, TriggerActor );
-  LINK_NATIVE_PROPERTY( ATeleporter, TriggerActor2 );
-  LINK_NATIVE_PROPERTY( ATeleporter, LastUdpTime );
-  LINK_NATIVE_PROPERTY( ATeleporter, TeleportCount );
-  LINK_NATIVE_PROPERTY( ATeleporter, bBackup_Enabled );
+  LINK_NATIVE_PROPERTY( URL );
+  LINK_NATIVE_PROPERTY( ProductRequired );
+  LINK_NATIVE_PROPERTY( bChangesVelocity );
+  LINK_NATIVE_PROPERTY( bChangesYaw );
+  LINK_NATIVE_PROPERTY( bReversesX );
+  LINK_NATIVE_PROPERTY( bReversesY );
+  LINK_NATIVE_PROPERTY( bReversesZ );
+  LINK_NATIVE_PROPERTY( bEnabled );
+  LINK_NATIVE_PROPERTY( TargetVelocity );
+  LINK_NATIVE_PROPERTY( TriggerActor );
+  LINK_NATIVE_PROPERTY( TriggerActor2 );
+  LINK_NATIVE_PROPERTY( LastUdpTime );
+  LINK_NATIVE_PROPERTY( TeleportCount );
+  LINK_NATIVE_PROPERTY( bBackup_Enabled );
 END_PROPERTY_LINK()
 

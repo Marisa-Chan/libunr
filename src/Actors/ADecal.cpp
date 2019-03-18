@@ -39,9 +39,9 @@ ADecal::~ADecal()
 IMPLEMENT_NATIVE_CLASS( ADecal );
 
 BEGIN_PROPERTY_LINK( ADecal, 4 )
-  LINK_NATIVE_PROPERTY( ADecal, MultiDecalLevel );
-  LINK_NATIVE_PROPERTY( ADecal, bAttachPanningSurfs );
-  LINK_NATIVE_PROPERTY( ADecal, bAttachUnlitSurfs );
-  LINK_NATIVE_PROPERTY( ADecal, SurfList );
+  LINK_NATIVE_PROPERTY( MultiDecalLevel );
+  LINK_NATIVE_PROPERTY( bAttachPanningSurfs );
+  LINK_NATIVE_PROPERTY( bAttachUnlitSurfs );
+  LINK_NATIVE_PROPERTY( SurfList );
 END_PROPERTY_LINK()
 

@@ -79,9 +79,9 @@ IMPLEMENT_NATIVE_CLASS( URenderIterator );
 IMPLEMENT_NATIVE_CLASS( UStaticLightData );
 
 BEGIN_PROPERTY_LINK( URenderIterator, 4 )
-  LINK_NATIVE_PROPERTY( URenderIterator, MaxItems );
-  LINK_NATIVE_PROPERTY( URenderIterator, Index );
-  LINK_NATIVE_PROPERTY( URenderIterator, Observer );
-  LINK_NATIVE_PROPERTY( URenderIterator, Frame );
+  LINK_NATIVE_PROPERTY( MaxItems );
+  LINK_NATIVE_PROPERTY( Index );
+  LINK_NATIVE_PROPERTY( Observer );
+  LINK_NATIVE_PROPERTY( Frame );
 END_PROPERTY_LINK()
 

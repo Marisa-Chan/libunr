@@ -331,12 +331,15 @@ public: \
     ObjectClass->ObjectFlags = ObjectClass->Export->ObjectFlags; \
     return true; \
   }
- 
-#define LINK_NATIVE_PROPERTY(cls, var) \
-  StaticNativePropList->AddProperty( #var, OFFSET_OF( cls, var ) );
+
+#define LINK_USELESS_PROPERTY(var) \
+  StaticNativePropList->AddProperty( #var, OFFSET_OF( LocalClassType, DummyVar ) );
+
+#define LINK_NATIVE_PROPERTY(var) \
+  StaticNativePropList->AddProperty( #var, OFFSET_OF( LocalClassType, var ) );
   
-#define LINK_NATIVE_ARRAY(cls, var) \
-  StaticNativePropList->AddProperty( #var, OFFSET_OF( cls, var[0] ) );
+#define LINK_NATIVE_ARRAY(var) \
+  StaticNativePropList->AddProperty( #var, OFFSET_OF( LocalClassType, var[0] ) );
 
 #define BEGIN_PROPERTY_LINK( cls, numprop ) \
 bool cls::StaticLinkNativeProperties() \
@@ -350,6 +353,7 @@ bool cls::StaticLinkNativeProperties() \
  \
   if ( StaticInitNativePropList( numprop ) ) \
   { \
+  typedef cls LocalClassType; \
 
 #define END_PROPERTY_LINK() \
     return true; \
@@ -522,6 +526,7 @@ public:
 
 protected:
   int RefCnt;
+  size_t DummyVar; // For pointing now useless properties to
   Stack<size_t>* OldPkgFileOffsets;
 
   static bool bStaticBootstrapped;

@@ -38,28 +38,28 @@ ATimeDemo::~ATimeDemo()
 IMPLEMENT_NATIVE_CLASS( ATimeDemo );
 
 BEGIN_PROPERTY_LINK( ATimeDemo, 23 )
-  LINK_NATIVE_PROPERTY( ATimeDemo, FileAr ); 
-  LINK_NATIVE_PROPERTY( ATimeDemo, TimePassed );
-  LINK_NATIVE_PROPERTY( ATimeDemo, TimeDilation );
-  LINK_NATIVE_PROPERTY( ATimeDemo, StartTime );
-  LINK_NATIVE_PROPERTY( ATimeDemo, LastSecTime );
-  LINK_NATIVE_PROPERTY( ATimeDemo, LastCycleTime );
-  LINK_NATIVE_PROPERTY( ATimeDemo, LastFrameTime );
-  LINK_NATIVE_PROPERTY( ATimeDemo, SquareSum );
-  LINK_NATIVE_PROPERTY( ATimeDemo, FrameNum );
-  LINK_NATIVE_PROPERTY( ATimeDemo, FrameLastSecond );
-  LINK_NATIVE_PROPERTY( ATimeDemo, FrameLastCycle );
-  LINK_NATIVE_PROPERTY( ATimeDemo, CycleCount );
-  LINK_NATIVE_PROPERTY( ATimeDemo, QuitAfterCycles );
-  LINK_NATIVE_PROPERTY( ATimeDemo, CycleMessage );
-  LINK_NATIVE_PROPERTY( ATimeDemo, CycleResult );
-  LINK_NATIVE_PROPERTY( ATimeDemo, bSaveToFile );
-  LINK_NATIVE_PROPERTY( ATimeDemo, bFirstFrame );
-  LINK_NATIVE_PROPERTY( ATimeDemo, LastSec );
-  LINK_NATIVE_PROPERTY( ATimeDemo, MinFPS );
-  LINK_NATIVE_PROPERTY( ATimeDemo, MaxFPS );
-  LINK_NATIVE_PROPERTY( ATimeDemo, OldPoint );
-  LINK_NATIVE_PROPERTY( ATimeDemo, NewPoint );
-  LINK_NATIVE_PROPERTY( ATimeDemo, Console );
+  LINK_NATIVE_PROPERTY( FileAr ); 
+  LINK_NATIVE_PROPERTY( TimePassed );
+  LINK_NATIVE_PROPERTY( TimeDilation );
+  LINK_NATIVE_PROPERTY( StartTime );
+  LINK_NATIVE_PROPERTY( LastSecTime );
+  LINK_NATIVE_PROPERTY( LastCycleTime );
+  LINK_NATIVE_PROPERTY( LastFrameTime );
+  LINK_NATIVE_PROPERTY( SquareSum );
+  LINK_NATIVE_PROPERTY( FrameNum );
+  LINK_NATIVE_PROPERTY( FrameLastSecond );
+  LINK_NATIVE_PROPERTY( FrameLastCycle );
+  LINK_NATIVE_PROPERTY( CycleCount );
+  LINK_NATIVE_PROPERTY( QuitAfterCycles );
+  LINK_NATIVE_PROPERTY( CycleMessage );
+  LINK_NATIVE_PROPERTY( CycleResult );
+  LINK_NATIVE_PROPERTY( bSaveToFile );
+  LINK_NATIVE_PROPERTY( bFirstFrame );
+  LINK_NATIVE_PROPERTY( LastSec );
+  LINK_NATIVE_PROPERTY( MinFPS );
+  LINK_NATIVE_PROPERTY( MaxFPS );
+  LINK_NATIVE_PROPERTY( OldPoint );
+  LINK_NATIVE_PROPERTY( NewPoint );
+  LINK_NATIVE_PROPERTY( Console );
 END_PROPERTY_LINK()
 

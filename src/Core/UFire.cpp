@@ -88,93 +88,93 @@ IMPLEMENT_NATIVE_CLASS( UWetTexture );
 IMPLEMENT_NATIVE_CLASS( UIceTexture );
 
 BEGIN_PROPERTY_LINK( UFractalTexture, 8 )
-  LINK_NATIVE_PROPERTY( UFractalTexture, UMask );
-  LINK_NATIVE_PROPERTY( UFractalTexture, VMask );
-  LINK_NATIVE_PROPERTY( UFractalTexture, LightOutput );
-  LINK_NATIVE_PROPERTY( UFractalTexture, SoundOutput );
-  LINK_NATIVE_PROPERTY( UFractalTexture, GlobalPhase );
-  LINK_NATIVE_PROPERTY( UFractalTexture, DrawPhase );
-  LINK_NATIVE_PROPERTY( UFractalTexture, AuxPhase );
-  LINK_NATIVE_PROPERTY( UFractalTexture, bHasInit );
+  LINK_NATIVE_PROPERTY( UMask );
+  LINK_NATIVE_PROPERTY( VMask );
+  LINK_NATIVE_PROPERTY( LightOutput );
+  LINK_NATIVE_PROPERTY( SoundOutput );
+  LINK_NATIVE_PROPERTY( GlobalPhase );
+  LINK_NATIVE_PROPERTY( DrawPhase );
+  LINK_NATIVE_PROPERTY( AuxPhase );
+  LINK_NATIVE_PROPERTY( bHasInit );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( UFireTexture, 20 )
-  LINK_NATIVE_PROPERTY( UFireTexture, SparkType );
-  LINK_NATIVE_PROPERTY( UFireTexture, RenderHeat );
-  LINK_NATIVE_PROPERTY( UFireTexture, bRising );
-  LINK_NATIVE_PROPERTY( UFireTexture, FX_Heat );
-  LINK_NATIVE_PROPERTY( UFireTexture, FX_Size );
-  LINK_NATIVE_PROPERTY( UFireTexture, FX_AuxSize );
-  LINK_NATIVE_PROPERTY( UFireTexture, FX_Area );
-  LINK_NATIVE_PROPERTY( UFireTexture, FX_Frequency );
-  LINK_NATIVE_PROPERTY( UFireTexture, FX_Phase );
-  LINK_NATIVE_PROPERTY( UFireTexture, FX_HorizSpeed );
-  LINK_NATIVE_PROPERTY( UFireTexture, FX_VertSpeed );
-  LINK_NATIVE_PROPERTY( UFireTexture, DrawMode );
-  LINK_NATIVE_PROPERTY( UFireTexture, SparksLimit );
-  LINK_NATIVE_PROPERTY( UFireTexture, NumSparks );
-  LINK_NATIVE_PROPERTY( UFireTexture, Sparks );
-  LINK_NATIVE_PROPERTY( UFireTexture, OldRenderHeat );
-  LINK_NATIVE_ARRAY   ( UFireTexture, RenderTable );
-  LINK_NATIVE_PROPERTY( UFireTexture, StarStatus );
-  LINK_NATIVE_PROPERTY( UFireTexture, PenDownX );
-  LINK_NATIVE_PROPERTY( UFireTexture, PenDownY );
+  LINK_NATIVE_PROPERTY( SparkType );
+  LINK_NATIVE_PROPERTY( RenderHeat );
+  LINK_NATIVE_PROPERTY( bRising );
+  LINK_NATIVE_PROPERTY( FX_Heat );
+  LINK_NATIVE_PROPERTY( FX_Size );
+  LINK_NATIVE_PROPERTY( FX_AuxSize );
+  LINK_NATIVE_PROPERTY( FX_Area );
+  LINK_NATIVE_PROPERTY( FX_Frequency );
+  LINK_NATIVE_PROPERTY( FX_Phase );
+  LINK_NATIVE_PROPERTY( FX_HorizSpeed );
+  LINK_NATIVE_PROPERTY( FX_VertSpeed );
+  LINK_NATIVE_PROPERTY( DrawMode );
+  LINK_NATIVE_PROPERTY( SparksLimit );
+  LINK_NATIVE_PROPERTY( NumSparks );
+  LINK_NATIVE_PROPERTY( Sparks );
+  LINK_NATIVE_PROPERTY( OldRenderHeat );
+  LINK_NATIVE_ARRAY   ( RenderTable );
+  LINK_NATIVE_PROPERTY( StarStatus );
+  LINK_NATIVE_PROPERTY( PenDownX );
+  LINK_NATIVE_PROPERTY( PenDownY );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( UWaterTexture, 17 )
-  LINK_NATIVE_PROPERTY( UWaterTexture, DropType );
-  LINK_NATIVE_PROPERTY( UWaterTexture, WaveAmp );
-  LINK_NATIVE_PROPERTY( UWaterTexture, FX_Frequency );
-  LINK_NATIVE_PROPERTY( UWaterTexture, FX_Phase );
-  LINK_NATIVE_PROPERTY( UWaterTexture, FX_Amplitude );
-  LINK_NATIVE_PROPERTY( UWaterTexture, FX_Speed );
-  LINK_NATIVE_PROPERTY( UWaterTexture, FX_Radius );
-  LINK_NATIVE_PROPERTY( UWaterTexture, FX_Size );
-  LINK_NATIVE_PROPERTY( UWaterTexture, FX_Depth );
-  LINK_NATIVE_PROPERTY( UWaterTexture, FX_Time );
-  LINK_NATIVE_PROPERTY( UWaterTexture, NumDrops );
-  LINK_NATIVE_ARRAY   ( UWaterTexture, Drops );
-  LINK_NATIVE_PROPERTY( UWaterTexture, SourceFields );
-  LINK_NATIVE_ARRAY   ( UWaterTexture, RenderTable );
-  LINK_NATIVE_ARRAY   ( UWaterTexture, WaterTable );
-  LINK_NATIVE_PROPERTY( UWaterTexture, WaterParity );
-  LINK_NATIVE_PROPERTY( UWaterTexture, OldWaveAmp );
+  LINK_NATIVE_PROPERTY( DropType );
+  LINK_NATIVE_PROPERTY( WaveAmp );
+  LINK_NATIVE_PROPERTY( FX_Frequency );
+  LINK_NATIVE_PROPERTY( FX_Phase );
+  LINK_NATIVE_PROPERTY( FX_Amplitude );
+  LINK_NATIVE_PROPERTY( FX_Speed );
+  LINK_NATIVE_PROPERTY( FX_Radius );
+  LINK_NATIVE_PROPERTY( FX_Size );
+  LINK_NATIVE_PROPERTY( FX_Depth );
+  LINK_NATIVE_PROPERTY( FX_Time );
+  LINK_NATIVE_PROPERTY( NumDrops );
+  LINK_NATIVE_ARRAY   ( Drops );
+  LINK_NATIVE_PROPERTY( SourceFields );
+  LINK_NATIVE_ARRAY   ( RenderTable );
+  LINK_NATIVE_ARRAY   ( WaterTable );
+  LINK_NATIVE_PROPERTY( WaterParity );
+  LINK_NATIVE_PROPERTY( OldWaveAmp );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( UWaveTexture, 4 )
-  LINK_NATIVE_PROPERTY( UWaveTexture, BumpMapLight );
-  LINK_NATIVE_PROPERTY( UWaveTexture, BumpMapAngle );
-  LINK_NATIVE_PROPERTY( UWaveTexture, PhongRange );
-  LINK_NATIVE_PROPERTY( UWaveTexture, PhongSize );
+  LINK_NATIVE_PROPERTY( BumpMapLight );
+  LINK_NATIVE_PROPERTY( BumpMapAngle );
+  LINK_NATIVE_PROPERTY( PhongRange );
+  LINK_NATIVE_PROPERTY( PhongSize );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( UWetTexture, 3 )
-  LINK_NATIVE_PROPERTY( UWetTexture, SourceTexture );
-  LINK_NATIVE_PROPERTY( UWetTexture, OldSourceTex );
-  LINK_NATIVE_PROPERTY( UWetTexture, LocalSourceBitmap );
+  LINK_NATIVE_PROPERTY( SourceTexture );
+  LINK_NATIVE_PROPERTY( OldSourceTex );
+  LINK_NATIVE_PROPERTY( LocalSourceBitmap );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( UIceTexture, 21 )
-  LINK_NATIVE_PROPERTY( UIceTexture, GlassTexture );
-  LINK_NATIVE_PROPERTY( UIceTexture, SourceTexture );
-  LINK_NATIVE_PROPERTY( UIceTexture, PanningStyle );
-  LINK_NATIVE_PROPERTY( UIceTexture, TimeMethod );
-  LINK_NATIVE_PROPERTY( UIceTexture, HorizPanSpeed );
-  LINK_NATIVE_PROPERTY( UIceTexture, VertPanSpeed );
-  LINK_NATIVE_PROPERTY( UIceTexture, Frequency );
-  LINK_NATIVE_PROPERTY( UIceTexture, Amplitude );
-  LINK_NATIVE_PROPERTY( UIceTexture, MoveIce );
-  LINK_NATIVE_PROPERTY( UIceTexture, MasterCount );
-  LINK_NATIVE_PROPERTY( UIceTexture, UDisplace );
-  LINK_NATIVE_PROPERTY( UIceTexture, VDisplace );
-  LINK_NATIVE_PROPERTY( UIceTexture, UPosition );
-  LINK_NATIVE_PROPERTY( UIceTexture, VPosition );
-  LINK_NATIVE_PROPERTY( UIceTexture, TickAccu );
-  LINK_NATIVE_PROPERTY( UIceTexture, OldUDisplace );
-  LINK_NATIVE_PROPERTY( UIceTexture, OldVDisplace );
-  LINK_NATIVE_PROPERTY( UIceTexture, OldGlassTex );
-  LINK_NATIVE_PROPERTY( UIceTexture, OldSourceTex );
-  LINK_NATIVE_PROPERTY( UIceTexture, LocalSource );
-  LINK_NATIVE_PROPERTY( UIceTexture, ForceRefresh );
+  LINK_NATIVE_PROPERTY( GlassTexture );
+  LINK_NATIVE_PROPERTY( SourceTexture );
+  LINK_NATIVE_PROPERTY( PanningStyle );
+  LINK_NATIVE_PROPERTY( TimeMethod );
+  LINK_NATIVE_PROPERTY( HorizPanSpeed );
+  LINK_NATIVE_PROPERTY( VertPanSpeed );
+  LINK_NATIVE_PROPERTY( Frequency );
+  LINK_NATIVE_PROPERTY( Amplitude );
+  LINK_NATIVE_PROPERTY( MoveIce );
+  LINK_NATIVE_PROPERTY( MasterCount );
+  LINK_NATIVE_PROPERTY( UDisplace );
+  LINK_NATIVE_PROPERTY( VDisplace );
+  LINK_NATIVE_PROPERTY( UPosition );
+  LINK_NATIVE_PROPERTY( VPosition );
+  LINK_NATIVE_PROPERTY( TickAccu );
+  LINK_NATIVE_PROPERTY( OldUDisplace );
+  LINK_NATIVE_PROPERTY( OldVDisplace );
+  LINK_NATIVE_PROPERTY( OldGlassTex );
+  LINK_NATIVE_PROPERTY( OldSourceTex );
+  LINK_NATIVE_PROPERTY( LocalSource );
+  LINK_NATIVE_PROPERTY( ForceRefresh );
 END_PROPERTY_LINK()
 

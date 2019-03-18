@@ -591,6 +591,6 @@ bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool bIsEdito
 }
 
 BEGIN_PROPERTY_LINK( USubsystem, 1 )
-  LINK_NATIVE_PROPERTY( USubsystem, ExecVtbl );
+  LINK_USELESS_PROPERTY( ExecVtbl );
 END_PROPERTY_LINK()
 

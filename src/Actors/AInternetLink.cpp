@@ -71,23 +71,23 @@ BEGIN_PROPERTY_LINK( AInternetInfo, 0 )
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( AInternetLink, 7 )
-  LINK_NATIVE_PROPERTY( AInternetLink, LinkMode );
-  LINK_NATIVE_PROPERTY( AInternetLink, Socket );
-  LINK_NATIVE_PROPERTY( AInternetLink, Port );
-  LINK_NATIVE_PROPERTY( AInternetLink, RemoteSocket );
-  LINK_NATIVE_PROPERTY( AInternetLink, PrivateResolveInfo );
-  LINK_NATIVE_PROPERTY( AInternetLink, DataPending );
-  LINK_NATIVE_PROPERTY( AInternetLink, ReceiveMode );
+  LINK_NATIVE_PROPERTY( LinkMode );
+  LINK_NATIVE_PROPERTY( Socket );
+  LINK_NATIVE_PROPERTY( Port );
+  LINK_NATIVE_PROPERTY( RemoteSocket );
+  LINK_NATIVE_PROPERTY( PrivateResolveInfo );
+  LINK_NATIVE_PROPERTY( DataPending );
+  LINK_NATIVE_PROPERTY( ReceiveMode );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( ATcpLink, 4 )
-  LINK_NATIVE_PROPERTY( ATcpLink, LinkState );
-  LINK_NATIVE_PROPERTY( ATcpLink, RemoteAddr );
-  LINK_NATIVE_PROPERTY( ATcpLink, AcceptClass );
-  LINK_NATIVE_PROPERTY( ATcpLink, SendFIFO );
+  LINK_NATIVE_PROPERTY( LinkState );
+  LINK_NATIVE_PROPERTY( RemoteAddr );
+  LINK_NATIVE_PROPERTY( AcceptClass );
+  LINK_NATIVE_PROPERTY( SendFIFO );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( AUdpLink, 1 )
-  LINK_NATIVE_PROPERTY( AUdpLink, BroadcastAddr );
+  LINK_NATIVE_PROPERTY( BroadcastAddr );
 END_PROPERTY_LINK()
 

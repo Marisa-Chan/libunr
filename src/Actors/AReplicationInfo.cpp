@@ -61,39 +61,39 @@ BEGIN_PROPERTY_LINK( AReplicationInfo, 0 )
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( APlayerReplicationInfo, 16 )
-  LINK_NATIVE_PROPERTY( APlayerReplicationInfo, PlayerName );
-  LINK_NATIVE_PROPERTY( APlayerReplicationInfo, PlayerID );
-  LINK_NATIVE_PROPERTY( APlayerReplicationInfo, TeamName );
-  LINK_NATIVE_PROPERTY( APlayerReplicationInfo, Team );
-  LINK_NATIVE_PROPERTY( APlayerReplicationInfo, TeamID );
-  LINK_NATIVE_PROPERTY( APlayerReplicationInfo, Score );
-  LINK_NATIVE_PROPERTY( APlayerReplicationInfo, Spree );
-  LINK_NATIVE_PROPERTY( APlayerReplicationInfo, VoiceType );
-  LINK_NATIVE_PROPERTY( APlayerReplicationInfo, HasFlag );
-  LINK_NATIVE_PROPERTY( APlayerReplicationInfo, Ping );
-  LINK_NATIVE_PROPERTY( APlayerReplicationInfo, bIsFemale );
-  LINK_NATIVE_PROPERTY( APlayerReplicationInfo, bIsABot );
-  LINK_NATIVE_PROPERTY( APlayerReplicationInfo, bFeigningDeath );
-  LINK_NATIVE_PROPERTY( APlayerReplicationInfo, bIsSpectator );
-  LINK_NATIVE_PROPERTY( APlayerReplicationInfo, TalkTexture );
-  LINK_NATIVE_PROPERTY( APlayerReplicationInfo, PlayerZone );
+  LINK_NATIVE_PROPERTY( PlayerName );
+  LINK_NATIVE_PROPERTY( PlayerID );
+  LINK_NATIVE_PROPERTY( TeamName );
+  LINK_NATIVE_PROPERTY( Team );
+  LINK_NATIVE_PROPERTY( TeamID );
+  LINK_NATIVE_PROPERTY( Score );
+  LINK_NATIVE_PROPERTY( Spree );
+  LINK_NATIVE_PROPERTY( VoiceType );
+  LINK_NATIVE_PROPERTY( HasFlag );
+  LINK_NATIVE_PROPERTY( Ping );
+  LINK_NATIVE_PROPERTY( bIsFemale );
+  LINK_NATIVE_PROPERTY( bIsABot );
+  LINK_NATIVE_PROPERTY( bFeigningDeath );
+  LINK_NATIVE_PROPERTY( bIsSpectator );
+  LINK_NATIVE_PROPERTY( TalkTexture );
+  LINK_NATIVE_PROPERTY( PlayerZone );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( AGameReplicationInfo, 15 )
-  LINK_NATIVE_PROPERTY( AGameReplicationInfo, GameName );
-  LINK_NATIVE_PROPERTY( AGameReplicationInfo, bTeamGame );
-  LINK_NATIVE_PROPERTY( AGameReplicationInfo, RemainingTime );
-  LINK_NATIVE_PROPERTY( AGameReplicationInfo, ElapsedTime );
-  LINK_NATIVE_PROPERTY( AGameReplicationInfo, ServerName );
-  LINK_NATIVE_PROPERTY( AGameReplicationInfo, ShortName );
-  LINK_NATIVE_PROPERTY( AGameReplicationInfo, AdminName );
-  LINK_NATIVE_PROPERTY( AGameReplicationInfo, AdminEmail );
-  LINK_NATIVE_PROPERTY( AGameReplicationInfo, Region );
-  LINK_NATIVE_PROPERTY( AGameReplicationInfo, ShowMOTD );
-  LINK_NATIVE_PROPERTY( AGameReplicationInfo, MOTDLine1 );
-  LINK_NATIVE_PROPERTY( AGameReplicationInfo, MOTDLine2 );
-  LINK_NATIVE_PROPERTY( AGameReplicationInfo, MOTDLine3 );
-  LINK_NATIVE_PROPERTY( AGameReplicationInfo, MOTDLine4 );
-  LINK_NATIVE_PROPERTY( AGameReplicationInfo, GameEndedComments );
+  LINK_NATIVE_PROPERTY( GameName );
+  LINK_NATIVE_PROPERTY( bTeamGame );
+  LINK_NATIVE_PROPERTY( RemainingTime );
+  LINK_NATIVE_PROPERTY( ElapsedTime );
+  LINK_NATIVE_PROPERTY( ServerName );
+  LINK_NATIVE_PROPERTY( ShortName );
+  LINK_NATIVE_PROPERTY( AdminName );
+  LINK_NATIVE_PROPERTY( AdminEmail );
+  LINK_NATIVE_PROPERTY( Region );
+  LINK_NATIVE_PROPERTY( ShowMOTD );
+  LINK_NATIVE_PROPERTY( MOTDLine1 );
+  LINK_NATIVE_PROPERTY( MOTDLine2 );
+  LINK_NATIVE_PROPERTY( MOTDLine3 );
+  LINK_NATIVE_PROPERTY( MOTDLine4 );
+  LINK_NATIVE_PROPERTY( GameEndedComments );
 END_PROPERTY_LINK()
 

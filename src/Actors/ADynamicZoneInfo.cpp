@@ -38,16 +38,16 @@ ADynamicZoneInfo::~ADynamicZoneInfo()
 IMPLEMENT_NATIVE_CLASS( ADynamicZoneInfo );
 
 BEGIN_PROPERTY_LINK( ADynamicZoneInfo, 11 )
-  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, NextDynamicZone );
-  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, ZoneAreaType );
-  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, BoxMin );
-  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, BoxMax );
-  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, CylinderSize );
-  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, SphereSize );
-  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, MatchOnlyZone );
-  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, bUseRelativeToRotation );
-  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, bMovesForceTouchUpdate );
-  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, bUpdateTouchers );
-  LINK_NATIVE_PROPERTY( ADynamicZoneInfo, OldPose );
+  LINK_NATIVE_PROPERTY( NextDynamicZone );
+  LINK_NATIVE_PROPERTY( ZoneAreaType );
+  LINK_NATIVE_PROPERTY( BoxMin );
+  LINK_NATIVE_PROPERTY( BoxMax );
+  LINK_NATIVE_PROPERTY( CylinderSize );
+  LINK_NATIVE_PROPERTY( SphereSize );
+  LINK_NATIVE_PROPERTY( MatchOnlyZone );
+  LINK_NATIVE_PROPERTY( bUseRelativeToRotation );
+  LINK_NATIVE_PROPERTY( bMovesForceTouchUpdate );
+  LINK_NATIVE_PROPERTY( bUpdateTouchers );
+  LINK_NATIVE_PROPERTY( OldPose );
 END_PROPERTY_LINK()
 
