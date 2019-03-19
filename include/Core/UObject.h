@@ -438,15 +438,11 @@ public:
   void ReadConfigProperties();
   static UClass* FindClass( FName ClassName );
 
-  // Property getters
+  // Property functions
   template <class T> inline T GetProperty( UProperty* Prop, int Idx );
+  template <class T> inline void SetProperty( UProperty* Prop, T NewVal, int Idx = 0 );
   UProperty* FindProperty( FName PropName );
   UProperty* FindProperty( const char* PropName );
-
-  // Property setters
-  template<class T> inline void SetProperty( UProperty* Prop, T NewVal, int Idx = 0 );
-  template<class T> inline void SetArrayProperty( UArrayProperty* ArrayProp, int Idx, u8 ByteSize, u8 NumElem );
-  void SetStructProperty( UStructProperty* Prop, int Idx = 0, u32 Offset = 0 );
 
   static bool StaticInit();
   static bool StaticExit();
@@ -468,11 +464,8 @@ public:
   static Array<UFunction*>* NativeFunctions;
   static Array<FNameEntry*>* NameTable;
 
-//  FHash     Hash;     // Hash of this object (TODO: Use FName)
-//  const char* Name;   // Name of this object (TODO: Use FName)
   FName     Name;     // Name of the object stored in the global name table 
   int       Index;    // Index of the object in object pool
-  UObject*  NextObj;  // The next object in the list
   UPackage* Pkg;      // Package this object was loaded from
   FExport*  Export;   // Export struct from the package of this object
   UObject*  Outer;    // Object that this object resides in

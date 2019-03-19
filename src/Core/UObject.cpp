@@ -123,7 +123,6 @@ UObject::UObject()
 {
   Index = -1;
   Export = NULL;
-  NextObj = NULL;
   ObjectFlags = 0;
   Outer = NULL;
   Class = NULL;
