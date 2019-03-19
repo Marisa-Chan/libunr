@@ -198,7 +198,7 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
       continue;
 
     // Write begin actor
-    Out->Printf("Begin Actor Class=%s Name=%s\r\n", Actor->Class->Name, Actor->Name );
+    Out->Printf("Begin Actor Class=%s Name=%s\r\n", Actor->Class->Name.Data(), Actor->Name.Data() );
 
     // Write actor properties
     for ( UField* Iter = Actor->Field; Iter != NULL; Iter = Iter->Next )
@@ -208,8 +208,8 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
       {
         if ( UNLIKELY( Prop->Offset & 0x80000000 ) )
         {
-          Logf( LOG_WARN, "Bad offset for property '%s' (Offset = %x)",
-              Prop->Name, Prop->Offset );
+          Logf( LOG_WARN, "Bad offset for property '%s' in Actor '%s' (Offset = %x)",
+              Prop->Name.Data(), Actor->Name.Data(), Prop->Offset );
           continue;
         }
 
@@ -244,9 +244,9 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
               }
 
               if ( Prop->ArrayDim > 1 )
-                Out->Printf( "\t%s(%i)=%s\r\n", Prop->Name, j, ValueBuf.Data() );
+                Out->Printf( "\t%s(%i)=%s\r\n", Prop->Name.Data(), j, ValueBuf.Data() );
               else
-                Out->Printf( "\t%s=%s\r\n", Prop->Name, ValueBuf.Data() );
+                Out->Printf( "\t%s=%s\r\n", Prop->Name.Data(), ValueBuf.Data() );
               
               ValueBuf.Erase();
             }

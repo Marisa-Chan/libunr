@@ -52,7 +52,7 @@ bool ABrush::ExportToFile( const char* Dir, const char* Type )
 
 void ABrush::ExportToLevelText( FileStreamOut* Out )
 {
-  Out->Printf( "\r\n\tBegin Brush Name=%s\r\n", Brush->Name );
+  Out->Printf( "\r\n\tBegin Brush Name=%s\r\n", Brush->Name.Data() );
   Brush->Polys->ExportToLevelText( Out );
   Out->Printf( "\tEnd Brush\r\n" );
 }
