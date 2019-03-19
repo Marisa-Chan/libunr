@@ -37,51 +37,6 @@
 using namespace xstl;
 
 /*-----------------------------------------------------------------------------
- * FPackageFileIn
- * Keeps track of package specifics when reading a package from a file
------------------------------------------------------------------------------*/
-class DLL_EXPORT FPackageFileIn : public FileStreamIn
-{
-public:
-  int Ver;
-  UPackage* Pkg;
-};
-
-int ReadArrayIndex( FPackageFileIn& PkgFile );
-
-/*-----------------------------------------------------------------------------
- * FPackageFileOut
- * Keeps track of package specifics when writing a package to a file
------------------------------------------------------------------------------*/
-class DLL_EXPORT FPackageFileOut : public FileStreamOut
-{
-public:
-  int Ver;
-  UPackage* Pkg;
-};
-
-/*-----------------------------------------------------------------------------
- * FCompactIndex
- * https://wiki.beyondunreal.com/Legacy:Package_File_Format/Data_Details
------------------------------------------------------------------------------*/
-class DLL_EXPORT FCompactIndex
-{
-public:
-  int Value;
-  friend FPackageFileIn&  operator>>( FPackageFileIn& Ar,  FCompactIndex& Index );
-  friend FPackageFileOut& operator<<( FPackageFileOut& Ar, FCompactIndex& Index );
-};
-
-#define CINDEX(val) (*(FCompactIndex*)&val)
-
-/*-----------------------------------------------------------------------------
- * FString
- * A string stored in a package
------------------------------------------------------------------------------*/
-FPackageFileIn&  operator>>( FPackageFileIn& In, String& Str );
-FPackageFileOut& operator<<( FPackageFileOut& Out, String& Str );
-
-/*-----------------------------------------------------------------------------
  * FExport
  * A data struct that contains information about a single object
  * that a package will expose to outside sources
@@ -173,10 +128,10 @@ class DLL_EXPORT UPackage : public UObject
   FExport*        GetClassExport( const char* ExportName );
   Array<FExport>* GetExportTable();
   Array<FImport>* GetImportTable();
-  u32             GetGlobalNameIndex( u32 PkgNameIdx );
+  u32             GetGlobalName( u32 PkgNameIdx );
   const char*     GetFilePath();
   const char*     GetFileName();
-  String*         GetFullObjName( FExport* ObjExp );
+  FString*        GetFullObjName( FExport* ObjExp );
   size_t          GetPackageVer();
 
   size_t FindName( const char* Name );
@@ -184,9 +139,11 @@ class DLL_EXPORT UPackage : public UObject
   // Name resolution
   const char* ResolveNameFromIdx( idx Index );
   const char* ResolveNameFromObjRef( int ObjRef );
+  FName ResolveGlobalNameIdx( idx Index );
+  FName ResolveGlobalNameObjRef( int ObjRef );
 
   // Accessors 
-  String GetPackageName();
+  FString GetPackageName();
   FPackageFileIn* GetStream();
 
   static bool StaticInit();
@@ -194,7 +151,7 @@ class DLL_EXPORT UPackage : public UObject
   static UPackage* StaticLoadPackage( const char* Filepath );
        
 protected:    
-  String Path;
+  FString Path;
   Array<FNameEntry>* Names;
   Array<FExport>*    Exports;
   Array<FImport>*    Imports;

@@ -43,12 +43,12 @@ class DLL_EXPORT UConsole : public UObject
 
   UViewport* Viewport;
   int HistoryTop, HistoryBot, HistoryCur;
-  String* TypedStr;
-  String* History[16];
+  FString* TypedStr;
+  FString* History[16];
   int Scrollback, NumLines, TopLine, TextLines;
   float MsgTime;
-  String* MsgText[64];
-  String* MsgPRINames[64];
+  FString* MsgText[64];
+  FString* MsgPRINames[64];
   idx MsgType[64];
   APlayerReplicationInfo* MsgPlayer[64];
   float MsgTick[64];
@@ -65,11 +65,11 @@ class DLL_EXPORT UConsole : public UObject
   u8 GlobalConsoleKey;
   u8 GlobalWindowKey;
 
-  String* LoadingMessage;
-  String* SavingMessage;
-  String* ConnectingMessage;
-  String* PausedMessage;
-  String* PrecachingMessage;
+  FString* LoadingMessage;
+  FString* SavingMessage;
+  FString* ConnectingMessage;
+  FString* PausedMessage;
+  FString* PrecachingMessage;
   bool bValidKeyEvent;
 
   // Input system states.

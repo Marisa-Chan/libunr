@@ -43,9 +43,9 @@ class APlayerReplicationInfo : public AReplicationInfo
 
   APlayerReplicationInfo();
 
-  String*      PlayerName;
+  FString*      PlayerName;
   int          PlayerID;
-  String*      TeamName;
+  FString*      TeamName;
   u8           Team;
   int          TeamID;
   float        Score;
@@ -68,23 +68,23 @@ class AGameReplicationInfo : public AReplicationInfo
 
   AGameReplicationInfo();
 
-  String* GameName;
+  FString* GameName;
   bool    bTeamGame;
   int     RemainingTime;
   int     ElapsedTime;
 
-  String* ServerName;
-  String* ShortName;
-  String* AdminName;
-  String* AdminEmail;
+  FString* ServerName;
+  FString* ShortName;
+  FString* AdminName;
+  FString* AdminEmail;
   int     Region;
   
   bool    ShowMOTD;
-  String* MOTDLine1;
-  String* MOTDLine2;
-  String* MOTDLine3;
-  String* MOTDLine4;
+  FString* MOTDLine1;
+  FString* MOTDLine2;
+  FString* MOTDLine3;
+  FString* MOTDLine4;
 
-  String* GameEndedComments;
+  FString* GameEndedComments;
 };
 

@@ -320,17 +320,23 @@ public: \
   } \
   bool cls::StaticCreateClass() \
   { \
-    UPackage* ClsPkg = UPackage::StaticLoadPackage( NativePkgName ); \
-    if (!ClsPkg) \
-    { \
-      Logf( LOG_CRIT, "Package '%s' for class '%s' could not be opened", \
-        NativePkgName, TEXT(cls) ); \
-      return false; \
-    } \
     if (!ObjectClass) \
     { \
+      UPackage* ClsPkg = UPackage::StaticLoadPackage( NativePkgName ); \
+      if (!ClsPkg) \
+      { \
+        Logf( LOG_CRIT, "Package '%s' for class '%s' could not be opened", \
+          NativePkgName, TEXT(cls) ); \
+        return false; \
+      } \
       const char* ClsNameStr = TEXT(cls); \
-      FName ClsName = ClsPkg->GetGlobalNameIndex( ClsPkg->FindName( ++ClsNameStr ) ); \
+      ClsNameStr++; \
+      size_t PkgNameIdx = ClsPkg->FindName( ClsNameStr ); \
+      FName ClsName = 0; \
+      if ( PkgNameIdx != MAX_SIZE ) \
+        ClsName = ClsPkg->GetGlobalName( PkgNameIdx ); \
+      else \
+        ClsName = FName::CreateName( ClsNameStr, RF_TagExp | RF_LoadContextFlags | RF_Native ); \
       ObjectClass = UObject::StaticAllocateClass( ClsName, StaticFlags, Super::ObjectClass,\
         NativeSize, NativeConstructor ); \
       if ( ObjectClass != NULL ) \
@@ -342,18 +348,6 @@ public: \
     } \
     return true; \
   } \
-
-#define LINK_NATIVE_PROPERTY_ALIASED(var, realvar) \
-  StaticNativePropList->AddProperty(#var,OFFSET_OF(LocalClassType,realvar));
-
-#define LINK_NATIVE_PROPERTY(var) \
-  LINK_NATIVE_PROPERTY_ALIASED(var, var)
-
-#define LINK_NATIVE_ARRAY(var) \
-  LINK_NATIVE_PROPERTY_ALIASED(var, var[0])
-
-#define LINK_USELESS_PROPERTY(var) \
-  LINK_NATIVE_PROPERTY_ALIASED(var, ObjectInternal[0])
 
 #define BEGIN_PROPERTY_LINK( cls, numprop ) \
 bool cls::StaticLinkNativeProperties() \
@@ -375,6 +369,18 @@ bool cls::StaticLinkNativeProperties() \
   return false; \
 }
 
+#define LINK_NATIVE_PROPERTY_ALIASED(var, realvar) \
+  StaticNativePropList->AddProperty(#var,OFFSET_OF(LocalClassType,realvar));
+
+#define LINK_NATIVE_PROPERTY(var) \
+  LINK_NATIVE_PROPERTY_ALIASED(var, var)
+
+#define LINK_NATIVE_ARRAY(var) \
+  LINK_NATIVE_PROPERTY_ALIASED(var, var[0])
+
+#define LINK_USELESS_PROPERTY(var) \
+  LINK_NATIVE_PROPERTY_ALIASED(var, ObjectInternal[0])
+
 #define EXPOSE_TO_USCRIPT() \
   static bool StaticLinkNativeProperties(); 
 
@@ -389,8 +395,7 @@ bool cls::StaticLinkNativeProperties() \
     ExpProp->Outer = ExpCls; \
     ExpProp->Offset = OFFSET_OF( cls, prop ); \
     ExpProp->Next = ExpCls->Children; \
-    ExpProp->Name = TEXT( prop ); \
-    ExpProp->Hash = FnvHashString( ExpProp->Name ); \
+    ExpProp->Name = FName::CreateName( TEXT(prop), RF_TagExp | RF_LoadContextFlags ); \
     ExpProp->ObjectFlags = RF_Native; \
     ExpProp->RefCnt = 1; \
     ExpProp->Class = ptype::StaticClass(); \
@@ -402,52 +407,6 @@ bool cls::StaticLinkNativeProperties() \
 
 #define EXPORTABLE() \
   virtual bool ExportToFile( const char* Dir, const char* Type );
-
-/*-----------------------------------------------------------------------------
- * FNameEntry
- * An entry into a name table
------------------------------------------------------------------------------*/
-#define NAME_LEN 64
-struct DLL_EXPORT FNameEntry
-{
-   FNameEntry();
-   FNameEntry( const char* InStr );
-  ~FNameEntry();
-  
-  friend FPackageFileIn&  operator>>( FPackageFileIn& In,  FNameEntry& Name );
-  friend FPackageFileOut& operator<<( FPackageFileOut& In, FNameEntry& Name );
-  
-  char Data[NAME_LEN];
-  int Flags;
-  FHash Hash;
-  UPackage* Pkg;
-};
-
-/*-----------------------------------------------------------------------------
- * FName
- * An index into the global name table
------------------------------------------------------------------------------*/
-struct FName
-{
-  u32 Index;
-
-  FName() { Index = 0; }
-  FName( int Idx ) { Index = Idx; }
-
-  operator const char*();
-  operator u32()
-  {
-    return Index;
-  }
-
-  inline FName operator=( int Idx )
-  {
-    Index = Idx;
-  }
-
-  friend bool operator==( FName& A, FName& B );
-  friend bool operator!=( FName& A, FName& B );
-};
 
 /*-----------------------------------------------------------------------------
  * UObject
@@ -473,14 +432,15 @@ public:
   void DelRef();
 
   bool IsA( UClass* ClassType );
-  bool IsA( char* ClassName, FHash& ClassHash );
+  bool IsA( FName ClassName );
   bool ParentsIsA( UClass* ClassType );
   void ReadDefaultProperties(); 
   void ReadConfigProperties();
-  static UClass* FindClass( FHash& ClassHash );
+  static UClass* FindClass( FName ClassName );
 
   // Property getters
   template <class T> inline T GetProperty( UProperty* Prop, int Idx );
+  UProperty* FindProperty( FName PropName );
   UProperty* FindProperty( const char* PropName );
 
   // Property setters
@@ -560,14 +520,14 @@ class DLL_EXPORT UCommandlet : public UObject
   EXPOSE_TO_USCRIPT();
 
   UCommandlet();
-  virtual int Main( String* Parms );
+  virtual int Main( FString* Parms );
 
-  String* HelpCmd;
-  String* HelpOneLiner;
-  String* HelpUsage;
-  String* HelpWebLink;
-  String* HelpParm[16];
-  String* HelpDesc[16];
+  FString* HelpCmd;
+  FString* HelpOneLiner;
+  FString* HelpUsage;
+  FString* HelpWebLink;
+  FString* HelpParm[16];
+  FString* HelpDesc[16];
   bool    LogToStdout;
   bool    IsServer;
   bool    IsClient;

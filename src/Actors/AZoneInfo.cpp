@@ -38,20 +38,10 @@ AZoneInfo::~AZoneInfo()
 ULevelSummary::ULevelSummary()
   : UObject()
 {
-  Title = new String();
-  Author = new String();
-  IdealPlayerCount = new String();
-  RecommendedEnemies = 0;
-  RecommendedTeammates = 0;
-  LevelEnterText = new String();
 }
 
 ULevelSummary::~ULevelSummary()
 {
-  delete Title;
-  delete Author;
-  delete IdealPlayerCount;
-  delete LevelEnterText;
 }
 
 ALevelInfo::ALevelInfo()

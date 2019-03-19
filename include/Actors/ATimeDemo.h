@@ -49,8 +49,8 @@ class ATimeDemo : public AInfo
   int CycleCount;
   int QuitAfterCycles;
 
-  String* CycleMessage;
-  String* CycleResult;
+  FString* CycleMessage;
+  FString* CycleResult;
 
   bool bSaveToFile;
   bool bFirstFrame;

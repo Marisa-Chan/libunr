@@ -62,86 +62,6 @@ void FNativePropertyList::AddProperty( const char* Name, u32 Offset )
 }
 
 /*-----------------------------------------------------------------------------
- * FNameEntry
------------------------------------------------------------------------------*/
-FNameEntry::FNameEntry()
-{
-  xstl::Set( Data, 0, NAME_LEN );
-  Hash = ZERO_HASH;
-  Flags = 0;
-  Pkg = NULL;
-}
-
-FNameEntry::FNameEntry( const char* InStr )
-{
-  strncpy( Data, InStr, NAME_LEN );
-  Data[NAME_LEN-1] = '\0';
-  Flags = 0;
-  Hash = FnvHashString( Data );
-  Pkg = NULL;
-}
-
-FNameEntry::~FNameEntry()
-{
-  if ( Pkg )
-    Pkg->DelRef();
-}
-
-FPackageFileIn& operator>>( FPackageFileIn& In, FNameEntry& Name )
-{
-  if( In.Ver <= PKG_VER_UN_220 )
-  {
-    u8 b;
-    char* ptr = Name.Data;
-    do
-    {
-      In >> b;
-      *ptr++ = b;
-      
-    } while( b && ptr < (Name.Data + NAME_LEN ) );
-    *ptr = '\0'; // in case we ran up against the name size limit
-  }
-  else
-  {
-    int len = 0;
-    In >> CINDEX( len );
-    if( len > 0 && len < NAME_LEN )
-      In.Read( Name.Data, len );
-  }
-  In >> Name.Flags;
-  Name.Hash = FnvHashString( Name.Data );
-  Name.Pkg = In.Pkg;
-}
-
-FPackageFileOut& operator<<( FPackageFileOut& Out, FNameEntry& Name )
-{
-  Name.Data[NAME_LEN-1] = '\0'; // just in case
-  
-  if( Out.Ver > PKG_VER_UN_220 )
-  {
-    int len = strlen( Name.Data );
-    Out << CINDEX( len );
-  }
-  
-  Out << Name;
-}
-
-FName::operator const char*()
-{
-  return ((*UObject::NameTable)[Index])->Data;
-}
-
-bool operator==( FName& A, FName& B )
-{
-  return (*UObject::NameTable)[A.Index]->Hash == (*UObject::NameTable)[B.Index]->Hash;
-}
-
-bool operator!=( FName& A, FName& B )
-{
-  return (*UObject::NameTable)[A.Index]->Hash != (*UObject::NameTable)[B.Index]->Hash;
-}
-
-/*-----------------------------------------------------------------------------
  * UObject
 -----------------------------------------------------------------------------*/
 Array<UObject*>* UObject::ObjectPool = NULL;
@@ -189,7 +109,6 @@ UObject* UObject::StaticConstructObject( FName InName, UClass* InClass, UObject*
 UClass* UObject::StaticAllocateClass( FName ClassName, u32 Flags, UClass* SuperClass, 
     size_t InStructSize, UObject *(*NativeCtor)(size_t) )
 {
-  ClassName++; // We don't want the prefix indicating object type in the name of the class
   UClass* Out = new UClass( ClassName, Flags, SuperClass, InStructSize, NativeCtor );
   Out->Class = UClass::StaticClass();
   return Out;
@@ -211,6 +130,7 @@ UObject::UObject()
   Pkg = NULL;
   RefCnt = 1;
   OldPkgFileOffsets = new Stack<size_t>();
+  Name = 0;
 }
 
 //TODO: write destructor
@@ -307,12 +227,12 @@ bool UObject::IsA( UClass* ClassType )
   return false;
 }
 
-bool UObject::IsA( char* ClassName, FHash& ClassHash )
+bool UObject::IsA( FName ClassName )
 {
   if ( strnicmp( ClassName, "None", 4 ) == 0 )
-    ClassHash = FnvHashString( "Class" );
+    ClassName = Pkg->GetGlobalName( Pkg->FindName( "Class" ) );
 
-  UClass* Cls = FindClass( ClassHash );
+  UClass* Cls = FindClass( ClassName );
   if ( Cls != NULL )
     return IsA( Cls );
 
@@ -330,15 +250,15 @@ bool UObject::ParentsIsA( UClass* ClassType )
   return false;
 }
 
-UClass* UObject::FindClass( FHash& ClassHash )
+UClass* UObject::FindClass( FName ClassName )
 {
-  if ( ClassHash == FnvHashString("None") )
+  if ( ClassName == 0 )
     return UClass::StaticClass();
 
   for ( size_t i = 0; i < ClassPool->Size() && i < MAX_SIZE; i++ )
   {
     UClass* Cls = (*ClassPool)[i];
-    if ( Cls->Hash == ClassHash )
+    if ( Cls->Name == ClassName )
       return Cls;
   }
 
@@ -359,7 +279,7 @@ void UObject::ReadDefaultProperties()
   while( 1 )
   {
     *PkgFile >> CINDEX( PropNameIdx );
-    PropName = FName( Pkg->GetGlobalNameIndex( PropNameIdx ) );
+    PropName = FName( Pkg->GetGlobalName( PropNameIdx ) );
     if ( UNLIKELY( strncmp( PropName, "None", 4 ) == 0 ) )
       break;
 
@@ -372,19 +292,19 @@ void UObject::ReadDefaultProperties()
     {
       if ( Outer )
         Logf( LOG_CRIT, "Property '%s' in '%s.%s.%s' does not exist",
-          (const char*)PropName, Pkg->Name, Outer->Name, Name );
+          (const char*)PropName, (const char*)Pkg->Name, (const char*)Outer->Name, (const char*)Name );
       else
         Logf( LOG_CRIT, "Property '%s' in '%s.%s' does not exist",
-          (const char*)PropName, Pkg->Name, Name );
+          (const char*)PropName, (const char*)Pkg->Name, (const char*)Name );
     }
     else if ( Prop->Offset == MAX_UINT32 )
     {
       if ( Outer )
         Logf( LOG_WARN, "Property '%s' in '%s.%s.%s' has no native component",
-            (const char*)PropName, Pkg->Name, Outer->Name, Name );
+            (const char*)PropName, (const char*)Pkg->Name, (const char*)Outer->Name, (const char*)Name );
       else
         Logf( LOG_WARN, "Property '%s' in '%s.%s' has no native component",
-            (const char*)PropName, Pkg->Name, Name );
+            (const char*)PropName, (const char*)Pkg->Name, (const char*)Name );
 
       Prop = NULL;
     }
@@ -451,7 +371,7 @@ void UObject::ReadDefaultProperties()
     }
     else if ( !Prop->LoadDefaultPropertySafe( this, *PkgFile, PropType, RealSize, ArrayIdx ) )
     {
-      Logf( LOG_CRIT, "Cannot continue parsing defaultproperty list for object '%s'", Name );
+      Logf( LOG_CRIT, "Cannot continue parsing defaultproperty list for object '%s'", (const char*)Name );
       return;
     }
   }
@@ -460,113 +380,17 @@ void UObject::ReadDefaultProperties()
 // TODO: Rewrite this awful crap...
 void UObject::ReadConfigProperties()
 {
-  for( UField* FieldIter = Field; FieldIter != NULL; FieldIter = FieldIter->Next )
+}
+
+UProperty* UObject::FindProperty( FName PropName )
+{
+  for ( UField* Iter = Field; Iter != NULL; Iter = Iter->Next )
   {
-    UProperty* Prop = SafeCast<UProperty>( FieldIter );
-    if ( Prop )
-    {
-      if ( Prop->Offset == MAX_UINT32 )
-      {
-        if ( Outer )
-          Logf( LOG_WARN, "Property '%s' in '%s.%s.%s' has no native component",
-              Prop->Name, Pkg->Name, Outer->Name, Name );
-        else
-          Logf( LOG_WARN, "Property '%s' in '%s.%s' has no native component",
-              Prop->Name, Pkg->Name, Name );
-
-        Prop = NULL;
-        continue;
-      }
-
-      FConfig* Cfg;
-      String* Category = new String();
-      if ( Prop->PropertyFlags & CPF_GlobalConfig )
-      {
-        Cfg = Prop->GlobalClass->ClassConfig;
-        *Category += Prop->GlobalClass->Pkg->Name;
-        *Category += ".";
-        *Category += Prop->GlobalClass->Name;
-      }
-      else if ( Prop->PropertyFlags & CPF_Config )
-      {
-        Cfg = Class->ClassConfig;
-        *Category += Pkg->Name;
-        *Category += ".";
-        *Category += Name;
-      }
-      else
-      {
-        continue;
-      }
-      const char* Variable = Prop->Name;
-
-      for( int i = 0; i < Prop->ArrayDim; i++ )
-      {
-        if ( Prop->Class == UByteProperty::StaticClass() )
-          SetProperty<u8>( (UByteProperty*)Prop, Cfg->ReadUInt8( Category->Data(), Variable, i ), i );
-
-        else if ( Prop->Class == UIntProperty::StaticClass() )
-          SetProperty<int>( (UIntProperty*)Prop, Cfg->ReadInt32( Category->Data(), Variable, i ), i );
-
-        else if ( Prop->Class == UBoolProperty::StaticClass() )
-          SetProperty<bool>( (UBoolProperty*)Prop, Cfg->ReadBool( Category->Data(), Variable ) );
-
-        else if ( Prop->Class == UFloatProperty::StaticClass() )
-          SetProperty<float>( (UFloatProperty*)Prop, Cfg->ReadFloat( Category->Data(), Variable, i ), i );
-
-        else if ( Prop->Class == UObjectProperty::StaticClass() )
-        {
-          /*UObject* ObjProp = GetObjProperty( (UObjectProperty*)Prop, i );
-          if ( ObjProp == NULL )
-            ObjProp = StaticConstructObject( 
-          SetObjectProperty( (UObjectProperty*)Prop, Cfg->ReadUInt8( Category->Data(), Variable, i ), i );*/
-          Logf( LOG_WARN, "Found an object property, look at '%s'.ini", Cfg->GetName() );
-          GSystem->Exit( -1 );
-        }
-
-        else if ( Prop->Class == UClassProperty::StaticClass() )
-        {
-          Logf( LOG_WARN, "Found a class property, look at '%s'.ini", Cfg->GetName() );
-          GSystem->Exit( -1 );
-        }
-
-        else if ( Prop->Class == UArrayProperty::StaticClass() )
-        {
-          Logf( LOG_WARN, "Found an array property, look at '%s'.ini", Cfg->GetName() );
-          GSystem->Exit( -1 );
-        }
-
-        else if ( Prop->Class == UStructProperty::StaticClass() )
-        {
-          UStructProperty* StructProp = (UStructProperty*)Prop;
-          Cfg->ReadStruct( Category->Data(), Variable, StructProp->Struct, 
-              GetProperty<UStruct*>( StructProp, i ), i );
-        }
-
-        else if ( Prop->Class == UStrProperty::StaticClass() )
-          SetProperty<char*>( (UStrProperty*)Prop, Cfg->ReadString( Category->Data(), Variable, i ), i );
-        
-        else if ( Prop->Class == UMapProperty::StaticClass() )
-        {
-          Logf( LOG_WARN, "Found a map property, look at '%s'.ini", Cfg->GetName() );
-          GSystem->Exit( -1 );
-        }
-
-        else if ( Prop->Class == UFixedArrayProperty::StaticClass() )
-        {
-          Logf( LOG_WARN, "Found a fixed array property, look at '%s'.ini", Cfg->GetName() );
-          GSystem->Exit( -1 );
-        }
-
-        else if ( Prop->Class == UStringProperty::StaticClass() )
-        {
-          Logf( LOG_WARN, "How is this different from UStrProperty in a config?" );
-          GSystem->Exit( -1 );
-        }
-      }
-      delete Category;
-    }
+    if ( Iter->IsA( UProperty::StaticClass() ) && Iter->Name == PropName )
+      return (UProperty*)Iter;
   }
+
+  return NULL;
 }
 
 UProperty* UObject::FindProperty( const char* PropName )
@@ -574,7 +398,7 @@ UProperty* UObject::FindProperty( const char* PropName )
   FHash PropHash = FnvHashString( PropName );
   for ( UField* Iter = Field; Iter != NULL; Iter = Iter->Next )
   {
-    if ( Iter->IsA( UProperty::StaticClass() ) && Iter->Hash == PropHash )
+    if ( Iter->IsA( UProperty::StaticClass() ) && Iter->Name == PropHash )
       return (UProperty*)Iter;
   }
 
@@ -643,7 +467,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
       for ( size_t i = 0; i < ClassPool->Size() && i != MAX_SIZE; i++ )
       {
         UClass* ClsIter = (*ClassPool)[i];
-        if ( ClsIter->Hash == ObjNameHash )
+        if ( ClsIter->Name == ObjNameHash )
         {
           // Does it need to be loaded?
           if ( !(ClsIter->ClassFlags & CLASS_NoExport) && ClsIter->NativeNeedsPkgLoad )
@@ -664,7 +488,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
       for ( size_t i = 0; i < ClassPool->Size() && i != MAX_SIZE; i++ )
       {
         UClass* ClsIter = (*ClassPool)[i];
-        if ( ClsIter->Hash == ClsNameHash )
+        if ( ClsIter->Name == ClsNameHash )
         {
           ObjClass = ClsIter;
           break;
@@ -758,7 +582,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
   if ( UNLIKELY( ObjExport == NULL ) )
   {
     // Stupid package remap stuff...
-    if ( UNLIKELY( ObjPkg->Hash == FnvHashString( "UnrealI" ) ) )
+    if ( UNLIKELY( ObjPkg->Name == FnvHashString( "UnrealI" ) ) )
     {
       ObjPkg = UPackage::StaticLoadPackage( "UnrealShare" );
       if ( UNLIKELY( ObjPkg == NULL ) )
@@ -766,7 +590,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
 
       return StaticLoadObject( ObjPkg, ObjName, ObjClass, InOuter, bLoadClassNow );
     }
-    else if ( UNLIKELY( ObjPkg->Hash == FnvHashString( "UnrealShare" ) ) )
+    else if ( UNLIKELY( ObjPkg->Name == FnvHashString( "UnrealShare" ) ) )
     {
       ObjPkg = UPackage::StaticLoadPackage( "UnrealI" );
       if ( UNLIKELY( ObjPkg == NULL ) )
@@ -786,7 +610,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
 UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass* ObjClass, 
   UObject* InOuter, bool bLoadClassNow )
 {
-  FName ObjName = ObjPkg->GetGlobalNameIndex( ObjExport->ObjectName );
+  FName ObjName = ObjPkg->GetGlobalName( ObjExport->ObjectName );
   bool bNeedsFullLoad = true;
 
   // 'None' object means NULL, don't load anything
@@ -806,7 +630,7 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
       for ( size_t i = 0; i < ClassPool->Size() && i != MAX_SIZE; i++ )
       {
         UClass* ClsIter = (*ClassPool)[i];
-        if ( ClsIter->Hash == ClsNameHash )
+        if ( ClsIter->Name == ClsNameHash )
         {
           ObjClass = ClsIter;
           break; // Already loaded the class apparently, great
@@ -828,8 +652,8 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
   }
 
   // Type checking
-  FNameEntry* ClassName = ObjPkg->GetNameEntryByObjRef( ObjExport->Class );
-  UClass* ClassType = FindClass( ClassName->Hash );
+  FName ClassName = ObjPkg->ResolveGlobalNameObjRef( ObjExport->Class );
+  UClass* ClassType = FindClass( ClassName );
   if ( UNLIKELY( ClassType == NULL ) )
   {
     // Load the actual type that it is
@@ -837,7 +661,7 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
     if ( UNLIKELY( ClassType == NULL ) )
     {
       Logf( LOG_WARN, "Can't load object '%s.%s', cannot load class",
-          ObjPkg->Name, ObjName );
+          (const char*)ObjPkg->Name, (const char*)ObjName );
       return NULL;
     }
   }
@@ -845,7 +669,7 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
   if ( UNLIKELY( !ClassType->Default->IsA( ObjClass ) ) )
   {
     Logf( LOG_WARN, "Object '%s.%s' was expected to be of type '%s' but was '%s'",
-        ObjPkg->Name, ObjName, ObjClass->Name, ClassName->Data );
+        (const char*)ObjPkg->Name, (const char*)ObjName, (const char*)ObjClass->Name, (const char*)ClassName );
     return NULL;
   }
 
@@ -913,7 +737,7 @@ UCommandlet::~UCommandlet()
   // TODO:
 }
 
-int UCommandlet::Main( String* Parms )
+int UCommandlet::Main( FString* Parms )
 {
   return 0;
 }

@@ -181,13 +181,13 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
 
   // Temporarily change package name to MyLevel
   FName PkgName = Pkg->Name;
-  Pkg->Name = Pkg->GetGlobalNameIndex( Pkg->FindName( "MyLevel" ) );
+  Pkg->Name = Pkg->GetGlobalName( Pkg->FindName( "MyLevel" ) );
 
   // Write beginning map
   Out->Printf( "Begin Map\r\n" );
 
   // Loop through all actors
-  String ValueBuf;
+  FString ValueBuf;
   for ( size_t i = 0; i < Actors.Size() && i != MAX_SIZE; i++ )
   {
     AActor* Actor = Actors[i];

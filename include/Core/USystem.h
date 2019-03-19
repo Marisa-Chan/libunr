@@ -75,10 +75,10 @@ class DLL_EXPORT USystem : public USubsystem
 
   // Per game
   int PurgeCacheDays;
-  String* SavePath;
-  String* CachePath;
-  String* CacheExt;
-  Array<String*> Paths;
+  FString* SavePath;
+  FString* CachePath;
+  FString* CacheExt;
+  Array<FString*> Paths;
 
   static int LogLevel;
 

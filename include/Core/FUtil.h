@@ -31,7 +31,8 @@
 #include <math.h>
 
 #include <libxstl/XTypes.h>
-#include <libxstl/XStream.h>
+#include <libxstl/XFileStream.h>
+#include <libxstl/XString.h>
 
 #if defined LIBUNR_LINUX
   #include <sys/types.h>
@@ -184,8 +185,156 @@ static inline FHash FnvHashString( const char* Data )
   }
   return Hash;
 }
- 
+
 #define ZERO_HASH {0, 0}
+class UPackage;
+using namespace xstl;
+
+/*-----------------------------------------------------------------------------
+ * FPackageFileIn
+ * Keeps track of package specifics when reading a package from a file
+-----------------------------------------------------------------------------*/
+class DLL_EXPORT FPackageFileIn : public FileStreamIn
+{
+public:
+  int Ver;
+  UPackage* Pkg;
+};
+
+int ReadArrayIndex( FPackageFileIn& PkgFile );
+
+/*-----------------------------------------------------------------------------
+ * FPackageFileOut
+ * Keeps track of package specifics when writing a package to a file
+-----------------------------------------------------------------------------*/
+class DLL_EXPORT FPackageFileOut : public FileStreamOut
+{
+public:
+  int Ver;
+  UPackage* Pkg;
+};
+
+/*-----------------------------------------------------------------------------
+ * FCompactIndex
+ * https://wiki.beyondunreal.com/Legacy:Package_File_Format/Data_Details
+-----------------------------------------------------------------------------*/
+class DLL_EXPORT FCompactIndex
+{
+public:
+  int Value;
+  friend FPackageFileIn&  operator>>( FPackageFileIn& Ar,  FCompactIndex& Index );
+  friend FPackageFileOut& operator<<( FPackageFileOut& Ar, FCompactIndex& Index );
+};
+
+#define CINDEX(val) (*(FCompactIndex*)&val)
+
+/*-----------------------------------------------------------------------------
+ * FNameEntry
+ * An entry into a name table
+-----------------------------------------------------------------------------*/
+#define NAME_LEN 64
+struct DLL_EXPORT FNameEntry
+{
+   FNameEntry();
+   FNameEntry( const char* InStr, int InFlags = 0 );
+  ~FNameEntry();
+  
+  friend FPackageFileIn&  operator>>( FPackageFileIn& In,  FNameEntry& Name );
+  friend FPackageFileOut& operator<<( FPackageFileOut& In, FNameEntry& Name );
+  
+  char Data[NAME_LEN];
+  FHash Hash;
+  int Flags;
+};
+
+/*-----------------------------------------------------------------------------
+ * FName
+ * An index into the global name table
+-----------------------------------------------------------------------------*/
+struct FName
+{
+  u32 Index;
+
+  FName() { Index = 0; }
+  FName( int Idx ) { Index = Idx; }
+
+  static FName CreateName( const char* InName, int InFlags );
+
+  operator u32()
+  {
+    return Index;
+  }
+  operator const char*();
+  operator FHash();
+
+  inline FName operator=( int Idx )
+  {
+    Index = Idx;
+  }
+
+  friend bool operator==( FName& A, FName& B );
+  friend bool operator!=( FName& A, FName& B );
+};
+
+/*-----------------------------------------------------------------------------
+ * FString
+ * A string with support for libunr data types
+-----------------------------------------------------------------------------*/
+class FString : public String
+{
+public:
+  FString() : String() {}
+  FString( const String& Str ) : String( Str ) {}
+  FString( const String& Str, size_t Pos, size_t Len = MAX_SIZE )
+    : String( Str, Pos, Len ) {}
+  FString( const FString& Str )
+    : String( (String&)Str ) {}
+  FString( const FString& Str, size_t Pos, size_t Len = MAX_SIZE )
+    : String( (String&)Str, Pos, Len ) {}
+  FString( const char* s ) : String( s ) {}
+  FString( const char* s, size_t n ) : String( s, n ) {}
+  FString( size_t n, char c ) : String( n, c ) {}
+  FString( int I ) : String( (int)I ) {}
+  FString( i64 I ) : String( (i64)I ) {}
+  FString( u32 U ) : String( (u32)U ) {}
+  FString( u64 U ) : String( (u64)U ) {}
+  FString( float F ) : String( (float)F ) {}
+  FString( double D ) : String( (double)D ) {}
+  FString( bool B ) : String( (bool)B ) {}
+  
+  FString& operator+=( const FString& Str );
+  FString& operator+=( const String& Str );
+  FString& operator+=( const char* s );
+  FString& operator+=( char c );
+  FString& operator+=( FName Name );
+ 
+  FString operator+( const FString& Str ) const;
+  FString operator+( const String& Str ) const;
+  FString operator+( const char* s ) const;
+  FString operator+( char c ) const;
+  FString& operator+( FName Name );
+ 
+  friend FPackageFileIn&  operator>>( FPackageFileIn& In, FString& Str );
+  friend FPackageFileOut& operator<<( FPackageFileOut& Out, FString& Str );
+
+  friend bool operator==( const FString& lhs, const FString& rhs );
+  friend bool operator==( const char* lhs,    const FString& rhs );
+  friend bool operator==( const FString& lhs, const char*   rhs );
+  friend bool operator==( const FString& lhs, const String& rhs );
+  friend bool operator==( const String& lhs,  const FString& rhs );
+
+  friend bool operator!=( const FString& lhs, const FString& rhs );
+  friend bool operator!=( const char* lhs,    const FString& rhs );
+  friend bool operator!=( const FString& lhs, const char*   rhs );
+  friend bool operator!=( const FString& lhs, const String& rhs );
+  friend bool operator!=( const String& lhs,  const FString& rhs );
+};
+  
+FString operator+( const char* lhs, const String& rhs );
+FString operator+( const char* lhs, const FString& rhs );
+FString operator+( char lhs, const String& rhs );
+FString operator+( char lhs, const FString& rhs );
+
 
 //========================================================================
 // EOF

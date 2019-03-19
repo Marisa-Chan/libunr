@@ -55,28 +55,28 @@ class USecurityData : public UObject
 
   struct BanEntry
   {
-    String* ClientIP;
-    String* ClientName;
-    String* ClientID;
-    String* ClientIdentNr;
+    FString* ClientIP;
+    FString* ClientName;
+    FString* ClientID;
+    FString* ClientIdentNr;
     int IPStart;
     int IPEnd;
   };
 
   struct TempBanEntry
   {
-    String* ClientName;
-    String* ClientID;
-    String* ClientIdentNr;
+    FString* ClientName;
+    FString* ClientID;
+    FString* ClientIdentNr;
     int IPAddress;
   };
 
   struct ClientLogEntry
   {
-    String* PlayerNames;
-    String* PlayerIP;
-    String* ClientID;
-    String* ClientIdentNr;
+    FString* PlayerNames;
+    FString* PlayerIP;
+    FString* ClientID;
+    FString* ClientIdentNr;
     int IPAddress;
   };
 

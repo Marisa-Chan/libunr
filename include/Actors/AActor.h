@@ -729,16 +729,16 @@ class AMenu : public AActor
   bool   bExitAllMenus;
   APlayerPawn* PlayerOwner;
 
-  String* HelpMessage[26];
-  String* MenuList[26];
-  String* LeftString;
-  String* RightString;
-  String* CenterString;
-  String* EnabledString;
-  String* DisabledString;
-  String* MenuTitle;
-  String* YesString;
-  String* NoString;
+  FString* HelpMessage[26];
+  FString* MenuList[26];
+  FString* LeftString;
+  FString* RightString;
+  FString* CenterString;
+  FString* EnabledString;
+  FString* DisabledString;
+  FString* MenuTitle;
+  FString* YesString;
+  FString* NoString;
 };
 
 class AProjectile : public AActor
@@ -813,7 +813,7 @@ class ATrigger : public ATriggers
   };
   ETriggerType TriggerType;
 
-  String* Message;
+  FString* Message;
   bool    bTriggerOnceOnly;
   bool    bInitiallyActive;
   bool    BACKUP_InitActive;

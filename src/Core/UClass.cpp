@@ -55,7 +55,7 @@ void UTextBuffer::Load()
   {
     char* TextBuf = (char*)xstl::Malloc( TextSize + 1 );
     PkgFile->Read( TextBuf, TextSize + 1 );
-    Text = new String( TextBuf );
+    Text = new FString( TextBuf );
     xstl::Free( TextBuf );
   }
 }
@@ -115,7 +115,7 @@ void UConst::Load()
   char* Str = (char*)xstl::Malloc( Size ); 
   PkgFile->Read( Str, Size );
 
-  Value = new String( Str );
+  Value = new FString( Str );
   xstl::Free( Str );
 }
 
@@ -738,7 +738,8 @@ FDependency::FDependency()
 // UClass
 void UClass::BootstrapStage1()
 {
-  ObjectClass = new UClass( 0, CLASS_NoExport, NULL, 
+  int NameFlags = RF_TagExp | RF_HighlightedName | RF_LoadContextFlags | RF_Native;
+  ObjectClass = new UClass( FName::CreateName( "Class", NameFlags ), CLASS_NoExport, NULL, 
       sizeof(UClass), UClass::NativeConstructor );
   ObjectClass->Class = ObjectClass;
   UObject::ClassPool->PushBack( ObjectClass );
@@ -787,7 +788,7 @@ UClass::~UClass()
 
 bool UClass::ExportToFile( const char* Dir, const char* Type )
 {
-  String* Filename = new String( Dir );
+  FString* Filename = new FString( Dir );
 #if defined LIBUNR_WIN32
   Filename->ReplaceChars( '\\', '/' );
 #endif
@@ -807,7 +808,7 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
   Out->Write( ScriptText->Text->Data(), ScriptText->Text->Size() );
 
   // Write default properties
-  String ValueBuf;
+  FString ValueBuf;
   Out->Printf( "defaultproperties\r\n{\r\n" );
   for ( UField* Iter = Default->Field; Iter != NULL; Iter = Iter->Next )
   {

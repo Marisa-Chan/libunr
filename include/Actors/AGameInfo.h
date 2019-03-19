@@ -50,22 +50,22 @@ class AGameInfo : public AInfo
   int     NumPlayers;
   int     CurrentID;
 
-  String* AdminPassword;
-  String* GamePassword;
+  FString* AdminPassword;
+  FString* GamePassword;
 
   UClass* ScoreBoardType;
   UClass* GameMenuType;
-  String* BotMenuType;
-  String* RulesMenuType;
-  String* SettingsMenuType;
-  String* GameUMenuType;
-  String* MultiplayerUMenuType;
-  String* GameOptionsMenuType;
+  FString* BotMenuType;
+  FString* RulesMenuType;
+  FString* SettingsMenuType;
+  FString* GameUMenuType;
+  FString* MultiplayerUMenuType;
+  FString* GameOptionsMenuType;
   UClass* HUDType;
   UClass* MapListType;
-  String* MapPrefix;
-  String* BeaconName;
-  String* SpecialDamageString, FemSpecialDamageString;
+  FString* MapPrefix;
+  FString* BeaconName;
+  FString* SpecialDamageString, FemSpecialDamageString;
   int     SentText;
 
   UClass*   MutatorClass;
@@ -78,41 +78,41 @@ class AGameInfo : public AInfo
   UClass* GameReplicationInfoClass;
   AGameReplicationInfo* GameReplicationInfo;
 
-  String* ServerLogName;
+  FString* ServerLogName;
 
   AStatLog* LocalLog;
   AStatLog* WorldLog;
-  String*   LocalLogFileName;
-  String*   WorldLogFileName;
-  String*   LocalBatcherURL;
-  String*   LocalBatcherParams;
-  String*   LocalStatsURL;
-  String*   WorldBatcherURL;
-  String*   WorldBatcherParams;
-  String*   WorldStatsURL;
+  FString*   LocalLogFileName;
+  FString*   WorldLogFileName;
+  FString*   LocalBatcherURL;
+  FString*   LocalBatcherParams;
+  FString*   LocalStatsURL;
+  FString*   WorldBatcherURL;
+  FString*   WorldBatcherParams;
+  FString*   WorldStatsURL;
 
-  String* SwitchLevelMessage;
-  String* DefaultPlayerName;
-  String* LeftMessage, FemLeftMessage;
-  String* FailedSpawnMessage;
-  String* FailedPlaceMessage;
-  String* FailedTeamMessage;
-  String* NameChangedMessage;
-  String* EnteredMessage, FemEnteredMessage;
-  String* GameName;
-  String* MaxedOutMessage;
-  String* WrongPassword;
-  String* NeedPassword;
+  FString* SwitchLevelMessage;
+  FString* DefaultPlayerName;
+  FString* LeftMessage, FemLeftMessage;
+  FString* FailedSpawnMessage;
+  FString* FailedPlaceMessage;
+  FString* FailedTeamMessage;
+  FString* NameChangedMessage;
+  FString* EnteredMessage, FemEnteredMessage;
+  FString* GameName;
+  FString* MaxedOutMessage;
+  FString* WrongPassword;
+  FString* NeedPassword;
 
-  String* LastPreloginIP;
-  String* LastLoginPlayerNames;
-  String* LastPreloginIdentity;
-  String* LastPreloginIdent;
-  String* MaleGender, FemaleGender;
+  FString* LastPreloginIP;
+  FString* LastLoginPlayerNames;
+  FString* LastPreloginIdentity;
+  FString* LastPreloginIdent;
+  FString* MaleGender, FemaleGender;
   class AGameRules* GameRules;
   class AAdminAccessManager* AccessManager;
 
-  String* AccessManagerClass;
+  FString* AccessManagerClass;
   int     BleedingDamageMin;
   int     BleedingDamageMax;
 

@@ -91,7 +91,7 @@ bool UProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8 Ty
   return Ret;
 }
 
-void UProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
+void UProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int Idx )
 {
   return;
 }
@@ -143,7 +143,7 @@ void UByteProperty::Load()
   PropertyType = PROP_Byte;
 }
 
-void UByteProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
+void UByteProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int Idx )
 {
   u8 DefVal = (Default) ? Default->GetProperty<u8>( this, Idx ) : 0;
   u8 Val = Obj->GetProperty<u8>( this, Idx );
@@ -152,7 +152,7 @@ void UByteProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Id
     if ( Enum && Val < Enum->Names.Size() )
       Buf += Enum->Names[Val];
     else
-      Buf += String( (int)Val );
+      Buf += FString( (int)Val );
   }
 }
 
@@ -163,12 +163,12 @@ void UIntProperty::Load()
   PropertyType = PROP_Int;
 }
 
-void UIntProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
+void UIntProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int Idx )
 {
   int DefVal = (Default) ? Default->GetProperty<int>( this, Idx ) : 0;
   int Val = Obj->GetProperty<int>( this, Idx );
   if ( Val != DefVal )
-    Buf += String( Val );
+    Buf += FString( Val );
 }
 
 void UBoolProperty::Load()
@@ -191,7 +191,7 @@ bool UBoolProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int R
   return true;
 }
 
-void UBoolProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
+void UBoolProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int Idx )
 {
   bool DefVal = (Default) ? Default->GetProperty<bool>( this, Idx ) : 0;
   bool Val = Obj->GetProperty<bool>( this, Idx );
@@ -206,12 +206,12 @@ void UFloatProperty::Load()
   PropertyType = PROP_Float;
 }
 
-void UFloatProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
+void UFloatProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int Idx )
 {
   float DefVal = (Default) ? Default->GetProperty<float>( this, Idx ) : 0;
   float Val = Obj->GetProperty<float>( this, Idx );
   if ( !FltEqual( Val, DefVal ) )
-    Buf += String( Val );
+    Buf += FString( Val );
 }
 
 void UNameProperty::Load()
@@ -232,7 +232,7 @@ bool UNameProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int R
   {
     idx PkgNameIdx;
     In >> CINDEX( PkgNameIdx );
-    *(FName*)Data = In.Pkg->GetGlobalNameIndex( PkgNameIdx );
+    *(FName*)Data = In.Pkg->GetGlobalName( PkgNameIdx );
 
     Data = PtrAdd( Data, ElementSize );
     Num -= ElementSize;
@@ -241,7 +241,7 @@ bool UNameProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int R
   return true;
 }
 
-void UNameProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
+void UNameProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int Idx )
 {
   FName DefVal = (Default) ? Default->GetProperty<FName>( this, Idx ) : FName( 0 );
   FName Val    = Obj->GetProperty<FName>( this, Idx );
@@ -257,14 +257,14 @@ void UNameProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Id
 void UStrProperty::Load()
 {
   Super::Load();
-  ElementSize = sizeof( String* );
+  ElementSize = sizeof( FString* );
   PropertyType = PROP_Ascii;
 }
 
 bool UStrProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int RealSize, int Idx )
 {
-  void* Data = PtrAdd( ObjMem, (Offset + ( MAX(Idx,0) * sizeof( String* )) ) );
-  size_t Num = sizeof( String* );
+  void* Data = PtrAdd( ObjMem, (Offset + ( MAX(Idx,0) * sizeof( FString* )) ) );
+  size_t Num = sizeof( FString* );
   if ( Idx < 0 )
     Num *= ArrayDim;
   
@@ -272,21 +272,21 @@ bool UStrProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int Re
   {
     if ( RealSize < 0 )
     {
-      String* NewStr = new String();
+      FString* NewStr = new FString();
       In >> *NewStr;
-      *(String**)Data = NewStr;
+      *(FString**)Data = NewStr;
     }
     else if ( RealSize > 0 )
     {
       char* NewStr = new char[RealSize];
       In.Read( NewStr, RealSize-- );
 
-      String* RealNewStr = new String( NewStr, RealSize );
-      *(String**)Data = RealNewStr;
+      FString* RealNewStr = new FString( NewStr, RealSize );
+      *(FString**)Data = RealNewStr;
     }
 
-    Num -= sizeof( String* );
-    Data = PtrAdd( Data, sizeof( String* ) );
+    Num -= sizeof( FString* );
+    Data = PtrAdd( Data, sizeof( FString* ) );
   }
 
   return true;
@@ -299,7 +299,7 @@ bool UStrProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8
     case PROP_Ascii:
       RealSize = -1;
       break;
-    case PROP_String:
+    case PROP_FString:
       break;
     default:
       Logf( LOG_CRIT, "Default property expected '%s' but got 'StrProperty'", PropNames[Type] );
@@ -309,10 +309,10 @@ bool UStrProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8
   return LoadDefaultProperty( ObjMem, In, RealSize, Idx );
 }
 
-void UStrProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
+void UStrProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int Idx )
 {
-  String* DefVal = (Default) ? Default->GetProperty<String*>( this, Idx ) : NULL;
-  String* Val = Obj->GetProperty<String*>( this, Idx );
+  FString* DefVal = (Default) ? Default->GetProperty<FString*>( this, Idx ) : NULL;
+  FString* Val = Obj->GetProperty<FString*>( this, Idx );
   if ( Val && Val->Length() > 0 && (DefVal == NULL || *Val != *DefVal) )
   {
     Buf += '"';
@@ -324,14 +324,14 @@ void UStrProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx
 void UStringProperty::Load()
 {
   Super::Load();
-  ElementSize = sizeof( String* );
-  PropertyType = PROP_String;
+  ElementSize = sizeof( FString* );
+  PropertyType = PROP_FString;
 }
 
 bool UStringProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int RealSize, int Idx )
 {
-  void* Data = PtrAdd( ObjMem, (Offset + ( MAX(Idx,0) * sizeof( String* )) ) );
-  size_t Num = sizeof( String* );
+  void* Data = PtrAdd( ObjMem, (Offset + ( MAX(Idx,0) * sizeof( FString* )) ) );
+  size_t Num = sizeof( FString* );
   if ( Idx < 0 )
     Num *= ArrayDim;
   
@@ -340,20 +340,20 @@ bool UStringProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int
     char* NewStr = new char[RealSize];
     In.Read( NewStr, RealSize-- );
 
-    String* RealNewStr = new String( NewStr, RealSize );
-    *(String**)Data = RealNewStr;
+    FString* RealNewStr = new FString( NewStr, RealSize );
+    *(FString**)Data = RealNewStr;
 
-    Num -= sizeof( String* );
-    Data = PtrAdd( Data, sizeof( String* ) );
+    Num -= sizeof( FString* );
+    Data = PtrAdd( Data, sizeof( FString* ) );
   }
 
   return true;
 }
 
-void UStringProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
+void UStringProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int Idx )
 {
-  String* DefVal = (Default) ? Default->GetProperty<String*>( this, Idx ) : NULL;
-  String* Val = Obj->GetProperty<String*>( this, Idx );
+  FString* DefVal = (Default) ? Default->GetProperty<FString*>( this, Idx ) : NULL;
+  FString* Val = Obj->GetProperty<FString*>( this, Idx );
   if ( Val && Val->Length() > 0 && (DefVal == NULL || *Val != *DefVal) )
   {
     Buf += '"';
@@ -393,7 +393,7 @@ bool UObjectProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int
   return true;
 }
 
-void UObjectProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
+void UObjectProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int Idx )
 {
   UObject* DefVal = (Default) ? Default->GetProperty<UObject*>( this, Idx ) : NULL;
   UObject* Val = Obj->GetProperty<UObject*>( this, Idx );
@@ -408,7 +408,7 @@ void UObjectProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int 
     Buf += Val->Class->Name;
     Buf += '\'';
     
-    String* FullName = Val->Pkg->GetFullObjName( Val->Export );
+    FString* FullName = Val->Pkg->GetFullObjName( Val->Export );
     Buf += (FullName) ? *FullName : "<NULL>";
 
     Buf += '\'';
@@ -426,7 +426,7 @@ void UClassProperty::Load()
   PropertyType = PROP_Object;
 }
 
-void UClassProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
+void UClassProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int Idx )
 {
   UClass* DefVal = (Default) ? Default->GetProperty<UClass*>( this, Idx ) : NULL;
   UClass* Val = Obj->GetProperty<UClass*>( this, Idx );
@@ -512,7 +512,7 @@ bool UStructProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In,
   }
 
   FHash StructHash = In.Pkg->GetNameEntry( StructName )->Hash;
-  if ( Struct->Hash != StructHash )
+  if ( Struct->Name != StructHash )
   {
     Logf( LOG_CRIT, "Default property expected struct type '%s' but got '%s'", 
       In.Pkg->ResolveNameFromIdx( StructName ), Struct->Name );
@@ -582,12 +582,12 @@ void UStructProperty::SkipDefaultProperty( FPackageFileIn& In, int RealSize )
   In.Seek( StructSize, Cur ); 
 }
 
-void UStructProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
+void UStructProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int Idx )
 {
   UStruct* DefMem = (Default) ? Default->GetProperty<UStruct*>( this, Idx ) : NULL;
   UStruct* ValMem = Obj->GetProperty<UStruct*>( this, Idx );
 
-  String InnerBuf;
+  FString InnerBuf;
 
   // Check if it's worth writing anything at all
   if ( DefMem == NULL || !xstl::Compare( ValMem, DefMem, Struct->StructSize ) )
@@ -658,7 +658,7 @@ bool UArrayProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int 
   return true;
 }
 
-void UArrayProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
+void UArrayProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int Idx )
 {
   ArrayNoType* GenericArray = Obj->GetProperty<ArrayNoType*>( this, Idx );
   if ( GenericArray == NULL )
@@ -667,7 +667,7 @@ void UArrayProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int I
   // Since dynamic arrays have their values printed one per line, but technically count
   // as one property themselves, we have to cheat by writing the name and value for
   // each value that is different
-  String InnerBuf;
+  FString InnerBuf;
   ArrayNoType* DefGenericArray = (Default) ? Default->GetProperty<ArrayNoType*>( this, Idx ) : NULL;
 
   size_t Num = GenericArray->Size();
@@ -687,11 +687,11 @@ void UArrayProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int I
       if ( ArrayDim > 1 )
       {
         Buf += '[';
-        Buf += String( Idx );
+        Buf += FString( Idx );
         Buf += ']';
       }
       Buf += '(';
-      Buf += String( (u64)i );
+      Buf += FString( (u64)i );
       Buf += ")=";
       Buf += InnerBuf;
       Buf += "\r\n";
@@ -712,7 +712,7 @@ bool UFixedArrayProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In,
   return false;
 }
 
-void UFixedArrayProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
+void UFixedArrayProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int Idx )
 {
 }
 
@@ -727,7 +727,7 @@ bool UMapProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int Re
   return false;
 }
 
-void UMapProperty::GetText( String& Buf, UObject* Obj, UObject* Default, int Idx )
+void UMapProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int Idx )
 {
 }
 

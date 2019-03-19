@@ -76,9 +76,9 @@ class AInventory : public AActor
   bool bInstantRespawn;
   bool bRotatingPickup;
   
-  String* PickupMessage;
-  String* ItemName;
-  String* ItemArticle;
+  FString* PickupMessage;
+  FString* ItemName;
+  FString* ItemArticle;
   float RespawnTime;
   idx   PlayerLastTouched;
   UClass* PickupMessageClass;
@@ -120,9 +120,9 @@ class AInventory : public AActor
   USound* RespawnSound;
 
   UTexture* Icon;
-  String*   M_Activated;
-  String*   M_Selected;
-  String*   M_Deactivated;
+  FString*   M_Activated;
+  FString*   M_Selected;
+  FString*   M_Deactivated;
 };
 
 

@@ -41,7 +41,7 @@ class DLL_EXPORT UTextBuffer : public UObject
   virtual void Load();
 
   u32 Pos, Top;
-  String* Text;
+  FString* Text;
 };
 
 class DLL_EXPORT UField : public UObject
@@ -62,7 +62,7 @@ class DLL_EXPORT UConst : public UField
   UConst();
   virtual void Load();
 
-  String* Value;
+  FString* Value;
 };
 
 class DLL_EXPORT UEnum : public UField

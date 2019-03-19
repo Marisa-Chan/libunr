@@ -143,7 +143,7 @@ class ATeleporter : public ANavigationPoint
 
   ATeleporter();
 
-  String* URL;
+  FString* URL;
   
   idx ProductRequired;
 

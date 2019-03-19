@@ -66,8 +66,8 @@ class UCanvas : public UObject
   FCoords RenderCoords;
 
   // Functions
-  void StrLen( String* Str, float* XL, float* YL );
-  void DrawText( String* Text, bool CR = false, int PolyFlags = 0 );
+  void StrLen( FString* Str, float* XL, float* YL );
+  void DrawText( FString* Text, bool CR = false, int PolyFlags = 0 );
   void DrawTile( UTexture* Tex, float XL, float YL, 
       float U, float V, 
       float UL, float VL, 
@@ -80,8 +80,8 @@ class UCanvas : public UObject
       float UL, float VL,
       int PolyFlags = 0 );
 
-  void DrawTextClipped( String* Text, bool bCheckHotKey = false, int PolyFlags = 0 );
-  void TextSize( String* Str, float* XL, float* YL ); // same as StrLen?
+  void DrawTextClipped( FString* Text, bool bCheckHotKey = false, int PolyFlags = 0 );
+  void TextSize( FString* Str, float* XL, float* YL ); // same as StrLen?
   void DrawClippedActor( AActor* A, bool WireFrame, int X, int Y, int XB, int YB, bool ClearZ = false );
   void DrawTileStretched( UTexture* Tex, int X1, int Y1, int X2, int Y2 );
   void DrawPortal( int X, int Y, int Width, int Height, AActor* CamActor, 

@@ -80,6 +80,9 @@ bool UObject::StaticInit()
   NativeFunctions->Reserve( 4096 );
   NameTable->Reserve( 16384 );
 
+  // Index 0 must always have "None"
+  FName::CreateName( "None", RF_TagExp | RF_LoadContextFlags | RF_Native );
+
   // Create the "class" class first, everything else depends on it
   UClass::BootstrapStage1();
 

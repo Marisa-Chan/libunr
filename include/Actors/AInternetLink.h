@@ -69,11 +69,11 @@ class AInternetLink : public AInternetInfo
 
   // Native functions
   bool IsDataPending();
-  bool ParseURL( String* URL, String* Addr, int Port, String* LevelName, String* EntryName );
-  void Resolve( String* Domain );
+  bool ParseURL( FString* URL, FString* Addr, int Port, FString* LevelName, FString* EntryName );
+  void Resolve( FString* Domain );
   int GetLastError();
-  String* IpAddrToString( IpAddr Arg );
-  String* Validate( String* ValidationString, String* GameName );
+  FString* IpAddrToString( IpAddr Arg );
+  FString* Validate( FString* ValidationString, FString* GameName );
 };
 
 class ATcpLink : public AInternetLink
@@ -107,9 +107,9 @@ class ATcpLink : public AInternetLink
   bool Open( IpAddr Addr );
   bool Close();
   bool IsConnected();
-  int SendText( String* Str );
+  int SendText( FString* Str );
   int SendBinary( int Count, u8* B );
-  int ReadText( String* Str );
+  int ReadText( FString* Str );
   int ReadBinary( int Count, u8* B );
 };
 
@@ -125,9 +125,9 @@ class AUdpLink : public AInternetLink
 
   // Native functions
   bool BindPort( int Port, bool bUseNextAvailable );
-  int SendText( String* Str );
+  int SendText( FString* Str );
   int SendBinary( int Count, u8* B );
-  int ReadText( String* Str );
+  int ReadText( FString* Str );
   int ReadBinary( int Count, u8* B );
 };
 

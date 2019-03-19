@@ -36,7 +36,7 @@ class DLL_EXPORT APlayerPawn : public APawn
   APlayerPawn();
 
   UPlayer* Player;
-  String*  Password;
+  FString*  Password;
 
   float DodgeClickTimer;
   float DodgeClickTime;
@@ -130,7 +130,7 @@ class DLL_EXPORT APlayerPawn : public APawn
   float ZoomLevel;
 
   UClass* SpecialMenu;
-  String* DelayedCommand;
+  FString* DelayedCommand;
   float   MouseSensitivity;
 
   idx WeaponPriority[30];
@@ -179,20 +179,20 @@ class DLL_EXPORT APlayerPawn : public APawn
   float LastPlaySound;
   float LastMessageWindow;
 
-  String* ProgressMessage[5];
+  FString* ProgressMessage[5];
   FColor  ProgressColor[5];
   float   ProgressTimeOut;
 
-  String* QuickSaveString;
-  String* NoPauseMessage;
-  String* ViewingFrom;
-  String* OwnCamera;
-  String* FailedView;
-  String* CantChangeNameMsg;
+  FString* QuickSaveString;
+  FString* NoPauseMessage;
+  FString* ViewingFrom;
+  FString* OwnCamera;
+  FString* FailedView;
+  FString* CantChangeNameMsg;
 
   AGameReplicationInfo* GameReplicationInfo;
 
-  String* ngWorldSecret;
+  FString* ngWorldSecret;
   bool ngSecretSet;
   bool ReceivedSecretChecksum;
 

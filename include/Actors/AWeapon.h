@@ -114,10 +114,10 @@ class AWeapon : public AInventory
   USound* Misc2Sound;
   USound* Misc3Sound;
 
-  String* MessageNoAmmo;
-  String* DeathMessage;
-  String* FemDeathMessage;
-  String* FemKillMessage;
+  FString* MessageNoAmmo;
+  FString* DeathMessage;
+  FString* FemDeathMessage;
+  FString* FemKillMessage;
 
   FRotator AdjustedAim;
   bool bBreakWeaponChange;

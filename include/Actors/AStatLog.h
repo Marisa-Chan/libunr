@@ -38,17 +38,17 @@ class AStatLog : public AInfo
   bool  bWorld;
   float TimeStamp;
 
-  String* LocalStandard;
-  String* WorldStandard;
-  String* LogVersion;
-  String* LogInfoURL;
-  String* GameName;
-  String* GameCreator;
-  String* GameCreatorURL;
-  String* DecoderRingURL;
+  FString* LocalStandard;
+  FString* WorldStandard;
+  FString* LogVersion;
+  FString* LogInfoURL;
+  FString* GameName;
+  FString* GameCreator;
+  FString* GameCreatorURL;
+  FString* DecoderRingURL;
 
-  String* LocalLogDir;
-  String* WorldLogDir;
+  FString* LocalLogDir;
+  FString* WorldLogDir;
 };
 
 class AStatLogFile : public AStatLog
@@ -61,15 +61,15 @@ class AStatLogFile : public AStatLog
   bool bWatermark;
   Stream* LogAr;
 
-  String* StatLogFile;
-  String* StatLogFinal;
+  FString* StatLogFile;
+  FString* StatLogFinal;
 
   void OpenLog();
   void CloseLog();
-  void Watermark( String* EventString );
-  String* GetChecksum();
-  String* GetPlayerChecksum( String* PlayerName, String* Secret );
+  void Watermark( FString* EventString );
+  FString* GetChecksum();
+  FString* GetPlayerChecksum( FString* PlayerName, FString* Secret );
   void FileFlush();
-  void FileLog( String* EventString );
+  void FileLog( FString* EventString );
 };
 

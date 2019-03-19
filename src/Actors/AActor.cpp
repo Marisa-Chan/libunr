@@ -37,7 +37,7 @@ AActor::~AActor()
 
 void AActor::PostDefaultLoad()
 {
-  Tag = Pkg->GetGlobalNameIndex( Class->Export->ObjectName );
+  Tag = Pkg->GetGlobalName( Class->Export->ObjectName );
 }
 
 ABlockingActor::ABlockingActor()

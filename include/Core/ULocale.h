@@ -33,6 +33,6 @@ class ULanguage : public UObject
 
   ULanguage();
  
-  String* LocaleExt;
+  FString* LocaleExt;
 };
 

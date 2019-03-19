@@ -76,8 +76,8 @@ class APawn : public AActor
   bool bCountJumps;
   bool bAdvancedTactics;
   bool bViewTarget;
-  String* SelectionMesh;
-  String* SpecialMesh;
+  FString* SelectionMesh;
+  FString* SpecialMesh;
 
   // 227 flags
   bool bEnhancedSightCheck;
@@ -232,9 +232,9 @@ class APawn : public AActor
 
   idx PlayerRestartState;
 
-  String* MenuName;
-  String* MenuNameDative;
-  String* NameArticle;
+  FString* MenuName;
+  FString* MenuNameDative;
+  FString* NameArticle;
 
   u8 VoicePitch;
   UClass* VoiceType;
@@ -256,8 +256,8 @@ class APawn : public AActor
 
   bool bIsSpeaking;
   bool bWasSpeaking;
-  String* LastPhoneme;
-  String* NextPhoneme;
+  FString* LastPhoneme;
+  FString* NextPhoneme;
 
   enum EPawnSightCheck
   {

@@ -46,7 +46,7 @@ USystem::USystem()
   PurgeCacheDays = 0;
   SavePath = NULL;
   CachePath = NULL;
-  CacheExt = new String(".uxx");
+  CacheExt = new FString(".uxx");
 }
 
 USystem::~USystem()
@@ -303,9 +303,9 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool
   char* CacheExt  = GGameConfig->ReadString( "Core.System", "CacheExt" );
 
   GSystem->PurgeCacheDays = GGameConfig->ReadInt32( "Core.System", "PurgeCacheDays" );
-  GSystem->SavePath  = new String( ( SavePath != NULL ) ? SavePath : "" );
-  GSystem->CachePath = new String( ( CachePath != NULL ) ? CachePath : "" );
-  GSystem->CacheExt  = new String( ( CacheExt != NULL ) ? CacheExt : "" );
+  GSystem->SavePath  = new FString( ( SavePath != NULL ) ? SavePath : "" );
+  GSystem->CachePath = new FString( ( CachePath != NULL ) ? CachePath : "" );
+  GSystem->CacheExt  = new FString( ( CacheExt != NULL ) ? CacheExt : "" );
 
   xstl::Free( SavePath );
   xstl::Free( CachePath );
@@ -319,7 +319,7 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool
     if ( PkgPath == NULL )
       break;
 
-    String* PkgPathString = new String( PkgPath );
+    FString* PkgPathString = new FString( PkgPath );
 #ifndef LIBUNR_WIN32
     PkgPathString->ReplaceChars( '\\', '/' );
 #endif

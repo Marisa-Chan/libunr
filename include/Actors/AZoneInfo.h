@@ -54,9 +54,9 @@ class AZoneInfo : public AInfo
   int           NumCarcasses;
   int           DamagePerSec;
   int           DamageType;
-  String*       DamageString;
-  String*       ZoneName;
-  String*       LocationStrings[4];
+  FString*       DamageString;
+  FString*       ZoneName;
+  FString*       LocationStrings[4];
   ALocationID*  LocationID;
   int           MaxCarcasses;
   USound*       EntrySound;
@@ -256,12 +256,12 @@ class ULevelSummary : public UObject
 
   ULevelSummary();
 
-  String* Title;
-  String* Author;
-  String* IdealPlayerCount;
+  FString* Title;
+  FString* Author;
+  FString* IdealPlayerCount;
   int     RecommendedEnemies;
   int     RecommendedTeammates;
-  String* LevelEnterText;
+  FString* LevelEnterText;
 };
 
 class ALevelInfo : public AZoneInfo
@@ -271,8 +271,8 @@ class ALevelInfo : public AZoneInfo
 
   ALevelInfo();
 
-  String* GetLocalURL();
-  String* GetAddressURL();
+  FString* GetLocalURL();
+  FString* GetAddressURL();
 
   float TimeDilation;
   float TimeSeconds;
@@ -285,16 +285,16 @@ class ALevelInfo : public AZoneInfo
   int   Second;
   int   Millisecond;
 
-  String* Title;
-  String* Author;
-  String* IdealPlayerCount;
+  FString* Title;
+  FString* Author;
+  FString* IdealPlayerCount;
   int     RecommendedEnemies;
   int     RecommendedTeammates;
-  String* LevelEnterText;
-  String* LocalizedPkg;
-  String* Pauser;
+  FString* LevelEnterText;
+  FString* LocalizedPkg;
+  FString* Pauser;
   ULevelSummary* Summary;
-  String* VisibleGroups;
+  FString* VisibleGroups;
 
   bool bLowRes;
   bool bNeverPrecache;
@@ -345,10 +345,10 @@ class ALevelInfo : public AZoneInfo
     NM_Client
   } NetMode;
   
-  String* ComputerName;
-  String* EngineVersion;
-  String* EngineSubVersion;
-  String* MinNetVersion;
+  FString* ComputerName;
+  FString* EngineVersion;
+  FString* EngineSubVersion;
+  FString* MinNetVersion;
 
   UClass* DefaultGameType;
   class AGameInfo* Game;
@@ -356,7 +356,7 @@ class ALevelInfo : public AZoneInfo
   ANavigationPoint* NavigationPointList;
   APawn* PawnList;
 
-  String* NextURL;
+  FString* NextURL;
   bool bNextItems;
   float NextSwitchCountdown;
 
@@ -386,7 +386,7 @@ class AWarpZoneInfo : public AZoneInfo
 
   AWarpZoneInfo();
 
-  String* OtherSideURL;
+  FString* OtherSideURL;
   idx ThisTag;
   bool bNoTeleFrag;
 
@@ -394,7 +394,7 @@ class AWarpZoneInfo : public AZoneInfo
   FCoords        WarpCoords;
   AWarpZoneInfo* OtherSideActor;
   UObject*       OtherSideLevel;
-  String*        Destinations[8];
+  FString*        Destinations[8];
   int            NumDestinations;
 };
 

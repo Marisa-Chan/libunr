@@ -48,11 +48,11 @@ struct DLL_EXPORT FURL
 {
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FURL& URL );
 
-  String Protocol;
-  String Host;
-  String Map;
-  String Portal;
-  Array<String> Op;
+  FString Protocol;
+  FString Host;
+  FString Map;
+  FString Portal;
+  Array<FString> Op;
   int    Port;
   bool   bValid;
 };
@@ -84,6 +84,6 @@ class ULevel : public ULevelBase
   UModel* Model;
   UTextBuffer* TextBlocks[16];
   double TimeSeconds;
-  Map<String,String> TravelInfo;
+  Map<FString,FString> TravelInfo;
 };
 

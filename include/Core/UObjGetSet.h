@@ -185,9 +185,9 @@ void UObject::SetArrayProperty<idx>( UArrayProperty* Prop, int Idx, u8 ByteSize,
 }
 
 template<> inline
-void UObject::SetArrayProperty<String*>( UArrayProperty* Prop, int Idx, u8 ByteSize, u8 NumElem )
+void UObject::SetArrayProperty<FString*>( UArrayProperty* Prop, int Idx, u8 ByteSize, u8 NumElem )
 {
-  Array<String*>* Arr = new Array<String*>();  
+  Array<FString*>* Arr = new Array<FString*>();  
   Arr->Reserve( NumElem );
 
   // TODO: Properly check ByteSize
@@ -197,7 +197,7 @@ void UObject::SetArrayProperty<String*>( UArrayProperty* Prop, int Idx, u8 ByteS
     idx StringLength = 0;
     *PkgFile >> CINDEX( StringLength );
 
-    String* Str = new String();
+    FString* Str = new FString();
     Str->Resize( StringLength );
 
     PkgFile->Read( Str->Data(), StringLength );
@@ -205,7 +205,7 @@ void UObject::SetArrayProperty<String*>( UArrayProperty* Prop, int Idx, u8 ByteS
     NumElem--;
   }
 
-  *GetPropAddr<Array<String*>*>( this, Prop, Idx ) = Arr;
+  *GetPropAddr<Array<FString*>*>( this, Prop, Idx ) = Arr;
 }
 
 template<> inline

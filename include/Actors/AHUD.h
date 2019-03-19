@@ -40,7 +40,7 @@ class DLL_EXPORT AHUD : public AActor
   int HudMode;
   int Crosshair;
   UClass* MainMenuType;
-  String* HUDConfigWindowType;
+  FString* HUDConfigWindowType;
 
   AMenu* MainMenu;
   Array<AHUDOverlay*>* Overlays;
