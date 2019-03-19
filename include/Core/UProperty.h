@@ -94,8 +94,8 @@ class DLL_EXPORT UProperty : public UField
   virtual bool LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8 Type, int RealSize, int Idx = -1 );
   virtual void GetText( FString& Buf, UObject* Obj, UObject* Default, int Idx );
 
-  u32 GetNativeOffset( const char* ClassName, const char* PropName );
-  
+  u32 GetNativeOffset( FName ClassName, FName PropName );
+
   static void SkipDefaultProperty( FPackageFileIn& In, int RealSize );
 };
 

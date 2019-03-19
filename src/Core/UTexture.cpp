@@ -114,26 +114,26 @@ void UTexture::Load()
 // TODO: Export to formats besides .bmp
 bool UTexture::ExportToFile( const char* Dir, const char* Type )
 {
-  String* Filename = new String( Dir );
+  FString Filename( Dir );
 #if defined LIBUNR_WIN32
-  Filename->ReplaceChars( '\\', '/' );
+  Filename.ReplaceChars( '\\', '/' );
 #endif
-  if ( Filename->Back() != '/' )
-    Filename->Append( "/" );
+  if ( Filename.Back() != '/' )
+    Filename += '/';
 
-  Filename->Append( Name );
-  Filename->Append( "." );
+  Filename += Name;
+  Filename += ".";
   if ( strnicmp( Type, "bmp", 3 ) != 0 )
   {
     Logf( LOG_WARN, "Can't export texture to file type '%s'", Type );
     return false;
   }
-  Filename->Append( Type );
+  Filename += Type;
   
   FileStreamOut* Out = new FileStreamOut();
-  if ( Out->Open( *Filename ) != 0 )
+  if ( Out->Open( Filename ) != 0 )
   {
-    Logf( LOG_WARN, "Failed to export texture to bitmap file '%s'", Filename->Data() );
+    Logf( LOG_WARN, "Failed to export texture to bitmap file '%s'", Filename.Data() );
     return false;
   }
   

@@ -331,7 +331,7 @@ const char* UPackage::GetFilePath()
 
 const char* UPackage::GetFileName()
 {
-  return Name;
+  return Name.Data();
 }
 
 FString* UPackage::GetFullObjName( FExport* ObjExp )
@@ -347,7 +347,7 @@ FString* UPackage::GetFullObjName( FExport* ObjExp )
     Names->Push( GetNameEntry( Exp->ObjectName )->Data );
   };
 
-  Names->Push( Name );
+  Names->Push( Name.Data() );
 
   // Concat all names to a string
   static FString* ObjName = new FString();
@@ -444,7 +444,7 @@ UPackage* UPackage::StaticLoadPackage( const char* PkgName )
     if ( Iter == NULL )
       break;
 
-    if ( strnicmp( Iter->Name, PkgName, strlen( Iter->Name ) ) == 0 )
+    if ( strnicmp( Iter->Name.Data(), PkgName, strlen( Iter->Name.Data() ) ) == 0 )
     {
       Pkg = Iter;
       break;

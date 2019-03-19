@@ -129,12 +129,12 @@ FName FName::CreateName( const char* InName, int InFlags )
   return Out;
 }
 
-FName::operator const char*()
+const char* FName::Data() const
 {
   return ((*UObject::NameTable)[Index])->Data;
 }
 
-FName::operator FHash()
+const FHash& FName::Hash() const
 {
   return ((*UObject::NameTable)[Index])->Hash;
 }
@@ -282,7 +282,7 @@ FString& FString::operator+=( char c )
 
 FString& FString::operator+=( FName Name )
 {
-  *(String*)this += (const char*)Name;
+  *(String*)this += Name.Data();
   return *this;
 }
 

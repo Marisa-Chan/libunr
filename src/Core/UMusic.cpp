@@ -56,22 +56,22 @@ void UMusic::Load()
 bool UMusic::ExportToFile( const char* Dir, const char* Type )
 {
   // Set up filename
-  String* Filename = new String( Dir );
+  FString Filename( Dir );
 #if defined LIBUNR_WIN32
-  Filename->ReplaceChars( '\\', '/' );
+  Filename.ReplaceChars( '\\', '/' );
 #endif
-  if ( Filename->Back() != '/' )
-    Filename->Append( "/" );
+  if ( Filename.Back() != '/' )
+    Filename += "/";
 
-  Filename->Append( Name );
-  Filename->Append( "." );
-  Filename->Append( Pkg->ResolveNameFromIdx( MusicType ) );
+  Filename += Name;
+  Filename += ".";
+  Filename += Pkg->ResolveNameFromIdx( MusicType );
 
   // Open file
   FileStreamOut* Out = new FileStreamOut();
-  if ( Out->Open( *Filename ) != 0 )
+  if ( Out->Open( Filename ) != 0 )
   {
-    Logf( LOG_WARN, "Failed to export music to file '%s'", Filename );
+    Logf( LOG_WARN, "Failed to export music to file '%s'", Filename.Data() );
     return false;
   }
   
@@ -81,6 +81,5 @@ bool UMusic::ExportToFile( const char* Dir, const char* Type )
   // Close
   Out->Close();
   delete Out;
-  delete Filename;  
   return true;
 }

@@ -162,20 +162,20 @@ void ULevel::Load()
 
 bool ULevel::ExportToFile( const char* Dir, const char* Type )
 {
-  String* Filename = new String( Dir );
+  FString Filename( Dir );
 #if defined LIBUNR_WIN32
   Filename->ReplaceChars( '\\', '/' );
 #endif
-  if ( Filename->Back() != '/' )
-    Filename->Append( "/" );
+  if ( Filename.Back() != '/' )
+    Filename += "/";
 
-  Filename->Append( Pkg->Name );
-  Filename->Append( ".t3d" ); // Levels won't get exported to any other type
+  Filename += Pkg->Name;
+  Filename += ".t3d"; // Levels won't get exported to any other type
  
   FileStreamOut* Out = new FileStreamOut();
-  if ( Out->Open( *Filename ) != 0 )
+  if ( Out->Open( Filename ) != 0 )
   {
-    Logf( LOG_WARN, "Failed to export level to file '%s'", Filename->Data() );
+    Logf( LOG_WARN, "Failed to export level to file '%s'", Filename.Data() );
     return false;
   }
 

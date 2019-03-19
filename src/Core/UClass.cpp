@@ -818,7 +818,7 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
       if ( UNLIKELY( PropIter->Offset & 0x80000000 ) )
       {
         Logf( LOG_WARN, "Bad offset for property '%s' (Offset = %x)",
-              PropIter->Name, PropIter->Offset );
+              PropIter->Name.Data(), PropIter->Offset );
         continue;
       }
 
@@ -840,9 +840,9 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
             }
 
             if ( PropIter->ArrayDim > 1 )
-              Out->Printf( "\t%s(%i)=%s\r\n", PropIter->Name, i, ValueBuf.Data() );
+              Out->Printf( "\t%s(%i)=%s\r\n", PropIter->Name.Data(), i, ValueBuf.Data() );
             else
-              Out->Printf( "\t%s=%s\r\n", PropIter->Name, ValueBuf.Data() );
+              Out->Printf( "\t%s=%s\r\n", PropIter->Name.Data(), ValueBuf.Data() );
 
             ValueBuf.Erase();
           }
@@ -1029,15 +1029,6 @@ UObject* UClass::CreateDefaultObject()
   Default = Constructor( StructSize );
   Default->Name = Name;
   Default->Class = this;
-}
-
-char* UClass::CreateDefaultObjectName()
-{
-  char* DefObjName = new char[1024];
-  xstl::Set( DefObjName, 0, 1024 );
-  strcat( DefObjName, "Default" );
-  strcat( DefObjName, Name );
-  return DefObjName;
 }
 
 void UClass::SetSuperClassProperties()

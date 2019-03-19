@@ -101,32 +101,28 @@ void UProperty::SkipDefaultProperty( FPackageFileIn& In, int RealSize )
   In.Seek( RealSize, Cur );
 }
 
-u32 UProperty::GetNativeOffset( const char* ClassName, const char* PropName )
+u32 UProperty::GetNativeOffset( FName ClassName, FName PropName )
 {
   FNativePropertyList* NativePropList = NULL;
   u32 Offset = MAX_UINT32;
 
-  FHash ClassHash = FnvHashString( ClassName );
   for ( size_t i = 0; i < NativePropertyLists->Size() && i != MAX_SIZE; i++ )
   {
     // Can you take the address of an overloaded operator[] ?
     NativePropList = NativePropertyLists->Data()[i];    
-    if ( ClassHash == NativePropList->Hash )
+    if ( ClassName.Hash() == NativePropList->Hash )
       break;
   }
  
-  char* UpperPropName = strupper( PropName );
-  FHash PropHash = FnvHashString( UpperPropName );
   for ( size_t i = 0; i < NativePropList->Num; i++ )
   {
-    if ( NativePropList->Properties[i].Hash == PropHash )
+    if ( NativePropList->Properties[i].Hash == PropName.Hash() )
     {
       Offset = NativePropList->Properties[i].Offset;
       break;
     }
   }
  
-  xstl::Free( UpperPropName );
   return Offset;
 }
 
@@ -249,7 +245,7 @@ void UNameProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int I
   if ( DefVal != Val )
   {
     Buf += '"';
-    Buf += (const char*)Val;
+    Buf += Val.Data();
     Buf += '"';
   }
 }
@@ -512,7 +508,7 @@ bool UStructProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In,
   }
 
   FHash StructHash = In.Pkg->GetNameEntry( StructName )->Hash;
-  if ( Struct->Name != StructHash )
+  if ( Struct->Name.Hash() != StructHash )
   {
     Logf( LOG_CRIT, "Default property expected struct type '%s' but got '%s'", 
       In.Pkg->ResolveNameFromIdx( StructName ), Struct->Name );

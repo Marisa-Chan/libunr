@@ -259,13 +259,14 @@ struct FName
   FName( int Idx ) { Index = Idx; }
 
   static FName CreateName( const char* InName, int InFlags );
-
-  operator u32()
+  
+  inline operator u32()
   {
     return Index;
   }
-  operator const char*();
-  operator FHash();
+
+  const char* Data() const;
+  const FHash& Hash() const;
 
   inline FName operator=( int Idx )
   {
@@ -313,7 +314,7 @@ public:
   FString operator+( const char* s ) const;
   FString operator+( char c ) const;
   FString& operator+( FName Name );
- 
+
   friend FPackageFileIn&  operator>>( FPackageFileIn& In, FString& Str );
   friend FPackageFileOut& operator<<( FPackageFileOut& Out, FString& Str );
 

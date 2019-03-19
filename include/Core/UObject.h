@@ -308,7 +308,7 @@ public: \
       Logf( LOG_CRIT, "Failed to load package '%s' for class '%s'.", NativePkgName, ObjectClass->Name ); \
       return false; \
     } \
-    ObjectClass->Export = ObjectClass->Pkg->GetClassExport( ObjectClass->Name ); \
+    ObjectClass->Export = ObjectClass->Pkg->GetClassExport( ObjectClass->Name.Data() ); \
     if ( ObjectClass->Export == NULL ) \
     { \
       ObjectClass->ObjectFlags = RF_EliminateObject; \

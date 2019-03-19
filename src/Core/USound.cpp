@@ -58,22 +58,22 @@ void USound::Load()
 bool USound::ExportToFile( const char* Dir, const char* Type )
 {
   // Set up filename
-  String* Filename = new String( Dir );
+  FString Filename( Dir );
 #if defined LIBUNR_WIN32
-  Filename->ReplaceChars( '\\', '/' );
+  Filename.ReplaceChars( '\\', '/' );
 #endif
-  if ( Filename->Back() != '/' )
-    Filename->Append( "/" );
+  if ( Filename.Back() != '/' )
+    Filename += '/';
 
-  Filename->Append( Name );
-  Filename->Append( "." );
-  Filename->Append( Pkg->ResolveNameFromIdx( SoundFormat ) );
+  Filename += Name.Data();
+  Filename += ".";
+  Filename += Pkg->ResolveNameFromIdx( SoundFormat );
   
   // Open file
   FileStreamOut* Out = new FileStreamOut();
-  if ( Out->Open( *Filename ) != 0 )
+  if ( Out->Open( Filename ) != 0 )
   {
-    Logf( LOG_WARN, "Failed to export sound to wav file '%s'", Filename->Data() );
+    Logf( LOG_WARN, "Failed to export sound to wav file '%s'", Filename.Data() );
     return false;
   }
 
@@ -83,6 +83,5 @@ bool USound::ExportToFile( const char* Dir, const char* Type )
   // Close
   Out->Close();
   delete Out;
-  delete Filename;  
   return true;
 }

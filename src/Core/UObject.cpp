@@ -229,7 +229,7 @@ bool UObject::IsA( UClass* ClassType )
 
 bool UObject::IsA( FName ClassName )
 {
-  if ( strnicmp( ClassName, "None", 4 ) == 0 )
+  if ( strnicmp( ClassName.Data(), "None", 4 ) == 0 )
     ClassName = Pkg->GetGlobalName( Pkg->FindName( "Class" ) );
 
   UClass* Cls = FindClass( ClassName );
@@ -280,7 +280,7 @@ void UObject::ReadDefaultProperties()
   {
     *PkgFile >> CINDEX( PropNameIdx );
     PropName = FName( Pkg->GetGlobalName( PropNameIdx ) );
-    if ( UNLIKELY( strncmp( PropName, "None", 4 ) == 0 ) )
+    if ( UNLIKELY( strncmp( PropName.Data(), "None", 4 ) == 0 ) )
       break;
 
     UProperty* Prop = FindProperty( PropName );
@@ -292,19 +292,19 @@ void UObject::ReadDefaultProperties()
     {
       if ( Outer )
         Logf( LOG_CRIT, "Property '%s' in '%s.%s.%s' does not exist",
-          (const char*)PropName, (const char*)Pkg->Name, (const char*)Outer->Name, (const char*)Name );
+          PropName.Data(), Pkg->Name.Data(), Outer->Name.Data(), Name.Data() );
       else
         Logf( LOG_CRIT, "Property '%s' in '%s.%s' does not exist",
-          (const char*)PropName, (const char*)Pkg->Name, (const char*)Name );
+          PropName.Data(), Pkg->Name.Data(), Name.Data() );
     }
     else if ( Prop->Offset == MAX_UINT32 )
     {
       if ( Outer )
         Logf( LOG_WARN, "Property '%s' in '%s.%s.%s' has no native component",
-            (const char*)PropName, (const char*)Pkg->Name, (const char*)Outer->Name, (const char*)Name );
+          PropName.Data(), Pkg->Name.Data(), Outer->Name.Data(), Name.Data() );
       else
         Logf( LOG_WARN, "Property '%s' in '%s.%s' has no native component",
-            (const char*)PropName, (const char*)Pkg->Name, (const char*)Name );
+          PropName.Data(), Pkg->Name.Data(), Name.Data() );
 
       Prop = NULL;
     }
@@ -371,7 +371,7 @@ void UObject::ReadDefaultProperties()
     }
     else if ( !Prop->LoadDefaultPropertySafe( this, *PkgFile, PropType, RealSize, ArrayIdx ) )
     {
-      Logf( LOG_CRIT, "Cannot continue parsing defaultproperty list for object '%s'", (const char*)Name );
+      Logf( LOG_CRIT, "Cannot continue parsing defaultproperty list for object '%s'", Name.Data() );
       return;
     }
   }
@@ -398,7 +398,7 @@ UProperty* UObject::FindProperty( const char* PropName )
   FHash PropHash = FnvHashString( PropName );
   for ( UField* Iter = Field; Iter != NULL; Iter = Iter->Next )
   {
-    if ( Iter->IsA( UProperty::StaticClass() ) && Iter->Name == PropHash )
+    if ( Iter->IsA( UProperty::StaticClass() ) && Iter->Name.Hash() == PropHash )
       return (UProperty*)Iter;
   }
 
@@ -467,7 +467,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
       for ( size_t i = 0; i < ClassPool->Size() && i != MAX_SIZE; i++ )
       {
         UClass* ClsIter = (*ClassPool)[i];
-        if ( ClsIter->Name == ObjNameHash )
+        if ( ClsIter->Name.Hash() == ObjNameHash )
         {
           // Does it need to be loaded?
           if ( !(ClsIter->ClassFlags & CLASS_NoExport) && ClsIter->NativeNeedsPkgLoad )
@@ -488,7 +488,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
       for ( size_t i = 0; i < ClassPool->Size() && i != MAX_SIZE; i++ )
       {
         UClass* ClsIter = (*ClassPool)[i];
-        if ( ClsIter->Name == ClsNameHash )
+        if ( ClsIter->Name.Hash() == ClsNameHash )
         {
           ObjClass = ClsIter;
           break;
@@ -582,7 +582,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
   if ( UNLIKELY( ObjExport == NULL ) )
   {
     // Stupid package remap stuff...
-    if ( UNLIKELY( ObjPkg->Name == FnvHashString( "UnrealI" ) ) )
+    if ( UNLIKELY( ObjPkg->Name.Hash() == FnvHashString( "UnrealI" ) ) )
     {
       ObjPkg = UPackage::StaticLoadPackage( "UnrealShare" );
       if ( UNLIKELY( ObjPkg == NULL ) )
@@ -590,7 +590,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
 
       return StaticLoadObject( ObjPkg, ObjName, ObjClass, InOuter, bLoadClassNow );
     }
-    else if ( UNLIKELY( ObjPkg->Name == FnvHashString( "UnrealShare" ) ) )
+    else if ( UNLIKELY( ObjPkg->Name.Hash() == FnvHashString( "UnrealShare" ) ) )
     {
       ObjPkg = UPackage::StaticLoadPackage( "UnrealI" );
       if ( UNLIKELY( ObjPkg == NULL ) )
@@ -614,7 +614,7 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
   bool bNeedsFullLoad = true;
 
   // 'None' object means NULL, don't load anything
-  if ( strnicmp( ObjName, "None", 4 ) == 0 )
+  if ( strnicmp( ObjName.Data(), "None", 4 ) == 0 )
     return NULL;
 
   if ( ObjClass == NULL )
@@ -630,7 +630,7 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
       for ( size_t i = 0; i < ClassPool->Size() && i != MAX_SIZE; i++ )
       {
         UClass* ClsIter = (*ClassPool)[i];
-        if ( ClsIter->Name == ClsNameHash )
+        if ( ClsIter->Name.Hash() == ClsNameHash )
         {
           ObjClass = ClsIter;
           break; // Already loaded the class apparently, great
@@ -661,7 +661,7 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
     if ( UNLIKELY( ClassType == NULL ) )
     {
       Logf( LOG_WARN, "Can't load object '%s.%s', cannot load class",
-          (const char*)ObjPkg->Name, (const char*)ObjName );
+          ObjPkg->Name.Data(), ObjName.Data() );
       return NULL;
     }
   }
@@ -669,7 +669,7 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
   if ( UNLIKELY( !ClassType->Default->IsA( ObjClass ) ) )
   {
     Logf( LOG_WARN, "Object '%s.%s' was expected to be of type '%s' but was '%s'",
-        (const char*)ObjPkg->Name, (const char*)ObjName, (const char*)ObjClass->Name, (const char*)ClassName );
+        ObjPkg->Name.Data(), ObjName.Data(), ObjClass->Name.Data(), ClassName.Data() );
     return NULL;
   }
 
