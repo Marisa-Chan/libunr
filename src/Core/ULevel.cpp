@@ -262,8 +262,10 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
   // Write end map
   Out->Write( (char*)"End Map\r\n", 9 );
   Out->Close();
+  delete Out;
 
   // Restore package name
+  Pkg->Name = PkgName;
 }
 
 IMPLEMENT_NATIVE_CLASS( ULevelBase );

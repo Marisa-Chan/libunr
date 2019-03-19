@@ -788,21 +788,21 @@ UClass::~UClass()
 
 bool UClass::ExportToFile( const char* Dir, const char* Type )
 {
-  FString* Filename = new FString( Dir );
+  FString Filename( Dir );
 #if defined LIBUNR_WIN32
-  Filename->ReplaceChars( '\\', '/' );
+  Filename.ReplaceChars( '\\', '/' );
 #endif
-  if ( Filename->Back() != '/' )
-    Filename->Append( "/" );
+  if ( Filename.Back() != '/' )
+    Filename += '/';
 
-  Filename->Append( Pkg->ResolveNameFromIdx( Export->ObjectName ) );
-  Filename->Append( ".uc" ); // Scripts won't get exported to any other type
+  Filename += Pkg->ResolveNameFromIdx( Export->ObjectName );
+  Filename += ".uc"; // Scripts won't get exported to any other type
  
   // Write script text
   FileStreamOut* Out = new FileStreamOut();
-  if ( Out->Open( *Filename ) != 0 )
+  if ( Out->Open( Filename ) != 0 )
   {
-    Logf( LOG_WARN, "Failed to export script to file '%s'", Filename->Data() );
+    Logf( LOG_WARN, "Failed to export script to file '%s'", Filename.Data() );
     return false;
   }
   Out->Write( ScriptText->Text->Data(), ScriptText->Text->Size() );
@@ -854,7 +854,6 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
 
   Out->Close();
   delete Out;
-  delete Filename;
   return true;
 }
 
