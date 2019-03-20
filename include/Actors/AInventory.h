@@ -125,4 +125,18 @@ class AInventory : public AActor
   FString*   M_Deactivated;
 };
 
+class APickup : public AInventory
+{
+  DECLARE_NATIVE_CLASS( APickup, AInventory, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  APickup();
+
+  AInventory* Inv;
+  int NumCopies;
+  bool bCanHaveMultipleCopies;
+  bool bCanActivate;
+  FString* ExpireMessage;
+  bool bAutoActivate;
+};
 

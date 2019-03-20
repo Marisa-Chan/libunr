@@ -28,6 +28,7 @@
 #include "Core/UObject.h"
 
 class UTexture;
+class UFont;
 class UViewport;
 class APlayerReplicationInfo;
 class ATimeDemo;
@@ -81,6 +82,30 @@ class DLL_EXPORT UConsole : public UObject
     IST_Release, // Handling a key or button release.
     IST_Axis,    // Handling analog axis movement.
   };
+
+  // UT99 Vars
+  float MsgTickTime;
+  bool  bStartTimeDemo;
+  bool  bRestartTimeDemo;
+  bool  bSaveTimeDemoToFile;
+  float StartTime;
+  float ExtraTime;
+  float LastFrameTime;
+  float LastSecondStartTime;
+  int   FrameCount;
+  int   LastSecondFrameCount;
+  float MinFPS;
+  float MaxFPS;
+  float LastSecFPS;
+  UFont* TimeDemoFont;
+  FString* FrameRateText;
+  FString* AvgText;
+  FString* LastSecText;
+  FString* MinText;
+  FString* MaxText;
+  FString* FpsText;
+  FString* SecondsText;
+  FString* FramesText;
   
   // Input keys.
   enum EInputKey

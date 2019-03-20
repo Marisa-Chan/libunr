@@ -243,11 +243,13 @@ bool UObject::StaticInit()
         Result &= AWarpZoneInfo::StaticClassInit();
     Result &= AKeypoint::StaticClassInit();
       Result &= ACollisionPlane::StaticClassInit();
+      Result &= ALocationID::StaticClassInit();
       Result &= AInterpolationPoint::StaticClassInit();
     Result &= ALight::StaticClassInit();
       Result &= ADynamicCorona::StaticClassInit();
       Result &= ASunlightCorona::StaticClassInit();
     Result &= AInventory::StaticClassInit();
+      Result &= APickup::StaticClassInit();
       Result &= AWeapon::StaticClassInit();
     Result &= AInventoryAttachment::StaticClassInit();
       Result &= AWeaponAttachment::StaticClassInit();

@@ -597,6 +597,18 @@ class AKeypoint : public AActor
   AKeypoint();
 };
 
+class ALocationID : public AKeypoint
+{
+  DECLARE_NATIVE_CLASS( ALocationID, AKeypoint, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  ALocationID();
+
+  FString* LocationName;
+  float Radius;
+  ALocationID* NextLocation;
+};
+
 class ACollisionPlane : public AKeypoint
 {
   DECLARE_NATIVE_CLASS( ACollisionPlane, AKeypoint, 0, Engine )

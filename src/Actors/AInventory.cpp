@@ -54,9 +54,19 @@ AInventory::~AInventory()
 {
 }
 
+APickup::APickup()
+  : AInventory()
+{
+}
+
+APickup::~APickup()
+{
+}
+
 IMPLEMENT_NATIVE_CLASS( AInventory );
 IMPLEMENT_NATIVE_CLASS( AInventorySpot );
 IMPLEMENT_NATIVE_CLASS( AInventoryAttachment );
+IMPLEMENT_NATIVE_CLASS( APickup );
 
 BEGIN_PROPERTY_LINK( AInventory, 58 )
   LINK_NATIVE_PROPERTY( AutoSwitchPriority );
@@ -126,3 +136,11 @@ END_PROPERTY_LINK()
 BEGIN_PROPERTY_LINK( AInventoryAttachment, 0 )
 END_PROPERTY_LINK()
 
+BEGIN_PROPERTY_LINK( APickup, 6 )
+  LINK_NATIVE_PROPERTY( Inv );
+  LINK_NATIVE_PROPERTY( NumCopies );
+  LINK_NATIVE_PROPERTY( bCanHaveMultipleCopies );
+  LINK_NATIVE_PROPERTY( bCanActivate );
+  LINK_NATIVE_PROPERTY( ExpireMessage );
+  LINK_NATIVE_PROPERTY( bAutoActivate );
+END_PROPERTY_LINK()

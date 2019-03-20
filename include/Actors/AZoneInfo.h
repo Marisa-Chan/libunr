@@ -394,7 +394,7 @@ class AWarpZoneInfo : public AZoneInfo
   FCoords        WarpCoords;
   AWarpZoneInfo* OtherSideActor;
   UObject*       OtherSideLevel;
-  FString*        Destinations[8];
+  FString*       Destinations[8];
   int            NumDestinations;
 };
 

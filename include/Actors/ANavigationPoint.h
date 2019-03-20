@@ -163,5 +163,7 @@ class ATeleporter : public ANavigationPoint
   float LastUdpTime;
   u8    TeleportCount;
   bool  bBackup_Enabled;
+
+  float LastFired;
 };
 

@@ -112,6 +112,15 @@ AKeypoint::~AKeypoint()
 {
 }
 
+ALocationID::ALocationID()
+  : AKeypoint()
+{
+}
+
+ALocationID::~ALocationID()
+{
+}
+
 AInterpolationPoint::AInterpolationPoint()
   : AKeypoint()
 {
@@ -211,6 +220,7 @@ IMPLEMENT_NATIVE_CLASS( ADynamicCorona );
 IMPLEMENT_NATIVE_CLASS( AInfo );
 IMPLEMENT_NATIVE_CLASS( AInterpolationPoint );
 IMPLEMENT_NATIVE_CLASS( AKeypoint );
+IMPLEMENT_NATIVE_CLASS( ALocationID );
 IMPLEMENT_NATIVE_CLASS( ALight );
 IMPLEMENT_NATIVE_CLASS( AMenu );
 IMPLEMENT_NATIVE_CLASS( AProjectile );
@@ -299,6 +309,12 @@ BEGIN_PROPERTY_LINK( ASavedMove, 9 )
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( AKeypoint, 0 )
+END_PROPERTY_LINK()
+
+BEGIN_PROPERTY_LINK( ALocationID, 3 )
+  LINK_NATIVE_PROPERTY( LocationName );
+  LINK_NATIVE_PROPERTY( Radius );
+  LINK_NATIVE_PROPERTY( NextLocation );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( ALight, 2 )
