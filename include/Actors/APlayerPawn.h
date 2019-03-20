@@ -133,7 +133,7 @@ class DLL_EXPORT APlayerPawn : public APawn
   FString* DelayedCommand;
   float   MouseSensitivity;
 
-  idx WeaponPriority[30];
+  FName WeaponPriority[50];
 
   int NetSpeed, LanSpeed;
   float SmoothMouseX, SmoothMouseY, KbdAccel;
