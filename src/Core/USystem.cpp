@@ -168,7 +168,7 @@ bool USystem::PromptForGameInfo()
   GameName = NameBuf;
 
   // Get real path 
-  GamePath = (char*)xstl::Malloc( 4096 );
+  GamePath = new char[4096];
   xstl::Set( (char*)GamePath, 0, 4096 );
   RealPath( PathBuf, (char*)GamePath, 4096 );
 
@@ -180,6 +180,18 @@ bool USystem::PromptForGameInfo()
   }
 
   xstl::Free( PathBuf );
+
+  // Detect specific game support
+  if ( stricmp( NameBuf, "Unreal" ) == 0 )
+    GameFlags |= GAME_Unreal;
+  else if ( stricmp( NameBuf, "UnrealTournament" ) == 0 )
+    GameFlags |= GAME_UT99;
+  else if ( stricmp( NameBuf, "DeusEx" ) == 0 )
+    GameFlags |= GAME_DeusEx;
+  else if ( stricmp( NameBuf, "Rune" ) == 0 )
+    GameFlags |= GAME_Rune;
+  else if ( stricmp( NameBuf, "OpenUE" ) == 0 )
+    GameFlags |= GAME_All;
 
   return true;
 }

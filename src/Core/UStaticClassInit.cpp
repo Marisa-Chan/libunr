@@ -61,6 +61,9 @@
 #include "Actors/AWeapon.h"
 #include "Actors/AZoneInfo.h"
 
+// Deus Ex specific headers
+#include "DeusEx/UEventManager.h"
+
 bool UObject::StaticInit()
 {
   bool Result = true;
@@ -273,6 +276,12 @@ bool UObject::StaticInit()
     Result &= ASpawnNotify::StaticClassInit();
     Result &= ATriggers::StaticClassInit();
       Result &= ATrigger::StaticClassInit();
+
+  // Load Deus Ex classes (if needed)
+  if ( GSystem->GameFlags & GAME_DeusEx )
+  {
+    Result &= UEventManager::StaticClassInit();
+  }
 
   // Load base actor class
   AActor::StaticClass()->PreLoad();
