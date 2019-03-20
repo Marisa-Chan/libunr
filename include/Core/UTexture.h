@@ -206,6 +206,7 @@ class DLL_EXPORT UTexture : public UBitmap
   bool bBigWavy;
   bool bSmallWavy;
   bool bWaterWavy;
+  bool bCloudWavy;
   bool bLowShadowDetail;
   bool bNoMerge;
   bool bAlphaBlend;

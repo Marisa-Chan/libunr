@@ -37,9 +37,6 @@ class UPlayer : public UObject
 
   UPlayer();
 
-  int vfOut;  // ??
-  int vfExec; // ??
-
   APlayerPawn* Actor;
   UConsole*    Console;
 
@@ -48,5 +45,11 @@ class UPlayer : public UObject
   float WindowsMouseX;
   float WindowsMouseY;
   u8    SelectedCursor;
+
+  // UT99 Variables
+  bool bSuspendPrecaching;
+  int  CurrentNetSpeed;
+  int  ConfiguredInternetSpeed;
+  int  ConfiguredLanSpeed;
 };
 

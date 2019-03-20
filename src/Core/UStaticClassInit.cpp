@@ -241,6 +241,13 @@ bool UObject::StaticInit()
         Result &= ADynamicZoneInfo::StaticClassInit();
         Result &= ALevelInfo::StaticClassInit();
         Result &= AWarpZoneInfo::StaticClassInit();
+    Result &= AInventory::StaticClassInit();
+      Result &= APickup::StaticClassInit();
+        Result &= AAmmo::StaticClassInit();
+      Result &= AWeapon::StaticClassInit();
+    Result &= AInventoryAttachment::StaticClassInit();
+      Result &= AWeaponAttachment::StaticClassInit();
+      Result &= AWeaponMuzzleFlash::StaticClassInit();
     Result &= AKeypoint::StaticClassInit();
       Result &= ACollisionPlane::StaticClassInit();
       Result &= ALocationID::StaticClassInit();
@@ -248,13 +255,8 @@ bool UObject::StaticInit()
     Result &= ALight::StaticClassInit();
       Result &= ADynamicCorona::StaticClassInit();
       Result &= ASunlightCorona::StaticClassInit();
-    Result &= AInventory::StaticClassInit();
-      Result &= APickup::StaticClassInit();
-      Result &= AWeapon::StaticClassInit();
-    Result &= AInventoryAttachment::StaticClassInit();
-      Result &= AWeaponAttachment::StaticClassInit();
-      Result &= AWeaponMuzzleFlash::StaticClassInit();
     Result &= AMenu::StaticClassInit();
+    Result &= AMutator::StaticClassInit();
     Result &= ANavigationPoint::StaticClassInit();
       Result &= AInventorySpot::StaticClassInit();
       Result &= ALiftCenter::StaticClassInit();
@@ -288,98 +290,4 @@ bool UObject::StaticInit()
 
   return Result;
 }
-
-  IMPLEMENT_NATIVE_CLASS( UAnimationNotify );
-  IMPLEMENT_NATIVE_CLASS( UCanvas );
-  IMPLEMENT_NATIVE_CLASS( UClient );
-        IMPLEMENT_NATIVE_CLASS( ULanguage );
-  IMPLEMENT_NATIVE_CLASS( UMusic );
-  IMPLEMENT_NATIVE_CLASS( UPackage );
-  IMPLEMENT_NATIVE_CLASS( UPlayer );
-    IMPLEMENT_NATIVE_CLASS( UViewport );
-  IMPLEMENT_NATIVE_CLASS( UPrimitive );
-    IMPLEMENT_NATIVE_CLASS( UMesh );
-    IMPLEMENT_NATIVE_CLASS( USound );
-    IMPLEMENT_NATIVE_CLASS( USubsystem );
-    IMPLEMENT_NATIVE_CLASS( UAudioSubsystem );
-    IMPLEMENT_NATIVE_CLASS( UEngine );
-    IMPLEMENT_NATIVE_CLASS( USystem );
-  IMPLEMENT_NATIVE_CLASS( UTextBuffer );
- 
-BEGIN_PROPERTY_LINK( UAnimationNotify, 5 )
-  LINK_NATIVE_ARRAY   ( AnimationNotify );
-  LINK_NATIVE_PROPERTY( NumNotifies );
-  LINK_NATIVE_PROPERTY( Owner );
-  LINK_NATIVE_PROPERTY( bInitialized );
-  LINK_NATIVE_PROPERTY( bErrorOccured );
-END_PROPERTY_LINK()
-
-BEGIN_PROPERTY_LINK( USkeletalMeshInstance, 20 )
-  LINK_NATIVE_PROPERTY( SpaceBases );
-  LINK_NATIVE_PROPERTY( CachedLinks );
-  LINK_NATIVE_PROPERTY( bHasUpdated );
-  LINK_NATIVE_PROPERTY( LastDrawnMesh );
-  LINK_NATIVE_PROPERTY( CachedAnim );
-  LINK_NATIVE_PROPERTY( CachedOrientations );
-  LINK_NATIVE_PROPERTY( CachedPositions );
-  LINK_NATIVE_PROPERTY( TweenStartFrame );
-  LINK_NATIVE_PROPERTY( Base );
-  LINK_NATIVE_PROPERTY( bHasCachedFrame );
-  LINK_NATIVE_PROPERTY( bWasTweening );
-  LINK_NATIVE_PROPERTY( CachedTweenSeq );
-  LINK_NATIVE_PROPERTY( Modifiers );
-  LINK_NATIVE_PROPERTY( Channels );
-  LINK_NATIVE_PROPERTY( TChannelPtr );
-  LINK_NATIVE_PROPERTY( AttachedActors );
-  LINK_NATIVE_PROPERTY( AttachedBoneIndex );
-  LINK_NATIVE_PROPERTY( AttachedBoneName );
-  LINK_NATIVE_PROPERTY( MyAttachment );
-  LINK_NATIVE_PROPERTY( HardAttachFlags );
-END_PROPERTY_LINK()
-
-BEGIN_PROPERTY_LINK( UPlayer, 9 )
-  LINK_NATIVE_PROPERTY( vfOut );
-  LINK_NATIVE_PROPERTY( vfExec );
-  LINK_NATIVE_PROPERTY( Actor );
-  LINK_NATIVE_PROPERTY( Console );
-  LINK_NATIVE_PROPERTY( bWindowsMouseAvailable );
-  LINK_NATIVE_PROPERTY( bShowWindowsMouse );
-  LINK_NATIVE_PROPERTY( WindowsMouseX );
-  LINK_NATIVE_PROPERTY( WindowsMouseY );
-  LINK_NATIVE_PROPERTY( SelectedCursor );
-END_PROPERTY_LINK()
-
-BEGIN_PROPERTY_LINK( UEngine, 15 )
-  LINK_NATIVE_PROPERTY( GameRenderDevice );
-  LINK_NATIVE_PROPERTY( AudioDevice );
-  LINK_NATIVE_PROPERTY( Console );
-  LINK_NATIVE_PROPERTY( NetworkDevice );
-  LINK_NATIVE_PROPERTY( Language );
-  LINK_NATIVE_PROPERTY( Cylinder );
-  LINK_NATIVE_PROPERTY( Client );
-  LINK_NATIVE_PROPERTY( Render );
-  LINK_NATIVE_PROPERTY( Audio );
-  LINK_NATIVE_PROPERTY( TickCycles );
-  LINK_NATIVE_PROPERTY( GameCycles );
-  LINK_NATIVE_PROPERTY( ClientCycles );
-  LINK_NATIVE_PROPERTY( CacheSizeMegs );
-  LINK_NATIVE_PROPERTY( UseSound );
-  LINK_NATIVE_PROPERTY( CurrentTickRate );
-END_PROPERTY_LINK()
-
-BEGIN_PROPERTY_LINK( AHUD, 6 )
-  LINK_NATIVE_PROPERTY( HudMode );
-  LINK_NATIVE_PROPERTY( Crosshair );
-  LINK_NATIVE_PROPERTY( MainMenuType );
-  LINK_NATIVE_PROPERTY( HUDConfigWindowType );
-  LINK_NATIVE_PROPERTY( MainMenu );
-  LINK_NATIVE_PROPERTY( Overlays );
-END_PROPERTY_LINK()
-
-BEGIN_PROPERTY_LINK( AHUDOverlay, 3 )
-  LINK_NATIVE_PROPERTY( myHUD );
-  LINK_NATIVE_PROPERTY( bPostRender );
-  LINK_NATIVE_PROPERTY( bPreRender );
-END_PROPERTY_LINK()
-
 

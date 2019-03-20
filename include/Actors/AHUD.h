@@ -44,6 +44,11 @@ class DLL_EXPORT AHUD : public AActor
 
   AMenu* MainMenu;
   Array<AHUDOverlay*>* Overlays;
+
+  // UT99 Variables
+  FColor WhiteColor;
+  AMutator* HUDMutator;
+  APlayerPawn* PlayerOwner;
 };
 
 class DLL_EXPORT AHUDOverlay : public AActor

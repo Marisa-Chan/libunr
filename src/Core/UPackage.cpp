@@ -470,3 +470,5 @@ UPackage* UPackage::StaticLoadPackage( const char* PkgName )
   return Pkg;
 }
 
+IMPLEMENT_NATIVE_CLASS( UPackage );
+

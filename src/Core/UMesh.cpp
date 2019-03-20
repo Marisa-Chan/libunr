@@ -43,3 +43,16 @@ UAnimationNotify::~UAnimationNotify()
 {
 }
 
+#include "Core/UClass.h"
+#include "Core/UPackage.h"
+IMPLEMENT_NATIVE_CLASS( UAnimationNotify );
+IMPLEMENT_NATIVE_CLASS( UMesh );
+
+BEGIN_PROPERTY_LINK( UAnimationNotify, 5 )
+  LINK_NATIVE_ARRAY   ( AnimationNotify );
+  LINK_NATIVE_PROPERTY( NumNotifies );
+  LINK_NATIVE_PROPERTY( Owner );
+  LINK_NATIVE_PROPERTY( bInitialized );
+  LINK_NATIVE_PROPERTY( bErrorOccured );
+END_PROPERTY_LINK()
+

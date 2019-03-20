@@ -78,6 +78,10 @@ class ANavigationPoint : public AActor
   bool bOneWayPath;
   bool bAutoBuilt;
   bool bNoStrafeTo;
+
+  // UT99 Variables
+  bool bNeverUseStrafing;
+  bool bTwoWay;
 };
 
 class AWarpZoneMarker : public ANavigationPoint

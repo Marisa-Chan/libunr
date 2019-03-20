@@ -43,9 +43,9 @@ class APlayerReplicationInfo : public AReplicationInfo
 
   APlayerReplicationInfo();
 
-  FString*      PlayerName;
+  FString*     PlayerName;
   int          PlayerID;
-  FString*      TeamName;
+  FString*     TeamName;
   u8           Team;
   int          TeamID;
   float        Score;
@@ -59,6 +59,16 @@ class APlayerReplicationInfo : public AReplicationInfo
   bool         bIsSpectator;
   UTexture*    TalkTexture;
   AZoneInfo*   PlayerZone;
+
+  // UT99 Variables
+  FString*     OldName;
+  float        Deaths; // ...and why is this a float???
+  u8           PacketLoss;
+  bool         bWaitingPlayer;
+  bool         bAdmin;
+  ALocationID* PlayerLocation;
+  int          StartTime;
+  int          TimeAcc;
 };
 
 class AGameReplicationInfo : public AReplicationInfo
@@ -86,5 +96,16 @@ class AGameReplicationInfo : public AReplicationInfo
   FString* MOTDLine4;
 
   FString* GameEndedComments;
+
+  // UT99 Variables
+  FString* GameClass;
+  bool  bClassicDeathMessages;
+  bool  bStopCountDown;
+  int   RemainingMinute;
+  float SecondCount;
+  int   NumPlayers;
+  int   SumFrags;
+  float UpdateTimer;
+  APlayerReplicationInfo* PRIArray[32];
 };
 

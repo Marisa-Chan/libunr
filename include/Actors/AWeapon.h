@@ -29,6 +29,20 @@
 
 class AWeapon;
 
+class AAmmo : public APickup
+{
+  DECLARE_NATIVE_CLASS( AAmmo, APickup, 0, Engine );
+  EXPOSE_TO_USCRIPT()
+
+  AAmmo();
+
+  int AmmoAmount;
+  int MaxAmmo;
+  UClass* ParentAmmo;
+  u8  UsedInWeaponSlot[10];
+  AAmmo* PAmmo;
+};
+
 class AWeaponMuzzleFlash : public AInventoryAttachment
 {
   DECLARE_NATIVE_CLASS( AWeaponMuzzleFlash, AInventoryAttachment, 0, Engine )

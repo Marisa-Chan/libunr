@@ -37,7 +37,7 @@ AGameInfo::~AGameInfo()
 
 IMPLEMENT_NATIVE_CLASS( AGameInfo );
 
-BEGIN_PROPERTY_LINK( AGameInfo, 110 )
+BEGIN_PROPERTY_LINK( AGameInfo, 125 )
   LINK_NATIVE_PROPERTY( ItemGoals );
   LINK_NATIVE_PROPERTY( KillGoals );
   LINK_NATIVE_PROPERTY( SecretGoals );
@@ -148,4 +148,19 @@ BEGIN_PROPERTY_LINK( AGameInfo, 110 )
   LINK_NATIVE_PROPERTY( bIsSavedGame );
   LINK_NATIVE_PROPERTY( bAlwaysEnhancedSightCheck );
   LINK_NATIVE_PROPERTY( bRestrictMoversRetriggering );
+  LINK_NATIVE_PROPERTY( bAllowFOV );
+  LINK_NATIVE_PROPERTY( bAlternateMode );
+  LINK_NATIVE_PROPERTY( bCanViewOthers );
+  LINK_NATIVE_PROPERTY( bExternalBatcher );
+  LINK_NATIVE_PROPERTY( IPBanned );
+  LINK_NATIVE_ARRAY   ( IPPolicies );
+  LINK_NATIVE_PROPERTY( DeathMessageClass );
+  LINK_NATIVE_PROPERTY( DMMessageClass );
+  LINK_NATIVE_PROPERTY( DamageMutator );
+  LINK_NATIVE_PROPERTY( MessageMutator );
+  LINK_NATIVE_PROPERTY( bBatchLocal );
+  LINK_NATIVE_PROPERTY( StatLogClass );
+  LINK_NATIVE_PROPERTY( DemoBuild );
+  LINK_NATIVE_PROPERTY( DemoHasTuts );
+  LINK_NATIVE_PROPERTY( EnabledMutators );
 END_PROPERTY_LINK()

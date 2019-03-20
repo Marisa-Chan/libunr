@@ -157,5 +157,22 @@ class AGameInfo : public AInfo
   bool bAlwaysEnhancedSightCheck;
 
   bool bRestrictMoversRetriggering;
+
+  // UT99 Variables
+  bool bAllowFOV;
+  bool bAlternateMode;
+  bool bCanViewOthers;
+  bool bExternalBatcher;
+  FString* IPBanned;
+  FString* IPPolicies[50]; // Dynamic arrays are cool, y'know...
+  UClass* DeathMessageClass;
+  UClass* DMMessageClass;
+  AMutator* DamageMutator;
+  AMutator* MessageMutator;
+  bool bBatchLocal;
+  UClass* StatLogClass;
+  int DemoBuild;
+  int DemoHasTuts;
+  FString* EnabledMutators;
 };
 

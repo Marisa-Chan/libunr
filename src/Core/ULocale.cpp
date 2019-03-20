@@ -34,3 +34,7 @@ ULanguage::~ULanguage()
 {
 }
 
+#include "Core/UClass.h"
+#include "Core/UPackage.h"
+IMPLEMENT_NATIVE_CLASS( ULanguage );
+

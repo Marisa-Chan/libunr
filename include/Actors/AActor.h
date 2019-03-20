@@ -587,6 +587,12 @@ class ASavedMove : public AInfo
   bool bPressedJump;
   bool bSent;
   bool bIsReducedCrouch;
+
+  // UT99 Variables
+  bool bFire;
+  bool bAltFire;
+  bool bForceFire;
+  bool bForceAltFire;
 };
 
 class AKeypoint : public AActor
@@ -721,9 +727,7 @@ class AMutator : public AActor
   AMutator* NextDamageMutator;
   AMutator* NextMessageMutator;
   AMutator* NextHUDMutator;
-
   bool bHUDMutator;
-
   UClass* DefaultWeapon;
 };
 

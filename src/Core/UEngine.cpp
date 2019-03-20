@@ -43,3 +43,27 @@ UEngine::~UEngine()
 {
 }
 
+#include "Core/UClass.h"
+#include "Core/UPackage.h"
+IMPLEMENT_NATIVE_CLASS( UClient );
+IMPLEMENT_NATIVE_CLASS( UEngine );
+
+BEGIN_PROPERTY_LINK( UEngine, 15 )
+  LINK_NATIVE_PROPERTY( GameRenderDevice );
+  LINK_NATIVE_PROPERTY( AudioDevice );
+  LINK_NATIVE_PROPERTY( Console );
+  LINK_NATIVE_PROPERTY( NetworkDevice );
+  LINK_NATIVE_PROPERTY( Language );
+  LINK_NATIVE_PROPERTY( Cylinder );
+  LINK_NATIVE_PROPERTY( Client );
+  LINK_NATIVE_PROPERTY( Render );
+  LINK_NATIVE_PROPERTY( Audio );
+  LINK_NATIVE_PROPERTY( TickCycles );
+  LINK_NATIVE_PROPERTY( GameCycles );
+  LINK_NATIVE_PROPERTY( ClientCycles );
+  LINK_NATIVE_PROPERTY( CacheSizeMegs );
+  LINK_NATIVE_PROPERTY( UseSound );
+  LINK_NATIVE_PROPERTY( CurrentTickRate );
+END_PROPERTY_LINK()
+
+

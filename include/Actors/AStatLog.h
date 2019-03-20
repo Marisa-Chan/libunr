@@ -49,6 +49,15 @@ class AStatLog : public AInfo
 
   FString* LocalLogDir;
   FString* WorldLogDir;
+
+  // UT99 Variables
+  FString* LocalBatcherURL;
+  FString* LocalBatcherParams;
+  FString* LocalStatsURL;
+  FString* WorldBatcherURL;
+  FString* WorldBatcherParams;
+  FString* WorldStatsURL;
+  bool     bWorldBatcherError;
 };
 
 class AStatLogFile : public AStatLog

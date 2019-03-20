@@ -74,6 +74,10 @@ UCanvas::~UCanvas()
     LargeFont->DelRef();
 }
 
+#include "Core/UClass.h"
+#include "Core/UPackage.h"
+IMPLEMENT_NATIVE_CLASS( UCanvas );
+
 BEGIN_PROPERTY_LINK( UCanvas, 27 )
   LINK_NATIVE_PROPERTY( Font );
   LINK_NATIVE_PROPERTY( SpaceX );

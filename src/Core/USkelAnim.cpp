@@ -23,7 +23,6 @@
  *========================================================================
 */
 
-#include "Core/UClass.h"
 #include "Core/USkelAnim.h"
 
 UAnimation::UAnimation()
@@ -44,6 +43,30 @@ USkeletalMeshInstance::~USkeletalMeshInstance()
 {
 }
 
+#include "Core/UClass.h"
 IMPLEMENT_NATIVE_CLASS( UAnimation );
 IMPLEMENT_NATIVE_CLASS( USkeletalMeshInstance );
+
+BEGIN_PROPERTY_LINK( USkeletalMeshInstance, 20 )
+  LINK_NATIVE_PROPERTY( SpaceBases );
+  LINK_NATIVE_PROPERTY( CachedLinks );
+  LINK_NATIVE_PROPERTY( bHasUpdated );
+  LINK_NATIVE_PROPERTY( LastDrawnMesh );
+  LINK_NATIVE_PROPERTY( CachedAnim );
+  LINK_NATIVE_PROPERTY( CachedOrientations );
+  LINK_NATIVE_PROPERTY( CachedPositions );
+  LINK_NATIVE_PROPERTY( TweenStartFrame );
+  LINK_NATIVE_PROPERTY( Base );
+  LINK_NATIVE_PROPERTY( bHasCachedFrame );
+  LINK_NATIVE_PROPERTY( bWasTweening );
+  LINK_NATIVE_PROPERTY( CachedTweenSeq );
+  LINK_NATIVE_PROPERTY( Modifiers );
+  LINK_NATIVE_PROPERTY( Channels );
+  LINK_NATIVE_PROPERTY( TChannelPtr );
+  LINK_NATIVE_PROPERTY( AttachedActors );
+  LINK_NATIVE_PROPERTY( AttachedBoneIndex );
+  LINK_NATIVE_PROPERTY( AttachedBoneName );
+  LINK_NATIVE_PROPERTY( MyAttachment );
+  LINK_NATIVE_PROPERTY( HardAttachFlags );
+END_PROPERTY_LINK()
 

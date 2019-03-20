@@ -590,6 +590,11 @@ bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool bIsEdito
   return true;
 }
 
+#include "Core/UClass.h"
+#include "Core/UPackage.h"
+IMPLEMENT_NATIVE_CLASS( USubsystem );
+IMPLEMENT_NATIVE_CLASS( USystem );
+
 BEGIN_PROPERTY_LINK( USubsystem, 1 )
   LINK_USELESS_PROPERTY( ExecVtbl );
 END_PROPERTY_LINK()

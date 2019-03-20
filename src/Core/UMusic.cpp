@@ -83,3 +83,8 @@ bool UMusic::ExportToFile( const char* Dir, const char* Type )
   delete Out;
   return true;
 }
+
+#include "Core/UClass.h"
+#include "Core/UPackage.h"
+IMPLEMENT_NATIVE_CLASS( UMusic );
+

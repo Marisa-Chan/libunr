@@ -23,6 +23,8 @@
  *========================================================================
 */
 
+#include "Core/UClass.h"
+#include "Core/UPackage.h"
 #include "Core/UPlayer.h"
 
 UPlayer::UPlayer()
@@ -33,4 +35,22 @@ UPlayer::UPlayer()
 UPlayer::~UPlayer()
 {
 }
+
+IMPLEMENT_NATIVE_CLASS( UPlayer );
+
+BEGIN_PROPERTY_LINK( UPlayer, 13 )
+  LINK_USELESS_PROPERTY( vfOut );
+  LINK_USELESS_PROPERTY( vfExec );
+  LINK_NATIVE_PROPERTY( Actor );
+  LINK_NATIVE_PROPERTY( Console );
+  LINK_NATIVE_PROPERTY( bWindowsMouseAvailable );
+  LINK_NATIVE_PROPERTY( bShowWindowsMouse );
+  LINK_NATIVE_PROPERTY( WindowsMouseX );
+  LINK_NATIVE_PROPERTY( WindowsMouseY );
+  LINK_NATIVE_PROPERTY( SelectedCursor );
+  LINK_NATIVE_PROPERTY( bSuspendPrecaching );
+  LINK_NATIVE_PROPERTY( CurrentNetSpeed );
+  LINK_NATIVE_PROPERTY( ConfiguredInternetSpeed );
+  LINK_NATIVE_PROPERTY( ConfiguredLanSpeed );
+END_PROPERTY_LINK()
 

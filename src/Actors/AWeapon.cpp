@@ -26,6 +26,15 @@
 #include "Core/UClass.h"
 #include "Actors/AWeapon.h"
 
+AAmmo::AAmmo()
+  : APickup()
+{
+}
+
+AAmmo::~AAmmo()
+{
+}
+
 AWeaponMuzzleFlash::AWeaponMuzzleFlash()
   : AInventoryAttachment()
 {
@@ -53,9 +62,18 @@ AWeapon::~AWeapon()
 {
 }
 
+IMPLEMENT_NATIVE_CLASS( AAmmo );
 IMPLEMENT_NATIVE_CLASS( AWeapon );
 IMPLEMENT_NATIVE_CLASS( AWeaponAttachment );
 IMPLEMENT_NATIVE_CLASS( AWeaponMuzzleFlash );
+
+BEGIN_PROPERTY_LINK( AAmmo, 5 )
+  LINK_NATIVE_PROPERTY( AmmoAmount );
+  LINK_NATIVE_PROPERTY( MaxAmmo );
+  LINK_NATIVE_PROPERTY( ParentAmmo );
+  LINK_NATIVE_ARRAY   ( UsedInWeaponSlot );
+  LINK_NATIVE_PROPERTY( PAmmo );
+END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( AWeaponMuzzleFlash, 4 )
   LINK_NATIVE_PROPERTY( bConstantMuzzle );
@@ -71,7 +89,7 @@ BEGIN_PROPERTY_LINK( AWeaponAttachment, 4 )
   LINK_NATIVE_PROPERTY( LastUpdateTime );
 END_PROPERTY_LINK()
 
-BEGIN_PROPERTY_LINK( AWeapon, 67 )
+BEGIN_PROPERTY_LINK( AWeapon, 68 )
   LINK_NATIVE_PROPERTY( MaxTargetRange );
   LINK_NATIVE_PROPERTY( AmmoName );
   LINK_NATIVE_PROPERTY( ReloadCount );
@@ -95,6 +113,7 @@ BEGIN_PROPERTY_LINK( AWeapon, 67 )
   LINK_NATIVE_PROPERTY( bMeleeWeapon );
   LINK_NATIVE_PROPERTY( bRapidFire );
   LINK_NATIVE_PROPERTY( bTossedOut );
+  LINK_NATIVE_PROPERTY( bSpecialIcon );
   LINK_NATIVE_PROPERTY( FiringSpeed );
   LINK_NATIVE_PROPERTY( FireOffset );
   LINK_NATIVE_PROPERTY( ProjectileClass );
