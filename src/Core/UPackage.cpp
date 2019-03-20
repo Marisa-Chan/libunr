@@ -462,8 +462,11 @@ UPackage* UPackage::StaticLoadPackage( const char* PkgName )
       delete Pkg;
       return NULL;
     }
- 
-    Pkg->Name = Pkg->GetGlobalName( Pkg->FindName( PkgName ) );
+
+    size_t PkgNameIdx = Pkg->FindName( PkgName );
+    Pkg->Name = (PkgNameIdx != MAX_SIZE) 
+      ? FName( Pkg->GetGlobalName( PkgNameIdx ) )
+      : FName::CreateName( PkgName, RF_LoadContextFlags );
     Packages->PushBack( Pkg );
   }
 
