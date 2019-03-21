@@ -53,7 +53,7 @@ void APawn::PostDefaultLoad()
 
 IMPLEMENT_NATIVE_CLASS( APawn );
 
-BEGIN_PROPERTY_LINK( APawn, 175 )
+BEGIN_PROPERTY_LINK( APawn, 193 )
   LINK_NATIVE_PROPERTY( bBehindView );
   LINK_NATIVE_PROPERTY( bIsPlayer );
   LINK_NATIVE_PROPERTY( bJustLanded );
@@ -229,5 +229,23 @@ BEGIN_PROPERTY_LINK( APawn, 175 )
   LINK_NATIVE_PROPERTY( BeaconOffset );
   LINK_NATIVE_PROPERTY( MaxFrobDistance );
   LINK_NATIVE_PROPERTY( FrobTarget );
+  LINK_NATIVE_PROPERTY( bCanGlide );
+  LINK_NATIVE_PROPERTY( HealthHead );
+  LINK_NATIVE_PROPERTY( HealthTorso );
+  LINK_NATIVE_PROPERTY( HealthLegLeft );
+  LINK_NATIVE_PROPERTY( HealthLegRight );
+  LINK_NATIVE_PROPERTY( HealthArmLeft );
+  LINK_NATIVE_PROPERTY( HealthArmRight );
+  LINK_NATIVE_ARRAY   ( AnimTimer );
+  LINK_NATIVE_PROPERTY( bOnFire );
+  LINK_NATIVE_PROPERTY( BurnTimer );
+  LINK_NATIVE_PROPERTY( AIHorizontalFov );
+  LINK_NATIVE_PROPERTY( AspectRatio );
+  LINK_NATIVE_PROPERTY( AngularResolution );
+  LINK_NATIVE_PROPERTY( MinAngularSize );
+  LINK_NATIVE_PROPERTY( VisibilityThreshold );
+  LINK_NATIVE_PROPERTY( SmellThreshold );
+  LINK_NATIVE_PROPERTY( Alliance );
+  LINK_NATIVE_PROPERTY( AIAddViewRotation );
 END_PROPERTY_LINK()
 

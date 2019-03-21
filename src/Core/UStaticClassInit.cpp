@@ -63,6 +63,7 @@
 
 // Deus Ex specific headers
 #include "DeusEx/UEventManager.h"
+#include "DeusEx/ACameraPoint.h"
 
 bool UObject::StaticInit()
 {
@@ -281,6 +282,7 @@ bool UObject::StaticInit()
   if ( GSystem->GameFlags & GAME_DeusEx )
   {
     Result &= UEventManager::StaticClassInit();
+    Result &= ACameraPoint::StaticClassInit();
   }
 
   // Load base actor class

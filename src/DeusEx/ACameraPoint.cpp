@@ -17,43 +17,50 @@
 \*===========================================================================*/
 
 /*========================================================================
- * UPlayer.h - Player object class
+ * ACameraPoint.cpp - Deus Ex CameraPoint actor
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#pragma once
+#include "DeusEx/ACameraPoint.h"
 
-#include "Core/UObject.h"
-
-class APlayerPawn;
-class UConsole;
-
-class UPlayer : public UObject
+ACameraPoint::ACameraPoint()
+  : AKeypoint()
 {
-  DECLARE_NATIVE_CLASS( UPlayer, UObject, CLASS_Transient | CLASS_Config, Engine )
-  EXPOSE_TO_USCRIPT()
+}
 
-  UPlayer();
+ACameraPoint::~ACameraPoint()
+{
+}
 
-  APlayerPawn* Actor;
-  UConsole*    Console;
+#include "Core/UClass.h"
+IMPLEMENT_NATIVE_CLASS( ACameraPoint );
 
-  bool  bWindowsMouseAvailable;
-  bool  bShowWindowsMouse;
-  float WindowsMouseX;
-  float WindowsMouseY;
-  u8    SelectedCursor;
-
-  // UT99 Variables
-  bool bSuspendPrecaching;
-  int  CurrentNetSpeed;
-  int  ConfiguredInternetSpeed;
-  int  ConfiguredLanSpeed;
-
-  // Deus Ex Variables
-  float StaticUpdateInterval;
-  float DynamicUpdateInterval;
-};
+BEGIN_PROPERTY_LINK( ACameraPoint, 24 )
+  LINK_NATIVE_PROPERTY( Cmd );
+  LINK_NATIVE_PROPERTY( Value );
+  LINK_NATIVE_PROPERTY( EventName );
+  LINK_NATIVE_PROPERTY( TimeSmooth );
+  LINK_NATIVE_PROPERTY( TimeWaitPost );
+  LINK_NATIVE_PROPERTY( bParallel );
+  LINK_NATIVE_PROPERTY( bRandom );
+  LINK_NATIVE_PROPERTY( RandomCount );
+  LINK_NATIVE_PROPERTY( PostRandomNum );
+  LINK_NATIVE_PROPERTY( SequenceNum );
+  LINK_NATIVE_PROPERTY( NextPoint );
+  LINK_NATIVE_PROPERTY( PrevPoint );
+  LINK_NATIVE_PROPERTY( CurTime );
+  LINK_NATIVE_PROPERTY( StartLoc );
+  LINK_NATIVE_PROPERTY( StartRot );
+  LINK_NATIVE_PROPERTY( StartFov );
+  LINK_NATIVE_PROPERTY( EndLoc );
+  LINK_NATIVE_PROPERTY( EndRot );
+  LINK_NATIVE_PROPERTY( EndFov );
+  LINK_NATIVE_PROPERTY( Player );
+  LINK_NATIVE_PROPERTY( bTickReady );
+  LINK_NATIVE_PROPERTY( bFirstRandom );
+  LINK_NATIVE_PROPERTY( RandomRemain );
+  LINK_NATIVE_PROPERTY( ContinuePoint );
+END_PROPERTY_LINK()
 

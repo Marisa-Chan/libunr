@@ -271,5 +271,25 @@ class APawn : public AActor
   float BeaconOffset;
   float MaxFrobDistance;
   AActor* FrobTarget;
+
+  // Deus Ex variables
+  bool bCanGlide;
+  int HealthHead;
+  int HealthTorso;
+  int HealthLegLeft;
+  int HealthLegRight;
+  int HealthArmLeft;
+  int HealthArmRight;
+  float AnimTimer[4];
+  bool bOnFire;
+  float BurnTimer;
+  float AIHorizontalFov;
+  float AspectRatio;
+  float AngularResolution;
+  float MinAngularSize;
+  float VisibilityThreshold;
+  float SmellThreshold;
+  FName Alliance;
+  FRotator AIAddViewRotation;
 };
 

@@ -436,7 +436,38 @@ class AActor : public UObject
     IST_Release, // Handling a key or button release.
     IST_Axis,    // Handling analog axis movement.
   };
-  
+
+  // Deus Ex Variables
+  bool  bBlockSight;
+  bool  bDetectable;
+  bool  bTransient;
+  bool  bIgnore;
+  float LastRenderTime;
+  float DistanceFromPlayer;
+  FName BlendAnimSequence[4];
+  float BlendAnimFrame[4];
+  float BlendAnimRate[4];
+  float BlendTweenRate[4];
+  float BlendAnimLast[4];
+  float BlendAnimMinRate[4];
+  float OldBlendAnimRate[4];
+  FPlane SimBlendAnim[4];
+  FString* BindName;
+  FString* BarkBindName;
+  FString* FamiliarName;
+  FString* UnfamiliarName;
+  UObject* ConListItems;
+  float    LastConEndTime;
+  float    ConStartInterval;
+  float    VisUpdateTime;
+  float    CurrentVisibility;
+  float    LastVisibility;
+  UClass*  SmellClass;
+  class ASmellNode* LastSmellNode;
+  bool     bOwned;
+  bool     bVisionImportant;
+  float    RelevantRadius;
+
   // Input keys.
   enum EInputKey
   {
@@ -505,6 +536,7 @@ class AActor : public UObject
     /*F8*/  IK_ExSel        ,IK_ErEof         ,IK_Play         ,IK_Zoom    ,
     /*FC*/  IK_NoName       ,IK_PA1           ,IK_OEMClear
   };
+
 };
 
 class ABlockingActor : public AActor
@@ -543,6 +575,9 @@ class ADecoration : public AActor
   USound* EndPushSound;
 
   AActor* Shadow;
+  
+  // Deus Ex Variables
+  float BaseEyeHeight;
 };
 
 class ACarcass : public ADecoration

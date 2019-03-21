@@ -208,6 +208,10 @@ class DLL_EXPORT APlayerPawn : public APawn
   class ACustomPlayerStateInfo* CustomPlayerStateInfo;
   class ARealCrouchController*  RealCrouchController;
   class ALadderTrigger*         ActiveLadder;
+
+  // Deus Ex Variables
+  AActor* AdditionalViews[3];
+  float TurnRateAdjuster;
 };
 
 class ACamera : public APlayerPawn

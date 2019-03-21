@@ -60,7 +60,7 @@ IMPLEMENT_NATIVE_CLASS( APlayerReplicationInfo );
 BEGIN_PROPERTY_LINK( AReplicationInfo, 0 )
 END_PROPERTY_LINK()
 
-BEGIN_PROPERTY_LINK( APlayerReplicationInfo, 24 )
+BEGIN_PROPERTY_LINK( APlayerReplicationInfo, 25 )
   LINK_NATIVE_PROPERTY( PlayerName );
   LINK_NATIVE_PROPERTY( PlayerID );
   LINK_NATIVE_PROPERTY( TeamName );
@@ -85,6 +85,7 @@ BEGIN_PROPERTY_LINK( APlayerReplicationInfo, 24 )
   LINK_NATIVE_PROPERTY( PlayerLocation );
   LINK_NATIVE_PROPERTY( StartTime );
   LINK_NATIVE_PROPERTY( TimeAcc );
+  LINK_NATIVE_PROPERTY( Streak );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( AGameReplicationInfo, 24 )

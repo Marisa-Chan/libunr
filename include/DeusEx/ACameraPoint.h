@@ -17,43 +17,57 @@
 \*===========================================================================*/
 
 /*========================================================================
- * UPlayer.h - Player object class
+ * ACameraPoint.h - Deus Ex CameraPoint actor
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#pragma once
+#include "Actors/AActor.h"
 
-#include "Core/UObject.h"
-
-class APlayerPawn;
-class UConsole;
-
-class UPlayer : public UObject
+class ACameraPoint : public AKeypoint
 {
-  DECLARE_NATIVE_CLASS( UPlayer, UObject, CLASS_Transient | CLASS_Config, Engine )
+  DECLARE_NATIVE_CLASS( ACameraPoint, AKeypoint, 0, Engine )
   EXPOSE_TO_USCRIPT()
 
-  UPlayer();
+  ACameraPoint();
 
-  APlayerPawn* Actor;
-  UConsole*    Console;
+  enum ECameraCommand
+  {
+    CAMCMD_Move,
+    CAMCMD_Push,
+    CAMCMD_Fov,
+    CAMCMD_Tilt,
+    CAMCMD_Pan,
+    CAMCMD_Roll,
+    CAMCMD_Wait,
+    CAMCMD_Trigger
+  };
 
-  bool  bWindowsMouseAvailable;
-  bool  bShowWindowsMouse;
-  float WindowsMouseX;
-  float WindowsMouseY;
-  u8    SelectedCursor;
+  ECameraCommand Cmd;
+  float Value;
+  FName EventName;
+  float TimeSmooth;
+  float TimeWaitPost;
+  bool  bParallel;
+  bool  bRandom;
+  int   RandomCount;
+  int   PostRandomNum;
 
-  // UT99 Variables
-  bool bSuspendPrecaching;
-  int  CurrentNetSpeed;
-  int  ConfiguredInternetSpeed;
-  int  ConfiguredLanSpeed;
-
-  // Deus Ex Variables
-  float StaticUpdateInterval;
-  float DynamicUpdateInterval;
+  int SequenceNum;
+  ACameraPoint* NextPoint;
+  ACameraPoint* PrevPoint;
+  float CurTime;
+  FVector   StartLoc;
+  FRotator  StartRot;
+  float     StartFov;
+  FVector   EndLoc;
+  FRotator  EndRot;
+  float     EndFov;
+  APlayerPawn* Player;
+  bool bTickReady;
+  bool bFirstRandom;
+  int RandomRemain;
+  ACameraPoint* ContinuePoint;
 };
 

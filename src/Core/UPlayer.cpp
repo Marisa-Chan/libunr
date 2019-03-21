@@ -38,7 +38,7 @@ UPlayer::~UPlayer()
 
 IMPLEMENT_NATIVE_CLASS( UPlayer );
 
-BEGIN_PROPERTY_LINK( UPlayer, 13 )
+BEGIN_PROPERTY_LINK( UPlayer, 15 )
   LINK_USELESS_PROPERTY( vfOut );
   LINK_USELESS_PROPERTY( vfExec );
   LINK_NATIVE_PROPERTY( Actor );
@@ -52,5 +52,7 @@ BEGIN_PROPERTY_LINK( UPlayer, 13 )
   LINK_NATIVE_PROPERTY( CurrentNetSpeed );
   LINK_NATIVE_PROPERTY( ConfiguredInternetSpeed );
   LINK_NATIVE_PROPERTY( ConfiguredLanSpeed );
+  LINK_NATIVE_PROPERTY( StaticUpdateInterval );
+  LINK_NATIVE_PROPERTY( DynamicUpdateInterval );
 END_PROPERTY_LINK()
 

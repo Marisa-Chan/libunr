@@ -255,7 +255,7 @@ BEGIN_PROPERTY_LINK( ACollisionPlane, 3 )
   LINK_NATIVE_PROPERTY( bBlockNonZeroExtent );
 END_PROPERTY_LINK()
 
-BEGIN_PROPERTY_LINK( ADecoration, 14 )
+BEGIN_PROPERTY_LINK( ADecoration, 15 )
   LINK_NATIVE_PROPERTY( bPushable ); 
   LINK_NATIVE_PROPERTY( bOnlyTriggerable );
   LINK_NATIVE_PROPERTY( bSplash );
@@ -270,6 +270,7 @@ BEGIN_PROPERTY_LINK( ADecoration, 14 )
   LINK_NATIVE_PROPERTY( Content3 );
   LINK_NATIVE_PROPERTY( EndPushSound );
   LINK_NATIVE_PROPERTY( Shadow );
+  LINK_NATIVE_PROPERTY( BaseEyeHeight );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( ACarcass, 9 )
@@ -430,7 +431,7 @@ BEGIN_PROPERTY_LINK( AVisibilityNotify, 1 )
   LINK_NATIVE_PROPERTY( NextNotify );
 END_PROPERTY_LINK()
 
-BEGIN_PROPERTY_LINK( AActor, 227 )
+BEGIN_PROPERTY_LINK( AActor, 256 )
   LINK_NATIVE_PROPERTY( bStatic );
   LINK_NATIVE_PROPERTY( bHidden );
   LINK_NATIVE_PROPERTY( bNoDelete );
@@ -658,5 +659,34 @@ BEGIN_PROPERTY_LINK( AActor, 227 )
   LINK_NATIVE_PROPERTY( SimAnim );
   LINK_NATIVE_PROPERTY( NetPriority );
   LINK_NATIVE_PROPERTY( NetUpdateFrequency );
+  LINK_NATIVE_PROPERTY( bBlockSight );
+  LINK_NATIVE_PROPERTY( bDetectable );
+  LINK_NATIVE_PROPERTY( bTransient );
+  LINK_NATIVE_PROPERTY( bIgnore );
+  LINK_NATIVE_PROPERTY( LastRenderTime );
+  LINK_NATIVE_PROPERTY( DistanceFromPlayer );
+  LINK_NATIVE_ARRAY   ( BlendAnimSequence );
+  LINK_NATIVE_ARRAY   ( BlendAnimFrame );
+  LINK_NATIVE_ARRAY   ( BlendAnimRate );
+  LINK_NATIVE_ARRAY   ( BlendTweenRate );
+  LINK_NATIVE_ARRAY   ( BlendAnimLast );
+  LINK_NATIVE_ARRAY   ( BlendAnimMinRate );
+  LINK_NATIVE_ARRAY   ( OldBlendAnimRate );
+  LINK_NATIVE_ARRAY   ( SimBlendAnim );
+  LINK_NATIVE_PROPERTY( BindName );
+  LINK_NATIVE_PROPERTY( BarkBindName );
+  LINK_NATIVE_PROPERTY( FamiliarName );
+  LINK_NATIVE_PROPERTY( UnfamiliarName );
+  LINK_NATIVE_PROPERTY( ConListItems );
+  LINK_NATIVE_PROPERTY( LastConEndTime );
+  LINK_NATIVE_PROPERTY( ConStartInterval );
+  LINK_NATIVE_PROPERTY( VisUpdateTime );
+  LINK_NATIVE_PROPERTY( CurrentVisibility );
+  LINK_NATIVE_PROPERTY( LastVisibility );
+  LINK_NATIVE_PROPERTY( SmellClass );
+  LINK_NATIVE_PROPERTY( LastSmellNode );
+  LINK_NATIVE_PROPERTY( bOwned );
+  LINK_NATIVE_PROPERTY( bVisionImportant );
+  LINK_NATIVE_PROPERTY( RelevantRadius );
 END_PROPERTY_LINK()
 

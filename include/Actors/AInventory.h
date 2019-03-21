@@ -123,6 +123,21 @@ class AInventory : public AActor
   FString*   M_Activated;
   FString*   M_Selected;
   FString*   M_Deactivated;
+
+  // Deus Ex Variables
+  USound* LandSound;
+  bool bCanUseObjectBelt;
+  UTexture* LargeIcon;
+  int LargeIconWidth;
+  int LargeIconHeight;
+  int InvSlotsX;
+  int InvSlotsY;
+  int InvPosX;
+  int InvPosY;
+  bool bInObjectBelt;
+  int BeltPos;
+  FString* Description;
+  FString* BeltDescription;
 };
 
 class APickup : public AInventory

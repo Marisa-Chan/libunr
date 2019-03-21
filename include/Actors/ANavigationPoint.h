@@ -138,6 +138,10 @@ class APlayerStart : public ANavigationPoint
   bool bSinglePlayerStart;
   bool bCoopStart;
   bool bEnabled;
+  
+  // Deus Ex Variables
+  bool bTeamOnlyStart;
+  bool bNonTeamOnlyStart;
 };
 
 class ATeleporter : public ANavigationPoint

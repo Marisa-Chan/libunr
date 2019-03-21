@@ -377,6 +377,9 @@ class ALevelInfo : public AZoneInfo
   int CommonRadius;
   int HumanRadius;
   int HumanHeight;
+
+  // Deus Ex Variables
+  class UEventManager* EventManager;
 };
 
 class AWarpZoneInfo : public AZoneInfo

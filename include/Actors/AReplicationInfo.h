@@ -69,6 +69,9 @@ class APlayerReplicationInfo : public AReplicationInfo
   ALocationID* PlayerLocation;
   int          StartTime;
   int          TimeAcc;
+
+  // Deus Ex Variables
+  float Streak;
 };
 
 class AGameReplicationInfo : public AReplicationInfo

@@ -128,6 +128,7 @@ set (SOURCES ${UNR_SRC}/Core/FConfig.cpp
              ${UNR_SRC}/Actors/AWeapon.cpp
              ${UNR_SRC}/Actors/AZoneInfo.cpp
              ${UNR_SRC}/DeusEx/UEventManager.cpp
+             ${UNR_SRC}/DeusEx/ACameraPoint.cpp
 )
 
 include_directories (${UNR_INC} ${XSTL_INC})
