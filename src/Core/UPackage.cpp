@@ -136,6 +136,7 @@ UPackage::UPackage()
   Names = new Array<FNameEntry>();
   Exports = new Array<FExport>();
   Imports = new Array<FImport>();
+  bIntrinsicPackage = false;
 }
 
 UPackage::~UPackage()

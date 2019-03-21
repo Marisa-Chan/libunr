@@ -278,7 +278,7 @@ bool UObject::StaticInit()
     Result &= ATriggers::StaticClassInit();
       Result &= ATrigger::StaticClassInit();
 
-  // Load Deus Ex classes (if needed)
+  // Init Deus Ex classes (if needed)
   if ( GSystem->GameFlags & GAME_DeusEx )
   {
     Result &= UEventManager::StaticClassInit();
@@ -298,6 +298,14 @@ bool UObject::StaticInit()
   AUdpLink::StaticClass()->PreLoad();
   AUdpLink::StaticClass()->Load();
   AUdpLink::StaticClass()->PostLoad();
+
+  // Load Deus Ex engine classes (if needed)
+  if ( GSystem->GameFlags & GAME_DeusEx )
+  {
+    ACameraPoint::StaticClass()->PreLoad();
+    ACameraPoint::StaticClass()->Load();
+    ACameraPoint::StaticClass()->PostLoad();
+  }
 
   return Result;
 }

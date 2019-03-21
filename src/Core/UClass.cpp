@@ -552,6 +552,13 @@ void UStruct::Load()
       StructSize = ((UStruct*)SuperField)->StructSize;
   }
 
+  if ( !Pkg->bIntrinsicPackage && ObjectFlags & RF_Native )
+  {
+    Logf( LOG_WARN, "Native class '%s' missing in non-intrinsic package '%s'",
+        Name.Data(), Pkg->Name.Data() );
+    ObjectFlags &= ~(RF_Native);
+  }
+
   idx ScriptTextIdx = MAX_UINT32;
   idx ChildIdx = MAX_UINT32;
   idx FriendlyNameIdx = MAX_UINT32;

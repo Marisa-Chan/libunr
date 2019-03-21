@@ -240,7 +240,7 @@ public: \
   } \
   static UClass* StaticClass() \
   { return ObjectClass; } \
-  static UObject* NativeConstructor( size_t ObjSize ) \
+  static DLL_EXPORT UObject* NativeConstructor( size_t ObjSize ) \
   { \
     return new(ObjSize) cls(); \
   } \
@@ -316,6 +316,7 @@ public: \
     } \
     ObjectClass->Export->Obj = ObjectClass; \
     ObjectClass->ObjectFlags = ObjectClass->Export->ObjectFlags; \
+    ObjectClass->Pkg->bIntrinsicPackage = true; \
     return true; \
   } \
   bool cls::StaticCreateClass() \
