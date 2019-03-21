@@ -468,7 +468,9 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
         if ( ClsIter->Name.Hash() == ObjNameHash )
         {
           // Does it need to be loaded?
-          if ( !(ClsIter->ClassFlags & CLASS_NoExport) && ClsIter->NativeNeedsPkgLoad )
+          if ( !(ClsIter->ClassFlags & CLASS_NoExport) &&
+               ClsIter->Export != NULL &&
+               ClsIter->NativeNeedsPkgLoad )
           {
             // Yup, load it in place
             ClsIter->PreLoad();
