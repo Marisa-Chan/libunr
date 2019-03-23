@@ -279,3 +279,15 @@ class DLL_EXPORT UModel : public UPrimitive
   FZoneProperties Zones[MAX_ZONES];
 };
 
+/*-----------------------------------------------------------------------------
+ * USkelModel
+ * Skeletal Model object. Only seems to exist in Rune
+-----------------------------------------------------------------------------*/
+class DLL_EXPORT USkelModel : public UPrimitive
+{
+  DECLARE_NATIVE_CLASS( USkelModel, UPrimitive, CLASS_NoExport, Engine )
+  USkelModel();
+
+  // TODO:
+};
+

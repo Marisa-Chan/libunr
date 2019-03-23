@@ -121,6 +121,9 @@ FPackageFileOut& operator<<( FPackageFileOut& Out, FNameEntry& Name )
   Out << Name;
 }
 
+/*-----------------------------------------------------------------------------
+ * FName
+-----------------------------------------------------------------------------*/
 FName FName::CreateName( const char* InName, int InFlags )
 {
   FNameEntry* NewEntry = new FNameEntry( InName, InFlags );

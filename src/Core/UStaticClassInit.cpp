@@ -207,6 +207,7 @@ bool UObject::StaticInit()
         Result &= USkeletalMesh::StaticClassInit();
       Result &= UStaticMesh::StaticClassInit();
     Result &= UModel::StaticClassInit();
+    Result &= USkelModel::StaticClassInit();
   Result &= UPlayer::StaticClassInit();
     Result &= UViewport::StaticClassInit();
   Result &= URenderBase::StaticClassInit();
@@ -283,6 +284,12 @@ bool UObject::StaticInit()
   {
     Result &= UEventManager::StaticClassInit();
     Result &= ACameraPoint::StaticClassInit();
+  }
+  
+  // Init Rune classes (if needed)
+  if ( GSystem->GameFlags & GAME_Rune )
+  {
+    Result &= APolyObj::StaticClassInit();
   }
 
   // Load base actor class

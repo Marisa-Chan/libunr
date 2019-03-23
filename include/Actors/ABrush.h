@@ -100,10 +100,11 @@ class DLL_EXPORT AMover : public ABrush
   u8 WorldRaytraceKey;
   u8 BrushRaytraceKey;
 
-  float MoveTime;
+  float MoveTime[16];
   float StayOpenTime;
   float OtherTime;
   int   EncroachDamage;
+  FName InterpolateEvent[16];
 
   bool bTriggerOnceOnly;
   bool bSlave;
@@ -131,8 +132,8 @@ class DLL_EXPORT AMover : public ABrush
   USound* ClosedSound;
   USound* MoveAmbientSound;
 
-  FVector  KeyPos[8];
-  FRotator KeyRot[8];
+  FVector  KeyPos[16];
+  FRotator KeyRot[16];
   FVector  BasePos, OldPos, OldPrePivot, SavedPos;
   FRotator BaseRot, OldRot, SavedRot;
   Array<int> NotifyLightMaps;
@@ -155,4 +156,126 @@ class DLL_EXPORT AMover : public ABrush
   int      LNextKeyNum;
 };
 
+class DLL_EXPORT APolyObj : public ABrush
+{
+  DECLARE_NATIVE_CLASS( APolyObj, ABrush, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  APolyObj();
+
+  enum EPolyObjEncroachType
+  {
+    PET_StopWhenEncroach,
+    PET_ReturnWhenEncroach,
+    PET_CrushWhenEncroach,
+    PET_IgnoreWhenEncroach
+  } PolyObjEncroachType;
+
+  enum EPolyGlideType
+  {
+    PGT_MoveByTime,
+    PGT_GlideByTime,
+    PGT_AccelOverTime,
+    PGT_DeAccelOverTime
+  } PolyObjGlideType;
+
+  enum EPolyBumpType
+  {
+    BT_PlayerBump,
+    BT_PawnBump,
+    BT_CreatureBump,
+    BT_AnyBump
+  } PolyObjBumpType;
+
+  u8 KeyNum;
+  u8 PrevKeyNum;
+  u8 NumKeys;
+  u8 WorldRaytraceKey;
+  u8 BrushRaytraceKey;
+
+  float MoveTime[16];
+  float StayOpenTime;
+  float OtherTime;
+  int   EncroachDamage;
+  FName InterpolateEvent[16];
+  int BumpDamage;
+
+  bool bTriggerOnceOnly;
+  bool bSlave;
+  bool bUseTriggered;
+  bool bDamageTriggered;
+  bool bDynamicLightMover;
+  idx     PlayerBumpEvent;
+  idx     BumpEvent;
+  AActor* SavedTrigger;
+  float   DamageThreshold;
+  int     NumTriggerEvents;
+  AMover* Leader;
+  AMover* Follower;
+  idx     ReturnGroup;
+  float   DelayTime;
+
+  USound* OpeningSound;
+  USound* OpenedSound;
+  USound* ClosingSound;
+  USound* ClosedSound;
+  USound* MoveAmbientSound;
+
+  FVector  KeyPos[16];
+  FRotator KeyRot[16];
+  FVector  BasePos, OldPos, OldPrePivot, SavedPos;
+  FRotator BaseRot, OldRot, SavedRot;
+
+  ANavigationPoint* MyMarker;
+  AActor*   TriggerActor;
+  AActor*   TriggerActor2;
+  APawn*    WaitingPawn;
+  bool      bOpening, bDelaying, bClientPause;
+  bool      bPlayerOnly;
+  ATrigger* RecommendedTrigger;
+
+  FVector  SimOldPos;
+  int      SimOldRotPitch, SimOldRotYaw, SimOldRotRoll;
+  FVector  SimInterpolate;
+  FVector  RealPosition;
+  FRotator RealRotation;
+  int      ClientUpdate;
+
+  bool bCanRender;
+  bool bDynamicLightPolyObj;
+
+  FVector  CStartLocation;
+  FVector  CHeightVect;
+  FRotator CRotator;
+  float    CTimeCounter;
+  float    CPrevV;
+  float    CPulse;
+  float    CDelay;
+  AActor*  CBase;
+
+  float   CCycleTime;
+  float   CPhase;
+  float   CHeight;
+  float   CSize;
+  float   CSpeed;
+  USound* CSound;
+  bool    Flag1;
+  bool    Flag2;
+  FName   CBaseName;
+
+#define CCUTOFF = 0.3f;
+
+  int OnMeCount;
+  APawn* OnMeList[4];
+  bool   SinkResting;
+  bool   bInitiallyOn;
+  FVector ThrustVector;
+
+  EMatterType Matter;
+  UClass*     DebrisType;
+  bool        bDestroyable;
+  int         NumDebrisChunks;
+  float       DebrisSpawnRadius;
+  UTexture*   DebrisTexture;
+};
 

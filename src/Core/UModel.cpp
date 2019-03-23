@@ -409,10 +409,20 @@ void UModel::Load()
   *PkgFile >> (u32&)Linked;
 }
 
+USkelModel::USkelModel()
+  : UPrimitive()
+{
+}
+
+USkelModel::~USkelModel()
+{
+}
+
 IMPLEMENT_NATIVE_CLASS( UVectors );
 IMPLEMENT_NATIVE_CLASS( UBspNodes );
 IMPLEMENT_NATIVE_CLASS( UBspSurfs );
 IMPLEMENT_NATIVE_CLASS( UVerts );
 IMPLEMENT_NATIVE_CLASS( UPolys );
 IMPLEMENT_NATIVE_CLASS( UModel );
+IMPLEMENT_NATIVE_CLASS( USkelModel );
 

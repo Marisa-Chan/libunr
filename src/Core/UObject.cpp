@@ -454,9 +454,11 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
     // We can figure out which package it should be in from our current package
     FImport* Import = &(*Pkg->GetImportTable())[ CalcObjRefValue( ObjRef ) ];
     const char* ClsName = Pkg->ResolveNameFromIdx( Import->ClassName );
+    const char* GroupName = Pkg->ResolveNameFromObjRef( Import->Package );
 
     FHash ObjNameHash = FnvHashString( ObjName );
     FHash ClsNameHash = FnvHashString( ClsName );
+    FHash GroupHash   = FnvHashString( GroupName );
 
     // Check to see if we're trying to load some intrinsic class
     if ( ObjClass == UClass::StaticClass() && ObjClass->ClassFlags & CLASS_NoExport )
@@ -482,7 +484,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
       }
     }
 
-    // We'll likely need the class too
+    // At this point, we'll likely need the class too
     if ( LIKELY( ObjClass == NULL ) )
     {
       for ( size_t i = 0; i < ClassPool->Size() && i != MAX_SIZE; i++ )
@@ -549,6 +551,9 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
 
       // Get object name entry
       FNameEntry* ExpObjName = ObjPkg->GetNameEntry( ExpIter->ObjectName );
+      FNameEntry* ExpGrpName = ObjPkg->GetNameEntryByObjRef( ExpIter->Group );
+      if ( ExpGrpName->Hash == FnvHashString("None") )
+        ExpGrpName = (*NameTable)[ObjPkg->Name.Index];
 
       // Get class name entry
       FNameEntry* ExpClsName = NULL;
@@ -566,7 +571,8 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
           ExpClsName = ObjPkg->GetNameEntry( (*Exports)[ ExpIter->Class - 1 ].ObjectName );
       }
 
-      if ( ExpObjName->Hash == ObjNameHash && ExpClsName->Hash == ClsNameHash )
+      if ( ExpObjName->Hash == ObjNameHash && ExpClsName->Hash == ClsNameHash && 
+           ExpGrpName->Hash == GroupHash )
       {
         ObjExport = ExpIter;
         break;
