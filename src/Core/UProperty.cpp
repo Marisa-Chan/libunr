@@ -84,7 +84,11 @@ bool UProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8 Ty
 {
   bool Ret = false;
   if ( Type != PropertyType )
-    Logf( LOG_CRIT, "Default property '%s' expected '%s' but got '%s'", Name, PropNames[Type], Class->Name );
+  {
+    Logf( LOG_CRIT, "Default property '%s' expected '%s' but got '%s'", 
+        Name.Data(), PropNames[Type], Class->Name.Data() );
+    return false;
+  }
   else
     Ret = LoadDefaultProperty( ObjMem, In, RealSize, Idx );
 
