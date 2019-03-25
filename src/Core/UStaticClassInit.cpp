@@ -65,6 +65,17 @@
 #include "DeusEx/UEventManager.h"
 #include "DeusEx/ACameraPoint.h"
 
+// Rune specific headers
+#include "Rune/ARuneActor.h"
+#include "Rune/AGameInfo.h"
+#include "Rune/ARuneMutator.h"
+#include "Rune/ARunePawn.h"
+#include "Rune/ARunePlayerPawn.h"
+#include "Rune/ARunePRI.h"
+#include "Rune/ARuneWeapon.h"
+#include "Rune/ARuneZoneInfo.h"
+#include "Rune/URuneCanvas.h"
+
 bool UObject::StaticInit()
 {
   bool Result = true;
@@ -289,7 +300,23 @@ bool UObject::StaticInit()
   // Init Rune classes (if needed)
   if ( GSystem->GameFlags & GAME_Rune )
   {
+    Result &= ARuneActor::StaticClassInit();
+    Result &= ARuneGameInfo::StaticClassInit();
+    Result &= ARuneMutator::StaticClassInit();
+    Result &= ARunePawn::StaticClassInit();
+    Result &= ARunePlayerPawn::StaticClassInit();
+    Result &= ARunePlayerReplicationInfo::StaticClassInit();
+    Result &= ARuneWeapon::StaticClassInit();
+    Result &= ARuneZoneInfo::StaticClassInit();
+    Result &= URuneCanvas::StaticClassInit();
     Result &= APolyObj::StaticClassInit();
+
+    ARuneActor::Alias();
+    ARuneGameInfo::Alias();
+    ARuneMutator::Alias();
+    ARunePawn::Alias();
+    ARunePlayerPawn::Alias();
+    ARunePlayerReplicationInfo::Alias();
   }
 
   // Load base actor class

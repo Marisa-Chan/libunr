@@ -60,6 +60,19 @@ void FNativePropertyList::AddProperty( const char* Name, u32 Offset )
   }
 }
 
+void FNativePropertyList::AppendList( FNativePropertyList* List )
+{
+  if ( UNLIKELY( !List ) )
+    return;
+
+  Num += List->Num;
+
+  Properties = xstl::Realloc( Properties, sizeof(FNativePropertyLink) * Num );
+  xstl::Copy( &Properties[Added], List->Properties, sizeof(FNativePropertyLink)*List->Added );
+
+  Added += List->Added;
+}
+
 /*-----------------------------------------------------------------------------
  * UObject
 -----------------------------------------------------------------------------*/

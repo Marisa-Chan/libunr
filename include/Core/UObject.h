@@ -179,7 +179,8 @@ struct FNativePropertyList
   FNativePropertyList( FHash InHash, size_t InNum );
   ~FNativePropertyList();
   void AddProperty( const char* Name, u32 InOffset );
- 
+  void AppendList( FNativePropertyList* List );
+
   bool bInitialized;
   FHash Hash;
   size_t Added;
@@ -293,9 +294,15 @@ public: \
 #define DECLARE_NATIVE_CLASS(cls, supcls, flags, pkg) \
   DECLARE_NATIVE_CLASS_BASE(cls, supcls, flags, pkg) \
 
-#define DECLARE_NATIVE_ABSTRACT_CLASS(cls, supcls, flags, pkg) \
-  DECLARE_NATIVE_CLASS_BASE(cls, supcls, flags | CLASS_Abstract, pkg) \
-  
+#define DECLARE_ALIASED_CLASS(cls, replaced, flags, pkg) \
+  DECLARE_NATIVE_CLASS_BASE(cls, replaced, flags|CLASS_Aliased, pkg) \
+protected: \
+  static void Alias() \
+  { \
+    Super::ObjectClass = ObjectClass; \
+    Super::StaticNativePropList->AppendList( StaticNativePropList ); \
+  } \
+
 #define IMPLEMENT_NATIVE_CLASS(cls) \
   UClass* cls::ObjectClass = NULL; \
   size_t  cls::NativeSize  = sizeof( cls ); \
@@ -338,6 +345,54 @@ public: \
         ClsName = ClsPkg->GetGlobalName( PkgNameIdx ); \
       else \
         ClsName = FName::CreateName( ClsNameStr, RF_TagExp | RF_LoadContextFlags | RF_Native ); \
+      ObjectClass = UObject::StaticAllocateClass( ClsName, StaticFlags, Super::ObjectClass,\
+        NativeSize, NativeConstructor ); \
+      if ( ObjectClass != NULL ) \
+      { \
+        ClassPool->PushBack( ObjectClass ); \
+        return true; \
+      } \
+      return false; \
+    } \
+    return true; \
+  } \
+
+#define IMPLEMENT_ALIASED_CLASS(cls) \
+  UClass* cls::ObjectClass = NULL; \
+  size_t  cls::NativeSize  = sizeof( cls ); \
+  FNativePropertyList* cls::StaticNativePropList = NULL; \
+  bool cls::StaticSetPackageProperties() \
+  { \
+    ObjectClass->Pkg = UPackage::StaticLoadPackage( NativePkgName ); \
+    if ( ObjectClass->Pkg == NULL ) \
+    { \
+      Logf( LOG_CRIT, "Failed to load package '%s' for class '%s'.", NativePkgName, ObjectClass->Name ); \
+      return false; \
+    } \
+    ObjectClass->Export = Super::ObjectClass->Export; \
+    if ( ObjectClass->Export == NULL ) \
+    { \
+      ObjectClass->ObjectFlags = RF_EliminateObject; \
+      return true; \
+    } \
+    ObjectClass->Export->Obj = ObjectClass; \
+    ObjectClass->ObjectFlags = ObjectClass->Export->ObjectFlags; \
+    Super::ObjectClass->ObjectFlags = ObjectClass->ObjectFlags; \
+    ObjectClass->Pkg->bIntrinsicPackage = true; \
+    return true; \
+  } \
+  bool cls::StaticCreateClass() \
+  { \
+    if (!ObjectClass) \
+    { \
+      UPackage* ClsPkg = UPackage::StaticLoadPackage( NativePkgName ); \
+      if (!ClsPkg) \
+      { \
+        Logf( LOG_CRIT, "Package '%s' for class '%s' could not be opened", \
+          NativePkgName, TEXT(cls) ); \
+        return false; \
+      } \
+      FName ClsName = Super::ObjectClass->Name; \
       ObjectClass = UObject::StaticAllocateClass( ClsName, StaticFlags, Super::ObjectClass,\
         NativeSize, NativeConstructor ); \
       if ( ObjectClass != NULL ) \
