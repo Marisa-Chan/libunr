@@ -67,7 +67,7 @@
 
 // Rune specific headers
 #include "Rune/ARuneActor.h"
-#include "Rune/AGameInfo.h"
+#include "Rune/ARuneGameInfo.h"
 #include "Rune/ARuneMutator.h"
 #include "Rune/ARunePawn.h"
 #include "Rune/ARunePlayerPawn.h"
@@ -300,7 +300,8 @@ bool UObject::StaticInit()
   // Init Rune classes (if needed)
   if ( GSystem->GameFlags & GAME_Rune )
   {
-    Result &= ARuneActor::StaticClassInit();
+    // The classes with the *Rune prefix will alias their respective superclasses
+    /*Result &= ARuneActor::StaticClassInit();
     Result &= ARuneGameInfo::StaticClassInit();
     Result &= ARuneMutator::StaticClassInit();
     Result &= ARunePawn::StaticClassInit();
@@ -309,14 +310,7 @@ bool UObject::StaticInit()
     Result &= ARuneWeapon::StaticClassInit();
     Result &= ARuneZoneInfo::StaticClassInit();
     Result &= URuneCanvas::StaticClassInit();
-    Result &= APolyObj::StaticClassInit();
-
-    ARuneActor::Alias();
-    ARuneGameInfo::Alias();
-    ARuneMutator::Alias();
-    ARunePawn::Alias();
-    ARunePlayerPawn::Alias();
-    ARunePlayerReplicationInfo::Alias();
+    Result &= APolyObj::StaticClassInit();*/
   }
 
   // Load base actor class

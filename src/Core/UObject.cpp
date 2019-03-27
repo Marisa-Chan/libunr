@@ -67,8 +67,9 @@ void FNativePropertyList::AppendList( FNativePropertyList* List )
 
   Num += List->Num;
 
-  Properties = xstl::Realloc( Properties, sizeof(FNativePropertyLink) * Num );
-  xstl::Copy( &Properties[Added], List->Properties, sizeof(FNativePropertyLink)*List->Added );
+  Properties = (FNativePropertyLink*)xstl::Realloc( Properties, sizeof(FNativePropertyLink) * Num );
+  xstl::Copy( &Properties[Added], sizeof(FNativePropertyLink)*List->Added, 
+                List->Properties, sizeof(FNativePropertyLink)*List->Added );
 
   Added += List->Added;
 }

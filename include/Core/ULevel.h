@@ -59,7 +59,7 @@ struct DLL_EXPORT FURL
 
 class ULevelBase : public UObject
 {
-  DECLARE_NATIVE_ABSTRACT_CLASS( ULevelBase, UObject, CLASS_NoExport, Engine )
+  DECLARE_NATIVE_CLASS( ULevelBase, UObject, CLASS_Abstract | CLASS_NoExport, Engine )
   ULevelBase();
 
   Array<AActor*> Actors;

@@ -35,7 +35,7 @@
 
 class DLL_EXPORT USubsystem : public UObject
 {
-  DECLARE_NATIVE_ABSTRACT_CLASS( USubsystem, UObject, 0, Core )
+  DECLARE_NATIVE_CLASS( USubsystem, UObject, CLASS_Abstract, Core )
   EXPOSE_TO_USCRIPT()
 
   USubsystem();

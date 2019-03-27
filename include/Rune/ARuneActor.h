@@ -24,7 +24,7 @@
 */
 
 #include "Actors/AActor.h"
-
+/*
 class ARuneActor : public AActor
 {
   DECLARE_ALIASED_CLASS( ARuneActor, AActor, CLASS_NativeReplication, Engine )
@@ -32,5 +32,5 @@ class ARuneActor : public AActor
 
   ARuneActor();
 
-}
+};*/
 

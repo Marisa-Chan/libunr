@@ -79,6 +79,7 @@ enum EClassFlags
   CLASS_NoUserCreate      = 0x00200, // Don't allow users to create in the editor.
   CLASS_PerObjectConfig   = 0x00400, // Handle object configuration on a per-object basis, rather than per-class.
   CLASS_NativeReplication = 0x00800, // Replication handled in C++.
+  CLASS_Aliased           = 0x01000, // Class is aliased to it's parent
 
   // Flags to inherit from base class.
   CLASS_Inherit           = CLASS_Transient | CLASS_Config | CLASS_Localized | CLASS_SafeReplace | 
@@ -296,12 +297,6 @@ public: \
 
 #define DECLARE_ALIASED_CLASS(cls, replaced, flags, pkg) \
   DECLARE_NATIVE_CLASS_BASE(cls, replaced, flags|CLASS_Aliased, pkg) \
-protected: \
-  static void Alias() \
-  { \
-    Super::ObjectClass = ObjectClass; \
-    Super::StaticNativePropList->AppendList( StaticNativePropList ); \
-  } \
 
 #define IMPLEMENT_NATIVE_CLASS(cls) \
   UClass* cls::ObjectClass = NULL; \
@@ -363,6 +358,8 @@ protected: \
   FNativePropertyList* cls::StaticNativePropList = NULL; \
   bool cls::StaticSetPackageProperties() \
   { \
+    Super::ObjectClass = ObjectClass; \
+    Super::StaticNativePropList->AppendList( StaticNativePropList ); \
     ObjectClass->Pkg = UPackage::StaticLoadPackage( NativePkgName ); \
     if ( ObjectClass->Pkg == NULL ) \
     { \
@@ -377,7 +374,6 @@ protected: \
     } \
     ObjectClass->Export->Obj = ObjectClass; \
     ObjectClass->ObjectFlags = ObjectClass->Export->ObjectFlags; \
-    Super::ObjectClass->ObjectFlags = ObjectClass->ObjectFlags; \
     ObjectClass->Pkg->bIntrinsicPackage = true; \
     return true; \
   } \

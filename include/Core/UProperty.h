@@ -69,7 +69,7 @@ const char* const PropNames[] =
 
 class DLL_EXPORT UProperty : public UField
 {
-  DECLARE_NATIVE_ABSTRACT_CLASS( UProperty, UField, CLASS_NoExport, Core )
+  DECLARE_NATIVE_CLASS( UProperty, UField, CLASS_Abstract | CLASS_NoExport, Core )
 
   UProperty();
   UProperty( int InNameIdx );

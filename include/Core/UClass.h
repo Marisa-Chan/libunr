@@ -35,7 +35,7 @@ using namespace xstl;
 
 class DLL_EXPORT UTextBuffer : public UObject
 {
-  DECLARE_NATIVE_ABSTRACT_CLASS( UTextBuffer, UObject, CLASS_NoExport, Core )
+  DECLARE_NATIVE_CLASS( UTextBuffer, UObject, CLASS_Abstract | CLASS_NoExport, Core )
 
   UTextBuffer();
   virtual void Load();
@@ -46,7 +46,7 @@ class DLL_EXPORT UTextBuffer : public UObject
 
 class DLL_EXPORT UField : public UObject
 {
-  DECLARE_NATIVE_ABSTRACT_CLASS( UField, UObject, CLASS_NoExport, Core )
+  DECLARE_NATIVE_CLASS( UField, UObject, CLASS_Abstract | CLASS_NoExport, Core )
 
   UField();
   virtual void Load();
