@@ -779,7 +779,7 @@ UClass::UClass( FName ClassName, u32 Flags, UClass* InSuperClass,
   StructSize = InStructSize;
   bLinkedChildren = false;
 
-  Default = CreateDefaultObject();
+  CreateDefaultObject();
   if ( UNLIKELY( bStaticBootstrapped && (Flags & CLASS_NoExport) ) )
   {
     LinkSuperClassChildren();
@@ -1035,6 +1035,7 @@ UObject* UClass::CreateDefaultObject()
   Default = Constructor( StructSize );
   Default->Name = Name;
   Default->Class = this;
+  return Default;
 }
 
 void UClass::SetSuperClassProperties()

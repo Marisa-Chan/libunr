@@ -199,6 +199,8 @@ bool UTexture::ExportToFile( const char* Dir, const char* Type )
     Out->Close();  
     return true;
   }
+
+  return false;
 }
 
 UFont::UFont()

@@ -231,6 +231,8 @@ bool UObject::StaticInit()
       
   // Init actor classes
   Result &= AActor::StaticClassInit();
+  Result &= ARuneActor::StaticClassInit(); // aliased class
+
     Result &= ABlockingActor::StaticClassInit();
     Result &= ABrush::StaticClassInit();
       Result &= AMover::StaticClassInit();
@@ -281,7 +283,9 @@ bool UObject::StaticInit()
       Result &= ATeleporter::StaticClassInit();
       Result &= AWarpZoneMarker::StaticClassInit();
     Result &= APawn::StaticClassInit();
+      Result &= ARunePawn::StaticClassInit(); //aliased
       Result &= APlayerPawn::StaticClassInit();
+//        Result &= ARunePlayerPawn::StaticClassInit(); // aliased
         Result &= ACamera::StaticClassInit();
     Result &= AProjectile::StaticClassInit();
     Result &= AProjector::StaticClassInit();
@@ -297,12 +301,8 @@ bool UObject::StaticInit()
     Result &= ACameraPoint::StaticClassInit();
   }
   
-  // Init Rune classes (if needed)
-  if ( GSystem->GameFlags & GAME_Rune )
-  {
     // The classes with the *Rune prefix will alias their respective superclasses
-    /*Result &= ARuneActor::StaticClassInit();
-    Result &= ARuneGameInfo::StaticClassInit();
+    /*Result &= ARuneGameInfo::StaticClassInit();
     Result &= ARuneMutator::StaticClassInit();
     Result &= ARunePawn::StaticClassInit();
     Result &= ARunePlayerPawn::StaticClassInit();
@@ -311,7 +311,6 @@ bool UObject::StaticInit()
     Result &= ARuneZoneInfo::StaticClassInit();
     Result &= URuneCanvas::StaticClassInit();
     Result &= APolyObj::StaticClassInit();*/
-  }
 
   // Load base actor class
   AActor::StaticClass()->PreLoad();

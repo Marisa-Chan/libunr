@@ -178,6 +178,7 @@ struct FLeaf
     In >> CINDEX( L.iPermeating );
     In >> CINDEX( L.iVolumetric );
     In >> L.VisibleZones;
+    return In;
   }
 };
 

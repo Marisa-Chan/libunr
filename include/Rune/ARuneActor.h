@@ -24,13 +24,79 @@
 */
 
 #include "Actors/AActor.h"
-/*
-class ARuneActor : public AActor
+#include "Core/UModel.h"
+
+class DLL_EXPORT AAnimationProxy : public AKeypoint
+{
+  DECLARE_NATIVE_CLASS( AAnimationProxy, AKeypoint, 0, Engine ) 
+  EXPOSE_TO_USCRIPT()
+
+  AAnimationProxy();
+
+  class AWeapon* curWeapon;
+  class AWeapon* NewWeapon;
+  class AShield* curShield;
+  class AShield* newShield;
+};
+
+class DLL_EXPORT ARuneActor : public AActor
 {
   DECLARE_ALIASED_CLASS( ARuneActor, AActor, CLASS_NativeReplication, Engine )
   EXPOSE_TO_USCRIPT()
 
   ARuneActor();
 
-};*/
+  bool bReleaseLock;
+  bool bRenderedLastFrame;
+  bool bSpecialRender;
+  bool bFrameNotifies;
+  bool bLookFocusPlayer;
+  bool bLookFocusCreature;
+  bool bForceRender;
+  u8 BaseJoint;
+  u8 BaseMatterType;
+  FVector BaseScrollDir;
+  bool bHasShadow;
+  class UShadowTexture* ShadowTexture;
+  FVector ShadowVector;
+  FVector ColorAdjust;
+  FVector DesiredColorAdjust;
+  u8 DesiredFatness;
+  float AlphaScale;
+  int LODPolyCount;
+  float LODDistMax;
+  float LODDistMin;
+  float LODPercentMin;
+  float LODPercentMax;
+  u8 LODCurve;
+  bool bPointLight;
+  bool bMirrored;
+  bool bPreLight;
+  bool bComplexOcclusion;
+  AActor* AttachParent;
+  u8 AttachParentJoint;
+  u8 IncrementStat;
+  bool bJointsBlock;
+  bool bJointsTouch;
+  bool bSweepable;
+  bool bSpecialLit2;
+  bool bSpecialLit3;
+  bool bNegativeLight;
+  bool bAffectWorld;
+  bool bAffectActors;
+  bool bNoSurfaceBob;
+  bool bDrawSkel;
+  bool bDrawJoints;
+  bool bDrawAxes;
+  bool bApplyLagToAccelerators;
+  u8 SkelMesh;
+  USkelModel* Skeletal;
+  USkelModel* SubstituteMesh;
+  float BlendAnimAlpha;
+  class AAnimationProxy* AnimProxy;
+  UTexture* SkelGroupSkins[16];
+  int SkelGroupFlags[16];
+  u8 JointFlags[50];
+  AActor* JointChild[50];
+};
 

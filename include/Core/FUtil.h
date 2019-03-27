@@ -271,6 +271,7 @@ struct FName
   inline FName operator=( int Idx )
   {
     Index = Idx;
+    return *this;
   }
 
   friend bool operator==( FName& A, FName& B );

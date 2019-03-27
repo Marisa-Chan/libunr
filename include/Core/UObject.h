@@ -352,13 +352,12 @@ public: \
     return true; \
   } \
 
-#define IMPLEMENT_ALIASED_CLASS(cls) \
+#define IMPLEMENT_ALIASED_CLASS(cls,game) \
   UClass* cls::ObjectClass = NULL; \
   size_t  cls::NativeSize  = sizeof( cls ); \
   FNativePropertyList* cls::StaticNativePropList = NULL; \
   bool cls::StaticSetPackageProperties() \
   { \
-    Super::ObjectClass = ObjectClass; \
     Super::StaticNativePropList->AppendList( StaticNativePropList ); \
     ObjectClass->Pkg = UPackage::StaticLoadPackage( NativePkgName ); \
     if ( ObjectClass->Pkg == NULL ) \
@@ -379,24 +378,14 @@ public: \
   } \
   bool cls::StaticCreateClass() \
   { \
+    /* skip if aliased class going to be supported */ \
+    if ( !(GSystem->GameFlags & game) ) \
+      return true; \
     if (!ObjectClass) \
     { \
-      UPackage* ClsPkg = UPackage::StaticLoadPackage( NativePkgName ); \
-      if (!ClsPkg) \
-      { \
-        Logf( LOG_CRIT, "Package '%s' for class '%s' could not be opened", \
-          NativePkgName, TEXT(cls) ); \
-        return false; \
-      } \
-      FName ClsName = Super::ObjectClass->Name; \
-      ObjectClass = UObject::StaticAllocateClass( ClsName, StaticFlags, Super::ObjectClass,\
-        NativeSize, NativeConstructor ); \
-      if ( ObjectClass != NULL ) \
-      { \
-        ClassPool->PushBack( ObjectClass ); \
-        return true; \
-      } \
-      return false; \
+      ObjectClass = Super::ObjectClass; \
+      ObjectClass->Constructor = cls::NativeConstructor; \
+      ObjectClass->StructSize = NativeSize; \
     } \
     return true; \
   } \

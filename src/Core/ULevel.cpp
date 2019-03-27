@@ -266,6 +266,7 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
 
   // Restore package name
   Pkg->Name = PkgName;
+  return true;
 }
 
 IMPLEMENT_NATIVE_CLASS( ULevelBase );

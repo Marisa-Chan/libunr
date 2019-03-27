@@ -106,6 +106,7 @@ FPackageFileIn& operator>>( FPackageFileIn& In, FNameEntry& Name )
   }
   In >> Name.Flags;
   Name.Hash = FnvHashString( Name.Data );
+  return In;
 }
 
 FPackageFileOut& operator<<( FPackageFileOut& Out, FNameEntry& Name )
@@ -119,6 +120,7 @@ FPackageFileOut& operator<<( FPackageFileOut& Out, FNameEntry& Name )
   }
   
   Out << Name;
+  return Out;
 }
 
 /*-----------------------------------------------------------------------------
@@ -254,6 +256,8 @@ DLL_EXPORT FPackageFileOut& operator<<( FPackageFileOut& Out, FCompactIndex& Ind
     
     Out << byte_out;
   }
+
+  return Out;
 }
 
 /*-----------------------------------------------------------------------------
