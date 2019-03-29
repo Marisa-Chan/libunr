@@ -43,8 +43,18 @@ ARuneActor::~ARuneActor()
 {
 }
 
+AScriptDispatcher::AScriptDispatcher()
+  : AKeypoint()
+{
+}
+
+AScriptDispatcher::~AScriptDispatcher()
+{
+}
+
 #include "Core/UClass.h"
 IMPLEMENT_NATIVE_CLASS( AAnimationProxy );
+IMPLEMENT_NATIVE_CLASS( AScriptDispatcher );
 IMPLEMENT_ALIASED_CLASS( ARuneActor, GAME_Rune );
 
 BEGIN_PROPERTY_LINK( AAnimationProxy, 4 )
@@ -108,3 +118,16 @@ BEGIN_PROPERTY_LINK( ARuneActor, 52 )
   LINK_NATIVE_PROPERTY( JointFlags );
   LINK_NATIVE_PROPERTY( JointChild );
 END_PROPERTY_LINK()
+
+BEGIN_PROPERTY_LINK( AScriptDispatcher, 9 )
+  LINK_NATIVE_PROPERTY( LookTarget );
+  LINK_NATIVE_PROPERTY( ControlMouth );
+  LINK_NATIVE_PROPERTY( ControlHead );
+  LINK_NATIVE_PROPERTY( ControlTimeGranularity );
+  LINK_NATIVE_PROPERTY( Actions );
+  LINK_NATIVE_PROPERTY( NextOrder );
+  LINK_NATIVE_PROPERTY( NextOrderTag );
+  LINK_NATIVE_PROPERTY( bWaitToBeTriggered );
+  LINK_NATIVE_PROPERTY( WaitingScripter );
+END_PROPERTY_LINK()
+

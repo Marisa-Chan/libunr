@@ -300,7 +300,12 @@ bool UObject::StaticInit()
     Result &= UEventManager::StaticClassInit();
     Result &= ACameraPoint::StaticClassInit();
   }
-  
+
+  if ( GSystem->GameFlags & GAME_Rune )
+  {
+    Result &= AScriptDispatcher::StaticClassInit(); 
+  }
+
     // The classes with the *Rune prefix will alias their respective superclasses
     /*Result &= ARuneGameInfo::StaticClassInit();
     Result &= ARuneMutator::StaticClassInit();

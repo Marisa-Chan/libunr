@@ -100,3 +100,30 @@ class DLL_EXPORT ARuneActor : public AActor
   AActor* JointChild[50];
 };
 
+class AScriptDispatcher : public AKeypoint
+{
+  DECLARE_NATIVE_CLASS( AScriptDispatcher, AKeypoint, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  AScriptDispatcher();
+
+  struct SAction
+  {
+    float   Delay;
+    FName   AnimToPlay;
+    FName   EventToFire;
+    USound* SoundToPlay;
+    bool    bTaskLocked;
+  };
+
+  FName LookTarget[12];
+  FString* ControlMouth[12];
+  FString* ControlHead[12];
+  float ControlTimeGranularity;
+  SAction Actions[12];
+  FName NextOrder;
+  FName NextOrderTag;
+  bool bWaitToBeTriggered;
+  APawn* WaitingScripter;
+};
+
