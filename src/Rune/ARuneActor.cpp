@@ -45,7 +45,7 @@ ARuneActor::~ARuneActor()
 
 #include "Core/UClass.h"
 IMPLEMENT_NATIVE_CLASS( AAnimationProxy );
-IMPLEMENT_ALIASED_CLASS( ARuneActor );
+IMPLEMENT_ALIASED_CLASS( ARuneActor, GAME_Rune );
 
 BEGIN_PROPERTY_LINK( AAnimationProxy, 4 )
   LINK_NATIVE_PROPERTY( curWeapon );

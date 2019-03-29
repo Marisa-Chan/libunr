@@ -231,7 +231,7 @@ bool UObject::StaticInit()
       
   // Init actor classes
   Result &= AActor::StaticClassInit();
-  Result &= ARuneActor::StaticClassInit(); // aliased class
+  //Result &= ARuneActor::StaticClassInit(); // aliased class
 
     Result &= ABlockingActor::StaticClassInit();
     Result &= ABrush::StaticClassInit();
@@ -283,7 +283,7 @@ bool UObject::StaticInit()
       Result &= ATeleporter::StaticClassInit();
       Result &= AWarpZoneMarker::StaticClassInit();
     Result &= APawn::StaticClassInit();
-      Result &= ARunePawn::StaticClassInit(); //aliased
+     // Result &= ARunePawn::StaticClassInit(); //aliased
       Result &= APlayerPawn::StaticClassInit();
 //        Result &= ARunePlayerPawn::StaticClassInit(); // aliased
         Result &= ACamera::StaticClassInit();
