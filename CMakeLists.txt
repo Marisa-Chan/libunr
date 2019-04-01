@@ -130,6 +130,7 @@ set (SOURCES ${UNR_SRC}/Core/FConfig.cpp
              ${UNR_SRC}/DeusEx/UEventManager.cpp
              ${UNR_SRC}/DeusEx/ACameraPoint.cpp
              ${UNR_SRC}/Rune/ARuneActor.cpp
+             ${UNR_SRC}/Rune/ARuneWeapon.cpp
 )
 
 include_directories (${UNR_INC} ${XSTL_INC})

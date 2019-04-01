@@ -202,6 +202,15 @@ ATriggers::~ATriggers()
 {
 }
 
+ADispatcher::ADispatcher()
+  : ATriggers()
+{
+}
+
+ADispatcher::~ADispatcher()
+{
+}
+
 ATrigger::ATrigger()
   : ATriggers()
 {
@@ -225,6 +234,7 @@ IMPLEMENT_NATIVE_CLASS( ABlockingActor );
 IMPLEMENT_NATIVE_CLASS( ACollisionPlane );
 IMPLEMENT_NATIVE_CLASS( ACarcass );
 IMPLEMENT_NATIVE_CLASS( ADecoration );
+IMPLEMENT_NATIVE_CLASS( ADispatcher );
 IMPLEMENT_NATIVE_CLASS( ADynamicCorona );
 IMPLEMENT_NATIVE_CLASS( AInfo );
 IMPLEMENT_NATIVE_CLASS( AInterpolationPoint );
@@ -362,7 +372,7 @@ BEGIN_PROPERTY_LINK( ASunlightCorona, 11 )
   LINK_NATIVE_PROPERTY( bUScriptRenderHandler );
 END_PROPERTY_LINK()
 
-BEGIN_PROPERTY_LINK( AInterpolationPoint, 10 )
+BEGIN_PROPERTY_LINK( AInterpolationPoint, 12 )
   LINK_NATIVE_PROPERTY( Position );
   LINK_NATIVE_PROPERTY( RateModifier );
   LINK_NATIVE_PROPERTY( GameSpeedModifier );
@@ -373,6 +383,8 @@ BEGIN_PROPERTY_LINK( AInterpolationPoint, 10 )
   LINK_NATIVE_PROPERTY( ScreenFlashFog );
   LINK_NATIVE_PROPERTY( Prev );
   LINK_NATIVE_PROPERTY( Next );
+  LINK_NATIVE_PROPERTY( bInterpInstant );
+  LINK_NATIVE_PROPERTY( bSplineThruPoints );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( AMenu, 16 )
@@ -412,7 +424,14 @@ END_PROPERTY_LINK()
 BEGIN_PROPERTY_LINK( ATriggers, 0 )
 END_PROPERTY_LINK()
 
-BEGIN_PROPERTY_LINK( ATrigger, 12 )
+BEGIN_PROPERTY_LINK( ADispatcher, 4 )
+  LINK_NATIVE_PROPERTY( OutEvents );
+  LINK_NATIVE_PROPERTY( OutDelays );
+  LINK_NATIVE_PROPERTY( bIsLooping );
+  LINK_NATIVE_PROPERTY( i );
+END_PROPERTY_LINK()
+
+BEGIN_PROPERTY_LINK( ATrigger, 14 )
   LINK_NATIVE_PROPERTY( TriggerType );
   LINK_NATIVE_PROPERTY( Message );
   LINK_NATIVE_PROPERTY( bTriggerOnceOnly );
@@ -425,6 +444,8 @@ BEGIN_PROPERTY_LINK( ATrigger, 12 )
   LINK_NATIVE_PROPERTY( DamageThreshold );
   LINK_NATIVE_PROPERTY( TriggerActor );
   LINK_NATIVE_PROPERTY( TriggerActor2 );
+  LINK_NATIVE_PROPERTY( SightDistance );
+  LINK_NATIVE_PROPERTY( SightAngle );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( AVisibilityNotify, 1 )

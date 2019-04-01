@@ -110,5 +110,8 @@ class AGameReplicationInfo : public AReplicationInfo
   int   SumFrags;
   float UpdateTimer;
   APlayerReplicationInfo* PRIArray[32];
+
+  // Rune Variables
+  int ServerRegion;
 };
 

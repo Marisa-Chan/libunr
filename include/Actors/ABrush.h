@@ -56,7 +56,6 @@ class DLL_EXPORT ABrush : public AActor
   int    PolyFlags;
   bool   bColored;
 
-  bool bClientPause;
 };
 
 class DLL_EXPORT AMover : public ABrush 
@@ -104,7 +103,6 @@ class DLL_EXPORT AMover : public ABrush
   float StayOpenTime;
   float OtherTime;
   int   EncroachDamage;
-  FName InterpolateEvent[16];
 
   bool bTriggerOnceOnly;
   bool bSlave;
@@ -154,6 +152,11 @@ class DLL_EXPORT AMover : public ABrush
   int      ServerUpdate;
   int      ClientUpdate;
   int      LNextKeyNum;
+
+  bool bClientPause;
+
+  // Rune Variables
+  FName InterpolateEvent[16];
 };
 
 class DLL_EXPORT APolyObj : public ABrush

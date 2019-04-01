@@ -44,6 +44,7 @@ class ATrigger;
 // Includes variable state for:
 //   Unreal 227j_39
 //   UT 436
+//   Deus Ex 1.112
 class AActor : public UObject
 {
   DECLARE_NATIVE_CLASS( AActor, UObject, CLASS_NativeReplication, Engine )
@@ -678,6 +679,10 @@ class AInterpolationPoint : public AKeypoint
   float   ScreenFlashScale;
   FVector ScreenFlashFog;
 
+  // Rune vars
+  bool bInterpInstant;
+  bool bSplineThruPoints;
+
   AInterpolationPoint* Prev;
   AInterpolationPoint* Next;
 };
@@ -847,6 +852,19 @@ class ATriggers : public AActor
   ATriggers();
 };
 
+class ADispatcher : public ATriggers
+{
+  DECLARE_NATIVE_CLASS( ADispatcher, ATriggers, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  ADispatcher();
+
+  FName OutEvents[8];
+  float OutDelays[8];
+  bool bIsLooping;
+  int i;
+};
+
 class ATrigger : public ATriggers
 {
   DECLARE_NATIVE_CLASS( ATrigger, ATriggers, 0, Engine )
@@ -877,6 +895,10 @@ class ATrigger : public ATriggers
 
   AActor* TriggerActor;
   AActor* TriggerActor2;
+
+  // Rune Variables
+  float SightDistance;
+  float SightAngle;
 };
 
 class AVisibilityNotify : public AInfo

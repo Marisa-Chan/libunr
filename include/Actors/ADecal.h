@@ -37,6 +37,7 @@ class ADecal : public AActor
   int  MultiDecalLevel;
   bool bAttachPanningSurfs;
   bool bAttachUnlitSurfs;
+  bool bBloodyDecal;
   Array<int>* SurfList;
   float LastRenderedTime;
 

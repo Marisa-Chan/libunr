@@ -24,6 +24,8 @@
 */
 
 #include "Actors/AActor.h"
+#include "Actors/AHUD.h"
+#include "Actors/ANavigationPoint.h"
 #include "Core/UModel.h"
 
 class DLL_EXPORT AAnimationProxy : public AKeypoint
@@ -37,6 +39,39 @@ class DLL_EXPORT AAnimationProxy : public AKeypoint
   class AWeapon* NewWeapon;
   class AShield* curShield;
   class AShield* newShield;
+};
+
+class DLL_EXPORT AAutoLink : public ANavigationPoint
+{
+  DECLARE_NATIVE_CLASS( AAutoLink, ANavigationPoint, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  AAutoLink();
+
+  FName LinkTag;
+};
+
+class DLL_EXPORT ADebugHUD : public AHUD
+{
+  DECLARE_NATIVE_CLASS( ADebugHUD, AHUD, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  ADebugHUD();
+
+  FName ModeTable[11];
+  AActor* Watch;
+  int DebugMode;
+  int DebugHudMode;
+};
+
+class DLL_EXPORT ARuneMutator : public AMutator
+{
+  DECLARE_ALIASED_CLASS( ARuneMutator, AMutator, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  ARuneMutator();
+
+  UClass* DefaultShield;
 };
 
 class DLL_EXPORT ARuneActor : public AActor
@@ -100,6 +135,99 @@ class DLL_EXPORT ARuneActor : public AActor
   AActor* JointChild[50];
 };
 
+class AParticleSystem : public AActor
+{
+  DECLARE_NATIVE_CLASS( AParticleSystem, AActor, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  AParticleSystem();
+
+  struct FParticle
+  {
+	  FVector Location;
+	  FVector Velocity;
+	  float LifeSpan;
+	  float XScale;
+	  float YScale;
+	  float ScaleStartX;
+	  float ScaleStartY;
+	  FVector Alpha;
+	  float U0, V0;
+	  float U1, V1;
+	  FVector Points[4];
+	  u8 Style;
+	  u8 TextureIndex;
+	  bool Valid;
+  };
+
+  bool IsLoaded;
+  bool bSpriteInEditor;
+  bool bSystemOneShot;
+  bool bSystemTicks;
+  bool bRelativeToSystem;
+  bool bEventDeath;
+  u8 ParticleCount;
+  UTexture* ParticleTexture[4];
+  bool bRandomTexture;
+  u8 ParticleType;
+  u8 ParticleSpriteType;
+  u8 SpawnShape;
+  float RandomDelay;
+  float SystemLifeSpan;
+  float CurrentDelay;
+  u8 OldParticleCount;
+  FCoords SystemCoords;
+  bool HasValidCoords;
+  float LastTime;
+  float CurrentTime;
+  FParticle ParticleArray[64];
+  FVector OriginOffset;
+  FVector ShapeVector;
+  FVector VelocityMin;
+  FVector VelocityMax;
+  float ScaleMin;
+  float ScaleMax;
+  float ScaleDeltaX;
+  float ScaleDeltaY;
+  float LifeSpanMin;
+  float LifeSpanMax;
+  u8 AlphaStart;
+  u8 AlphaEnd;
+  u8 PercentOffset;
+  bool bAlphaFade;
+  bool bApplyGravity;
+  float GravityScale;
+  bool bApplyZoneVelocity;
+  float ZoneVelocityScale;
+  bool bWaterOnly;
+  bool bOneShot;
+  bool bConvergeX;
+  bool bConvergeY;
+  bool bConvergeZ;
+  bool bConstrainToBounds;
+  float SpawnDelay;
+  float SpawnOverTime;
+  float TextureChangeTime;
+  u8 BaseJointIndex;
+  u8 OffsetJointIndex;
+  FVector OldBaseLocation;
+  FVector OldOffsetLocation;
+  float SwipeSpeed;
+  u8 NumConPts;
+  float BeamThickness;
+  float BeamTextureScale;
+  int TargetJointIndex;
+  FVector ConnectionPoint[32];
+  FVector ConnectionOffset[32];
+  bool bUseTargetLocation;
+  FVector TargetLocation;
+  bool bEventSystemInit;
+  bool bEventSystemTick;
+  bool bEventParticleTick;
+  bool bTaperStartPoint;
+  bool bTaperEndPoint;
+};
+
 class AScriptDispatcher : public AKeypoint
 {
   DECLARE_NATIVE_CLASS( AScriptDispatcher, AKeypoint, 0, Engine )
@@ -125,5 +253,65 @@ class AScriptDispatcher : public AKeypoint
   FName NextOrderTag;
   bool bWaitToBeTriggered;
   APawn* WaitingScripter;
+};
+
+class AScriptAction : public AKeypoint
+{
+  DECLARE_NATIVE_CLASS( AScriptAction, AKeypoint, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  AScriptAction();
+
+  FName AnimToPlay;
+  float PauseBeforeSound;
+  USound* SoundToPlay;
+  float AnimTimeToLoop;
+  bool bReleaseUponCompletion;
+  bool bFireEventImmediately;
+  bool bTurnToRotation;
+  FString* ControlTorso;
+  FName NextOrder;
+  FName NextOrderTag;
+  bool bWaitToBeTriggered;
+  FString* ControlMouth;
+  FString* ControlHead;
+  float ControlTimeGranularity;
+  FName LookTarget;
+  APawn* WaitingScripter;
+};
+
+class ASoundPlayer : public AKeypoint
+{
+  DECLARE_NATIVE_CLASS( ASoundPlayer, AKeypoint, 0, Engine )
+  EXPOSE_TO_USCRIPT()
+
+  ASoundPlayer();
+
+  bool bPlayerSound;
+  bool bAutoContinuous;
+  bool bRandomPosition;
+  float RndPosHeight;
+  float RndPosRadius;
+  u8 RandomDelayMin;
+  u8 RandomDelayMax;
+  u8 RandomPercentPitch;
+  u8 RandomPercentVolume;
+  USound* TSound[4];
+  u8 TSoundPitch[4];
+  float TSoundProbability[4];
+  float TSoundRadius;
+  u8 TSoundVolume[4];
+  int TriggerCountdown;
+  u8 TriggerBehavior;
+  u8 SelectMode;
+  int SoundCount;
+  int SoundXLat[4];
+  float AdjustedProbability[4];
+  int CSnd;
+  float CSndDuration;
+  FVector StartOffsetLocation;
+  FVector RandomSize;
+  int SPMaxSize;
+  int CycleSound;
 };
 

@@ -263,6 +263,7 @@ bool UObject::StaticInit()
       Result &= APickup::StaticClassInit();
         Result &= AAmmo::StaticClassInit();
       Result &= AWeapon::StaticClassInit();
+        Result &= ARuneWeapon::StaticClassInit(); // aliased class
     Result &= AInventoryAttachment::StaticClassInit();
       Result &= AWeaponAttachment::StaticClassInit();
       Result &= AWeaponMuzzleFlash::StaticClassInit();
@@ -275,6 +276,7 @@ bool UObject::StaticInit()
       Result &= ASunlightCorona::StaticClassInit();
     Result &= AMenu::StaticClassInit();
     Result &= AMutator::StaticClassInit();
+      Result &= ARuneMutator::StaticClassInit(); // aliased class
     Result &= ANavigationPoint::StaticClassInit();
       Result &= AInventorySpot::StaticClassInit();
       Result &= ALiftCenter::StaticClassInit();
@@ -303,7 +305,15 @@ bool UObject::StaticInit()
 
   if ( GSystem->GameFlags & GAME_Rune )
   {
-    Result &= AScriptDispatcher::StaticClassInit(); 
+    Result &= AAnimationProxy::StaticClassInit();
+    Result &= AAutoLink::StaticClassInit();
+    Result &= ADebugHUD::StaticClassInit();
+    Result &= ADispatcher::StaticClassInit(); // only native in rune?
+    Result &= AParticleSystem::StaticClassInit();
+    Result &= APolyObj::StaticClassInit();
+    Result &= AScriptDispatcher::StaticClassInit();
+    Result &= AScriptAction::StaticClassInit();
+    Result &= ASoundPlayer::StaticClassInit(); // useful for all games but why native?
   }
 
     // The classes with the *Rune prefix will alias their respective superclasses
