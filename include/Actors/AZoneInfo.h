@@ -247,6 +247,19 @@ class AZoneInfo : public AInfo
   
   // Network replication.
   AVisibilityNotify* VisNotify;
+
+  // Rune variables
+  FName ZonePlayerExitEvent;
+  FName ZonePlayerDiedEvent;
+  USound* EntrySoundBig;
+  bool bTakeOverCamera;
+  float MaxCameraDist;
+  FName SkyZoneName;
+  bool bFarClipZone;
+  bool bLokiBloodZone; // Ugh, only useful for rune but I don't wanna alias just for this one var
+  u8 FogBrightness;
+  u8 FogHue;
+  u8 FogSaturation;
 };
 
 class ULevelSummary : public UObject
@@ -380,6 +393,14 @@ class ALevelInfo : public AZoneInfo
 
   // Deus Ex Variables
   class UEventManager* EventManager;
+
+  // Rune Variables
+  bool bIntro;
+  bool bFadeIn;
+  float FadeRate;
+  float CdTrackLength;
+  FString* GameVersion;
+  FString* BuildNumber;
 };
 
 class AWarpZoneInfo : public AZoneInfo

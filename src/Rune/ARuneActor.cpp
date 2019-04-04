@@ -61,24 +61,6 @@ AParticleSystem::~AParticleSystem()
 {
 }
 
-ARuneActor::ARuneActor()
-  : AActor()
-{
-}
-
-ARuneActor::~ARuneActor()
-{
-}
-
-ARuneMutator::ARuneMutator()
-  : AMutator()
-{
-}
-
-ARuneMutator::~ARuneMutator()
-{
-}
-
 AScriptDispatcher::AScriptDispatcher()
   : AKeypoint()
 {
@@ -114,8 +96,6 @@ IMPLEMENT_NATIVE_CLASS( AParticleSystem );
 IMPLEMENT_NATIVE_CLASS( AScriptAction );
 IMPLEMENT_NATIVE_CLASS( AScriptDispatcher );
 IMPLEMENT_NATIVE_CLASS( ASoundPlayer );
-IMPLEMENT_ALIASED_CLASS( ARuneActor, GAME_Rune );
-IMPLEMENT_ALIASED_CLASS( ARuneMutator, GAME_Rune );
 
 BEGIN_PROPERTY_LINK( AAnimationProxy, 4 )
   LINK_NATIVE_PROPERTY( curWeapon );
@@ -202,65 +182,6 @@ BEGIN_PROPERTY_LINK( AParticleSystem, 66 )
   LINK_NATIVE_PROPERTY( bEventParticleTick );
   LINK_NATIVE_PROPERTY( bTaperStartPoint );
   LINK_NATIVE_PROPERTY( bTaperEndPoint );
-END_PROPERTY_LINK()
-
-BEGIN_PROPERTY_LINK( ARuneActor, 52 )
-  LINK_NATIVE_PROPERTY( bReleaseLock );
-  LINK_NATIVE_PROPERTY( bRenderedLastFrame );
-  LINK_NATIVE_PROPERTY( bSpecialRender );
-  LINK_NATIVE_PROPERTY( bFrameNotifies );
-  LINK_NATIVE_PROPERTY( bLookFocusPlayer );
-  LINK_NATIVE_PROPERTY( bLookFocusCreature );
-  LINK_NATIVE_PROPERTY( bForceRender );
-  LINK_NATIVE_PROPERTY( BaseJoint );
-  LINK_NATIVE_PROPERTY( BaseMatterType );
-  LINK_NATIVE_PROPERTY( BaseScrollDir );
-  LINK_NATIVE_PROPERTY( bHasShadow );
-  LINK_NATIVE_PROPERTY( ShadowTexture );
-  LINK_NATIVE_PROPERTY( ShadowVector );
-  LINK_NATIVE_PROPERTY( ColorAdjust );
-  LINK_NATIVE_PROPERTY( DesiredColorAdjust );
-  LINK_NATIVE_PROPERTY( DesiredFatness );
-  LINK_NATIVE_PROPERTY( AlphaScale );
-  LINK_NATIVE_PROPERTY( LODPolyCount );
-  LINK_NATIVE_PROPERTY( LODDistMax );
-  LINK_NATIVE_PROPERTY( LODDistMin );
-  LINK_NATIVE_PROPERTY( LODPercentMin );
-  LINK_NATIVE_PROPERTY( LODPercentMax );
-  LINK_NATIVE_PROPERTY( LODCurve );
-  LINK_NATIVE_PROPERTY( bPointLight );
-  LINK_NATIVE_PROPERTY( bMirrored );
-  LINK_NATIVE_PROPERTY( bPreLight );
-  LINK_NATIVE_PROPERTY( bComplexOcclusion );
-  LINK_NATIVE_PROPERTY( AttachParent );
-  LINK_NATIVE_PROPERTY( AttachParentJoint );
-  LINK_NATIVE_PROPERTY( IncrementStat );
-  LINK_NATIVE_PROPERTY( bJointsBlock );
-  LINK_NATIVE_PROPERTY( bJointsTouch );
-  LINK_NATIVE_PROPERTY( bSweepable );
-  LINK_NATIVE_PROPERTY( bSpecialLit2 );
-  LINK_NATIVE_PROPERTY( bSpecialLit3 );
-  LINK_NATIVE_PROPERTY( bNegativeLight );
-  LINK_NATIVE_PROPERTY( bAffectWorld );
-  LINK_NATIVE_PROPERTY( bAffectActors );
-  LINK_NATIVE_PROPERTY( bNoSurfaceBob );
-  LINK_NATIVE_PROPERTY( bDrawSkel );
-  LINK_NATIVE_PROPERTY( bDrawJoints );
-  LINK_NATIVE_PROPERTY( bDrawAxes );
-  LINK_NATIVE_PROPERTY( bApplyLagToAccelerators );
-  LINK_NATIVE_PROPERTY( SkelMesh );
-  LINK_NATIVE_PROPERTY( Skeletal );
-  LINK_NATIVE_PROPERTY( SubstituteMesh );
-  LINK_NATIVE_PROPERTY( BlendAnimAlpha );
-  LINK_NATIVE_PROPERTY( AnimProxy );
-  LINK_NATIVE_PROPERTY( SkelGroupSkins );
-  LINK_NATIVE_PROPERTY( SkelGroupFlags );
-  LINK_NATIVE_PROPERTY( JointFlags );
-  LINK_NATIVE_PROPERTY( JointChild );
-END_PROPERTY_LINK()
-
-BEGIN_PROPERTY_LINK( ARuneMutator, 1 )
-  LINK_NATIVE_PROPERTY( DefaultShield );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( AScriptAction, 16 )

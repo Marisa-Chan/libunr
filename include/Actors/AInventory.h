@@ -138,6 +138,11 @@ class AInventory : public AActor
   int BeltPos;
   FString* Description;
   FString* BeltDescription;
+
+  // Rune Variables
+  bool bExpireWhenTossed;
+  float ExpireTime;
+  USound* DropSound;
 };
 
 class APickup : public AInventory

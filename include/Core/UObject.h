@@ -295,9 +295,6 @@ public: \
 #define DECLARE_NATIVE_CLASS(cls, supcls, flags, pkg) \
   DECLARE_NATIVE_CLASS_BASE(cls, supcls, flags, pkg) \
 
-#define DECLARE_ALIASED_CLASS(cls, replaced, flags, pkg) \
-  DECLARE_NATIVE_CLASS_BASE(cls, replaced, flags|CLASS_Aliased, pkg) \
-
 #define IMPLEMENT_NATIVE_CLASS(cls) \
   UClass* cls::ObjectClass = NULL; \
   size_t  cls::NativeSize  = sizeof( cls ); \
@@ -348,44 +345,6 @@ public: \
         return true; \
       } \
       return false; \
-    } \
-    return true; \
-  } \
-
-#define IMPLEMENT_ALIASED_CLASS(cls,game) \
-  UClass* cls::ObjectClass = NULL; \
-  size_t  cls::NativeSize  = sizeof( cls ); \
-  FNativePropertyList* cls::StaticNativePropList = NULL; \
-  bool cls::StaticSetPackageProperties() \
-  { \
-    Super::StaticNativePropList->AppendList( StaticNativePropList ); \
-    ObjectClass->Pkg = UPackage::StaticLoadPackage( NativePkgName ); \
-    if ( ObjectClass->Pkg == NULL ) \
-    { \
-      Logf( LOG_CRIT, "Failed to load package '%s' for class '%s'.", NativePkgName, ObjectClass->Name ); \
-      return false; \
-    } \
-    ObjectClass->Export = Super::ObjectClass->Export; \
-    if ( ObjectClass->Export == NULL ) \
-    { \
-      ObjectClass->ObjectFlags = RF_EliminateObject; \
-      return true; \
-    } \
-    ObjectClass->Export->Obj = ObjectClass; \
-    ObjectClass->ObjectFlags = ObjectClass->Export->ObjectFlags; \
-    ObjectClass->Pkg->bIntrinsicPackage = true; \
-    return true; \
-  } \
-  bool cls::StaticCreateClass() \
-  { \
-    /* skip if aliased class going to be supported */ \
-    if ( !(GSystem->GameFlags & game) ) \
-      return true; \
-    if (!ObjectClass) \
-    { \
-      ObjectClass = Super::ObjectClass; \
-      ObjectClass->Constructor = cls::NativeConstructor; \
-      ObjectClass->StructSize = NativeSize; \
     } \
     return true; \
   } \

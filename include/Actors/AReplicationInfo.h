@@ -72,6 +72,12 @@ class APlayerReplicationInfo : public AReplicationInfo
 
   // Deus Ex Variables
   float Streak;
+
+  // Rune Variables
+  bool bReadyToPlay;
+  bool bFirstBlood;
+  int MaxSpree;
+  int HeadKills;
 };
 
 class AGameReplicationInfo : public AReplicationInfo

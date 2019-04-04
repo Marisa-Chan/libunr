@@ -17,11 +17,13 @@
 \*===========================================================================*/
 
 /*========================================================================
- * ARuneActor.h - Actor class replacement for Rune
+ * ARuneActor.h - Various actor classes specific to Rune
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
+
+#pragma once
 
 #include "Actors/AActor.h"
 #include "Actors/AHUD.h"
@@ -62,77 +64,6 @@ class DLL_EXPORT ADebugHUD : public AHUD
   AActor* Watch;
   int DebugMode;
   int DebugHudMode;
-};
-
-class DLL_EXPORT ARuneMutator : public AMutator
-{
-  DECLARE_ALIASED_CLASS( ARuneMutator, AMutator, 0, Engine )
-  EXPOSE_TO_USCRIPT()
-
-  ARuneMutator();
-
-  UClass* DefaultShield;
-};
-
-class DLL_EXPORT ARuneActor : public AActor
-{
-  DECLARE_ALIASED_CLASS( ARuneActor, AActor, CLASS_NativeReplication, Engine )
-  EXPOSE_TO_USCRIPT()
-
-  ARuneActor();
-
-  bool bReleaseLock;
-  bool bRenderedLastFrame;
-  bool bSpecialRender;
-  bool bFrameNotifies;
-  bool bLookFocusPlayer;
-  bool bLookFocusCreature;
-  bool bForceRender;
-  u8 BaseJoint;
-  u8 BaseMatterType;
-  FVector BaseScrollDir;
-  bool bHasShadow;
-  class UShadowTexture* ShadowTexture;
-  FVector ShadowVector;
-  FVector ColorAdjust;
-  FVector DesiredColorAdjust;
-  u8 DesiredFatness;
-  float AlphaScale;
-  int LODPolyCount;
-  float LODDistMax;
-  float LODDistMin;
-  float LODPercentMin;
-  float LODPercentMax;
-  u8 LODCurve;
-  bool bPointLight;
-  bool bMirrored;
-  bool bPreLight;
-  bool bComplexOcclusion;
-  AActor* AttachParent;
-  u8 AttachParentJoint;
-  u8 IncrementStat;
-  bool bJointsBlock;
-  bool bJointsTouch;
-  bool bSweepable;
-  bool bSpecialLit2;
-  bool bSpecialLit3;
-  bool bNegativeLight;
-  bool bAffectWorld;
-  bool bAffectActors;
-  bool bNoSurfaceBob;
-  bool bDrawSkel;
-  bool bDrawJoints;
-  bool bDrawAxes;
-  bool bApplyLagToAccelerators;
-  u8 SkelMesh;
-  USkelModel* Skeletal;
-  USkelModel* SubstituteMesh;
-  float BlendAnimAlpha;
-  class AAnimationProxy* AnimProxy;
-  UTexture* SkelGroupSkins[16];
-  int SkelGroupFlags[16];
-  u8 JointFlags[50];
-  AActor* JointChild[50];
 };
 
 class AParticleSystem : public AActor

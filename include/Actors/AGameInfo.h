@@ -174,5 +174,18 @@ class AGameInfo : public AInfo
   int DemoBuild;
   int DemoHasTuts;
   FString* EnabledMutators;
+
+  // Rune Variables
+  bool bSubtitles;
+  bool bAllowWeaponDrop;
+  bool bAllowShieldDrop;
+  bool bAutoPickup;
+  bool bEllipticalMovement;
+  UClass* DefaultShield;
+  FString* MutatorMenuType;
+  FString* MaplistMenuType;
+  float DebrisPercentage;
+  float ParticlePercentage;
+  bool bAllowLimbSever;
 };
 

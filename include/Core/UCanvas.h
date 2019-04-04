@@ -65,6 +65,12 @@ class UCanvas : public UObject
   int RenderPtr; // this and FramePtr are probably not useful anymore
   FCoords RenderCoords;
 
+  // Rune Variables
+  float AlphaScale;
+  UFont* RuneMedFont;
+  UFont* CredsFont;
+  UFont* ButtonFont;
+
   // Functions
   void StrLen( FString* Str, float* XL, float* YL );
   void DrawText( FString* Text, bool CR = false, int PolyFlags = 0 );

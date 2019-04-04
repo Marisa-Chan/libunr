@@ -67,14 +67,6 @@
 
 // Rune specific headers
 #include "Rune/ARuneActor.h"
-#include "Rune/ARuneGameInfo.h"
-#include "Rune/ARuneMutator.h"
-#include "Rune/ARunePawn.h"
-#include "Rune/ARunePlayerPawn.h"
-#include "Rune/ARunePRI.h"
-#include "Rune/ARuneWeapon.h"
-#include "Rune/ARuneZoneInfo.h"
-#include "Rune/URuneCanvas.h"
 
 bool UObject::StaticInit()
 {
@@ -263,7 +255,6 @@ bool UObject::StaticInit()
       Result &= APickup::StaticClassInit();
         Result &= AAmmo::StaticClassInit();
       Result &= AWeapon::StaticClassInit();
-        Result &= ARuneWeapon::StaticClassInit(); // aliased class
     Result &= AInventoryAttachment::StaticClassInit();
       Result &= AWeaponAttachment::StaticClassInit();
       Result &= AWeaponMuzzleFlash::StaticClassInit();
@@ -276,7 +267,6 @@ bool UObject::StaticInit()
       Result &= ASunlightCorona::StaticClassInit();
     Result &= AMenu::StaticClassInit();
     Result &= AMutator::StaticClassInit();
-      Result &= ARuneMutator::StaticClassInit(); // aliased class
     Result &= ANavigationPoint::StaticClassInit();
       Result &= AInventorySpot::StaticClassInit();
       Result &= ALiftCenter::StaticClassInit();
@@ -315,17 +305,6 @@ bool UObject::StaticInit()
     Result &= AScriptAction::StaticClassInit();
     Result &= ASoundPlayer::StaticClassInit(); // useful for all games but why native?
   }
-
-    // The classes with the *Rune prefix will alias their respective superclasses
-    /*Result &= ARuneGameInfo::StaticClassInit();
-    Result &= ARuneMutator::StaticClassInit();
-    Result &= ARunePawn::StaticClassInit();
-    Result &= ARunePlayerPawn::StaticClassInit();
-    Result &= ARunePlayerReplicationInfo::StaticClassInit();
-    Result &= ARuneWeapon::StaticClassInit();
-    Result &= ARuneZoneInfo::StaticClassInit();
-    Result &= URuneCanvas::StaticClassInit();
-    Result &= APolyObj::StaticClassInit();*/
 
   // Load base actor class
   AActor::StaticClass()->PreLoad();

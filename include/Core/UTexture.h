@@ -268,6 +268,7 @@ class DLL_EXPORT UTexture : public UBitmap
 
   FColor PaletteTransform;
   void*  TextureHandle; // ???
+  u8     TextureMaterial;
   
   virtual void Load();
 };

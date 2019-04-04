@@ -469,6 +469,60 @@ class AActor : public UObject
   bool     bVisionImportant;
   float    RelevantRadius;
 
+  // Rune Variables
+  bool bReleaseLock;
+  bool bRenderedLastFrame;
+  bool bSpecialRender;
+  bool bFrameNotifies;
+  bool bLookFocusPlayer;
+  bool bLookFocusCreature;
+  bool bForceRender;
+  u8 BaseJoint;
+  u8 BaseMatterType;
+  FVector BaseScrollDir;
+  bool bHasShadow;
+  class UShadowTexture* ShadowTexture;
+  FVector ShadowVector;
+  FVector ColorAdjust;
+  FVector DesiredColorAdjust;
+  u8 DesiredFatness;
+  float AlphaScale;
+  int LODPolyCount;
+  float LODDistMax;
+  float LODDistMin;
+  float LODPercentMin;
+  float LODPercentMax;
+  u8 LODCurve;
+  bool bPointLight;
+  bool bMirrored;
+  bool bPreLight;
+  bool bComplexOcclusion;
+  AActor* AttachParent;
+  u8 AttachParentJoint;
+  u8 IncrementStat;
+  bool bJointsBlock;
+  bool bJointsTouch;
+  bool bSweepable;
+  bool bSpecialLit2;
+  bool bSpecialLit3;
+  bool bNegativeLight;
+  bool bAffectWorld;
+  bool bAffectActors;
+  bool bNoSurfaceBob;
+  bool bDrawSkel;
+  bool bDrawJoints;
+  bool bDrawAxes;
+  bool bApplyLagToAccelerators;
+  u8 SkelMesh;
+  class USkelModel* Skeletal;
+  class USkelModel* SubstituteMesh;
+  float BlendAnimAlpha;
+  class AAnimationProxy* AnimProxy;
+  UTexture* SkelGroupSkins[16];
+  int SkelGroupFlags[16];
+  u8 JointFlags[50];
+  AActor* JointChild[50];
+
   // Input keys.
   enum EInputKey
   {
@@ -769,6 +823,9 @@ class AMutator : public AActor
   AMutator* NextHUDMutator;
   bool bHUDMutator;
   UClass* DefaultWeapon;
+
+  // Rune specific
+  UClass* DefaultShield;
 };
 
 class AMenu : public AActor

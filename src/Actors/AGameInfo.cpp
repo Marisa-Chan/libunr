@@ -37,7 +37,7 @@ AGameInfo::~AGameInfo()
 
 IMPLEMENT_NATIVE_CLASS( AGameInfo );
 
-BEGIN_PROPERTY_LINK( AGameInfo, 125 )
+BEGIN_PROPERTY_LINK( AGameInfo, 136 )
   LINK_NATIVE_PROPERTY( ItemGoals );
   LINK_NATIVE_PROPERTY( KillGoals );
   LINK_NATIVE_PROPERTY( SecretGoals );
@@ -163,4 +163,15 @@ BEGIN_PROPERTY_LINK( AGameInfo, 125 )
   LINK_NATIVE_PROPERTY( DemoBuild );
   LINK_NATIVE_PROPERTY( DemoHasTuts );
   LINK_NATIVE_PROPERTY( EnabledMutators );
+  LINK_NATIVE_PROPERTY( bSubtitles );
+  LINK_NATIVE_PROPERTY( bAllowWeaponDrop );
+  LINK_NATIVE_PROPERTY( bAllowShieldDrop );
+  LINK_NATIVE_PROPERTY( bAutoPickup );
+  LINK_NATIVE_PROPERTY( bEllipticalMovement );
+  LINK_NATIVE_PROPERTY( DefaultShield );
+  LINK_NATIVE_PROPERTY( MutatorMenuType );
+  LINK_NATIVE_PROPERTY( MaplistMenuType );
+  LINK_NATIVE_PROPERTY( DebrisPercentage );
+  LINK_NATIVE_PROPERTY( ParticlePercentage );
+  LINK_NATIVE_PROPERTY( bAllowLimbSever );
 END_PROPERTY_LINK()

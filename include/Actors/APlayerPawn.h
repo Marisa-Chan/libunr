@@ -212,6 +212,22 @@ class DLL_EXPORT APlayerPawn : public APawn
   // Deus Ex Variables
   AActor* AdditionalViews[3];
   float TurnRateAdjuster;
+
+  // Rune Variables
+  class ADebugHUD* myDebugHUD;
+  float HudTranslucency;
+  float AtrophyTimer;
+  bool bBloodLust;
+  FVector PolyColorAdjust;
+  FVector DesiredPolyColorAdjust;
+  bool bClientSideAlpha;
+  float ClientSideAlphaScale;
+  u8 OldStyle;
+  float OldScale;
+  AWeapon* StowSpot[3];
+  bool bJustSpawned;
+  float LevelFadeAlpha;
+  u8 oldPhysics;
 };
 
 class ACamera : public APlayerPawn

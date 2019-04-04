@@ -68,7 +68,7 @@ IMPLEMENT_NATIVE_CLASS( AInventorySpot );
 IMPLEMENT_NATIVE_CLASS( AInventoryAttachment );
 IMPLEMENT_NATIVE_CLASS( APickup );
 
-BEGIN_PROPERTY_LINK( AInventory, 81 )
+BEGIN_PROPERTY_LINK( AInventory, 84 )
   LINK_NATIVE_PROPERTY( AutoSwitchPriority );
   LINK_NATIVE_PROPERTY( InventoryGroup );
   LINK_NATIVE_PROPERTY( bActivatable );
@@ -140,6 +140,9 @@ BEGIN_PROPERTY_LINK( AInventory, 81 )
   LINK_NATIVE_PROPERTY( BeltPos );
   LINK_NATIVE_PROPERTY( Description );
   LINK_NATIVE_PROPERTY( BeltDescription );
+  LINK_NATIVE_PROPERTY( bExpireWhenTossed );
+  LINK_NATIVE_PROPERTY( ExpireTime );
+  LINK_NATIVE_PROPERTY( DropSound );
 END_PROPERTY_LINK()
 
 BEGIN_PROPERTY_LINK( AInventorySpot, 1 )
