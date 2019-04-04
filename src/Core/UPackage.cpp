@@ -247,7 +247,9 @@ FNameEntry* UPackage::GetNameEntryByObjRef( int ObjRef )
     Index = (*Imports)[Index].ObjectName;
   else if ( ObjRef > 0 )
     Index = (*Exports)[Index].ObjectName;
-
+  else if ( ObjRef == 0 )
+    Index = FindName( "None" );
+  
   return &(*Names)[Index];
 }
 
