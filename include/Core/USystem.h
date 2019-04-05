@@ -42,7 +42,7 @@ class DLL_EXPORT USubsystem : public UObject
 };
 
 // Prompt callback for if the game has not been picked 
-typedef int(*GamePromptCallback)(Array<char*>*); // Names
+typedef int(*GamePromptCallback)(Array<char*>*, Array<char*>*, Array<char*>*);
 
 // Prompt callback for if audio/render devices have not been picked
 typedef void(*DevicePromptCallback)(char*, char*); // RenderBuf, AudioBuf

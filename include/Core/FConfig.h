@@ -65,6 +65,8 @@ public:
   void ReadStruct( const char* Category, const char* Variable, UStruct* Struct, void* StructLoc, size_t Index = 0 );
   void ReadObject( const char* Category, const char* Variable, UObject* Obj, size_t Index = 0 );
 
+  Array<char*>* GetRawValues( const char* Category, const char* Variable );
+
   // Write functions
   // These functions will write a variable to the config, updating it if it exists, creating
   // a new one otherwise
@@ -84,6 +86,8 @@ public:
   void WriteDouble( const char* Category, const char* Variable, double Value, size_t Index = 0 );
 
   void WriteObject( const char* Category, const char* Variable, UObject* Obj, size_t Index = 0 );
+
+  Array<char*>* CreateEntry( const char* Category, const char* Variable );
 
   // Accessors
   const char* GetName();

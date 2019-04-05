@@ -520,6 +520,26 @@ void FConfig::ReadObject( const char* Category, const char* Variable, UObject* O
 {
 }
 
+Array<char*>* FConfig::GetRawValues( const char* Category, const char* Variable )
+{
+  FHash CatHash = FnvHashString( Category ); // meow
+  for ( size_t i = 0; i < Categories.Size() && i != MAX_SIZE; i++ )
+  {
+    FConfigCategory* CatIter = Categories[i];
+    if ( CatIter->Hash == CatHash )
+    {
+      FHash VarHash = FnvHashString( Variable );
+      for ( size_t j = 0; j < CatIter->Entries->Size(); j++ )
+      {
+        FConfigEntry* Entry = (*CatIter->Entries)[j];
+        if ( Entry->Hash == VarHash )
+          return Entry->Values;
+      }
+    }
+  }
+  return NULL;
+}
+
 void FConfig::WriteString( const char* Category, const char* Variable, const char* Value, size_t Index )
 {
   FConfigCategory* Cat = NULL; // meow
@@ -569,6 +589,44 @@ void FConfig::WriteString( const char* Category, const char* Variable, const cha
      
   char** Val = &Entry->Values->Data()[ Index ];
   *Val = StringDup( Value );
+}
+
+Array<char*>* FConfig::CreateEntry( const char* Category, const char* Variable )
+{
+  FConfigCategory* CatIter;
+  FConfigEntry* Entry;
+  FHash CatHash = FnvHashString( Category ); // meow
+  for ( size_t i = 0; i < Categories.Size() && i != MAX_SIZE; i++ )
+  {
+    CatIter = Categories[i];
+    if ( CatIter->Hash == CatHash )
+    {
+      FHash VarHash = FnvHashString( Variable );
+      for ( size_t j = 0; j < CatIter->Entries->Size(); j++ )
+      {
+        Entry = (*CatIter->Entries)[j];
+        if ( Entry->Hash == VarHash )
+          return Entry->Values; // Don't make a new one if one already exists
+      }
+
+      Entry = new FConfigEntry();
+      Entry->Name = StringDup( Variable );
+      Entry->Hash = FnvHashString( Entry->Name );
+      CatIter->Entries->PushBack( Entry );
+      return Entry->Values;
+    }
+
+    CatIter = new FConfigCategory();
+    CatIter->Name = StringDup( Category );
+    CatIter->Hash = FnvHashString( CatIter->Name );
+
+    Entry = new FConfigEntry();
+    Entry->Name = StringDup( Variable );
+    Entry->Hash = FnvHashString( Entry->Name );
+    CatIter->Entries->PushBack( Entry );
+    return Entry->Values;
+  }
+  return NULL;
 }
 
 const char* FConfig::GetName()

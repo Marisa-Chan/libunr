@@ -147,50 +147,38 @@ bool USystem::PromptForGameInfo()
   if ( DoGamePrompt == NULL )
     return false;
 
-  Array<char*> Names;
-  int i = 0;
-  char* NameBuf = GLibunrConfig->ReadString( "Game", "Name", i );
+  Array<char*>* Names = GLibunrConfig->CreateEntry( "Game", "Name" );
+  Array<char*>* Execs = GLibunrConfig->CreateEntry( "Game", "Exec" );
+  Array<char*>* Paths = GLibunrConfig->CreateEntry( "Game", "Path" );
+
+  char* NameBuf = NULL;
+  char* ExecBuf = NULL;
   char* PathBuf = NULL;
-  
-  // Create array of possible names
-  while ( NameBuf != NULL || strnicmp( NameBuf, "None", 4 ) )
-  {
-    Names.PushBack( NameBuf );
-    NameBuf = GLibunrConfig->ReadString( "Game", "Name", ++i );
-  }
 
   // Run callback
-  i = DoGamePrompt( &Names );
+  int i = DoGamePrompt( Names, Execs, Paths );
 
   // Get name and set
-  NameBuf = Names[i];
-  PathBuf = GLibunrConfig->ReadString( "Game", "Path", i );
-  GameName = NameBuf;
+  NameBuf = (*Names)[i];
+  ExecBuf = (*Execs)[i];
+  PathBuf = (*Paths)[i];
+  GameName = ExecBuf;
 
   // Get real path 
   GamePath = new char[4096];
   xstl::Set( (char*)GamePath, 0, 4096 );
   RealPath( PathBuf, (char*)GamePath, 4096 );
 
-  // Free retrieved name values
-  for ( i = 0; i < Names.Size(); i++ )
-  {
-    if ( Names[i] != NameBuf )
-      xstl::Free( Names[i] );
-  }
-
-  xstl::Free( PathBuf );
-
   // Detect specific game support
-  if ( stricmp( NameBuf, "Unreal" ) == 0 )
+  if ( stricmp( ExecBuf, "Unreal" ) == 0 )
     GameFlags |= GAME_Unreal;
-  else if ( stricmp( NameBuf, "UnrealTournament" ) == 0 )
+  else if ( stricmp( ExecBuf, "UnrealTournament" ) == 0 )
     GameFlags |= GAME_UT99;
-  else if ( stricmp( NameBuf, "DeusEx" ) == 0 )
+  else if ( stricmp( ExecBuf, "DeusEx" ) == 0 )
     GameFlags |= GAME_DeusEx;
-  else if ( stricmp( NameBuf, "Rune" ) == 0 )
+  else if ( stricmp( ExecBuf, "Rune" ) == 0 )
     GameFlags |= GAME_Rune;
-  else if ( stricmp( NameBuf, "OpenUE" ) == 0 )
+  else if ( stricmp( ExecBuf, "OpenUE" ) == 0 )
     GameFlags |= GAME_All;
 
   return true;
