@@ -30,7 +30,7 @@
 #include "Core/UViewport.h"
 #include "Actors/AActor.h"
 
-class UCanvas : public UObject
+class DLL_EXPORT UCanvas : public UObject
 {
   DECLARE_NATIVE_CLASS( UCanvas, UObject, 0, Engine )
   EXPOSE_TO_USCRIPT()

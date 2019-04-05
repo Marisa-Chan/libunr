@@ -152,7 +152,7 @@ struct DLL_EXPORT FLightMapIndex
 
 };
 
-struct FVert
+struct DLL_EXPORT FVert
 {
   idx pVertex;
   idx iSide;
@@ -165,7 +165,7 @@ struct FVert
   }
 };
 
-struct FLeaf
+struct DLL_EXPORT FLeaf
 {
   idx iZone;
   idx iPermeating;
@@ -182,7 +182,7 @@ struct FLeaf
   }
 };
 
-struct FZoneProperties
+struct DLL_EXPORT FZoneProperties
 {
   class AZoneInfo* ZoneInfo;
   float LastRenderTime;

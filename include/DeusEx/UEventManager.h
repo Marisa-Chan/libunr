@@ -25,7 +25,7 @@
 
 #include "Core/UObject.h"
 
-class UEventManager : public UObject
+class DLL_EXPORT UEventManager : public UObject
 {
   DECLARE_NATIVE_CLASS( UEventManager, UObject, CLASS_NoExport, Engine )
   UEventManager();

@@ -27,7 +27,7 @@
 
 #include "Actors/AActor.h"
 
-class AStatLog : public AInfo
+class DLL_EXPORT AStatLog : public AInfo
 {
   DECLARE_NATIVE_CLASS( AStatLog, AInfo, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -60,7 +60,7 @@ class AStatLog : public AInfo
   bool     bWorldBatcherError;
 };
 
-class AStatLogFile : public AStatLog
+class DLL_EXPORT AStatLogFile : public AStatLog
 {
   DECLARE_NATIVE_CLASS( AStatLogFile, AStatLog, 0, Engine )
   EXPOSE_TO_USCRIPT()

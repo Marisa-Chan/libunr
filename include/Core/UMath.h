@@ -34,7 +34,7 @@ inline bool FltEqual( float A, float B )
   return fabsf( A - B ) <= FLT_MIN;
 }
 
-struct FVector
+struct DLL_EXPORT FVector
 {
   float X;
   float Y;
@@ -57,7 +57,7 @@ struct FVector
   }
 };
 
-struct FPlane : public FVector
+struct DLL_EXPORT FPlane : public FVector
 {
   float W;
 
@@ -76,7 +76,7 @@ struct FPlane : public FVector
   }
 };
 
-struct FQuat
+struct DLL_EXPORT FQuat
 {
   float X;
   float Y;
@@ -102,7 +102,7 @@ struct FQuat
   }
 };
 
-struct FRotator
+struct DLL_EXPORT FRotator
 {
   int Pitch;
   int Yaw;
@@ -125,7 +125,7 @@ struct FRotator
   }
 };
 
-struct FBox
+struct DLL_EXPORT FBox
 {
   FVector Min;
   FVector Max;
@@ -148,7 +148,7 @@ struct FBox
   }
 };
 
-struct FSphere : public FPlane
+struct DLL_EXPORT FSphere : public FPlane
 {
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FSphere& Sphere )
   {
@@ -167,7 +167,7 @@ struct FSphere : public FPlane
   }
 };
 
-struct FCoords
+struct DLL_EXPORT FCoords
 {
   FVector Origin;
   FVector XAxis;
@@ -185,7 +185,7 @@ struct FCoords
   }
 };
 
-struct FScale
+struct DLL_EXPORT FScale
 {
   FVector Scale;
   float   SheerRate;

@@ -57,7 +57,7 @@ struct DLL_EXPORT FURL
   bool   bValid;
 };
 
-class ULevelBase : public UObject
+class DLL_EXPORT ULevelBase : public UObject
 {
   DECLARE_NATIVE_CLASS( ULevelBase, UObject, CLASS_Abstract | CLASS_NoExport, Engine )
   ULevelBase();
@@ -72,7 +72,7 @@ class ULevelBase : public UObject
   UNetDriver* DemoRecDriver; // do we need this?
 };
 
-class ULevel : public ULevelBase
+class DLL_EXPORT ULevel : public ULevelBase
 {
   DECLARE_NATIVE_CLASS( ULevel, ULevelBase, CLASS_NoExport, Engine )
   EXPORTABLE()

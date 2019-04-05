@@ -28,7 +28,7 @@
 #include "Core/UPlayer.h"
 #include "Core/USystem.h"
 
-class UNetConnection : public UPlayer
+class DLL_EXPORT UNetConnection : public UPlayer
 {
   DECLARE_NATIVE_CLASS( UNetConnection, UPlayer, 
       CLASS_NoExport | CLASS_Transient | CLASS_Config, Engine )
@@ -37,7 +37,7 @@ class UNetConnection : public UPlayer
   UNetConnection();
 };
 
-class UNetDriver : public USubsystem
+class DLL_EXPORT UNetDriver : public USubsystem
 {
   DECLARE_NATIVE_CLASS( UNetDriver, USubsystem,
       CLASS_NoExport | CLASS_Transient, Engine )
@@ -47,7 +47,7 @@ class UNetDriver : public USubsystem
   // TODO:
 };
 
-class USecurityData : public UObject
+class DLL_EXPORT USecurityData : public UObject
 {
   DECLARE_NATIVE_CLASS( USecurityData, UObject, CLASS_Config, Engine )
   EXPOSE_TO_USCRIPT()

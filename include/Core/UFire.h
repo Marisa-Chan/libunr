@@ -27,7 +27,7 @@
 
 #include "Core/UTexture.h"
 
-class UFractalTexture : public UTexture
+class DLL_EXPORT UFractalTexture : public UTexture
 {
   DECLARE_NATIVE_CLASS( UFractalTexture, UTexture, CLASS_Abstract, Fire )
   EXPOSE_TO_USCRIPT();
@@ -44,7 +44,7 @@ class UFractalTexture : public UTexture
   u8  bHasInit;
 };
 
-class UFireTexture : public UFractalTexture
+class DLL_EXPORT UFireTexture : public UFractalTexture
 {
   DECLARE_NATIVE_CLASS( UFireTexture, UFractalTexture, 0, Fire )
   EXPOSE_TO_USCRIPT();
@@ -132,7 +132,7 @@ class UFireTexture : public UFractalTexture
   u8  PenDownY;
 };
 
-class UWaterTexture : public UFractalTexture
+class DLL_EXPORT UWaterTexture : public UFractalTexture
 {
   DECLARE_NATIVE_CLASS( UWaterTexture, UFractalTexture, CLASS_Abstract, Fire )
   EXPOSE_TO_USCRIPT()
@@ -198,7 +198,7 @@ class UWaterTexture : public UFractalTexture
   int OldWaveAmp;
 };
 
-class UWaveTexture : public UWaterTexture
+class DLL_EXPORT UWaveTexture : public UWaterTexture
 {
   DECLARE_NATIVE_CLASS( UWaveTexture, UWaterTexture, 0, Fire )
   EXPOSE_TO_USCRIPT()
@@ -211,7 +211,7 @@ class UWaveTexture : public UWaterTexture
   u8 PhongSize;
 };
 
-class UWetTexture : public UWaterTexture
+class DLL_EXPORT UWetTexture : public UWaterTexture
 {
   DECLARE_NATIVE_CLASS( UWetTexture, UWaterTexture, 0, Fire )
   EXPOSE_TO_USCRIPT()
@@ -223,7 +223,7 @@ class UWetTexture : public UWaterTexture
   int       LocalSourceBitmap;
 };
 
-class UIceTexture : public UFractalTexture
+class DLL_EXPORT UIceTexture : public UFractalTexture
 {
   DECLARE_NATIVE_CLASS( UIceTexture, UFractalTexture, 0, Fire )
   EXPOSE_TO_USCRIPT()

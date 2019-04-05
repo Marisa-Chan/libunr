@@ -27,7 +27,7 @@
 
 #include "Core/UPlayer.h"
 
-class UViewport : public UPlayer
+class DLL_EXPORT UViewport : public UPlayer
 {
   DECLARE_NATIVE_CLASS( UViewport, UPlayer, CLASS_NoExport, Engine )
   UViewport();

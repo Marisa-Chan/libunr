@@ -230,7 +230,7 @@ class DLL_EXPORT APlayerPawn : public APawn
   u8 oldPhysics;
 };
 
-class ACamera : public APlayerPawn
+class DLL_EXPORT ACamera : public APlayerPawn
 {
   DECLARE_NATIVE_CLASS( ACamera, APlayerPawn, CLASS_Transient, Engine )
   EXPOSE_TO_USCRIPT()

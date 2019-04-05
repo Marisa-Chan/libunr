@@ -30,7 +30,7 @@
 #include "Core/USystem.h"
 #include "Core/UPrimitive.h"
 
-class UClient : public UObject
+class DLL_EXPORT UClient : public UObject
 {
   DECLARE_NATIVE_CLASS( UClient, UObject, CLASS_NoExport, Engine )
 
@@ -39,7 +39,7 @@ class UClient : public UObject
   // TODO:
 };
 
-class UEngine : public USubsystem
+class DLL_EXPORT UEngine : public USubsystem
 {
   DECLARE_NATIVE_CLASS( UEngine, USubsystem, CLASS_Transient, Engine )
   EXPOSE_TO_USCRIPT()

@@ -28,7 +28,7 @@
 
 #include "Actors/AZoneInfo.h"
 
-class ADynamicZoneInfo : public AZoneInfo
+class DLL_EXPORT ADynamicZoneInfo : public AZoneInfo
 {
   DECLARE_NATIVE_CLASS( ADynamicZoneInfo, AZoneInfo, 0, Engine )
   EXPOSE_TO_USCRIPT()

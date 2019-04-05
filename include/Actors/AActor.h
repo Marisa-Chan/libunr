@@ -45,7 +45,7 @@ class ATrigger;
 //   Unreal 227j_39
 //   UT 436
 //   Deus Ex 1.112
-class AActor : public UObject
+class DLL_EXPORT AActor : public UObject
 {
   DECLARE_NATIVE_CLASS( AActor, UObject, CLASS_NativeReplication, Engine )
   EXPOSE_TO_USCRIPT()
@@ -594,7 +594,7 @@ class AActor : public UObject
 
 };
 
-class ABlockingActor : public AActor
+class DLL_EXPORT ABlockingActor : public AActor
 {
   DECLARE_NATIVE_CLASS( ABlockingActor, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -607,7 +607,7 @@ class ABlockingActor : public AActor
   Array<UClass*>* ScriptBlocking;
 };
 
-class ADecoration : public AActor
+class DLL_EXPORT ADecoration : public AActor
 {
   DECLARE_NATIVE_CLASS( ADecoration, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -635,7 +635,7 @@ class ADecoration : public AActor
   float BaseEyeHeight;
 };
 
-class ACarcass : public ADecoration
+class DLL_EXPORT ACarcass : public ADecoration
 {
   DECLARE_NATIVE_CLASS( ACarcass, ADecoration, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -653,7 +653,7 @@ class ACarcass : public ADecoration
   APawn* Bugs;
 };
 
-class AInfo : public AActor
+class DLL_EXPORT AInfo : public AActor
 {
   DECLARE_NATIVE_CLASS( AInfo, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -661,7 +661,7 @@ class AInfo : public AActor
   AInfo();
 };
 
-class ASavedMove : public AInfo
+class DLL_EXPORT ASavedMove : public AInfo
 {
   DECLARE_NATIVE_CLASS( ASavedMove, AInfo, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -685,7 +685,7 @@ class ASavedMove : public AInfo
   bool bForceAltFire;
 };
 
-class AKeypoint : public AActor
+class DLL_EXPORT AKeypoint : public AActor
 {
   DECLARE_NATIVE_CLASS( AKeypoint, AActor, CLASS_Abstract, Engine )
   EXPOSE_TO_USCRIPT()
@@ -693,7 +693,7 @@ class AKeypoint : public AActor
   AKeypoint();
 };
 
-class ALocationID : public AKeypoint
+class DLL_EXPORT ALocationID : public AKeypoint
 {
   DECLARE_NATIVE_CLASS( ALocationID, AKeypoint, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -705,7 +705,7 @@ class ALocationID : public AKeypoint
   ALocationID* NextLocation;
 };
 
-class ACollisionPlane : public AKeypoint
+class DLL_EXPORT ACollisionPlane : public AKeypoint
 {
   DECLARE_NATIVE_CLASS( ACollisionPlane, AKeypoint, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -717,7 +717,7 @@ class ACollisionPlane : public AKeypoint
   bool bBlockNonZeroExtent;
 };
 
-class AInterpolationPoint : public AKeypoint
+class DLL_EXPORT AInterpolationPoint : public AKeypoint
 {
   DECLARE_NATIVE_CLASS( AInterpolationPoint, AKeypoint, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -741,7 +741,7 @@ class AInterpolationPoint : public AKeypoint
   AInterpolationPoint* Next;
 };
 
-class ALight : public AActor
+class DLL_EXPORT ALight : public AActor
 {
   DECLARE_NATIVE_CLASS( ALight, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -758,7 +758,7 @@ class ALight : public AActor
   Array<ShadowMoverInfo>* MoverShadowSurfs;
 };
 
-class ADynamicCorona : public ALight
+class DLL_EXPORT ADynamicCorona : public ALight
 {
   DECLARE_NATIVE_CLASS( ADynamicCorona, ALight, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -782,7 +782,7 @@ class ADynamicCorona : public ALight
   ECoronaAttenuateType CoronaAttenuate;
 };
 
-class ASunlightCorona : public ALight
+class DLL_EXPORT ASunlightCorona : public ALight
 {
   DECLARE_NATIVE_CLASS( ASunlightCorona, ALight, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -810,7 +810,7 @@ class ASunlightCorona : public ALight
   bool bUScriptRenderHandler;
 };
 
-class AMutator : public AActor
+class DLL_EXPORT AMutator : public AActor
 {
   DECLARE_NATIVE_CLASS( AMutator, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -828,7 +828,7 @@ class AMutator : public AActor
   UClass* DefaultShield;
 };
 
-class AMenu : public AActor
+class DLL_EXPORT AMenu : public AActor
 {
   DECLARE_NATIVE_CLASS( AMenu, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -854,7 +854,7 @@ class AMenu : public AActor
   FString* NoString;
 };
 
-class AProjectile : public AActor
+class DLL_EXPORT AProjectile : public AActor
 {
   DECLARE_NATIVE_CLASS( AProjectile, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -878,7 +878,7 @@ class AProjectile : public AActor
   AActor* LastHitActor;
 };
 
-class AStaticMeshActor : public AActor
+class DLL_EXPORT AStaticMeshActor : public AActor
 {
   DECLARE_NATIVE_CLASS( AStaticMeshActor, AActor, CLASS_NoUserCreate, Engine )
   EXPOSE_TO_USCRIPT()
@@ -890,7 +890,7 @@ class AStaticMeshActor : public AActor
   bool bComputeUnlitColor;
 };
 
-class ASpawnNotify : public AActor
+class DLL_EXPORT ASpawnNotify : public AActor
 {
   DECLARE_NATIVE_CLASS( ASpawnNotify, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -901,7 +901,7 @@ class ASpawnNotify : public AActor
   ASpawnNotify* Next;
 };
 
-class ATriggers : public AActor
+class DLL_EXPORT ATriggers : public AActor
 {
   DECLARE_NATIVE_CLASS( ATriggers, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -909,7 +909,7 @@ class ATriggers : public AActor
   ATriggers();
 };
 
-class ADispatcher : public ATriggers
+class DLL_EXPORT ADispatcher : public ATriggers
 {
   DECLARE_NATIVE_CLASS( ADispatcher, ATriggers, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -922,7 +922,7 @@ class ADispatcher : public ATriggers
   int i;
 };
 
-class ATrigger : public ATriggers
+class DLL_EXPORT ATrigger : public ATriggers
 {
   DECLARE_NATIVE_CLASS( ATrigger, ATriggers, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -958,7 +958,7 @@ class ATrigger : public ATriggers
   float SightAngle;
 };
 
-class AVisibilityNotify : public AInfo
+class DLL_EXPORT AVisibilityNotify : public AInfo
 {
   DECLARE_NATIVE_CLASS( AVisibilityNotify, AInfo, 0, Engine )
   EXPOSE_TO_USCRIPT()

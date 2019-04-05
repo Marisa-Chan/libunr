@@ -27,7 +27,7 @@
 
 #include "AActor.h"
 
-class AProjector : public AActor
+class DLL_EXPORT AProjector : public AActor
 {
   DECLARE_NATIVE_CLASS( AProjector, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()

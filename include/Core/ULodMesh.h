@@ -27,7 +27,7 @@
 
 #include "Core/UMesh.h"
 
-class ULodMesh : public UMesh
+class DLL_EXPORT ULodMesh : public UMesh
 {
   DECLARE_NATIVE_CLASS( ULodMesh, UMesh, CLASS_NoExport, Engine )
 

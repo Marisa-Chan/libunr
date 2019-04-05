@@ -29,7 +29,7 @@
 #include "Actors/AReplicationInfo.h"
 #include "Actors/AStatLog.h"
 
-class AGameInfo : public AInfo
+class DLL_EXPORT AGameInfo : public AInfo
 {
   DECLARE_NATIVE_CLASS( AGameInfo, AInfo, 0, Engine )
   EXPOSE_TO_USCRIPT()

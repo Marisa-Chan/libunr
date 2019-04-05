@@ -29,7 +29,7 @@
 
 class AActor;
 
-class UMesh : public UPrimitive
+class DLL_EXPORT UMesh : public UPrimitive
 {
   DECLARE_NATIVE_CLASS( UMesh, UPrimitive, CLASS_NoExport, Engine )
 
@@ -39,7 +39,7 @@ class UMesh : public UPrimitive
   // TODO:
 };
 
-class UAnimationNotify : public UObject
+class DLL_EXPORT UAnimationNotify : public UObject
 {
   DECLARE_NATIVE_CLASS( UAnimationNotify, UObject, 0, Engine )
   EXPOSE_TO_USCRIPT()

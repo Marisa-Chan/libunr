@@ -25,7 +25,7 @@
 
 #include "Actors/AActor.h"
 
-class ACameraPoint : public AKeypoint
+class DLL_EXPORT ACameraPoint : public AKeypoint
 {
   DECLARE_NATIVE_CLASS( ACameraPoint, AKeypoint, 0, Engine )
   EXPOSE_TO_USCRIPT()

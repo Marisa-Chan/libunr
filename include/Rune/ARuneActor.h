@@ -66,7 +66,7 @@ class DLL_EXPORT ADebugHUD : public AHUD
   int DebugHudMode;
 };
 
-class AParticleSystem : public AActor
+class DLL_EXPORT AParticleSystem : public AActor
 {
   DECLARE_NATIVE_CLASS( AParticleSystem, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -159,7 +159,7 @@ class AParticleSystem : public AActor
   bool bTaperEndPoint;
 };
 
-class AScriptDispatcher : public AKeypoint
+class DLL_EXPORT AScriptDispatcher : public AKeypoint
 {
   DECLARE_NATIVE_CLASS( AScriptDispatcher, AKeypoint, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -186,7 +186,7 @@ class AScriptDispatcher : public AKeypoint
   APawn* WaitingScripter;
 };
 
-class AScriptAction : public AKeypoint
+class DLL_EXPORT AScriptAction : public AKeypoint
 {
   DECLARE_NATIVE_CLASS( AScriptAction, AKeypoint, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -211,7 +211,7 @@ class AScriptAction : public AKeypoint
   APawn* WaitingScripter;
 };
 
-class ASoundPlayer : public AKeypoint
+class DLL_EXPORT ASoundPlayer : public AKeypoint
 {
   DECLARE_NATIVE_CLASS( ASoundPlayer, AKeypoint, 0, Engine )
   EXPOSE_TO_USCRIPT()

@@ -27,7 +27,7 @@
 
 #include "Actors/AActor.h"
 
-class ADecal : public AActor
+class DLL_EXPORT ADecal : public AActor
 {
   DECLARE_NATIVE_CLASS( ADecal, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()

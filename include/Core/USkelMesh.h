@@ -27,7 +27,7 @@
 
 #include "Core/ULodMesh.h"
 
-class USkeletalMesh : public ULodMesh
+class DLL_EXPORT USkeletalMesh : public ULodMesh
 {
   DECLARE_NATIVE_CLASS( USkeletalMesh, ULodMesh, CLASS_NoExport, Engine )
 

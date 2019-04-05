@@ -27,7 +27,7 @@
 
 #include "Core/UObject.h"
 
-class ULanguage : public UObject
+class DLL_EXPORT ULanguage : public UObject
 {
   DECLARE_NATIVE_CLASS( ULanguage, UObject, CLASS_NoExport, Core )
 

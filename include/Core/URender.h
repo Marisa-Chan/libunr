@@ -29,7 +29,7 @@
 
 class APlayerPawn;
 
-class URenderIterator : public UObject
+class DLL_EXPORT URenderIterator : public UObject
 {
   DECLARE_NATIVE_CLASS( URenderIterator, UObject, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -54,7 +54,7 @@ class URenderIterator : public UObject
   void* Frame;
 };
 
-class URenderDevice : public USubsystem
+class DLL_EXPORT URenderDevice : public USubsystem
 {
   DECLARE_NATIVE_CLASS( URenderDevice, USubsystem, CLASS_NoExport, Engine )
 
@@ -63,7 +63,7 @@ class URenderDevice : public USubsystem
   // TODO:
 };
 
-class URenderBase : public USubsystem
+class DLL_EXPORT URenderBase : public USubsystem
 {
   DECLARE_NATIVE_CLASS( URenderBase, USubsystem, CLASS_NoExport, Engine )
 
@@ -73,7 +73,7 @@ class URenderBase : public USubsystem
   // TODO:
 };
 
-class UStaticLightData : public UObject
+class DLL_EXPORT UStaticLightData : public UObject
 {
   DECLARE_NATIVE_CLASS( UStaticLightData, UObject, CLASS_NoExport, Engine )
   UStaticLightData();

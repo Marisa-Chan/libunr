@@ -31,7 +31,7 @@
 
 class AActor;
 
-class UAnimation : public UObject
+class DLL_EXPORT UAnimation : public UObject
 {
   DECLARE_NATIVE_CLASS( UAnimation, UObject, CLASS_NoExport, Engine )
 
@@ -40,7 +40,7 @@ class UAnimation : public UObject
   // TODO: Fill out variables when we get to implementing this
 };
 
-class USkeletalMeshInstance : public UObject
+class DLL_EXPORT USkeletalMeshInstance : public UObject
 {
   DECLARE_NATIVE_CLASS( USkeletalMeshInstance, UObject, 0, Engine )
   EXPOSE_TO_USCRIPT()
