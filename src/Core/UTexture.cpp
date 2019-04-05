@@ -85,7 +85,7 @@ void UTexture::Load()
   *PkgFile >> MipCount;
   Mips.Resize( MipCount );
 
-  for ( int i = 0; i < MipCount; i++ )
+  for ( int i = 0; i < 1/*MipCount*/; i++ )
   {
     u32 WidthOffset = 0;
     idx MipMapSize;
