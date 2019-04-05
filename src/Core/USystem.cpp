@@ -115,8 +115,8 @@ const char* USystem::ResolvePath( const char* PkgName )
             return StringDup( RealPath.Data() );
           }
         }
+        closedir(dir);
       }
-      closedir(dir);
     }
 #endif
     perror("ResolvePath");
