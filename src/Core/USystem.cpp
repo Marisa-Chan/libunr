@@ -148,20 +148,17 @@ bool USystem::PromptForGameInfo()
     return false;
 
   Array<char*>* Names = GLibunrConfig->CreateEntry( "Game", "Name" );
-  Array<char*>* Execs = GLibunrConfig->CreateEntry( "Game", "Exec" );
-  Array<char*>* Paths = GLibunrConfig->CreateEntry( "Game", "Path" );
-
   char* NameBuf = NULL;
   char* ExecBuf = NULL;
   char* PathBuf = NULL;
 
   // Run callback
-  int i = DoGamePrompt( Names, Execs, Paths );
+  int i = DoGamePrompt( Names );
 
   // Get name and set
-  NameBuf = (*Names)[i];
-  ExecBuf = (*Execs)[i];
-  PathBuf = (*Paths)[i];
+  NameBuf = GLibunrConfig->ReadString( "Game", "Name", i );
+  ExecBuf = GLibunrConfig->ReadString( "Game", "Exec", i );
+  PathBuf = GLibunrConfig->ReadString( "Game", "Path", i );
   GameName = ExecBuf;
 
   // Get real path 
