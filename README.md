@@ -58,12 +58,11 @@ code into other projects, the use of ideas that UE4 implements in other projects
 	- git clone https://Xaleros@bitbucket.org/Xaleros/libunr.git
 
 4) Run, in the root folder, the following command
-	- cmake -DCMAKE_BUILD_TYPE=<buildtype> -DTARGET_PLATFORM=<platform> .
+	- cmake -DCMAKE_BUILD_TYPE=<buildtype> -DBUILD32=<On/Off> .
 		- buildtype can be "Debug", "Release", or "RelWithDebInfo"
-        - platform can be "Linux" (more platforms will be added later, or Linux platform renamed to something more universal)
 	- make
 
-6) (optional) Download a program to use this library with
+6) (optional) Download/Build a program to use this library with
 	- Libunr UCC (lucc) can be found here -> https://bitbucket.org/Xaleros/lucc/
 ```
 
