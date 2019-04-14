@@ -19,17 +19,22 @@ macro(install_symlink filepath sympath)
     install(CODE "message(\"-- Created symlink: ${sympath} -> ${filepath}\")")
 endmacro(install_symlink)
 
+set (TARGET_PLATFORM "POSIX" CACHE STRING "The target platform that is being built for") 
+
+option( BUILD32 "Build32" OFF )
+option( BUILD_CYGWIN "Build_Cygwin" OFF )
+
 #System Include Dir
-if ( WIN32 )
-  set (SYS_INC_PATH C:\\MinGW\\include)
+if ( TARGET_PLATFORM STREQUAL "Windows" )
+  if ( BUILD32 )
+	set (SYS_INC_PATH C:\\MinGW\\include)
+  else()
+	set (SYS_INC_PATH C:\\Program\ Files\\mingw-w64\\x86_64-8.1.0-posix-seh-rt_v6-rev0\\mingw64\\include)
+  endif()
   message(${SYS_INC_PATH})
 else()
   set (SYS_INC_PATH /usr/include)
 endif()
-
-set (TARGET_PLATFORM "Linux" CACHE STRING "The target platform that is being built for") 
-
-option( BUILD32 "Build32" OFF )
 
 #Check for libxstl, Use <> by default, if not found, use ../xstl
 
@@ -72,8 +77,8 @@ set_target_properties( xstl PROPERTIES IMPORTED_LOCATION "${XSTL_LIB_PATH}" )
 
 if ( TARGET_PLATFORM STREQUAL "Windows" )
   add_definitions("-DLIBUNR_WIN32" "-Wno-invalid-offsetof")
-elseif ( TARGET_PLATFORM STREQUAL "Linux" )
-  add_definitions("-DLIBUNR_LINUX")
+elseif ( TARGET_PLATFORM STREQUAL "POSIX" )
+  add_definitions("-DLIBUNR_POSIX")
   install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/share/libunr)
   install(FILES ${UNR_ROOT}/res/DefaultLibunr.ini DESTINATION
     ${CMAKE_INSTALL_PREFIX}/share/libunr)
@@ -142,7 +147,12 @@ set_source_files_properties( tags PROPERTIES GENERATED true )
 add_custom_target( tags COMMAND ctags --c++-kinds=+p --fields=+iaS --extra=+q
  --language-force=C++ --recurse=yes . WORKING_DIRECTORY ${UNR_ROOT} )
 add_library( unr SHARED ${SOURCES} tags )
-target_link_libraries(unr xstl)
+
+if ( TARGET_PLATFORM STREQUAL "Windows" )
+	target_link_libraries(unr libxstl.dll.a)
+else()
+	target_link_libraries(unr xstl)
+endif()
 
 # Debug symbols & optimization levels
 if ( CMAKE_BUILD_TYPE STREQUAL "Debug" )
@@ -162,7 +172,7 @@ if ( BUILD32 )
   set_target_properties (unr PROPERTIES LINK_FLAGS "-m32")
   if ( TARGET_PLATFORM STREQUAL "Windows" )
     install(TARGETS unr DESTINATION "${WINDOWS_32_INSTALL_PATH}\\libunr")
-  elseif ( TARGET_PLATFORM STREQUAL "Linux" )
+  elseif ( TARGET_PLATFORM STREQUAL "POSIX" )
     install(TARGETS unr DESTINATION lib32/libunr)
   endif()
 
@@ -170,7 +180,7 @@ else()
 
     if ( TARGET_PLATFORM STREQUAL "Windows" )
         install(TARGETS unr DESTINATION libunr)
-    elseif ( TARGET_PLATFORM STREQUAL "Linux" )
+    elseif ( TARGET_PLATFORM STREQUAL "POSIX" )
         install(TARGETS unr DESTINATION lib64/libunr)
     endif()
 

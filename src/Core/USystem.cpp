@@ -27,6 +27,13 @@
 #include "Core/USystem.h"
 #include "Core/UPackage.h"
 
+#ifdef LIBUNR_WIN32
+  #include "Windows.h"
+  #undef CopyFile
+  #undef TEXT
+  #define TEXT(s) #s
+#endif
+
 USystem* GSystem = NULL;
 int USystem::LogLevel = LOG_INFO;
 bool USystem::bIsEditor = false;
@@ -43,10 +50,12 @@ USystem::USystem()
 {
   GamePath = NULL;
   GameName = NULL;
+  GameFlags = NULL;
   PurgeCacheDays = 0;
   SavePath = NULL;
   CachePath = NULL;
   CacheExt = new FString(".uxx");
+  bEnhancedRuntime = false;
 }
 
 USystem::~USystem()
@@ -176,7 +185,10 @@ bool USystem::PromptForGameInfo()
   else if ( stricmp( ExecBuf, "Rune" ) == 0 )
     GameFlags |= GAME_Rune;
   else if ( stricmp( ExecBuf, "OpenUE" ) == 0 )
+  {
+    bEnhancedRuntime = true;
     GameFlags |= GAME_All;
+  }
 
   return true;
 }
@@ -205,7 +217,7 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool
   {
     // Create an ini if its missing
     Logf( LOG_WARN, "Main ini file '%s' does not exist; creating one", LibunrIniPath );
-#if defined LIBUNR_LINUX || LIBUNR_BSD
+#if defined LIBUNR_POSIX
     String* ConfigLibunr = new String( GetHomeDir() );
     ConfigLibunr->Append( "/.config/libunr/" );
     DIR* ConfigLibunrDir = opendir( ConfigLibunr->Data() );
@@ -359,7 +371,7 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool
 
 const char* USystem::GetLibunrIniPath()
 {
-#if defined LIBUNR_LINUX || LIBUNR_BSD
+#if defined LIBUNR_POSIX
   static char LibUnrPath[1024] = { 0 };
   strcpy( LibUnrPath, GetHomeDir() );
   strcat( LibUnrPath, "/.config/libunr/libunr.ini" ); 
@@ -374,7 +386,7 @@ const char* USystem::GetLibunrIniPath()
 
 const char* USystem::GetDefaultLibunrIniPath()
 {
-#if defined LIBUNR_LINUX || LIBUNR_BSD
+#if defined LIBUNR_POSIX
   static char DefLibUnrPath[1024] = { 0 };
   strcpy( DefLibUnrPath, INSTALL_PREFIX );
   strcat( DefLibUnrPath, "/share/libunr/DefaultLibunr.ini" );
@@ -429,6 +441,8 @@ bool USystem::FileExists( const char* Filename )
   return (Status != ENOENT) ? true : false;
 }
 
+// FIXME: Verify that a directory traversal backwards is actually possible
+// This code looks *VERY* exploitable at the moment...
 void USystem::RealPath( const char* Path, char* FullPath, size_t FullPathSize )
 {
   char CurrentFolder[128] = { 0 };
@@ -437,8 +451,23 @@ void USystem::RealPath( const char* Path, char* FullPath, size_t FullPathSize )
   char* c = &CurrentFolder[0];
   u16 Len = 0;
 
+#ifdef LIBUNR_WIN32
+  char* FwdSlsh = strchr( Path, '/' );
+  if ( FwdSlsh != NULL )
+  {
+    *FwdSlsh++ = '\\';
+    while ( *FwdSlsh )
+    {
+      if ( *FwdSlsh == '/' )
+        *FwdSlsh = '\\';
+      FwdSlsh++;
+    }
+  }
+#endif
+
   if ( *p != DIRECTORY_SEPARATOR )
   {
+#ifndef LIBUNR_WIN32
     if ( *p == '~' )
     {
       strcat( FullPath, GetHomeDir() );
@@ -446,12 +475,15 @@ void USystem::RealPath( const char* Path, char* FullPath, size_t FullPathSize )
       f += strlen( FullPath );
     }
     else
+#else
+	if ( !(p[1] == ':' && p[2] == '\\') )
+#endif
     {
       // If the path doesn't start from root, get the current directory
       char* ignored = getcwd( FullPath, FullPathSize );
       f += strlen( FullPath );
-      *f++ = '/';
-      *c++ = '/';
+      *f++ = DIRECTORY_SEPARATOR;
+      *c++ = DIRECTORY_SEPARATOR;
     }
   }
 
@@ -505,9 +537,23 @@ bool USystem::MakeDir( const char* Path )
   size_t PathLen = strlen( Path );
   if ( PathLen >= 4096 )
   {
-    Logf( LOG_WARN, "Can't create directory '%s'; path is too long" );
+    Logf( LOG_WARN, "Can't create directory '%s'; path is too long", Path );
     return false;
   }
+  
+#ifdef LIBUNR_WIN32
+  char* FwdSlsh = strchr( Path, '/' );
+  if ( FwdSlsh != NULL )
+  {
+    *FwdSlsh++ = '\\';
+    while ( *FwdSlsh )
+    {
+      if ( *FwdSlsh == '/' )
+        *FwdSlsh = '\\';
+      FwdSlsh++;
+    }
+  }
+#endif
 
   char CurrentPath[4096] = { 0 };
   strcpy( CurrentPath, Path );
@@ -526,6 +572,13 @@ bool USystem::MakeDir( const char* Path )
   {
     if ( *s == DIRECTORY_SEPARATOR && CurrentPath[0] != '\0' )
     {
+    #ifdef LIBUNR_WIN32
+      if ( *(s-1) == ':' )
+      {
+		*c++ = *s++;
+        continue;
+	  }
+	#endif
       // Folder should now have the name of our current folder
       // stat() once to check for existence at all
       if (stat(CurrentPath, &sb) == 0)
@@ -540,7 +593,11 @@ bool USystem::MakeDir( const char* Path )
       else
       {
         // Directory does not exist, try to make it
+	  #ifndef LIBUNR_WIN32
         if ( mkdir( CurrentPath, S_IRWXU | S_IRGRP | S_IROTH ) < 0 ) 
+	  #else
+		if ( mkdir( CurrentPath ) < 0 ) 
+	  #endif
         {
           int err = errno;
           Logf( LOG_WARN, "Failed to create directory '%s'; couldn't create directory '%s'",
@@ -556,7 +613,7 @@ bool USystem::MakeDir( const char* Path )
   return true;
 }
 
-#if defined LIBUNR_LINUX || LIBUNR_BSD
+#if defined LIBUNR_POSIX
 const char* USystem::GetHomeDir()
 {
   struct ::passwd* pw = getpwuid( getuid() );

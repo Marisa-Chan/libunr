@@ -117,9 +117,9 @@ private:
   char* Name;
 };
 
-extern FConfig* GLibunrConfig; // Used only before loading any game
-extern FConfig* GGameConfig;   // Used when a game is picked
-extern FConfig* GUserConfig;   // Used when a game is picked
+extern DLL_EXPORT FConfig* GLibunrConfig; // Used only before loading any game
+extern DLL_EXPORT FConfig* GGameConfig;   // Used when a game is picked
+extern DLL_EXPORT FConfig* GUserConfig;   // Used when a game is picked
 
 class DLL_EXPORT FConfigManager
 {

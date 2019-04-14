@@ -29,12 +29,13 @@
 #include <string.h>
 #include <float.h>
 #include <math.h>
+#include <sys/stat.h>
 
 #include <libxstl/XTypes.h>
 #include <libxstl/XFileStream.h>
 #include <libxstl/XString.h>
 
-#if defined LIBUNR_LINUX
+#if defined LIBUNR_POSIX
   #include <sys/types.h>
   #include <sys/stat.h>
   #include <dirent.h>
@@ -251,7 +252,7 @@ struct DLL_EXPORT FNameEntry
  * FName
  * An index into the global name table
 -----------------------------------------------------------------------------*/
-struct FName
+struct DLL_EXPORT FName
 {
   u32 Index;
 

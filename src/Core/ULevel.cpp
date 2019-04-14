@@ -164,7 +164,7 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
 {
   FString Filename( Dir );
 #if defined LIBUNR_WIN32
-  Filename->ReplaceChars( '\\', '/' );
+  Filename.ReplaceChars( '\\', '/' );
 #endif
   if ( Filename.Back() != '/' )
     Filename += "/";

@@ -29,7 +29,7 @@
 
 class AWeapon;
 
-class AAmmo : public APickup
+class DLL_EXPORT AAmmo : public APickup
 {
   DECLARE_NATIVE_CLASS( AAmmo, APickup, 0, Engine );
   EXPOSE_TO_USCRIPT()
@@ -43,7 +43,7 @@ class AAmmo : public APickup
   AAmmo* PAmmo;
 };
 
-class AWeaponMuzzleFlash : public AInventoryAttachment
+class DLL_EXPORT AWeaponMuzzleFlash : public AInventoryAttachment
 {
   DECLARE_NATIVE_CLASS( AWeaponMuzzleFlash, AInventoryAttachment, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -56,7 +56,7 @@ class AWeaponMuzzleFlash : public AInventoryAttachment
   bool bCurrentlyVisible;
 };
 
-class AWeaponAttachment : public AInventoryAttachment
+class DLL_EXPORT AWeaponAttachment : public AInventoryAttachment
 {
   DECLARE_NATIVE_CLASS( AWeaponAttachment, AInventoryAttachment, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -69,7 +69,7 @@ class AWeaponAttachment : public AInventoryAttachment
   float               LastUpdateTime;
 };
 
-class AWeapon : public AInventory 
+class DLL_EXPORT AWeapon : public AInventory 
 {
   DECLARE_NATIVE_CLASS( AWeapon, AInventory, 0, Engine )
   EXPOSE_TO_USCRIPT()
