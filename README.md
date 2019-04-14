@@ -78,7 +78,7 @@ code into other projects, the use of ideas that UE4 implements in other projects
 	- git clone https://Xaleros@bitbucket.org/Xaleros/libunr.git
 
 4) Run, in the root folder, the following command
-	- cmake -DCMAKE_BUILD_TYPE=<buildtype> -DTARGET_PLATFORM=Windows -DBUILD32=<On/Off> .
+	- cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=<buildtype> -DTARGET_PLATFORM=Windows -DBUILD32=<On/Off> .
 		- buildtype can be "Debug", "Release", or "RelWithDebInfo"
 	- mingw32-make
 
