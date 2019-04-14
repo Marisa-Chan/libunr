@@ -111,6 +111,8 @@ const char* const LogLevelStrings[] =
 #define ERR_FILE_CREATE    3
 
 DLL_EXPORT void Logf( int Type, const char* Str, ... );
+DLL_EXPORT bool CreateLogFile( const char* Path );
+DLL_EXPORT void CloseLogFile();
 
 #define FNV1A_HASH 0
 #define FNV1_HASH  1

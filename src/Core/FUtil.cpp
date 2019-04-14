@@ -37,6 +37,49 @@
 #define CI_20_BIT_LIMIT 1048576 - 1
 #define CI_27_BIT_LIMIT 134217728  - 1
 
+FileStreamOut* GLogFile = NULL;
+
+bool CreateLogFile( const char* Path )
+{
+  char FullPath[4096];
+  USystem::RealPath( Path, FullPath, sizeof(FullPath) );
+  GLogFile = new FileStreamOut();
+  if ( GLogFile->Open( FullPath ) < 0 )
+  {
+    delete GLogFile;
+    GLogFile = NULL;
+    return false;
+  }
+
+  char TimeStr[32];
+  time_t TimeVal;
+  struct tm* TimeInfo;
+  time( &TimeVal );
+  TimeInfo = localtime( &TimeVal );
+  strftime( TimeStr, sizeof(TimeStr), "%Y-%m-%d %H:%M:%S", TimeInfo );
+
+  Logf( LOG_INFO, "Log file opened on %s", TimeStr );
+  return true;
+}
+
+void CloseLogFile()
+{
+  if ( GLogFile )
+  {
+    char TimeStr[32];
+    time_t TimeVal;
+    struct tm* TimeInfo;
+    time( &TimeVal );
+    TimeInfo = localtime( &TimeVal );
+    strftime( TimeStr, sizeof(TimeStr), "%Y-%m-%d %H:%M:%S", TimeInfo );
+  
+    Logf( LOG_INFO, "Log file closed on %s", TimeStr );
+    GLogFile->Close();
+    delete GLogFile;
+    GLogFile = NULL;
+  }
+}
+
 void Logf( int Type, const char* Str, ... )
 {
   if ( Type < USystem::LogLevel )
@@ -59,6 +102,8 @@ void Logf( int Type, const char* Str, ... )
   }
 
   printf( "%s", Msg );
+  if ( GLogFile )
+    GLogFile->Printf( "%s", Msg );
 }
 
 /*-----------------------------------------------------------------------------

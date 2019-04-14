@@ -148,6 +148,7 @@ void USystem::Exit( int ExitCode )
   // TODO: Print some kind of message box showing an error
 
   // Exit
+  CloseLogFile();
   exit( ExitCode );
 }
 
@@ -202,7 +203,7 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool
 {
   // Create global system
   GSystem = new USystem();
-  
+
   // (?) Should we check the function addresses to make sure its in text section?
   // Set callbacks
   GSystem->DoGamePrompt = GPC;
