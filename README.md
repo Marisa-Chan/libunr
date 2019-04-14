@@ -47,7 +47,9 @@ code into other projects, the use of ideas that UE4 implements in other projects
 
 # Building #
 
-1) Install CMake 3.7 and git
+(Unix/Linux)
+```
+1) Install CMake 3.7
 
 2) Download/Build XSTL (eXtenstible Standard Template Library)
 	- Currently, there are no binaries, pull from the repo and build here -> https://Xaleros@bitbucket.org/Xaleros/xstl.git
@@ -56,19 +58,36 @@ code into other projects, the use of ideas that UE4 implements in other projects
 	- git clone https://Xaleros@bitbucket.org/Xaleros/libunr.git
 
 4) Run, in the root folder, the following command
-	- cmake .
+	- cmake -DCMAKE_BUILD_TYPE=<buildtype> -DBUILD32=<On/Off> .
+		- buildtype can be "Debug", "Release", or "RelWithDebInfo"
 	- make
 
-5) Install the library somewhere
-	- for windows users, drag libxstl.dll and libunr.dll where ever your application is
-	- for linux users, run "sudo make install" after
+6) (optional) Download/Build a program to use this library with
+	- Libunr UCC (lucc) can be found here -> https://bitbucket.org/Xaleros/lucc/
+```
+
+(Windows)
+```
+1) Install MinGW64 and CMake 3.7
+
+2) Download/Build XSTL (eXtenstible Standard Template Library)
+	- Currently, there are no binaries, pull from the repo and build here -> https://Xaleros@bitbucket.org/Xaleros/xstl.git
+	- NOTE: Make a "libxstl" directory in your main MinGW include folder, then copy the files inside of "include" there
+
+3) Pull this repo with the following command
+	- git clone https://Xaleros@bitbucket.org/Xaleros/libunr.git
+
+4) Run, in the root folder, the following command
+	- cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=<buildtype> -DTARGET_PLATFORM=Windows -DBUILD32=<On/Off> .
+		- buildtype can be "Debug", "Release", or "RelWithDebInfo"
+	- mingw32-make
 
 6) (optional) Download a program to use this library with
 	- Libunr UCC (lucc) can be found here -> https://bitbucket.org/Xaleros/lucc/
-
+```
 # Installing #
 	
 TODO
 
 # Licensing #
-	GNU General Public License v3
+	GNU Affero General Public License v3
