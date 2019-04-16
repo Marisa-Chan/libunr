@@ -497,6 +497,7 @@ static u8 LoadScriptToken( UStruct* Struct, FPackageFileIn* PkgFile, u32* Parsed
       case EX_NameToString:
       case EX_VectorToString:
       case EX_RotatorToString:
+      case EX_StringToName2:
         LoadScriptToken( Struct, PkgFile, ParsedSize );
         break;
       case EX_Unk03:
@@ -504,7 +505,6 @@ static u8 LoadScriptToken( UStruct* Struct, FPackageFileIn* PkgFile, u32* Parsed
       case EX_Unk2b:
       case EX_Unk35:
       case EX_Unk37:
-      case EX_Unk5a:
       case EX_Unk5b:
       case EX_Unk5c:
       case EX_Unk5d:

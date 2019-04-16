@@ -129,6 +129,7 @@ const char* USystem::ResolvePath( const char* PkgName )
     }
 #endif
     perror("ResolvePath");
+    Logf( LOG_WARN, "Error loading package file '%s'", PkgName );
   }
 
   return GoodPath;

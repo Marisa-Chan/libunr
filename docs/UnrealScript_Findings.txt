@@ -43,4 +43,9 @@ Bugs/Misunderstandings
 ---------------------------------------------------------------------
 Unknown Opcodes
 ---------------------------------------------------------------------
-N/A
+- 0x5a: EX_StringToName2
+  Description:
+    This is exactly the same as EX_StringToName, but for some reason it
+    has a duplicate opcode. 
+    
+    First seen in "Brother Bear" in "Actor.StringToAnimName" at "0x6fbbf"

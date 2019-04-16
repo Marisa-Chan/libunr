@@ -29,14 +29,67 @@
 
 class AActor;
 
+struct DLL_EXPORT FMeshVert
+{
+  float X;
+  float Y;
+  float Z;
+  bool bDeusEx;
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FMeshVert& MV );
+};
+
+struct DLL_EXPORT FMeshTri
+{
+  u16 Vertex[3];
+  u8  VertexUV[2][3];
+  u32 Flags;
+  u32 TextureIndex;
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FMeshTri& MT );
+};
+
+struct DLL_EXPORT FMeshAnimFunc
+{
+  float Time;
+  UFunction* Function;
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FMeshAnimFunc& MAF );
+};
+
+struct DLL_EXPORT FMeshAnim
+{
+  FName Name;
+  FName Group;
+  u32   StartFrame;
+  u32   NumFrames;
+  Array<FMeshAnimFunc>* Functions;
+  float Rate;
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FMeshAnim& MA );
+};
+
+struct DLL_EXPORT FMeshVertConnect
+{
+  u32 NumVertTriangles;
+  u32 TriangleListOffset;
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FMeshVertConnect& MVC );
+};
+
 class DLL_EXPORT UMesh : public UPrimitive
 {
   DECLARE_NATIVE_CLASS( UMesh, UPrimitive, CLASS_NoExport, Engine )
 
   UMesh();
+  virtual void Load();
 
+  Array<FMeshVert>* Verts;
+  Array<FMeshTri>*  Tris;
+  Array<FMeshAnim>* Anims;
+  Array<FMeshVertConnect>* Connects;
   bool bCurvyMesh;
-  // TODO:
+  bool bDeusExMesh;
 };
 
 class DLL_EXPORT UAnimationNotify : public UObject

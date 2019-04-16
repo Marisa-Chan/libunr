@@ -185,7 +185,7 @@ int FConfig::Load( const char* Filename )
         if ( Probe == ']' )
           break;
 
-        if ( !isalnum( Probe ) && !IsAcceptedChar( Probe, "_. " ) )
+        if ( !isalnum( Probe ) && !IsAcceptedChar( Probe, "_./* " ) )
         {
           Set( CategoryBuf, 0, sizeof( CategoryBuf ) );
           break;

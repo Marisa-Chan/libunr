@@ -56,7 +56,7 @@ enum EScriptToken
   EX_RotatorToBool      = 0x51, EX_ByteToString       = 0x52, EX_IntToString        = 0x53,
   EX_BoolToString       = 0x54, EX_FloatToString      = 0x55, EX_ObjectToString     = 0x56,
   EX_NameToString       = 0x57, EX_VectorToString     = 0x58, EX_RotatorToString    = 0x59,
-  EX_Unk5a              = 0x5A, EX_Unk5b              = 0x5B, EX_Unk5c              = 0x5C,
+  EX_StringToName2      = 0x5A, EX_Unk5b              = 0x5B, EX_Unk5c              = 0x5C,
   EX_Unk5d              = 0x5D, EX_Unk5e              = 0x5E, EX_Unk5f              = 0x5F,
   EX_ExtendedNative     = 0x60, EX_FirstNative        = 0x70,
 };

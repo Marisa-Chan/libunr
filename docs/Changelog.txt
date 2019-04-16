@@ -1,0 +1,11 @@
+//===========================================================
+//  0.2.0
+//===========================================================
++First official release. Way too much to document, way too much is broken
+
+//===========================================================
+//  0.2.1
+//===========================================================
+Features:
++Implements a (somewhat) proper log file functionality
++UnrealScript bytecode "0x5a" (known as EX_StringToName2) implemented
