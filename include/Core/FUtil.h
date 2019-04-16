@@ -30,6 +30,7 @@
 #include <float.h>
 #include <math.h>
 #include <sys/stat.h>
+#include <time.h>
 
 #include <libxstl/XTypes.h>
 #include <libxstl/XFileStream.h>

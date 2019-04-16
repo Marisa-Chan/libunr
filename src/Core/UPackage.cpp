@@ -447,7 +447,7 @@ UPackage* UPackage::StaticLoadPackage( const char* PkgName )
     if ( Iter == NULL )
       break;
 
-    if ( strnicmp( Iter->Name.Data(), PkgName, strlen( Iter->Name.Data() ) ) == 0 )
+    if ( stricmp( Iter->Name.Data(), PkgName ) == 0 )
     {
       Pkg = Iter;
       break;
