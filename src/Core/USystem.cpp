@@ -153,7 +153,7 @@ void USystem::Exit( int ExitCode )
   exit( ExitCode );
 }
 
-bool USystem::PromptForGameInfo()
+bool USystem::PromptForGameInfo( char* InGameName )
 {
   if ( DoGamePrompt == NULL )
     return false;
@@ -164,7 +164,26 @@ bool USystem::PromptForGameInfo()
   char* PathBuf = NULL;
 
   // Run callback
-  int i = DoGamePrompt( Names );
+  int i;
+  if ( InGameName != NULL )
+  {
+    for ( i = 0; i < Names->Size(); i++ )
+    {
+      if ( stricmp( (*Names)[i], InGameName ) == 0 )
+        break;
+    }
+
+    if ( i == Names->Size() )
+    {
+      // Didn't find the game they asked for, let them know
+      Logf( LOG_WARN, "Specified game '%s' does not exist", InGameName );
+      i = DoGamePrompt( Names );
+    }
+  }
+  else
+  {
+    i = DoGamePrompt( Names );
+  }
 
   // Get name and set
   NameBuf = GLibunrConfig->ReadString( "Game", "Name", i );
@@ -200,7 +219,7 @@ bool USystem::IsEditor()
   return bIsEditor;
 }
 
-bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool InIsEditor )
+bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool InIsEditor, char* InGameName )
 {
   // Create global system
   GSystem = new USystem();
@@ -263,7 +282,7 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool
   // }
 
   // Get game info
-  if ( !GSystem->PromptForGameInfo() )
+  if ( !GSystem->PromptForGameInfo( InGameName ) )
   {
     Logf( LOG_CRIT, "DoGamePrompt() callback is not set; aborting" );
     return false;
@@ -623,9 +642,9 @@ const char* USystem::GetHomeDir()
 }
 #endif
 
-bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool bIsEditor )
+bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool bIsEditor, char* GameName )
 {
-  if ( UNLIKELY( !USystem::StaticInit( GPC, DPC, bIsEditor ) ) )
+  if ( UNLIKELY( !USystem::StaticInit( GPC, DPC, bIsEditor, GameName ) ) )
   {
     Logf( LOG_CRIT, "USystem::StaticInit() failed!" );
     return false;

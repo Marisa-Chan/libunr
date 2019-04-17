@@ -93,13 +93,15 @@ typedef i32 idx;
 #define PKG_VER_UT_432 69
 
 // Log levels
-#define LOG_INFO 0
-#define LOG_WARN 1
-#define LOG_ERR  2
-#define LOG_CRIT 3
+#define LOG_DEV  0
+#define LOG_INFO 1
+#define LOG_WARN 2
+#define LOG_ERR  3
+#define LOG_CRIT 4
 
 const char* const LogLevelStrings[] =
 {
+  "D",
   "I",
   "W",
   "E",

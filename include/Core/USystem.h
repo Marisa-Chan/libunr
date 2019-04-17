@@ -56,11 +56,11 @@ class DLL_EXPORT USystem : public USubsystem
   const char* ResolvePath( const char* PkgName );
   void Exit( int ExitCode );
 
-  bool PromptForGameInfo();
+  bool PromptForGameInfo( char* InGameName = NULL );
   bool PromptForDeviceInfo();
   
   // Global methods
-  static bool StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool InIsEditor );
+  static bool StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool InIsEditor, char* InGameName = NULL );
   static const char* GetLibunrIniPath();
   static const char* GetDefaultLibunrIniPath();
   static bool CopyFile( const char* OrigFile, const char* NewFile );
@@ -99,5 +99,5 @@ protected:
 };
 
 extern USystem* GSystem;
-DLL_EXPORT bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool bIsEditor );
+DLL_EXPORT bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool bIsEditor, char* GameName = NULL );
 

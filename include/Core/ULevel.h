@@ -70,6 +70,8 @@ class DLL_EXPORT ULevelBase : public UObject
   UEngine*    Engine;
   FURL        URL;
   UNetDriver* DemoRecDriver; // do we need this?
+
+  bool bDeletedBrushwork;
 };
 
 class DLL_EXPORT ULevel : public ULevelBase

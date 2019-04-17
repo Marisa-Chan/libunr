@@ -95,6 +95,9 @@ void ULevelBase::Load()
 {
   Super::Load();
 
+  bDeletedBrushwork = true;
+  int NumBrushes = 0;
+
   int NumActors = 0;
   int _Unknown0 = 0;
 
@@ -109,7 +112,45 @@ void ULevelBase::Load()
 
     // Don't load garbage zeroes
     if ( ActorObjRef != 0 )
-      Actors.PushBack( (AActor*)LoadObject( ActorObjRef, NULL, NULL, true ) );
+    {
+      AActor* Actor = (AActor*)LoadObject( ActorObjRef, NULL, NULL, true );
+      if ( bDeletedBrushwork )
+      {
+        if ( Actor->Class == ABrush::StaticClass() )
+          NumBrushes++;
+        if ( NumBrushes > 2 )
+          bDeletedBrushwork = false;
+      }
+      Actors.PushBack( Actor );
+    }
+  }
+
+  // Unreal seems to preserve all Brush actors in the package export tree 
+  // even when they're "deleted". The actor properties of each brush will
+  // have bDeleteMe set to true. These brushes can (and should be) recovered
+  // if this is the case.
+  //
+  // This is an over 20 year old game with a very dead community. Part of 
+  // the reason why it is so dead (unlike Doom) is because people have this
+  // silly idea that content should be kept proprietary and nobody should ever
+  // be able to learn or be inspired from one another whatsoever. 
+  //
+  // Stop that shit.
+  //
+  // By keeping mods and maps proprietary, you actively destroy what's
+  // left of the community.
+  if ( bDeletedBrushwork )
+  {
+    Array<FExport>* Exports = Pkg->GetExportTable();
+    for ( int i = 0; i < Exports->Size(); i++ )
+    {
+      FExport* Export = &(*Exports)[i];
+      if ( stricmp( Pkg->ResolveNameFromObjRef( Export->Class ), "Brush" ) == 0 )
+      {
+        ABrush* Brush = (ABrush*)StaticLoadObject( Pkg, Export, ABrush::StaticClass(), NULL, true );
+        Actors.PushBack( Brush );
+      }
+    } 
   }
 
   *PkgFile >> URL;
