@@ -8,13 +8,19 @@ libunr Features:
 +UnrealScript bytecode "0x5a" (known as EX_StringToName2) implemented
 
 libunr Bug fixes:
-+UPackage::StaticLoadPkg() improperly used strnicmp() to check package name.
+-UPackage::StaticLoadPkg() improperly used strnicmp() to check package name.
 
 lucc Features:
++batch*export renamed to just *export
+	batchclassexport -> classexport, batchtextureexport -> textureexport
 +Adds the '-g', '-l', and '-v' command line options
-	- '-g': specifies a game at the command line, rather than using the menu
-	- '-l': specifies the desired log level (see help output for more details)
-	- '-v': sets the log level to the highest verbosity (LOG_DEV)
+	'-g': specifies a game at the command line, rather than using the menu
+	'-l': specifies the desired log level (see help output for more details)
+	'-v': sets the log level to the highest verbosity (LOG_DEV)
++Commands previously named batch*export now support...
+	- singular object exporting
+	- optional path specification (default to exporting in game folder)
+		- some allow export to Textures/<Pkg> folder, or <Pkg>/Textures/ with opt
 
 //===========================================================
 //  0.2.0
@@ -24,7 +30,7 @@ lucc Features:
 libunr Features:
 +Implements an (almost) entire Unreal object system
 	- Classes are fully loadable
-	- Dependencies are completely resolved
+	- Dependencies are completely resolved and loaded
 	- Some object types still need to be loaded fully
 	- UnrealScript bytecode loadable
 +Supports multiple games on the same binary
