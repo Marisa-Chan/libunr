@@ -6,6 +6,13 @@
 //===========================================================
 //  0.2.1
 //===========================================================
-Features:
+libunr Features:
 +Implements a (somewhat) proper log file functionality
 +UnrealScript bytecode "0x5a" (known as EX_StringToName2) implemented
+
+lucc Features:
++Adds the '-g', '-l', and '-v' command line options
+	- '-g': specifies a game at the command line, rather than using the menu
+	- '-l': specifies the desired log level (see help output for more details)
+	- '-v': sets the log level to the highest verbosity (LOG_DEV)
+
