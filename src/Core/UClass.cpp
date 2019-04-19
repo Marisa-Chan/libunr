@@ -804,7 +804,9 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
 
   Filename += Pkg->ResolveNameFromIdx( Export->ObjectName );
   Filename += ".uc"; // Scripts won't get exported to any other type
- 
+
+  Logf( LOG_INFO, "Exporting %s.uc", Name.Data() ); 
+
   // Write script text
   FileStreamOut* Out = new FileStreamOut();
   if ( Out->Open( Filename ) != 0 )

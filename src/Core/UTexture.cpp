@@ -123,13 +123,17 @@ bool UTexture::ExportToFile( const char* Dir, const char* Type )
 
   Filename += Name;
   Filename += ".";
-  if ( strnicmp( Type, "bmp", 3 ) != 0 )
+  if ( Type == NULL )
+    Type = "bmp";
+  else if ( strnicmp( Type, "bmp", 3 ) != 0 )
   {
     Logf( LOG_WARN, "Can't export texture to file type '%s'", Type );
     return false;
   }
   Filename += Type;
-  
+ 
+  Logf( LOG_INFO, "Exporting %s.%s", Name.Data(), Type );
+
   FileStreamOut* Out = new FileStreamOut();
   if ( Out->Open( Filename ) != 0 )
   {

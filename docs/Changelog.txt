@@ -4,6 +4,8 @@
 libunr Features:
 +Wheel of Time export supported
 +Dr. Brain: Action Reaction export supported
++Harry Potter: Sorceror's Stone export supported
++Adventure Pinball export supported
 +Implements a (somewhat) proper log file functionality
 +UnrealScript bytecode "0x5a" (known as EX_StringToName2) implemented
 
@@ -21,6 +23,8 @@ lucc Features:
 	- singular object exporting
 	- optional path specification (default to exporting in game folder)
 		- some allow export to Textures/<Pkg> folder, or <Pkg>/Textures/ with opt
++levelexport supports exporting MyLevel context
++Actual documentation :D :D :D
 
 //===========================================================
 //  0.2.0

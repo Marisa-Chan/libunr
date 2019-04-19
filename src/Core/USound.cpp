@@ -57,6 +57,8 @@ void USound::Load()
 // TODO: Support exporting to a number of different formats
 bool USound::ExportToFile( const char* Dir, const char* Type )
 {
+  const char* Ext = Pkg->ResolveNameFromIdx( SoundFormat );
+
   // Set up filename
   FString Filename( Dir );
 #if defined LIBUNR_WIN32
@@ -67,8 +69,10 @@ bool USound::ExportToFile( const char* Dir, const char* Type )
 
   Filename += Name.Data();
   Filename += ".";
-  Filename += Pkg->ResolveNameFromIdx( SoundFormat );
-  
+  Filename += Ext;
+
+  Logf( LOG_INFO, "Exporting %s.%s", Name.Data(), Ext );
+
   // Open file
   FileStreamOut* Out = new FileStreamOut();
   if ( Out->Open( Filename ) != 0 )

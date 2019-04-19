@@ -55,6 +55,8 @@ void UMusic::Load()
 
 bool UMusic::ExportToFile( const char* Dir, const char* Type )
 {
+  const char* Ext = Pkg->ResolveNameFromIdx( MusicType );
+
   // Set up filename
   FString Filename( Dir );
 #if defined LIBUNR_WIN32
@@ -65,7 +67,9 @@ bool UMusic::ExportToFile( const char* Dir, const char* Type )
 
   Filename += Name;
   Filename += ".";
-  Filename += Pkg->ResolveNameFromIdx( MusicType );
+  Filename += Ext;
+
+  Logf( LOG_INFO, "Exporting %s.%s", Name.Data(), Ext );
 
   // Open file
   FileStreamOut* Out = new FileStreamOut();
