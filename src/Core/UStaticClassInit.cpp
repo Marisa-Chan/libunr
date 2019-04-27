@@ -30,6 +30,7 @@
 #include "Core/UConsole.h"
 #include "Core/UEngine.h"
 #include "Core/UFire.h"
+#include "Core/UGesture.h"
 #include "Core/ULocale.h"
 #include "Core/ULevel.h"
 #include "Core/UMesh.h"
@@ -67,6 +68,10 @@
 
 // Rune specific headers
 #include "Rune/ARuneActor.h"
+
+// Harry Potter specific headers
+#include "HPSS/UParticleList.h"
+#include "HPSS/AParticleFX.h"
 
 bool UObject::StaticInit()
 {
@@ -188,12 +193,12 @@ bool UObject::StaticInit()
   Result &= UConsole::StaticClassInit();
   Result &= UEngine::StaticClassInit();
   Result &= UFont::StaticClassInit();
+  Result &= UGesture::StaticClassInit();
   Result &= ULevelBase::StaticClassInit();
   Result &= ULevel::StaticClassInit();
   Result &= ULevelSummary::StaticClassInit();
   Result &= UNetConnection::StaticClassInit();
   Result &= UNetDriver::StaticClassInit();
-  Result &= USkeletalMesh::StaticClassInit();
   Result &= USound::StaticClassInit();
   Result &= UStaticLightData::StaticClassInit();
   Result &= UMusic::StaticClassInit();
@@ -304,6 +309,12 @@ bool UObject::StaticInit()
     Result &= AScriptDispatcher::StaticClassInit();
     Result &= AScriptAction::StaticClassInit();
     Result &= ASoundPlayer::StaticClassInit(); // useful for all games but why native?
+  }
+
+  if ( GSystem->GameFlags & GAME_HPSS )
+  {
+    Result &= UParticleList::StaticClassInit();
+    Result &= AParticleFX::StaticClassInit();
   }
 
   // Load base actor class

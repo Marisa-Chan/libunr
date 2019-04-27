@@ -27,11 +27,12 @@
 #include "Core/UObject.h"
 
 // Game specific flags
-#define GAME_Unreal 0x0001
-#define GAME_UT99   0x0002
-#define GAME_DeusEx 0x0004
-#define GAME_Rune   0x0008
-#define GAME_All    0xFFFF
+#define GAME_Unreal 0x00001
+#define GAME_UT99   0x00002
+#define GAME_DeusEx 0x00004
+#define GAME_Rune   0x00008
+#define GAME_HPSS   0x00010
+#define GAME_All    0xFFFFF
 
 class DLL_EXPORT USubsystem : public UObject
 {
@@ -79,7 +80,7 @@ class DLL_EXPORT USystem : public USubsystem
   const char* AudioDevice;
   const char* GamePath;
   const char* GameName;
-  u16 GameFlags; // Flags for the games that are currently supported by this instance
+  u32 GameFlags; // Flags for the games that are currently supported by this instance
 
   // Per game
   int PurgeCacheDays;

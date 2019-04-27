@@ -205,6 +205,8 @@ bool USystem::PromptForGameInfo( char* InGameName )
     GameFlags |= GAME_DeusEx;
   else if ( stricmp( ExecBuf, "Rune" ) == 0 )
     GameFlags |= GAME_Rune;
+  else if ( stricmp( ExecBuf, "HP" ) == 0 )
+    GameFlags |= GAME_HPSS;
   else if ( stricmp( ExecBuf, "OpenUE" ) == 0 )
   {
     bEnhancedRuntime = true;
@@ -370,6 +372,7 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool
     {
       // There isn't one at all for this game, use the game config instead
       GUserConfig = GGameConfig;
+      return true;
     }
 
     else if ( !CopyFile( "DefUser.ini", "User.ini" ) )

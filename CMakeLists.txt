@@ -9,6 +9,7 @@ endif()
 
 set (UNR_VER_MAJOR 0)
 set (UNR_VER_MINOR 2)
+set (UNR_VER_PATCH 1)
 set (UNR_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 set (UNR_INC ${UNR_ROOT}/include)
 set (UNR_SRC ${UNR_ROOT}/src)
@@ -39,10 +40,10 @@ endif()
 #Check for libxstl, Use <> by default, if not found, use ../xstl
 
 #Headers
-set (XSTL_INC   "${SYS_INC_PATH}/libxstl")
+set (XSTL_INC "${SYS_INC_PATH}/libxstl")
 
 if( NOT EXISTS ${XSTL_INC} )
-    set (XSTL_INC   "${UNR_ROOT}/../xstl/include")
+    set (XSTL_INC "${UNR_ROOT}/../xstl/include")
 
     if( NOT EXISTS ${XSTL_INC} )
     message( FATAL_ERROR "Libunr Requires libxstl: library headers not found in ${SYS_INC_PATH}/libxstl or ../xstl/include" )
@@ -94,6 +95,7 @@ set (SOURCES ${UNR_SRC}/Core/FConfig.cpp
              ${UNR_SRC}/Core/UConsole.cpp
              ${UNR_SRC}/Core/UEngine.cpp
              ${UNR_SRC}/Core/UFire.cpp
+             ${UNR_SRC}/Core/UGesture.cpp
              ${UNR_SRC}/Core/ULocale.cpp
              ${UNR_SRC}/Core/ULodMesh.cpp
              ${UNR_SRC}/Core/ULevel.cpp
@@ -135,6 +137,8 @@ set (SOURCES ${UNR_SRC}/Core/FConfig.cpp
              ${UNR_SRC}/DeusEx/UEventManager.cpp
              ${UNR_SRC}/DeusEx/ACameraPoint.cpp
              ${UNR_SRC}/Rune/ARuneActor.cpp
+             ${UNR_SRC}/HPSS/UParticleList.cpp
+             ${UNR_SRC}/HPSS/AParticleFX.cpp
 )
 
 include_directories (${UNR_INC} ${XSTL_INC})

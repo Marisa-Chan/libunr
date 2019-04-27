@@ -5,14 +5,20 @@ libunr Features:
 +Wheel of Time export supported
 +Dr. Brain: Action Reaction export supported
 +Harry Potter: Sorceror's Stone export supported
++Nerf Arena Blast export supported
++Klingon Honor Guard export supported
 +Adventure Pinball export supported
 +Implements a (somewhat) proper log file functionality
 +UnrealScript bytecode "0x5a" (known as EX_StringToName2) implemented
 
 libunr Bug fixes:
 -UPackage::StaticLoadPkg() improperly used strnicmp() to check package name.
+-UObject::StaticInit() initialized USkeletalMesh() before ULodMesh()
+-UStruct::SkipDefaultProperty never read the name of the struct
 
 lucc Features:
++Adds 'fullpkgexport' command
++levelexport supports exporting MyLevel context
 +batch*export renamed to just *export
 	batchclassexport -> classexport, batchtextureexport -> textureexport
 +Adds the '-g', '-l', and '-v' command line options
@@ -23,7 +29,6 @@ lucc Features:
 	- singular object exporting
 	- optional path specification (default to exporting in game folder)
 		- some allow export to Textures/<Pkg> folder, or <Pkg>/Textures/ with opt
-+levelexport supports exporting MyLevel context
 +Actual documentation :D :D :D
 
 //===========================================================

@@ -553,7 +553,8 @@ bool UStructProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In,
 void UStructProperty::SkipDefaultProperty( FPackageFileIn& In, int RealSize )
 {
   idx StructName;
-  
+  In >> CINDEX( StructName );
+
   u8 SizeByte = (RealSize & 0x70) >> 4;
   u8 IsArray  = (RealSize & 0x80) >> 7;
   int ArrayIdx = 0;

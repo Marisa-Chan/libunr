@@ -320,6 +320,14 @@ class DLL_EXPORT AActor : public UObject
   // Collision size.
   float CollisionRadius; // Radius of collision cyllinder.
   float CollisionHeight; // Half-height cyllinder.
+  float CollisionWidth;  // Y of collision box.
+  enum ECollideType
+  {
+    CT_AlignedCylinder,
+    CT_OrientedCylinder,
+    CT_Box,
+    CT_Shape,
+  } CollideType;
   
   //-----------------------------------------------------------------------------
   // Lighting.

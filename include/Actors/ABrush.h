@@ -55,7 +55,6 @@ class DLL_EXPORT ABrush : public AActor
   FColor BrushColor;
   int    PolyFlags;
   bool   bColored;
-
 };
 
 class DLL_EXPORT AMover : public ABrush 
