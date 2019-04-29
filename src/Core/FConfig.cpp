@@ -311,7 +311,7 @@ int FConfig::Load( const char* Filename )
         *ValuePtr++ = Probe;
       }
 
-      if ( LIKELY( !bIndexed || VarHash == PreviousHash ) )
+      if ( !bIndexed )
         Entry->Values->PushBack( xstl::StringDup( ValueBuf ) );
       else
         (*Entry->Values)[Index] = xstl::StringDup( ValueBuf );
