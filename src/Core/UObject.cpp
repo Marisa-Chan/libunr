@@ -765,13 +765,14 @@ int UCommandlet::Main( FString* Parms )
 bool UObject::StaticLinkNativeProperties()
 {
   typedef UObject LocalClassType;
-  if ( StaticInitNativePropList( 5 ) )
+  if ( StaticInitNativePropList( 6 ) )
   {
     LINK_NATIVE_ARRAY( ObjectInternal );
     LINK_NATIVE_PROPERTY( Outer );
     LINK_NATIVE_PROPERTY( ObjectFlags );
     LINK_NATIVE_PROPERTY( Name );
     LINK_NATIVE_PROPERTY( Class );
+    LINK_NATIVE_PROPERTY_ALIASED( Parent, Outer ); 
     return true;
   }
   return false;
