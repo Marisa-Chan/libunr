@@ -546,6 +546,7 @@ void USystem::RealPath( const char* Path, char* FullPath, size_t FullPathSize )
         {
           memcpy( f, c, CfLen );
           f += CfLen;
+          *f = '\0';
         }
       }
 
