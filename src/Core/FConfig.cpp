@@ -31,6 +31,9 @@ FConfig* GLibunrConfig = NULL;
 FConfig* GGameConfig = NULL;
 FConfig* GUserConfig = NULL;
 
+// FIXME: this is NOT thread safe!
+static int NumLines;
+
 static inline bool IsAcceptedChar( char C, const char* Accepted )
 {
   size_t Len = strlen( Accepted );
@@ -66,6 +69,8 @@ static inline void ReadNewLine( FileStreamIn& In, const char* Filename )
     Logf( LOG_WARN, "Expected newline in config file '%s' (Pos = %llu, C = %c)",
         Filename, In.Tell(), C );
   }
+  else
+    NumLines++;
 }
 
 static inline bool IsNextCharSeqNewline( FileStreamIn& In, const char* Filename )
@@ -118,6 +123,7 @@ int FConfig::Load( const char* Filename )
   bool bIndexed = false;
   u32  Index = 0;
   FHash PreviousHash = {0, 0};
+  NumLines = 0;
 
   FileStreamIn IniFile;
   int Status = IniFile.Open( Filename );
@@ -165,16 +171,6 @@ int FConfig::Load( const char* Filename )
             break;
       }   
     }
-    /*else if ( Probe == '\r' )
-    {
-      IniFile.Read( &Probe, 1 );
-      if ( Probe == '\n' )
-        Category = NULL; 
-    }
-    else if ( Probe == '\n' )
-    {
-      Category = NULL;
-    }*/
     else if ( Probe == '[' )
     {
       char* CategoryPtr = CategoryBuf;
@@ -197,8 +193,8 @@ int FConfig::Load( const char* Filename )
       if ( CategoryBuf[0] == '\0' )
       {
         Logf( LOG_WARN, 
-            "Malformed or corrupted category in file '%s' (Pos = %llu)", 
-            Filename, IniFile.Tell() );
+            "Malformed or corrupted category in file '%s' (Line = %llu)", 
+            Filename, NumLines );
         IniFile.Close();
         return ERR_BAD_DATA;
       }
@@ -216,8 +212,8 @@ int FConfig::Load( const char* Filename )
       if ( Category == NULL )
       {
         Logf( LOG_WARN, 
-            "Got non-category character, but no category in config file '%s' (Pos = %llu)",
-            Filename, IniFile.Tell() );
+            "Got non-category character, but no category in config file '%s' (Line = %llu)",
+            Filename, NumLines );
         IniFile.Close();
         return ERR_BAD_DATA;
       }
@@ -250,10 +246,19 @@ int FConfig::Load( const char* Filename )
       if ( VariableBuf[0] == '\0' )
       {
         Logf( LOG_WARN, 
-            "Malformed or corrupted variable in file '%s' (Pos = %llu)", 
-            Filename, IniFile.Tell() );
+            "Malformed or corrupted variable in file '%s' (Line = %llu)", 
+            Filename, NumLines );
         IniFile.Close();
         return ERR_BAD_DATA;
+      }
+
+      FHash VarHash = FnvHashString( VariableBuf );
+      if ( LIKELY( VarHash != PreviousHash ) )
+      {
+        Entry = new FConfigEntry();
+        Category->Entries->PushBack( Entry );
+        Entry->Name = StringDup( VariableBuf );
+        Entry->Hash = VarHash;
       }
 
       if ( bIndexed )
@@ -269,29 +274,31 @@ int FConfig::Load( const char* Filename )
            *IndexPtr++ = Probe;
         }
 
+        IniFile.Read( &Probe, 1 );
+        if ( Probe != '=' )
+        {
+          Logf( LOG_WARN, "Missing equals sign after indexed variable in file '%s' (Line = %llu)",
+              Filename, NumLines );
+          IniFile.Close();
+          return ERR_BAD_DATA;
+        }
+
         if ( IndexBuf[0] == '\0' )
         {
           Logf( LOG_WARN, 
-              "Array indexed variable, but no index found in file '%s' (Pos = %llu, C = '%c')", 
-              Filename, IniFile.Tell(), Probe );
+              "Array indexed variable, but no index found in file '%s' (Line = %llu, C = '%c')", 
+              Filename, NumLines, Probe );
           IniFile.Close();
           return ERR_BAD_DATA;
         }
 
         Index = strtol( IndexBuf, NULL, 10 );
-        Entry->Values->Resize( Index );
+        Entry->Values->Resize( Index+1 );
         xstl::Set( IndexBuf, 0, sizeof( IndexBuf ) );
+
+        Entry->bWriteIndices = true;
       }
       
-      FHash VarHash = FnvHashString( VariableBuf );
-      if ( LIKELY( VarHash != PreviousHash ) )
-      {
-        Entry = new FConfigEntry();
-        Category->Entries->PushBack( Entry );
-        Entry->Name = StringDup( VariableBuf );
-        Entry->Hash = VarHash;
-      }
-
       // Read the value
       char* ValuePtr = ValueBuf;
       xstl::Set( ValueBuf, 0, sizeof( ValueBuf ) );
@@ -307,7 +314,7 @@ int FConfig::Load( const char* Filename )
       if ( LIKELY( !bIndexed || VarHash == PreviousHash ) )
         Entry->Values->PushBack( xstl::StringDup( ValueBuf ) );
       else
-        Entry->Values->Assign( Index, xstl::StringDup( ValueBuf ) );
+        (*Entry->Values)[Index] = xstl::StringDup( ValueBuf );
 
       ReadNewLine( IniFile, Filename );
       bIndexed = false;

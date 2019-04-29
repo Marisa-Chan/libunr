@@ -14,7 +14,8 @@ libunr Features:
 libunr Bug fixes:
 -UPackage::StaticLoadPkg() improperly used strnicmp() to check package name.
 -UObject::StaticInit() initialized USkeletalMesh() before ULodMesh()
--UStruct::SkipDefaultProperty never read the name of the struct
+-UStruct::SkipDefaultProperty() never read the name of the struct
+-FConfig::Load() did not properly set value array when explicitly indexed
 
 lucc Features:
 +Adds 'fullpkgexport' command
