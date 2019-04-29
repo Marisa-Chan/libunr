@@ -294,7 +294,21 @@ static u8 LoadScriptToken( UStruct* Struct, FPackageFileIn* PkgFile, u32* Parsed
   *ParsedSize += 1;
   LOAD_CODE( Struct, Token, u8 );
 
-  if ( (Token & 0xF0) == EX_ExtendedNative )
+  if ( Token == EX_LetBool && PkgFile->Ver == PKG_VER_UN_200 )
+  {
+    u8 Byte;
+    while (1)
+    {
+      *PkgFile >> Byte;
+      *ParsedSize += 1;
+      if ( Byte == 0 )
+        return Token;
+      *PkgFile >> Byte;
+      *ParsedSize += 1;
+    }
+  }
+
+  else if ( (Token & 0xF0) == EX_ExtendedNative )
   {
     LoadScriptByte( Struct, PkgFile, ParsedSize );
     *ParsedSize += 1;
@@ -373,6 +387,7 @@ static u8 LoadScriptToken( UStruct* Struct, FPackageFileIn* PkgFile, u32* Parsed
         LoadScriptToken( Struct, PkgFile, ParsedSize );
         LoadScriptToken( Struct, PkgFile, ParsedSize );
         break;
+      case EX_EndFunction:
       case EX_EndFunctionParms:
       case EX_Self:
         break;
@@ -429,6 +444,10 @@ static u8 LoadScriptToken( UStruct* Struct, FPackageFileIn* PkgFile, u32* Parsed
         LoadScriptIndex( Struct, PkgFile, ParsedSize );
         break;
       case EX_NoObject:
+        break;
+      case EX_CastStringSize:
+        LoadScriptByte( Struct, PkgFile, ParsedSize );
+        LoadScriptToken( Struct, PkgFile, ParsedSize );
         break;
       case EX_IntConstByte:
         LoadScriptByte( Struct, PkgFile, ParsedSize );
@@ -501,8 +520,6 @@ static u8 LoadScriptToken( UStruct* Struct, FPackageFileIn* PkgFile, u32* Parsed
         LoadScriptToken( Struct, PkgFile, ParsedSize );
         break;
       case EX_Unk03:
-      case EX_Unk15:
-      case EX_Unk2b:
       case EX_Unk35:
       case EX_Unk37:
       case EX_Unk5b:
@@ -527,14 +544,9 @@ static u8 LoadScriptToken( UStruct* Struct, FPackageFileIn* PkgFile, u32* Parsed
 // Does not care about type resolution whatsoever
 static inline void LoadScriptCode( UStruct* Struct, FPackageFileIn* PkgFile )
 {
-  u8 Token = -1;
   u32 ParsedSize = 0;
-  bool bQueueReadIteratorWord = false;
-  bool bReadIteratorWord = false;
   while ( ParsedSize < Struct->ScriptSize )
-  {
     LoadScriptToken( Struct, PkgFile, &ParsedSize );
-  }
 }
 
 void UStruct::Load()

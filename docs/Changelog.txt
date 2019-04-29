@@ -10,6 +10,9 @@ libunr Features:
 +Adventure Pinball export supported
 +Implements a (somewhat) proper log file functionality
 +UnrealScript bytecode "0x5a" (known as EX_StringToName2) implemented
++UnrealScript bytecode "0x14" recognized as "EX_StartFunction" for package version 61.
++UnrealScript bytecode "0x15" (known as EX_EndFunction) implemented
++UnrealScript bytecode "0x2b" (known as EX_CastStringSize) implemented
 
 libunr Bug fixes:
 -UPackage::StaticLoadPkg() improperly used strnicmp() to check package name.

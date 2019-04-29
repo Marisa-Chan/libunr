@@ -40,6 +40,18 @@ Bugs/Misunderstandings
       BYTE
       TOKEN
 
+- EX_LetBool (0x14) on Package Version 61
+  Description:
+    EX_LetBool appears at the beginning of every function on package
+    version 61. It appears that this bytecode is treated as a "begin
+    function" indicator with variable data afterwards. This data seems
+    to come in pairs of bytes where the first byte is non-zero and the
+    second byte is usually zero. If the first byte is zero, then the data
+    appears to end.
+  Solution:
+    Treat EX_LetBool as "EX_StartFunction", read pairs of bytes until
+    the first byte in a pair is zero.
+
 ---------------------------------------------------------------------
 Unknown Opcodes
 ---------------------------------------------------------------------
@@ -49,3 +61,25 @@ Unknown Opcodes
     has a duplicate opcode. 
     
     First seen in "Brother Bear" in "Actor.StringToAnimName" at "0x6fbbf"
+
+- 0x15: EX_EndFunction
+  Description:
+    The end of a function. Only appears on package version 61
+
+- 0x2b: EX_CastStringSize
+  Description:
+    This appears to be used where string concatenation is seen in scripts for
+    package version 61 (Engine.Pawn.PlayGutHit for example). The package file
+    format pdf describes this as a sort of type cast.
+
+    Strings in old versions of Unreal are declared as such:
+    intrinsic(231) final static function Log( coerce string[240] S, optional name Tag );
+    intrinsic(228) static final operator(40) string[255] $  ( coerce string[255] A, coerce String[255] B );
+    intrinsic(197) static final operator(24) bool        <  ( string[255] A, string[255] B );
+    intrinsic(198) static final operator(24) bool        >  ( string[255] A, string[255] B );
+
+    That is, the size of the string MUST be specified before declaring it,
+    rather than being treated as a dynamically modifiable string.
+    EX_CastStringSize takes a string of one length and casts it to a string of
+    another length
+
