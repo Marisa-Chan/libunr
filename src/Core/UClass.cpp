@@ -933,8 +933,7 @@ void UClass::Load()
     ClassWithin = (UClass*)LoadObject( ClassWithinIdx, UClass::StaticClass(), NULL );
     ClassConfigName = Pkg->ResolveNameFromIdx( ClassConfigNameIdx );
 
-    FHash CfgHash = FnvHashString( ClassConfigName );
-    if ( CfgHash == FnvHashString( "System" ) )
+    if ( stricmp( ClassConfigName, "System" ) == 0 )
       ClassConfig = GGameConfig;
     else
       ClassConfig = GConfigManager->GetConfig( ClassConfigName );

@@ -485,7 +485,6 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
         {
           // Does it need to be loaded?
           if ( !(ClsIter->ClassFlags & CLASS_NoExport) &&
-               ClsIter->Export != NULL &&
                ClsIter->NativeNeedsPkgLoad )
           {
             // Yup, load it in place
@@ -537,6 +536,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
     }
 
     FImport* PkgImport = Import;
+    Array<FImport>* PkgImports = Pkg->GetImportTable();
     do
     {
       // The 'Package' field for FImport does not actually tell what package it is in,
@@ -545,7 +545,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
       // "Core.Object.Color" -> Package points to the import for 'Object'
       // to get around this, we keep going back and getting the package until Import->Class 
       // points to "Package"
-      PkgImport = &(*Pkg->GetImportTable())[ CalcObjRefValue( PkgImport->Package ) ]; 
+      PkgImport = &(*PkgImports)[ CalcObjRefValue( PkgImport->Package ) ]; 
     } while ( strnicmp( Pkg->ResolveNameFromIdx( PkgImport->ClassName ), "Package", 7 ) != 0 ||
               PkgImport->Package != 0 );
 
@@ -558,23 +558,30 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
     } 
 
     // Get the corresponding export index for this package
+    // Optimization: Get the package tables here rather than inside of the loop
     Array<FExport>* Exports = ObjPkg->GetExportTable();
+    Array<FImport>* Imports = ObjPkg->GetImportTable();
+    Array<FNameEntry>* Names = ObjPkg->GetNameTable();
     for ( size_t i = 0; i < Exports->Size() && i != MAX_SIZE; i++ )
     {
       FExport* ExpIter = &(*Exports)[i];
 
       // Get object name entry
-      FNameEntry* ExpObjName = ObjPkg->GetNameEntry( ExpIter->ObjectName );
+      FNameEntry* ExpObjName = &(*Names)[ExpIter->ObjectName];
       FNameEntry* ExpGrpName = ObjPkg->GetNameEntryByObjRef( ExpIter->Group );
-      if ( ExpGrpName->Hash == FnvHashString("None") )
+
+      // Optimization: stricmp eats a large chunk of execution time here, so we
+      // elect to treat this comparison as a single int
+      #define NONE 0x656e6f4e
+      if ( *(int*)&ExpGrpName->Data[0] == NONE )
         ExpGrpName = (*NameTable)[ObjPkg->Name.Index];
 
       // Get class name entry
       FNameEntry* ExpClsName = NULL;
       if ( ExpIter->Class < 0 )
       {
-        Import = &(*ObjPkg->GetImportTable())[ CalcObjRefValue( ExpIter->Class ) ];
-        ExpClsName = ObjPkg->GetNameEntry( Import->ObjectName );
+        Import = &(*Imports)[(-ExpIter->Class)-1];
+        ExpClsName = &(*Names)[Import->ObjectName];
       }
       else
       {
@@ -582,7 +589,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
         if ( ExpIter->Class == 0 )
           ExpClsName = &ClassNameEntry;
         else
-          ExpClsName = ObjPkg->GetNameEntry( (*Exports)[ ExpIter->Class - 1 ].ObjectName );
+          ExpClsName = &(*Names)[((*Exports)[ExpIter->Class - 1].ObjectName )];
       }
 
       if ( ExpObjName->Hash == ObjNameHash && ExpClsName->Hash == ClsNameHash && 
@@ -602,7 +609,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
   if ( UNLIKELY( ObjExport == NULL ) )
   {
     // Stupid package remap stuff...
-    if ( UNLIKELY( ObjPkg->Name.Hash() == FnvHashString( "UnrealI" ) ) )
+    if ( UNLIKELY( stricmp( ObjPkg->Name.Data(), "UnrealI" ) == 0 ) )
     {
       ObjPkg = UPackage::StaticLoadPackage( "UnrealShare" );
       if ( UNLIKELY( ObjPkg == NULL ) )
@@ -610,7 +617,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
 
       return StaticLoadObject( ObjPkg, ObjName, ObjClass, InOuter, bLoadClassNow );
     }
-    else if ( UNLIKELY( ObjPkg->Name.Hash() == FnvHashString( "UnrealShare" ) ) )
+    else if ( UNLIKELY( stricmp( ObjPkg->Name.Data(), "UnrealShare" ) == 0 ) )
     {
       ObjPkg = UPackage::StaticLoadPackage( "UnrealI" );
       if ( UNLIKELY( ObjPkg == NULL ) )
@@ -646,11 +653,10 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
     }
     else
     {
-      FHash ClsNameHash  = FnvHashString( ClsName );
       for ( size_t i = 0; i < ClassPool->Size() && i != MAX_SIZE; i++ )
       {
         UClass* ClsIter = (*ClassPool)[i];
-        if ( ClsIter->Name.Hash() == ClsNameHash )
+        if ( stricmp( ClsIter->Name.Data(), ClsName ) == 0 )
         {
           ObjClass = ClsIter;
           break; // Already loaded the class apparently, great
@@ -734,17 +740,6 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
   }
 
   return Obj;
-}
-
-int UObject::CalcObjRefValue( idx ObjRef )
-{
-  if ( ObjRef == 0 )
-    return ObjRef;
-  
-  else if ( ObjRef < 0 )
-    ObjRef = -ObjRef;
-  
-  return ObjRef - 1;
 }
 
 UCommandlet::UCommandlet()

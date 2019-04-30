@@ -117,6 +117,17 @@ DLL_EXPORT void Logf( int Type, const char* Str, ... );
 DLL_EXPORT bool CreateLogFile( const char* Path );
 DLL_EXPORT void CloseLogFile();
 
+static inline int CalcObjRefValue( idx ObjRef )
+{
+  if ( ObjRef == 0 )
+    return ObjRef;
+  
+  else if ( ObjRef < 0 )
+    ObjRef = -ObjRef;
+  
+  return ObjRef - 1;
+}
+
 #define FNV1A_HASH 0
 #define FNV1_HASH  1
 

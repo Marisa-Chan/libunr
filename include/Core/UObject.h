@@ -456,7 +456,6 @@ public:
     UObject* InOuter, UPackage* InPkg, FExport* InExport );
   static UClass* StaticAllocateClass( FName InName, u32 Flags, UClass* SuperClass, 
     size_t InStructSize, UObject *(*NativeCtor)(size_t) );
-  static int CalcObjRefValue( idx ObjRef );
 
   static Array<UObject*>* ObjectPool;
   static Array<UClass*>*  ClassPool; 

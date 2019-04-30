@@ -126,6 +126,7 @@ class DLL_EXPORT UPackage : public UObject
   FNameEntry*     GetNameEntryByObjRef( int ObjRef );
   FExport*        GetExportByName( size_t Name );
   FExport*        GetClassExport( const char* ExportName );
+  Array<FNameEntry>* GetNameTable();
   Array<FExport>* GetExportTable();
   Array<FImport>* GetImportTable();
   u32             GetGlobalName( u32 PkgNameIdx );
@@ -151,6 +152,7 @@ class DLL_EXPORT UPackage : public UObject
   static UPackage* StaticLoadPackage( const char* Filepath );
   
   bool bIntrinsicPackage;
+  FNameEntry* NoneNameEntry;
 
 protected:    
   FString Path;

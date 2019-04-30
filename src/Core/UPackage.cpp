@@ -197,6 +197,7 @@ bool UPackage::Load( const char* File )
     *PackageFile >> *NameEntry;
     NameTable->PushBack( NameEntry );
   }
+  NoneNameEntry = &(*Names)[FindName("None")];
   
   // read in imports
   Imports->Resize( Header.ImportCount );
@@ -242,15 +243,21 @@ FNameEntry* UPackage::GetNameEntry( size_t Index )
 
 FNameEntry* UPackage::GetNameEntryByObjRef( int ObjRef )
 {
-  int Index = CalcObjRefValue( ObjRef );
+  if ( ObjRef == 0 )
+    return NoneNameEntry;
+
+  int Index;
   if ( ObjRef < 0 )
-    Index = (*Imports)[Index].ObjectName;
+    Index = (*Imports)[(-ObjRef)-1].ObjectName;
   else if ( ObjRef > 0 )
-    Index = (*Exports)[Index].ObjectName;
-  else if ( ObjRef == 0 )
-    Index = FindName( "None" );
+    Index = (*Exports)[ObjRef-1].ObjectName;
   
   return &(*Names)[Index];
+}
+
+Array<FNameEntry>* UPackage::GetNameTable()
+{
+  return Names;
 }
 
 FImport* UPackage::GetImport( size_t Index )
@@ -370,10 +377,9 @@ FString* UPackage::GetFullObjName( FExport* ObjExp )
 
 size_t UPackage::FindName( const char* Name )
 {
-  FHash NameHash = FnvHashString( Name );
   for ( size_t i = 0; i < Names->Size() && i != MAX_SIZE; i++ )
   {
-    if ( (*Names)[i].Hash == NameHash )
+    if ( stricmp( (*Names)[i].Data, Name ) == 0 )
       return i;
   }
   
