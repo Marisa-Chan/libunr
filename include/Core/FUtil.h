@@ -128,6 +128,12 @@ static inline int CalcObjRefValue( idx ObjRef )
   return ObjRef - 1;
 }
 
+#if defined LIBUNR_BIG_ENDIAN
+  #define NONE_STR 0x4e6f6e65
+#else
+  #define NONE_STR 0x656e6f4e
+#endif
+
 #define FNV1A_HASH 0
 #define FNV1_HASH  1
 

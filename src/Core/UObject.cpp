@@ -241,7 +241,7 @@ bool UObject::IsA( UClass* ClassType )
 
 bool UObject::IsA( FName ClassName )
 {
-  if ( strnicmp( ClassName.Data(), "None", 4 ) == 0 )
+  if ( *(int*)ClassName.Data() == NONE_STR )
     ClassName = Pkg->GetGlobalName( Pkg->FindName( "Class" ) );
 
   UClass* Cls = FindClass( ClassName );
@@ -458,7 +458,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
   FNameEntry ClassNameEntry( "Class" );
 
   // Is the object reference None?
-  if ( strnicmp( ObjName, "None", 4 ) == 0 )
+  if ( *(int*)ObjName == NONE_STR )
     return NULL;
 
   // Is our object in this package?
@@ -578,8 +578,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
 
       // Optimization: stricmp eats a large chunk of execution time here, so we
       // elect to treat this comparison as a single int
-      #define NONE 0x656e6f4e
-      if ( *(int*)&ExpGrpName->Data[0] == NONE )
+      if ( *(int*)&ExpGrpName->Data[0] == NONE_STR )
         ExpGrpName = (*NameTable)[ObjPkg->Name.Index];
 
       // Get class name entry
@@ -598,8 +597,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
           ExpClsName = &(*Names)[((*Exports)[ExpIter->Class - 1].ObjectName )];
       }
 
-      if ( ExpObjName->Hash == ObjNameHash && ExpClsName->Hash == ClsNameHash && 
-           ExpGrpName->Hash == GroupHash )
+      if ( ExpObjName->Hash == ObjNameHash && ExpClsName->Hash == ClsNameHash && ExpGrpName->Hash == GroupHash )
       {
         ObjExport = ExpIter;
         break;
@@ -647,7 +645,7 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
   bool bNeedsFullLoad = true;
 
   // 'None' object means NULL, don't load anything
-  if ( strnicmp( ObjName.Data(), "None", 4 ) == 0 )
+  if ( *(int*)ObjName.Data() == NONE_STR )
     return NULL;
 
   if ( ObjClass == NULL )
