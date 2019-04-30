@@ -2,6 +2,7 @@
 //  0.2.1
 //===========================================================
 libunr Features:
++MASSIVE optimizations to UObject::StaticLoadObject() as well as other commonly executed functions
 +Wheel of Time export supported
 +Dr. Brain: Action Reaction export supported
 +Harry Potter: Sorceror's Stone export supported
