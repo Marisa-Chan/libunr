@@ -110,7 +110,7 @@ u32 UProperty::GetNativeOffset( FName ClassName, FName PropName )
   FNativePropertyList* NativePropList = NULL;
   u32 Offset = MAX_UINT32;
 
-  for ( size_t i = 0; i < NativePropertyLists->Size() && i != MAX_SIZE; i++ )
+  for ( int i = 0; i < NativePropertyLists->Size(); i++ )
   {
     // Can you take the address of an overloaded operator[] ?
     NativePropList = NativePropertyLists->Data()[i];    
@@ -118,7 +118,7 @@ u32 UProperty::GetNativeOffset( FName ClassName, FName PropName )
       break;
   }
  
-  for ( size_t i = 0; i < NativePropList->Num; i++ )
+  for ( int i = 0; i < NativePropList->Num; i++ )
   {
     if ( NativePropList->Properties[i].Hash == PropName.Hash() )
     {
@@ -672,7 +672,7 @@ void UArrayProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int 
   ArrayNoType* DefGenericArray = (Default) ? Default->GetProperty<ArrayNoType*>( this, Idx ) : NULL;
 
   size_t Num = GenericArray->Size();
-  for ( size_t i = 0; i < Num && i != MAX_SIZE; i++ )
+  for ( size_t i = 0; i < Num; i++ )
   {
     void* DefValAddr = 0;
     if ( DefGenericArray && i < DefGenericArray->Size() )

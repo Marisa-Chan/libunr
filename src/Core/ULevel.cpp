@@ -229,7 +229,7 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
 
   // Loop through all actors
   FString ValueBuf;
-  for ( size_t i = 0; i < Actors.Size() && i != MAX_SIZE; i++ )
+  for ( size_t i = 0; i < Actors.Size(); i++ )
   {
     AActor* Actor = Actors[i];
       

@@ -278,7 +278,7 @@ FExport* UPackage::GetExport( size_t Index )
 
 FExport* UPackage::GetExportByName( size_t Name )
 {
-  for ( size_t i = 0; i < Exports->Size() && i != MAX_SIZE; i++ )
+  for ( int i = 0; i < Exports->Size(); i++ )
   {
     FExport* Export = &(*Exports)[i];
     if ( Export->ObjectName == Name )
@@ -293,7 +293,7 @@ FExport* UPackage::GetClassExport( const char* ExportName )
   // Find the name in this package's name table
   int NameIndex = -1;
   FHash NameHash = FnvHashString( ExportName );
-  for ( int i = 0; i < Names->Size() && i < MAX_SIZE; i++ )
+  for ( int i = 0; i < Names->Size(); i++ )
   {
     if ( NameHash == (*Names)[i].Hash )
     {
@@ -306,7 +306,7 @@ FExport* UPackage::GetClassExport( const char* ExportName )
 
   // Now find the export associated with this name
   FExport* Export = NULL;
-  for ( int i = 0; i < Exports->Size() && i < MAX_SIZE; i++ )
+  for ( int i = 0; i < Exports->Size(); i++ )
   {
     // Index 0 in the name table is always None 
     if ( (*Exports)[i].ObjectName == NameIndex && (*Exports)[i].Class == 0 )
@@ -377,7 +377,7 @@ FString* UPackage::GetFullObjName( FExport* ObjExp )
 
 size_t UPackage::FindName( const char* Name )
 {
-  for ( size_t i = 0; i < Names->Size() && i != MAX_SIZE; i++ )
+  for ( int i = 0; i < Names->Size(); i++ )
   {
     if ( stricmp( (*Names)[i].Data, Name ) == 0 )
       return i;

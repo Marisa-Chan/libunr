@@ -267,7 +267,7 @@ UClass* UObject::FindClass( FName ClassName )
   if ( ClassName == 0 )
     return UClass::StaticClass();
 
-  for ( size_t i = 0; i < ClassPool->Size() && i < MAX_SIZE; i++ )
+  for ( size_t i = 0; i < ClassPool->Size(); i++ )
   {
     UClass* Cls = (*ClassPool)[i];
     if ( Cls->Name == ClassName )
@@ -407,10 +407,9 @@ UProperty* UObject::FindProperty( FName PropName )
 
 UProperty* UObject::FindProperty( const char* PropName )
 {
-  FHash PropHash = FnvHashString( PropName );
   for ( UField* Iter = Field; Iter != NULL; Iter = Iter->Next )
   {
-    if ( Iter->IsA( UProperty::StaticClass() ) && Iter->Name.Hash() == PropHash )
+    if ( Iter->IsA( UProperty::StaticClass() ) && stricmp( Iter->Name.Data(), PropName ) )
       return (UProperty*)Iter;
   }
 
@@ -478,7 +477,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
     if ( ObjClass == UClass::StaticClass() && ObjClass->ClassFlags & CLASS_NoExport )
     {
       // Go find it in the class pool
-      for ( size_t i = 0; i < ClassPool->Size() && i != MAX_SIZE; i++ )
+      for ( int i = 0; i < ClassPool->Size(); i++ )
       {
         UClass* ClsIter = (*ClassPool)[i];
         if ( ClsIter->Name.Hash() == ObjNameHash )
@@ -500,7 +499,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
     // At this point, we'll likely need the class too
     if ( LIKELY( ObjClass == NULL ) )
     {
-      for ( size_t i = 0; i < ClassPool->Size() && i != MAX_SIZE; i++ )
+      for ( int i = 0; i < ClassPool->Size(); i++ )
       {
         UClass* ClsIter = (*ClassPool)[i];
         if ( ClsIter->Name.Hash() == ClsNameHash )
@@ -562,13 +561,20 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
     Array<FExport>* Exports = ObjPkg->GetExportTable();
     Array<FImport>* Imports = ObjPkg->GetImportTable();
     Array<FNameEntry>* Names = ObjPkg->GetNameTable();
-    for ( size_t i = 0; i < Exports->Size() && i != MAX_SIZE; i++ )
+    for ( int i = 0; i < Exports->Size(); i++ )
     {
       FExport* ExpIter = &(*Exports)[i];
 
+      // Optimization: don't go through function calls to get this info. It's
+      // much faster to do everything here even if it is slightly on the not-so-great
+      // side from a design perspective.
       // Get object name entry
       FNameEntry* ExpObjName = &(*Names)[ExpIter->ObjectName];
-      FNameEntry* ExpGrpName = ObjPkg->GetNameEntryByObjRef( ExpIter->Group );
+      FNameEntry* ExpGrpName;
+      if ( ExpIter->Group == 0 )
+        ExpGrpName = ObjPkg->NoneNameEntry;
+      else
+        ExpGrpName = &(*Names)[(*Exports)[ExpIter->Group-1].ObjectName];
 
       // Optimization: stricmp eats a large chunk of execution time here, so we
       // elect to treat this comparison as a single int
@@ -653,7 +659,7 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
     }
     else
     {
-      for ( size_t i = 0; i < ClassPool->Size() && i != MAX_SIZE; i++ )
+      for ( int i = 0; i < ClassPool->Size(); i++ )
       {
         UClass* ClsIter = (*ClassPool)[i];
         if ( stricmp( ClsIter->Name.Data(), ClsName ) == 0 )

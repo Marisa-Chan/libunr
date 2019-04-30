@@ -109,7 +109,7 @@ FConfig::FConfig( const char* Filename )
 
 FConfig::~FConfig()
 {
-  for ( size_t i = 0; i < Categories.Size() && i != MAX_SIZE; i++ )
+  for ( size_t i = 0; i < Categories.Size(); i++ )
     delete Categories[i];
 
   Categories.Clear();
@@ -349,17 +349,17 @@ int FConfig::Save()
   int WriteLen = 0;
   char WriteBuf[512];
   char NewLine[] = "\r\n";
-  for( size_t i = 0; i < Categories.Size() && i != MAX_SIZE; i++ )
+  for( size_t i = 0; i < Categories.Size(); i++ )
   {
     Set( WriteBuf, 0, sizeof( WriteBuf ) );
     FConfigCategory* Category = Categories[i];
     WriteLen = snprintf( WriteBuf, sizeof( WriteBuf ), "[%s]\r\n", Category->Name );
     IniFile.Write( WriteBuf, MIN( WriteLen, sizeof( WriteBuf ) ) );
 
-    for( size_t j = 0; j < Category->Entries->Size() && j != MAX_SIZE; j++ )
+    for( size_t j = 0; j < Category->Entries->Size(); j++ )
     {
       FConfigEntry* Entry = (*Category->Entries)[j];
-      for ( size_t k = 0; k < Entry->Values->Size() && k != MAX_SIZE; k++ )
+      for ( size_t k = 0; k < Entry->Values->Size(); k++ )
       {
         char* Value = (*Entry->Values)[k];
         Set( WriteBuf, 0, sizeof( WriteBuf ) );
@@ -388,7 +388,7 @@ int FConfig::Save()
 char* FConfig::ReadString( const char* Category, const char* Variable, size_t Index )
 {
   FHash CatHash = FnvHashString( Category ); // meow
-  for ( size_t i = 0; i < Categories.Size() && i != MAX_SIZE; i++ )
+  for ( size_t i = 0; i < Categories.Size(); i++ )
   {
     FConfigCategory* CatIter = Categories[i];
     if ( CatIter->Hash == CatHash )
@@ -532,7 +532,7 @@ void FConfig::WriteString( const char* Category, const char* Variable, const cha
   FConfigCategory* Cat = NULL; // meow
   FConfigEntry* Entry = NULL;
   FHash CatHash = FnvHashString( Category );
-  for ( size_t i = 0; i < Categories.Size() && i != MAX_SIZE; i++ )
+  for ( size_t i = 0; i < Categories.Size(); i++ )
   {
     FConfigCategory* CatIter = Categories[i];
     if ( CatIter->Hash == CatHash )
@@ -583,7 +583,7 @@ Array<char*>* FConfig::CreateEntry( const char* Category, const char* Variable )
   FConfigCategory* CatIter;
   FConfigEntry* Entry;
   FHash CatHash = FnvHashString( Category ); // meow
-  for ( size_t i = 0; i < Categories.Size() && i != MAX_SIZE; i++ )
+  for ( size_t i = 0; i < Categories.Size(); i++ )
   {
     CatIter = Categories[i];
     if ( CatIter->Hash == CatHash )
