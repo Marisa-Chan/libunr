@@ -25,16 +25,19 @@ lucc Features:
 +Adds 'fullpkgexport' command
 +levelexport supports exporting MyLevel context
 +batch*export renamed to just *export
-	batchclassexport -> classexport, batchtextureexport -> textureexport
+  batchclassexport -> classexport, batchtextureexport -> textureexport
 +Adds the '-g', '-l', and '-v' command line options
-	'-g': specifies a game at the command line, rather than using the menu
-	'-l': specifies the desired log level (see help output for more details)
-	'-v': sets the log level to the highest verbosity (LOG_DEV)
+  '-g': specifies a game at the command line, rather than using the menu
+  '-l': specifies the desired log level (see help output for more details)
+  '-v': sets the log level to the highest verbosity (LOG_DEV)
 +Commands previously named batch*export now support...
-	- singular object exporting
-	- optional path specification (default to exporting in game folder)
-		- some allow export to Textures/<Pkg> folder, or <Pkg>/Textures/ with opt
+  - singular object exporting
+  - optional path specification (default to exporting in game folder)
+    - some allow export to Textures/<Pkg> folder, or <Pkg>/Textures/ with opt
 +Actual documentation :D :D :D
+
+lucc Bug fixes:
+-Specifying a path with a drive letter in Windows was broken
 
 //===========================================================
 //  0.2.0
@@ -43,17 +46,17 @@ lucc Features:
 
 libunr Features:
 +Implements an (almost) entire Unreal object system
-	- Classes are fully loadable
-	- Dependencies are completely resolved and loaded
-	- Some object types still need to be loaded fully
-	- UnrealScript bytecode loadable
+  - Classes are fully loadable
+  - Dependencies are completely resolved and loaded
+  - Some object types still need to be loaded fully
+  - UnrealScript bytecode loadable
 +Supports multiple games on the same binary
 +Supports exporting objects to whatever data type is suitable
 
 lucc Features:
 +Currently provides a frontend for various exporting tasks.
-	- Batch class/texture/sound/music export
-	- Level export
-	- Checks & repots missing native properties in native classes
+  - Batch class/texture/sound/music export
+  - Level export
+  - Checks & repots missing native properties in native classes
 
 
