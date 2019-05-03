@@ -292,8 +292,15 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool
   
   // Change directory to the game's system folder
   String GameSysPath( GSystem->GamePath );
-  GameSysPath += "/System/";
+  GameSysPath += DIRECTORY_SEPARATOR;
+  GameSysPath += "System";
+  GameSysPath += DIRECTORY_SEPARATOR;
+  
+#ifdef LIBUNR_WIN32
+  if ( !SetCurrentDirectory( GameSysPath.Data() ) )
+#else
   if ( chdir( GameSysPath.Data() ) < 0 )
+#endif
   {
     Logf( LOG_WARN, "Game directory system folder '%s' does not exist; aborting (errno = %s)", GameSysPath.Data(), strerror( errno ) );
     return false;

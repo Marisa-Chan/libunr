@@ -36,13 +36,15 @@
 #include <libxstl/XFileStream.h>
 #include <libxstl/XString.h>
 
-#if defined LIBUNR_POSIX
+#if defined __linux__ || defined __unix__
+  #define LIBUNR_POSIX
   #include <sys/types.h>
   #include <sys/stat.h>
   #include <dirent.h>
   #include <pwd.h>
   #define DIRECTORY_SEPARATOR '/'
-#elif defined LIBUNR_WIN32
+#elif defined _WIN32
+  #define LIBUNR_WIN32
   #define DIRECTORY_SEPARATOR '\\'
 #endif
 

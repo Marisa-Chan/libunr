@@ -77,9 +77,8 @@ add_library( xstl SHARED IMPORTED )
 set_target_properties( xstl PROPERTIES IMPORTED_LOCATION "${XSTL_LIB_PATH}" )
 
 if ( TARGET_PLATFORM STREQUAL "Windows" )
-  add_definitions("-DLIBUNR_WIN32" "-Wno-invalid-offsetof")
+  add_definitions("-Wno-invalid-offsetof")
 elseif ( TARGET_PLATFORM STREQUAL "POSIX" )
-  add_definitions("-DLIBUNR_POSIX")
   install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/share/libunr)
   install(FILES ${UNR_ROOT}/res/DefaultLibunr.ini DESTINATION
     ${CMAKE_INSTALL_PREFIX}/share/libunr)
