@@ -77,11 +77,11 @@ void FNativePropertyList::AppendList( FNativePropertyList* List )
 /*-----------------------------------------------------------------------------
  * UObject
 -----------------------------------------------------------------------------*/
-Array<UObject*>* UObject::ObjectPool = NULL;
-Array<UClass*>*  UObject::ClassPool = NULL;
-Array<FNativePropertyList*>* UObject::NativePropertyLists = NULL;
-Array<UFunction*>* UObject::NativeFunctions = NULL;
-Array<FNameEntry*>* UObject::NameTable = NULL;
+Array<UObject*> UObject::ObjectPool;
+Array<UClass*>  UObject::ClassPool;
+Array<FNativePropertyList*> UObject::NativePropertyLists;
+Array<UFunction*> UObject::NativeFunctions;
+Array<FNameEntry*> UObject::NameTable;
 bool UObject::bStaticBootstrapped = false;
 
 UObject* UObject::StaticConstructObject( FName InName, UClass* InClass, UObject* InOuter, 
@@ -94,7 +94,7 @@ UObject* UObject::StaticConstructObject( FName InName, UClass* InClass, UObject*
   Out->Pkg = InPkg;
   Out->Export = InExport;
   Out->Name = InName;
-  Out->Index = ObjectPool->Size();
+  Out->Index = ObjectPool.Size();
   Out->RefCnt = 1;
   Out->Outer = InOuter;
   Out->ObjectFlags = InExport->ObjectFlags;
@@ -112,7 +112,7 @@ UObject* UObject::StaticConstructObject( FName InName, UClass* InClass, UObject*
   }
 
   // Add to object
-  ObjectPool->PushBack( Out );
+  ObjectPool.PushBack( Out );
 
   // Script init (TODO)
   
@@ -267,9 +267,9 @@ UClass* UObject::FindClass( FName ClassName )
   if ( ClassName == 0 )
     return UClass::StaticClass();
 
-  for ( size_t i = 0; i < ClassPool->Size(); i++ )
+  for ( size_t i = 0; i < ClassPool.Size(); i++ )
   {
-    UClass* Cls = (*ClassPool)[i];
+    UClass* Cls = ClassPool[i];
     if ( Cls->Name == ClassName )
       return Cls;
   }
@@ -465,7 +465,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
   if ( ObjRef < 0 )
   {
     // We can figure out which package it should be in from our current package
-    FImport* Import = &(*Pkg->GetImportTable())[ CalcObjRefValue( ObjRef ) ];
+    FImport* Import = &Pkg->GetImportTable()[ CalcObjRefValue( ObjRef ) ];
     const char* ClsName = Pkg->ResolveNameFromIdx( Import->ClassName );
     const char* GroupName = Pkg->ResolveNameFromObjRef( Import->Package );
 
@@ -477,9 +477,9 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
     if ( ObjClass == UClass::StaticClass() && ObjClass->ClassFlags & CLASS_NoExport )
     {
       // Go find it in the class pool
-      for ( int i = 0; i < ClassPool->Size(); i++ )
+      for ( int i = 0; i < ClassPool.Size(); i++ )
       {
-        UClass* ClsIter = (*ClassPool)[i];
+        UClass* ClsIter = ClassPool[i];
         if ( ClsIter->Name.Hash() == ObjNameHash )
         {
           // Does it need to be loaded?
@@ -500,9 +500,9 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
     // At this point, we'll likely need the class too
     if ( LIKELY( ObjClass == NULL ) )
     {
-      for ( int i = 0; i < ClassPool->Size(); i++ )
+      for ( int i = 0; i < ClassPool.Size(); i++ )
       {
-        UClass* ClsIter = (*ClassPool)[i];
+        UClass* ClsIter = ClassPool[i];
         if ( ClsIter->Name.Hash() == ClsNameHash )
         {
           ObjClass = ClsIter;
@@ -536,7 +536,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
     }
 
     FImport* PkgImport = Import;
-    Array<FImport>* PkgImports = Pkg->GetImportTable();
+    Array<FImport>& PkgImports = Pkg->GetImportTable();
     do
     {
       // The 'Package' field for FImport does not actually tell what package it is in,
@@ -545,7 +545,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
       // "Core.Object.Color" -> Package points to the import for 'Object'
       // to get around this, we keep going back and getting the package until Import->Class 
       // points to "Package"
-      PkgImport = &(*PkgImports)[ CalcObjRefValue( PkgImport->Package ) ]; 
+      PkgImport = &PkgImports[ CalcObjRefValue( PkgImport->Package ) ]; 
     } while ( strnicmp( Pkg->ResolveNameFromIdx( PkgImport->ClassName ), "Package", 7 ) != 0 ||
               PkgImport->Package != 0 );
 
@@ -559,35 +559,35 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
 
     // Get the corresponding export index for this package
     // Optimization: Get the package tables here rather than inside of the loop
-    Array<FExport>* Exports = ObjPkg->GetExportTable();
-    Array<FImport>* Imports = ObjPkg->GetImportTable();
-    Array<FNameEntry>* Names = ObjPkg->GetNameTable();
-    for ( int i = 0; i < Exports->Size(); i++ )
+    Array<FExport>& Exports = ObjPkg->GetExportTable();
+    Array<FImport>& Imports = ObjPkg->GetImportTable();
+    Array<FNameEntry>& Names = ObjPkg->GetNameTable();
+    for ( int i = 0; i < Exports.Size(); i++ )
     {
-      FExport* ExpIter = &(*Exports)[i];
+      FExport* ExpIter = &Exports[i];
 
       // Optimization: don't go through function calls to get this info. It's
       // much faster to do everything here even if it is slightly on the not-so-great
       // side from a design perspective.
       // Get object name entry
-      FNameEntry* ExpObjName = &(*Names)[ExpIter->ObjectName];
+      FNameEntry* ExpObjName = &Names[ExpIter->ObjectName];
       FNameEntry* ExpGrpName;
       if ( ExpIter->Group == 0 )
         ExpGrpName = ObjPkg->NoneNameEntry;
       else
-        ExpGrpName = &(*Names)[(*Exports)[ExpIter->Group-1].ObjectName];
+        ExpGrpName = &Names[Exports[ExpIter->Group-1].ObjectName];
 
       // Optimization: stricmp eats a large chunk of execution time here, so we
       // elect to treat this comparison as a single int
       if ( *(int*)&ExpGrpName->Data[0] == NONE_STR )
-        ExpGrpName = (*NameTable)[ObjPkg->Name.Index];
+        ExpGrpName = NameTable[ObjPkg->Name.Index];
 
       // Get class name entry
       FNameEntry* ExpClsName = NULL;
       if ( ExpIter->Class < 0 )
       {
-        Import = &(*Imports)[(-ExpIter->Class)-1];
-        ExpClsName = &(*Names)[Import->ObjectName];
+        Import = &Imports[(-ExpIter->Class)-1];
+        ExpClsName = &Names[Import->ObjectName];
       }
       else
       {
@@ -595,7 +595,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
         if ( ExpIter->Class == 0 )
           ExpClsName = &ClassNameEntry;
         else
-          ExpClsName = &(*Names)[((*Exports)[ExpIter->Class - 1].ObjectName )];
+          ExpClsName = &Names[Exports[ExpIter->Class - 1].ObjectName];
       }
 
       if ( ExpObjName->Hash == ObjNameHash && ExpClsName->Hash == ClsNameHash && ExpGrpName->Hash == GroupHash )
@@ -658,9 +658,9 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
     }
     else
     {
-      for ( int i = 0; i < ClassPool->Size(); i++ )
+      for ( int i = 0; i < ClassPool.Size(); i++ )
       {
-        UClass* ClsIter = (*ClassPool)[i];
+        UClass* ClsIter = ClassPool[i];
         if ( stricmp( ClsIter->Name.Data(), ClsName ) == 0 )
         {
           ObjClass = ClsIter;

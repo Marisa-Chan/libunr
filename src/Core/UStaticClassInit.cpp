@@ -77,20 +77,17 @@ bool UObject::StaticInit()
 {
   bool Result = true;
 
-  ObjectPool = new Array<UObject*>();
-  ClassPool  = new Array<UClass*> ();
-  NativePropertyLists = new Array<FNativePropertyList*>();
-  NativeFunctions = new Array<UFunction*>();
-  NameTable = new Array<FNameEntry*>();
+  ObjectPool = Array<UObject*>();
+  ClassPool  = Array<UClass*> ();
+  NativePropertyLists = Array<FNativePropertyList*>();
+  NativeFunctions = Array<UFunction*>();
+  NameTable = Array<FNameEntry*>();
 
-  if ( ObjectPool == NULL || ClassPool == NULL || NativePropertyLists == NULL ) 
-    return false;
-
-  ObjectPool->Reserve( 64 );
-  ClassPool->Reserve( 64 );
-  NativePropertyLists->Reserve( 64 );
-  NativeFunctions->Reserve( 4096 );
-  NameTable->Reserve( 16384 );
+  ObjectPool.Reserve( 64 );
+  ClassPool.Reserve( 64 );
+  NativePropertyLists.Reserve( 64 );
+  NativeFunctions.Reserve( 4096 );
+  NameTable.Reserve( 16384 );
 
   // Index 0 must always have "None"
   FName::CreateName( "None", RF_TagExp | RF_LoadContextFlags | RF_Native );

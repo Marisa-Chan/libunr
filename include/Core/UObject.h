@@ -256,7 +256,7 @@ public: \
         NumProperties ); \
       if ( StaticNativePropList != NULL ) \
       { \
-        NativePropertyLists->PushBack( StaticNativePropList ); \
+        NativePropertyLists.PushBack( StaticNativePropList ); \
         return true; \
       } \
       return false; \
@@ -341,7 +341,7 @@ public: \
         NativeSize, NativeConstructor ); \
       if ( ObjectClass != NULL ) \
       { \
-        ClassPool->PushBack( ObjectClass ); \
+        ClassPool.PushBack( ObjectClass ); \
         return true; \
       } \
       return false; \
@@ -400,7 +400,7 @@ bool cls::StaticLinkNativeProperties() \
     ExpProp->RefCnt = 1; \
     ExpProp->Class = ptype::StaticClass(); \
     ExpProp->PropertyType = enumptype; \
-    ObjectPool->PushBack( ExpProp ); \
+      ObjectPool.PushBack( ExpProp ); \
     ExpCls->Children = ExpProp; \
     ExpCls->Default->Field = ExpCls->Children; \
   }
@@ -457,11 +457,11 @@ public:
   static UClass* StaticAllocateClass( FName InName, u32 Flags, UClass* SuperClass, 
     size_t InStructSize, UObject *(*NativeCtor)(size_t) );
 
-  static Array<UObject*>* ObjectPool;
-  static Array<UClass*>*  ClassPool; 
-  static Array<FNativePropertyList*>* NativePropertyLists;
-  static Array<UFunction*>* NativeFunctions;
-  static Array<FNameEntry*>* NameTable;
+  static Array<UObject*> ObjectPool;
+  static Array<UClass*>  ClassPool; 
+  static Array<FNativePropertyList*> NativePropertyLists;
+  static Array<UFunction*> NativeFunctions;
+  static Array<FNameEntry*> NameTable;
 
   FName     Name;     // Name of the object stored in the global name table 
   int       Index;    // Index of the object in object pool

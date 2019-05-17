@@ -126,9 +126,9 @@ class DLL_EXPORT UPackage : public UObject
   FNameEntry*     GetNameEntryByObjRef( int ObjRef );
   FExport*        GetExportByName( size_t Name );
   FExport*        GetClassExport( const char* ExportName );
-  Array<FNameEntry>* GetNameTable();
-  Array<FExport>* GetExportTable();
-  Array<FImport>* GetImportTable();
+  Array<FNameEntry>& GetNameTable();
+  Array<FExport>& GetExportTable();
+  Array<FImport>& GetImportTable();
   u32             GetGlobalName( u32 PkgNameIdx );
   const char*     GetFilePath();
   const char*     GetFileName();
@@ -156,9 +156,9 @@ class DLL_EXPORT UPackage : public UObject
 
 protected:    
   FString Path;
-  Array<FNameEntry>* Names;
-  Array<FExport>*    Exports;
-  Array<FImport>*    Imports;
+  Array<FNameEntry> Names;
+  Array<FExport>    Exports;
+  Array<FImport>    Imports;
   FileStream* Stream;
   UPackageHeader Header;
   u32 NameTableStart; // The index at which this package's name table appears in the global name table

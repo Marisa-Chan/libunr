@@ -133,22 +133,14 @@ Array<UPackage*>* UPackage::Packages = NULL;
 UPackage::UPackage()
 {
   xstl::Set( &Header, 0, sizeof ( UPackageHeader ) );
-  Names = new Array<FNameEntry>();
-  Exports = new Array<FExport>();
-  Imports = new Array<FImport>();
+  Names = Array<FNameEntry>();
+  Exports = Array<FExport>();
+  Imports = Array<FImport>();
   bIntrinsicPackage = false;
 }
 
 UPackage::~UPackage()
 {
-  if ( Names != NULL )
-    delete Names;
-
-  if ( Exports != NULL )
-    delete Exports;
-
-  if ( Imports != NULL )
-    delete Imports;
 }
 
 bool UPackage::Load( const char* File )
@@ -188,30 +180,30 @@ bool UPackage::Load( const char* File )
   }
 
   // read in the name table
-  NameTableStart = NameTable->Size();
-  Names->Resize( Header.NameCount );
+  NameTableStart = NameTable.Size();
+  Names.Resize( Header.NameCount );
   PackageFile->Seek( Header.NameOffset, ESeekBase::Begin );
   for ( int i = 0; i < Header.NameCount; i++ )
   {
-    FNameEntry* NameEntry = &(*Names)[i];
+    FNameEntry* NameEntry = &Names[i];
     *PackageFile >> *NameEntry;
-    NameTable->PushBack( NameEntry );
+    NameTable.PushBack( NameEntry );
   }
-  NoneNameEntry = &(*Names)[FindName("None")];
+  NoneNameEntry = &Names[FindName("None")];
   
   // read in imports
-  Imports->Resize( Header.ImportCount );
+  Imports.Resize( Header.ImportCount );
   PackageFile->Seek( Header.ImportOffset, ESeekBase::Begin );
   for ( int i = 0; i < Header.ImportCount; i++ )
-    *PackageFile >> (*Imports)[i];
+    *PackageFile >> Imports[i];
   
   // read in exports
-  Exports->Resize( Header.ExportCount );
+  Exports.Resize( Header.ExportCount );
   PackageFile->Seek( Header.ExportOffset, ESeekBase::Begin );
   for ( int i = 0; i < Header.ExportCount; i++ )
   {
-    *PackageFile >> (*Exports)[i];
-    (*Exports)[i].Index = i;
+    *PackageFile >> Exports[i];
+    Exports[i].Index = i;
   }
 
   PackageFile->Seek( 0, ESeekBase::Begin );
@@ -236,7 +228,7 @@ UPackageHeader* UPackage::GetHeader()
 FNameEntry* UPackage::GetNameEntry( size_t Index )
 {
   if ( LIKELY( Index >= 0 ) )
-    return &(*Names)[Index];
+    return &Names[Index];
 
   return NULL;
 }
@@ -248,14 +240,14 @@ FNameEntry* UPackage::GetNameEntryByObjRef( int ObjRef )
 
   int Index;
   if ( ObjRef < 0 )
-    Index = (*Imports)[(-ObjRef)-1].ObjectName;
+    Index = Imports[(-ObjRef)-1].ObjectName;
   else if ( ObjRef > 0 )
-    Index = (*Exports)[ObjRef-1].ObjectName;
+    Index = Exports[ObjRef-1].ObjectName;
   
-  return &(*Names)[Index];
+  return &Names[Index];
 }
 
-Array<FNameEntry>* UPackage::GetNameTable()
+Array<FNameEntry>& UPackage::GetNameTable()
 {
   return Names;
 }
@@ -263,7 +255,7 @@ Array<FNameEntry>* UPackage::GetNameTable()
 FImport* UPackage::GetImport( size_t Index )
 {
   if ( LIKELY( Index >= 0 ) )
-    return &(*Imports)[Index];
+    return &Imports[Index];
   
   return NULL;
 }
@@ -271,16 +263,16 @@ FImport* UPackage::GetImport( size_t Index )
 FExport* UPackage::GetExport( size_t Index )
 {
   if ( LIKELY( Index >= 0 ) )
-    return &(*Exports)[Index];
+    return &Exports[Index];
 
   return NULL;
 }
 
 FExport* UPackage::GetExportByName( size_t Name )
 {
-  for ( int i = 0; i < Exports->Size(); i++ )
+  for ( int i = 0; i < Exports.Size(); i++ )
   {
-    FExport* Export = &(*Exports)[i];
+    FExport* Export = &Exports[i];
     if ( Export->ObjectName == Name )
       return Export;
   }
@@ -293,9 +285,9 @@ FExport* UPackage::GetClassExport( const char* ExportName )
   // Find the name in this package's name table
   int NameIndex = -1;
   FHash NameHash = FnvHashString( ExportName );
-  for ( int i = 0; i < Names->Size(); i++ )
+  for ( int i = 0; i < Names.Size(); i++ )
   {
-    if ( NameHash == (*Names)[i].Hash )
+    if ( NameHash == Names[i].Hash )
     {
       NameIndex = i;
       break;
@@ -306,12 +298,12 @@ FExport* UPackage::GetClassExport( const char* ExportName )
 
   // Now find the export associated with this name
   FExport* Export = NULL;
-  for ( int i = 0; i < Exports->Size(); i++ )
+  for ( int i = 0; i < Exports.Size(); i++ )
   {
     // Index 0 in the name table is always None 
-    if ( (*Exports)[i].ObjectName == NameIndex && (*Exports)[i].Class == 0 )
+    if ( Exports[i].ObjectName == NameIndex && Exports[i].Class == 0 )
     {
-      Export = &(*Exports)[i];
+      Export = &Exports[i];
       break;
     }
   }
@@ -319,7 +311,7 @@ FExport* UPackage::GetClassExport( const char* ExportName )
   return Export;
 }
 
-Array<FExport>* UPackage::GetExportTable()
+Array<FExport>& UPackage::GetExportTable()
 {
   return Exports;
 }
@@ -329,7 +321,7 @@ u32 UPackage::GetGlobalName( u32 PkgNameIdx )
   return NameTableStart + PkgNameIdx;
 }
 
-Array<FImport>* UPackage::GetImportTable()
+Array<FImport>& UPackage::GetImportTable()
 {
   return Imports;
 }
@@ -377,9 +369,9 @@ FString* UPackage::GetFullObjName( FExport* ObjExp )
 
 size_t UPackage::FindName( const char* Name )
 {
-  for ( int i = 0; i < Names->Size(); i++ )
+  for ( int i = 0; i < Names.Size(); i++ )
   {
-    if ( stricmp( (*Names)[i].Data, Name ) == 0 )
+    if ( stricmp( Names[i].Data, Name ) == 0 )
       return i;
   }
   

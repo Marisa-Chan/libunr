@@ -141,10 +141,10 @@ void ULevelBase::Load()
   // left of the community.
   if ( bDeletedBrushwork )
   {
-    Array<FExport>* Exports = Pkg->GetExportTable();
-    for ( int i = 0; i < Exports->Size(); i++ )
+    Array<FExport>& Exports = Pkg->GetExportTable();
+    for ( int i = 0; i < Exports.Size(); i++ )
     {
-      FExport* Export = &(*Exports)[i];
+      FExport* Export = &Exports[i];
       if ( stricmp( Pkg->ResolveNameFromObjRef( Export->Class ), "Brush" ) == 0 )
       {
         ABrush* Brush = (ABrush*)StaticLoadObject( Pkg, Export, ABrush::StaticClass(), NULL, true );

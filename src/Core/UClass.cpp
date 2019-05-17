@@ -717,7 +717,7 @@ void UFunction::Load()
   *PkgFile >> FunctionFlags;
 
   if ( FunctionFlags & FUNC_Native )
-    UObject::NativeFunctions->PushBack( this );
+    UObject::NativeFunctions.PushBack( this );
 
   if ( FunctionFlags & FUNC_Net )
     *PkgFile >> ReplicationOffset;
@@ -761,7 +761,7 @@ void UClass::BootstrapStage1()
   ObjectClass = new UClass( FName::CreateName( "Class", NameFlags ), CLASS_NoExport, NULL, 
       sizeof(UClass), UClass::NativeConstructor );
   ObjectClass->Class = ObjectClass;
-  UObject::ClassPool->PushBack( ObjectClass );
+  UObject::ClassPool.PushBack( ObjectClass );
 }
 
 void UClass::BootstrapStage2()

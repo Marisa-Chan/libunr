@@ -174,29 +174,29 @@ FPackageFileOut& operator<<( FPackageFileOut& Out, FNameEntry& Name )
 FName FName::CreateName( const char* InName, int InFlags )
 {
   FNameEntry* NewEntry = new FNameEntry( InName, InFlags );
-  FName Out = UObject::NameTable->Size();
-  UObject::NameTable->PushBack( NewEntry );
+  FName Out = UObject::NameTable.Size();
+  UObject::NameTable.PushBack( NewEntry );
   return Out;
 }
 
 const char* FName::Data() const
 {
-  return ((*UObject::NameTable)[Index])->Data;
+  return UObject::NameTable[Index]->Data;
 }
 
 const FHash& FName::Hash() const
 {
-  return ((*UObject::NameTable)[Index])->Hash;
+  return UObject::NameTable[Index]->Hash;
 }
 
 bool operator==( FName& A, FName& B )
 {
-  return (*UObject::NameTable)[A.Index]->Hash == (*UObject::NameTable)[B.Index]->Hash;
+  return UObject::NameTable[A.Index]->Hash == UObject::NameTable[B.Index]->Hash;
 }
 
 bool operator!=( FName& A, FName& B )
 {
-  return (*UObject::NameTable)[A.Index]->Hash != (*UObject::NameTable)[B.Index]->Hash;
+  return UObject::NameTable[A.Index]->Hash != UObject::NameTable[B.Index]->Hash;
 }
 
 /*-----------------------------------------------------------------------------
