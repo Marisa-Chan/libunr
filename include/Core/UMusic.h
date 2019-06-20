@@ -41,10 +41,10 @@ enum EMusicTransition
 class DLL_EXPORT UMusic : public UObject
 {
   DECLARE_NATIVE_CLASS( UMusic, UObject, CLASS_NoExport | CLASS_SafeReplace, Core )
-  EXPORTABLE() 
   UMusic();
 
   virtual void Load();
+  virtual bool ExportToFile( const char* Dir, const char* Type );
   
   u16 ChunkCount; //?
   u32 _unknown0; // PackageVerison > 61

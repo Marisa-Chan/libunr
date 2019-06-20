@@ -102,6 +102,7 @@ class DLL_EXPORT UProperty : public UField
 class DLL_EXPORT UByteProperty : public UProperty
 {
   DECLARE_NATIVE_CLASS( UByteProperty, UProperty, CLASS_NoExport, Core )
+  UByteProperty();
 
   virtual void Load();
   virtual void GetText( FString& Buf, UObject* Obj, UObject* Default, int Idx );
@@ -134,6 +135,8 @@ class DLL_EXPORT UFloatProperty : public UProperty
 class DLL_EXPORT UObjectProperty : public UProperty
 {
   DECLARE_NATIVE_CLASS( UObjectProperty, UProperty, CLASS_NoExport, Core )
+  UObjectProperty();
+
   virtual void Load();
   virtual bool LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int RealSize, int Idx = -1 );
   virtual void GetText( FString& Buf, UObject* Obj, UObject* Default, int Idx );
@@ -162,6 +165,8 @@ class DLL_EXPORT UStringProperty : public UProperty
 class DLL_EXPORT UClassProperty : public UObjectProperty
 {
   DECLARE_NATIVE_CLASS( UClassProperty, UObjectProperty, CLASS_NoExport, Core )
+  UClassProperty();
+
   virtual void Load();
   virtual void GetText( FString& Buf, UObject* Obj, UObject* Default, int Idx );
   UClass* ClassObj;
@@ -170,6 +175,8 @@ class DLL_EXPORT UClassProperty : public UObjectProperty
 class DLL_EXPORT UArrayProperty : public UProperty
 {
   DECLARE_NATIVE_CLASS( UArrayProperty, UProperty, CLASS_NoExport, Core )
+  UArrayProperty();
+
   virtual void Load();
   virtual bool LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int RealSize, int Idx = -1 );
   virtual void GetText( FString& Buf, UObject* Obj, UObject* Default, int Idx );
@@ -179,6 +186,8 @@ class DLL_EXPORT UArrayProperty : public UProperty
 class DLL_EXPORT UStructProperty : public UProperty
 {
   DECLARE_NATIVE_CLASS( UStructProperty, UProperty, CLASS_NoExport, Core )
+  UStructProperty();
+
   virtual void Load();
   virtual bool LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int RealSize, int Idx = -1 );
   virtual bool LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8 Type, int RealSize, int Idx = -1 );

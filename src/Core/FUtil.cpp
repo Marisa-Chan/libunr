@@ -199,6 +199,14 @@ bool operator!=( FName& A, FName& B )
   return UObject::NameTable[A.Index]->Hash != UObject::NameTable[B.Index]->Hash;
 }
 
+DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FName& Name )
+{
+  idx NameIdx;
+  In >> CINDEX( NameIdx );
+  Name = In.Pkg->GetGlobalName( NameIdx );
+  return In;
+}
+
 /*-----------------------------------------------------------------------------
  * FCompactIndex
 -----------------------------------------------------------------------------*/

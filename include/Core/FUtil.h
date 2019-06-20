@@ -62,11 +62,12 @@
 #else
   #error "Unsupported compiler type, read more here"
   
-  // At this point in time, only the g++ compiler is supported
-  // Clang may be supported in the future. Compilers for less
-  // common architectures should also be supported where gcc does
-  // not have support or if gcc tends to be slower on said arch. 
-  // No version of Visual Studio will be officially supported.
+  // At this point in time, only the g++ and Clang compilers
+  // are supported. Compilers for less common architectures 
+  // should also be supported where cross-platform compilers do
+  // not have support or if they tend to generate slower code for
+  // said platform. No version of Visual Studio will be officially 
+  // supported.
   
 #endif
 
@@ -284,7 +285,11 @@ struct DLL_EXPORT FName
   FName( int Idx ) { Index = Idx; }
 
   static FName CreateName( const char* InName, int InFlags );
-  
+  static inline bool IsNameNone( FName Name )
+  {
+    return (*(int*)Name.Data()) == NONE_STR;
+  }
+
   inline operator u32()
   {
     return Index;
@@ -301,6 +306,7 @@ struct DLL_EXPORT FName
 
   friend bool operator==( FName& A, FName& B );
   friend bool operator!=( FName& A, FName& B );
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FName& Name );
 };
 
 /*-----------------------------------------------------------------------------

@@ -50,7 +50,7 @@ USystem::USystem()
 {
   GamePath = NULL;
   GameName = NULL;
-  GameFlags = NULL;
+  GameFlags = 0;
   PurgeCacheDays = 0;
   SavePath = NULL;
   CachePath = NULL;

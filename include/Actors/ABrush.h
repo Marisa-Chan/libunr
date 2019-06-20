@@ -31,10 +31,10 @@ class DLL_EXPORT ABrush : public AActor
 {
   DECLARE_NATIVE_CLASS( ABrush, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()
-  EXPORTABLE()
 
   ABrush();
   void ExportToLevelText( FileStreamOut* Out );
+  virtual bool ExportToFile( const char* Dir, const char* Type );
 
   enum ECsgOper
   {

@@ -62,44 +62,62 @@ FPackageFileIn& operator>>( FPackageFileIn& In, FMeshVert& MV )
 
 FPackageFileIn& operator>>( FPackageFileIn& In, FMeshTri& MT )
 {
-  In >> MT.Vertex[0] >> MT.Vertex[1] >> MT.Vertex[2];
-  In >> MT.VertexUV[0][0] >> MT.VertexUV[1][0];
-  In >> MT.VertexUV[0][1] >> MT.VertexUV[1][1];
-  In >> MT.VertexUV[0][2] >> MT.VertexUV[1][2];
-  In >> MT.Flags;
-  In >> MT.TextureIndex;
+  In.Read( &MT, sizeof(FMeshTri) );
   return In;
+}
+
+FPackageFileIn& operator>>( FPackageFileIn& In, FMeshAnimFunc& MAF )
+{
+  In >> MAF.Time;
+
+  // We'll get the actual function object if we need it later
+  // Chances are, if we need it then the function will already be loaded
+  // since the mesh would've been loaded from a defaultproperty list.
+  In >> CINDEX( MAF.FuncIdx );
+
+  return In; 
 }
 
 FPackageFileIn& operator>>( FPackageFileIn& In, FMeshAnim& MA )
 {
-  return In;  
+  In >> MA.Name;
+  In >> MA.Group;
+  In >> MA.StartFrame;
+  In >> MA.NumFrames;
+
+  idx FunctionCount;
+  In >> CINDEX( FunctionCount );
+  MA.Functions.Resize( FunctionCount );
+
+  for ( int i = 0; i < FunctionCount; i++ )
+    In >> MA.Functions[i];
+
+  In >> MA.Rate;
+
+  return In;
 }
 
 FPackageFileIn& operator>>( FPackageFileIn& In, FMeshVertConnect& MVC )
 {
+  In.Read( &MVC, sizeof(FMeshVertConnect) );
   return In;  
 }
 
 UMesh::UMesh()
   : UPrimitive()
 {
-  Verts = new Array<FMeshVert>();
-  Tris  = new Array<FMeshTri>();
-  Anims = new Array<FMeshAnim>();
   bDeusExMesh = false;
 }
 
 UMesh::~UMesh()
 {
-  delete Verts;
-  delete Tris;
-  delete Anims;
 }
 
 void UMesh::Load()
 {
-/*  Super::Load();
+  Super::Load();
+
+  FPackageFileIn& In = *PkgFile;
 
   u32 VertsJump = 0;
   u32 VertLinksJump = 0;
@@ -114,53 +132,102 @@ void UMesh::Load()
   idx TexturesCount;
   idx BoundBoxCount;
   idx BoundSphereCount;
-  
+  idx TexLODCount;
 
-  if ( PkgFile->Ver > PKG_VER_UN_200 )
-    *PkgFile >> VertsJump;
+  if ( In.Ver > PKG_VER_UN_200 )
+    In >> VertsJump;
 
-  *PkgFile >> CINDEX( VertsCount );
-  Verts->Resize( VertsCount );
+  In >> CINDEX( VertsCount );
+  Verts.Resize( VertsCount );
 
   // Deus Ex mesh detection
-  // I'm going to assume that this works since UTPT does the same exact thing
-  if ( VertsCount > 0 && VertsJump > 0 && ( (VertsJump-PkgFile->Tell())/VertsCount ) == 8 )
+  if ( VertsCount > 0 && VertsJump > 0 && ( (VertsJump - In.Tell())/VertsCount ) == 8 )
     bDeusExMesh = true;
 
   for ( int i = 0; i < VertsCount; i++ )
   {
-    (*Verts)[i].bDeusEx = bDeusExMesh;
-    *PkgFile >> (*Verts)[i];
+    Verts[i].bDeusEx = bDeusExMesh;
+    In >> Verts[i];
   }
 
   if ( PkgFile->Ver > PKG_VER_UN_200 )
-    *PkgFile >> TrisJump;
+    In >> TrisJump;
 
-  *PkgFile >> CINDEX( TrisCount );
-  Tris->Resize( TrisCount );
+  In >> CINDEX( TrisCount );
+  Tris.Resize( TrisCount );
   for ( int i = 0; i < TrisCount; i++ )  
-    *PkgFile >> (*Tris)[i];
+    In >> Tris[i];
 
-  *PkgFile >> CINDEX( AnimsCount );
-  Anims->Resize( AnimsCount );
+  In >> CINDEX( AnimsCount );
+  Anims.Resize( AnimsCount );
   for ( int i = 0; i < AnimsCount; i++ )
-    *PkgFile >> (*Anims)[i];
+    In >> Anims[i];
 
   if ( PkgFile->Ver > PKG_VER_UN_200 )
-    *PkgFile >> ConnectsJump;
+    In >> ConnectsJump;
 
-  *PkgFile >> CINDEX( ConnectsCount );
-  Connects->Resize( ConnectsCount );
+  In >> CINDEX( ConnectsCount );
+  Connects.Resize( ConnectsCount );
   for ( int i = 0; i < ConnectsCount; i++ )
-    *PkgFile >> (*Connects)[i];
+    In >> Connects[i];
 
   // Why are these stored twice???
   FBox BBox2;
   FSphere Sphere2;
 
-  *PkgFile >> BBox2;
-  *PkgFile >> Sphere2; 
-*/
+  In >> BBox2 >> Sphere2; 
+
+  In >> VertLinksJump;
+  In >> CINDEX( VertLinksCount );
+  VertLinks.Resize( VertLinksCount );
+  for ( int i = 0; i < VertLinksCount; i++ )
+    In >> VertLinks[i];
+
+  In >> CINDEX( TexturesCount );
+  Textures.Resize( TexturesCount );
+  for ( int i = 0; i < TexturesCount; i++ )
+  {
+    idx ObjRef;
+    In >> CINDEX( ObjRef );
+    Textures[i] = (UTexture*)LoadObject( ObjRef, UTexture::StaticClass(), NULL );
+  }
+
+  In >> CINDEX( BoundBoxCount );
+  BoundingBoxes.Resize( BoundBoxCount );
+  for ( int i = 0; i < BoundBoxCount; i++ )
+    In >> BoundingBoxes[i];
+
+  In >> CINDEX( BoundSphereCount );
+  BoundingSpheres.Resize( BoundSphereCount );
+  for ( int i = 0; i < BoundSphereCount; i++ )
+    In >> BoundingSpheres[i];
+
+  In >> FrameVerts >> AnimFrames;
+
+  u32 ANDFlags, ORFlags; // ???
+  In >> ANDFlags >> ORFlags;
+
+  In >> Scale >> Origin >> RotOrigin;
+  
+  u32 CurPoly, CurVertex; // ???
+  In >> CurPoly >> CurVertex;
+
+  if ( In.Ver == PKG_VER_UN_222 )
+  {
+    TextureLODs.Resize( 1 );
+    In >> TextureLODs[0];
+  }
+  else if ( In.Ver > PKG_VER_UN_222 )
+  {
+    In >> CINDEX( TexLODCount );
+    TextureLODs.Resize( TexLODCount );
+    for ( int i = 0; i < TexLODCount; i++ )
+      In >> TextureLODs[i];
+  }
+  else
+  {
+    TextureLODs.PushBack( 1.00f );
+  }
 }
 
 UAnimationNotify::UAnimationNotify()

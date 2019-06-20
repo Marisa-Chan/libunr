@@ -77,10 +77,10 @@ class DLL_EXPORT ULevelBase : public UObject
 class DLL_EXPORT ULevel : public ULevelBase
 {
   DECLARE_NATIVE_CLASS( ULevel, ULevelBase, CLASS_NoExport, Engine )
-  EXPORTABLE()
   ULevel();
 
   virtual void Load();
+  virtual bool ExportToFile( const char* Dir, const char* Type );
 
   Array<FReachSpec> ReachSpecs;
   UModel* Model;

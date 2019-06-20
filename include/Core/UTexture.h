@@ -193,7 +193,6 @@ class DLL_EXPORT UTexture : public UBitmap
 {
   DECLARE_NATIVE_CLASS( UTexture, UBitmap, CLASS_SafeReplace, Engine )
   EXPOSE_TO_USCRIPT()
-  EXPORTABLE()
   UTexture();
 
   UTexture* BumpMap;
@@ -271,6 +270,7 @@ class DLL_EXPORT UTexture : public UBitmap
   u8     TextureMaterial;
   
   virtual void Load();
+  virtual bool ExportToFile( const char* Dir, const char* Type );
 };
 
 class DLL_EXPORT UFont : public UObject

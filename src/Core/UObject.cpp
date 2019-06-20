@@ -127,11 +127,6 @@ UClass* UObject::StaticAllocateClass( FName ClassName, u32 Flags, UClass* SuperC
   return Out;
 }
 
-FPackageFileOut& operator<<( FPackageFileOut& Ar, UObject& Obj )
-{
-  return Ar;
-}
-
 UObject::UObject()
 {
   Index = -1;
@@ -272,6 +267,21 @@ UClass* UObject::FindClass( FName ClassName )
     UClass* Cls = ClassPool[i];
     if ( Cls->Name == ClassName )
       return Cls;
+  }
+
+  return NULL;
+}
+
+UObject* UObject::StaticFindObject( UPackage* Pkg, FName ObjName )
+{
+  if ( FName::IsNameNone( ObjName ) )
+    return NULL;
+
+  for ( size_t i = 0; i < ObjectPool.Size(); i++ )
+  {
+    UObject* Obj = ObjectPool[i];
+    if ( Obj->Name == ObjName )
+      return Obj;
   }
 
   return NULL;

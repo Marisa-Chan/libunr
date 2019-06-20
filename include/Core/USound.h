@@ -41,10 +41,10 @@ enum ESoundSlot
 class DLL_EXPORT USound : public UObject
 {
   DECLARE_NATIVE_CLASS( USound, UObject, CLASS_NoExport | CLASS_SafeReplace, Engine )
-  EXPORTABLE()
   USound();
 
   virtual void Load();
+  virtual bool ExportToFile( const char* Dir, const char* Type );
   
   int SoundFormat;
   u32 OffsetNext;  // PackageVersion >= 63

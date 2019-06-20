@@ -1,0 +1,24 @@
+This is a document describing LOD mesh flags and their possible meaning.
+-------------------------------------------------------------------------------------
+Master list
+-------------------------------------------------------------------------------------
+0   = Normal
+2   = Masked
+256 = Two sided
+
+-------------------------------------------------------------------------------------
+Scratch work
+-------------------------------------------------------------------------------------
+UnrealShare.Skaarjw
+(gdb) p/x Materials
+$2 = {ElementSize = 0x8, Vector = std::vector of length 3, capacity 3 = {{Flags = 0x0, TextureIndex = 0x0}, {Flags = 0x100, TextureIndex = 0x0}, {Flags = 0x102, TextureIndex = 0x0}}}
+0x000 = Normal Polygon (every other polygon)
+0x002 = Masked         (the dreads)
+0x102 = Masked AND Two sided  (the raziks, flags are 0x100 and 0x002, so two-sided AND masked)
+
+UnrealShare.Male3
+(gdb) p/x Materials
+$3 = {ElementSize = 0x8, Vector = std::vector of length 2, capacity 2 = {{Flags = 0x0, TextureIndex = 0x0}, {Flags = 0x102, TextureIndex = 0x0}}}
+0x000 = Normal Polygon
+0x102 = Masked AND two sided (the fingers)
+

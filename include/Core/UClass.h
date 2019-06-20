@@ -174,7 +174,7 @@ struct DLL_EXPORT FDependency
 class DLL_EXPORT UClass : public UState
 {
   DECLARE_NATIVE_CLASS( UClass, UState, CLASS_NoExport, Core )
-  EXPORTABLE();
+  
   static void BootstrapStage1();
   static void BootstrapStage2();
 
@@ -184,6 +184,7 @@ class DLL_EXPORT UClass : public UState
   
   virtual void Load();
   virtual void PostLoad();
+  virtual bool ExportToFile( const char* Dir, const char* Type );
 
   bool ClassIsA( UClass* ClassType );
   bool IsNative();

@@ -405,9 +405,6 @@ bool cls::StaticLinkNativeProperties() \
     ExpCls->Default->Field = ExpCls->Children; \
   }
 
-#define EXPORTABLE() \
-  virtual bool ExportToFile( const char* Dir, const char* Type );
-
 /*-----------------------------------------------------------------------------
  * UObject
  * The base class of all Unreal objects
@@ -417,8 +414,6 @@ class DLL_EXPORT UObject
 public:
   DECLARE_NATIVE_CLASS_BASE( UObject, UObject, CLASS_Abstract, Core )
   EXPOSE_TO_USCRIPT()
-  // not really exportable, but just so all subclasses can have export called generically
-  EXPORTABLE() 
   UObject();
 
   UObject* LoadObject( idx ObjRef, UClass* ObjClass, UObject* InOuter, bool bLoadClassNow = false );
@@ -427,6 +422,7 @@ public:
   virtual void Load();
   virtual void PostLoad();
   virtual void PostDefaultLoad();
+  virtual bool ExportToFile( const char* Dir, const char* Type );
 
   void AddRef();
   void DelRef();
@@ -456,6 +452,7 @@ public:
     UObject* InOuter, UPackage* InPkg, FExport* InExport );
   static UClass* StaticAllocateClass( FName InName, u32 Flags, UClass* SuperClass, 
     size_t InStructSize, UObject *(*NativeCtor)(size_t) );
+  static UObject* StaticFindObject( UPackage* Pkg, FName ObjName );
 
   static Array<UObject*> ObjectPool;
   static Array<UClass*>  ClassPool; 

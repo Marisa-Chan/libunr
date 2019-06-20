@@ -130,6 +130,12 @@ u32 UProperty::GetNativeOffset( FName ClassName, FName PropName )
   return Offset;
 }
 
+UByteProperty::UByteProperty()
+  : UProperty()
+{
+  Enum = NULL;
+}
+
 void UByteProperty::Load()
 {
   Super::Load();
@@ -362,6 +368,11 @@ void UStringProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int
   }
 }
 
+UObjectProperty::UObjectProperty()
+{
+  ObjectType = NULL;
+}
+
 void UObjectProperty::Load()
 {
   Super::Load();
@@ -415,6 +426,12 @@ void UObjectProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int
   }
 }
 
+UClassProperty::UClassProperty()
+  : UObjectProperty()
+{
+  ClassObj = NULL;
+}
+
 void UClassProperty::Load()
 {
   Super::Load();
@@ -444,6 +461,12 @@ void UClassProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int 
     Buf += Val->Name;
     Buf += '\'';
   }
+}
+
+UStructProperty::UStructProperty()
+  : UProperty()
+{
+  Struct = NULL;
 }
 
 void UStructProperty::Load()
@@ -627,6 +650,12 @@ void UStructProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int
       Buf += ')';
     }
   }
+}
+
+UArrayProperty::UArrayProperty()
+  : UProperty()
+{
+  Inner = NULL;
 }
 
 void UArrayProperty::Load()

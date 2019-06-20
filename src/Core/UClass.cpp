@@ -606,12 +606,7 @@ void UStruct::Load()
         UProperty* Prop = (UProperty*)ChildIter;
         if ( !(Prop->PropertyFlags & CPF_Native) )
         {
-          // UPak.SpaceMarine has this cool thing where the struct MarineSound
-          // contains a variable of type SpaceMarine, the class actually being loaded.
-          // Because of that, the struct doesn't finish loading until it gets to this
-          // point, but the struct property VoiceList will have an element size of 0.
-          // As a result, SaluteTarget and VoiceList end up having the same Offset value.
-          // Needless to say, this causes problems when accessing both variables.
+          // Special case for handling struct properties
           if ( Prop->Class == UStructProperty::StaticClass() )
             Prop->ElementSize = ((UStructProperty*)Prop)->Struct->StructSize;
 
@@ -628,7 +623,7 @@ void UStruct::FinalizeClassLoad()
   if ( bFinalizedLoad )
     return;
 
-  UField* Iter;
+  UField* Iter = NULL;
   for ( Iter = Children; Iter != NULL; Iter = Iter->Next )
   {
     if ( Class == UClass::StaticClass() && Iter->Outer != this )
@@ -775,12 +770,14 @@ UClass::UClass()
   Constructor = NULL;
   StructSize = 0;
   bLinkedChildren = false;
+  Export = NULL;
 }
 
 UClass::UClass( FName ClassName, u32 Flags, UClass* InSuperClass, 
     size_t InStructSize, UObject *(*NativeCtor)(size_t) )
   : UState()
 {
+  Export = NULL;
   Name = ClassName;
 //Hash = FnvHashString( Name );
   ClassFlags = Flags;

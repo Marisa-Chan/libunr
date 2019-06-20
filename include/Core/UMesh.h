@@ -26,6 +26,7 @@
 #pragma once
 
 #include "Core/UPrimitive.h"
+#include "Core/UTexture.h"
 
 class AActor;
 
@@ -42,7 +43,7 @@ struct DLL_EXPORT FMeshVert
 struct DLL_EXPORT FMeshTri
 {
   u16 Vertex[3];
-  u8  VertexUV[2][3];
+  u8  VertexUV[3][2];
   u32 Flags;
   u32 TextureIndex;
 
@@ -52,6 +53,7 @@ struct DLL_EXPORT FMeshTri
 struct DLL_EXPORT FMeshAnimFunc
 {
   float Time;
+  idx FuncIdx;
   UFunction* Function;
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FMeshAnimFunc& MAF );
@@ -63,7 +65,7 @@ struct DLL_EXPORT FMeshAnim
   FName Group;
   u32   StartFrame;
   u32   NumFrames;
-  Array<FMeshAnimFunc>* Functions;
+  Array<FMeshAnimFunc> Functions;
   float Rate;
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FMeshAnim& MA );
@@ -84,10 +86,20 @@ class DLL_EXPORT UMesh : public UPrimitive
   UMesh();
   virtual void Load();
 
-  Array<FMeshVert>* Verts;
-  Array<FMeshTri>*  Tris;
-  Array<FMeshAnim>* Anims;
-  Array<FMeshVertConnect>* Connects;
+  Array<FMeshVert> Verts;
+  Array<FMeshTri>  Tris;
+  Array<FMeshAnim> Anims;
+  Array<FMeshVertConnect> Connects;
+  Array<u32> VertLinks;
+  Array<UTexture*> Textures;
+  Array<FBox> BoundingBoxes; // Boundaries per frame, need to store?
+  Array<FSphere> BoundingSpheres; // ''
+  Array<float> TextureLODs;
+  u32 FrameVerts;
+  u32 AnimFrames;
+  FVector Scale;
+  FVector Origin;
+  FRotator RotOrigin;
   bool bCurvyMesh;
   bool bDeusExMesh;
 };
