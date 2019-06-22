@@ -141,6 +141,7 @@ bool ULodMesh::ExportUnreal3DMesh( const char* Dir, int Frame )
     // Mesh flags in a _d.3d file use something else
     TriOut.Type = 0;
     FLodMaterial Mat = Materials[Faces[i].MaterialIndex];
+
     // Weapon triangles are invisible, so maybe that's the only thing the engine
     // checks for? Might need to look into this some more...
     if ( Mat.Flags & PF_Invisible && SpecialVerts > 0 )

@@ -32,18 +32,18 @@ FPackageFileIn& operator>>( FPackageFileIn& In, FMeshVert& MV )
     u64 XYZ;
     In >> XYZ;
 
-    MV.X = (XYZ & 0xFFFF) / 256;
-    MV.Y = ((XYZ >> 16) & 0xFFFF) / 256;
-    MV.Z = ((XYZ >> 32) & 0xFFFF) / 256;
+    MV.X = (XYZ & 0xFFFF) / 256.0;
+    MV.Y = ((XYZ >> 16) & 0xFFFF) / 256.0;
+    MV.Z = ((XYZ >> 32) & 0xFFFF) / 256.0;
   }
   else
   {
     u32 XYZ;
     In >> XYZ;
 
-    MV.X = (XYZ & 0x7FF) / 8;
-    MV.Y = ((XYZ >> 11) & 0x7FF) / 8;
-    MV.Z = ((XYZ >> 22) & 0x3FF) / 4;
+    MV.X = (XYZ & 0x7FF) / 8.0;
+    MV.Y = ((XYZ >> 11) & 0x7FF) / 8.0;
+    MV.Z = ((XYZ >> 22) & 0x3FF) / 4.0;
   }
     
   if ( MV.X > 128 )
