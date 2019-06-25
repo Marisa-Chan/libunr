@@ -97,6 +97,7 @@ class DLL_EXPORT ULodMesh : public UMesh
 
   ULodMesh();
   virtual void Load();
+  virtual bool ExportToFile( const char* Dir, const char* Type );
   virtual bool ExportToFile( const char* Dir, const char* Type, int Frame = -1 );
 
   Array<u16> CollapsePoints;

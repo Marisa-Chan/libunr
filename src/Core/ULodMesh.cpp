@@ -385,10 +385,17 @@ bool ULodMesh::ExportObjMesh( const char* Dir, int Frame )
   return true;
 }
 
+bool ULodMesh::ExportToFile( const char* Dir, const char* Type )
+{
+  return ULodMesh::ExportToFile( Dir, Type, -1 );
+}
+
 bool ULodMesh::ExportToFile( const char* Dir, const char* Type, int Frame )
 {
   if ( Type == NULL )
     Type = "U3D";
+
+  Logf( LOG_INFO, "Exporting %s.3d", Name.Data() );
 
   if ( stricmp( Type, "U3D" ) == 0 )
   {
