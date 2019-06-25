@@ -98,6 +98,7 @@ set (SOURCES ${UNR_SRC}/Core/FConfig.cpp
              ${UNR_SRC}/Core/ULocale.cpp
              ${UNR_SRC}/Core/ULodMesh.cpp
              ${UNR_SRC}/Core/ULevel.cpp
+             ${UNR_SRC}/Core/UMath.cpp
              ${UNR_SRC}/Core/UMesh.cpp
              ${UNR_SRC}/Core/UModel.cpp
              ${UNR_SRC}/Core/UMusic.cpp

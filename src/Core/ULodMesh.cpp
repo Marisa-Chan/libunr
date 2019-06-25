@@ -197,7 +197,190 @@ bool ULodMesh::ExportUnreal3DMesh( const char* Dir, int Frame )
 
 bool ULodMesh::ExportObjMesh( const char* Dir, int Frame )
 {
-  return false;
+  FileStreamOut Out;
+  FString Filename( Dir );
+#if defined LIBUNR_WIN32
+  Filename.ReplaceChars( '\\', '/' );
+#endif
+  if ( Filename.Back() != '/' )
+    Filename += '/';
+
+  Filename += Name.Data();
+
+  // Export obj mesh
+
+  FString ObjFileName = Filename;
+  ObjFileName += ".obj";
+
+  if ( Out.Open( ObjFileName ) != 0 )
+  {
+    Logf( LOG_WARN, "Failed to export LOD mesh to obj file '%s'", ObjFileName.Data() );
+    return false;
+  }
+ 
+  Out.Printf("# OBJ File generated with libunr LODMesh exporter\n");
+  Out.Printf("mtllib %s.mtl\n", Name.Data());
+  Out.Printf("o %s\n", Name.Data());
+
+  // Vertex coordinates
+  int FirstVert = Frame * FrameVerts;
+  for ( int i = 0; i < FrameVerts; i++ )
+  {
+    FMeshVert Vtx = Verts[FirstVert+i];
+    Out.Printf("v %.6f %.6f %.6f\n", -Vtx.X, -Vtx.Y, -Vtx.Z);
+  }
+
+  // Vertex UVs
+  for ( int i = 0; i < Wedges.Size(); i++ )
+  {
+    FLodWedge Wedge = Wedges[i];
+    Out.Printf("vt %.6f %.6f\n", Wedge.S/255.0, (255-Wedge.T)/255.0); 
+  }
+
+  // Vertex Normals
+  FVector* VertNormals = new FVector[FrameVerts];
+  xstl::Set( VertNormals, 0, sizeof(FVector)*FrameVerts );
+
+  {
+    FVector FaceNormals[2];
+    FLodWedge TriWedges[2][3];
+    int v[2][3];
+    int i = 0;
+
+    if ( Faces.Size() & 1 )
+    {
+      TriWedges[0][0] = Wedges[Faces[0].WedgeIndex[0]];
+      TriWedges[0][1] = Wedges[Faces[0].WedgeIndex[1]];
+      TriWedges[0][2] = Wedges[Faces[0].WedgeIndex[2]];
+  
+      v[0][0] = TriWedges[0][0].VertexIndex;
+      v[0][1] = TriWedges[0][1].VertexIndex;
+      v[0][2] = TriWedges[0][2].VertexIndex;
+  
+      FVector U = *(FVector*)&Verts[v[0][0]] - *(FVector*)&Verts[v[0][1]];
+      FVector V = *(FVector*)&Verts[v[0][2]] - *(FVector*)&Verts[v[0][1]];
+  
+      FaceNormals[0].X = (U.Y * V.Z) - (U.Z * V.Y);
+      FaceNormals[0].Y = (U.Z * V.X) - (U.X * V.Z);
+      FaceNormals[0].Z = (U.X * V.Y) - (U.Y * V.X);
+  
+      VertNormals[v[0][0]] += FaceNormals[0];
+      VertNormals[v[0][1]] += FaceNormals[0];
+      VertNormals[v[0][2]] += FaceNormals[0];
+
+      i++;
+    }
+    for ( ; i < Faces.Size(); i+=2 )
+    {
+      // Loop unrolling, woo
+      TriWedges[0][0] = Wedges[Faces[i].WedgeIndex[0]];
+      TriWedges[0][1] = Wedges[Faces[i].WedgeIndex[1]];
+      TriWedges[0][2] = Wedges[Faces[i].WedgeIndex[2]];
+  
+      TriWedges[1][0] = Wedges[Faces[i+1].WedgeIndex[0]];
+      TriWedges[1][1] = Wedges[Faces[i+1].WedgeIndex[1]];
+      TriWedges[1][2] = Wedges[Faces[i+1].WedgeIndex[2]];
+  
+      v[0][0] = TriWedges[0][0].VertexIndex;
+      v[0][1] = TriWedges[0][1].VertexIndex;
+      v[0][2] = TriWedges[0][2].VertexIndex;
+  
+      v[1][0] = TriWedges[1][0].VertexIndex;
+      v[1][1] = TriWedges[1][1].VertexIndex;
+      v[1][2] = TriWedges[1][2].VertexIndex;
+  
+      FVector U1 = *(FVector*)&Verts[FirstVert+v[0][0]] - *(FVector*)&Verts[FirstVert+v[0][1]];
+      FVector V1 = *(FVector*)&Verts[FirstVert+v[0][2]] - *(FVector*)&Verts[FirstVert+v[0][1]];
+  
+      FVector U2 = *(FVector*)&Verts[FirstVert+v[1][0]] - *(FVector*)&Verts[FirstVert+v[1][1]];
+      FVector V2 = *(FVector*)&Verts[FirstVert+v[1][2]] - *(FVector*)&Verts[FirstVert+v[1][1]];
+ 
+      FaceNormals[0].X = (U1.Y * V1.Z) - (U1.Z * V1.Y);
+      FaceNormals[0].Y = (U1.Z * V1.X) - (U1.X * V1.Z);
+      FaceNormals[0].Z = (U1.X * V1.Y) - (U1.Y * V1.X);
+  
+      FaceNormals[1].X = (U2.Y * V2.Z) - (U2.Z * V2.Y);
+      FaceNormals[1].Y = (U2.Z * V2.X) - (U2.X * V2.Z);
+      FaceNormals[1].Z = (U2.X * V2.Y) - (U2.Y * V2.X);
+      
+      VertNormals[v[0][0]] += FaceNormals[0];
+      VertNormals[v[0][1]] += FaceNormals[0];
+      VertNormals[v[0][2]] += FaceNormals[0];
+  
+      VertNormals[v[1][0]] += FaceNormals[1];
+      VertNormals[v[1][1]] += FaceNormals[1];
+      VertNormals[v[1][2]] += FaceNormals[1];
+    }
+    for ( int i = 0; i < FrameVerts; i++ )
+    {
+      FVector Normal = VertNormals[i];
+      if ( Normal.X == 0 && Normal.Y == 0 && Normal.Z == 0 )
+        continue;
+
+      float Norm = sqrtf((Normal.X * Normal.X) + (Normal.Y * Normal.Y) + (Normal.Z * Normal.Z));
+
+      Normal.X /= Norm;
+      Normal.Y /= Norm;
+      Normal.Z /= Norm;
+
+      Out.Printf("vn %.6f %.6f %.6f\n", Normal.X, Normal.Y, Normal.Z);
+    }
+    delete VertNormals;
+  }
+
+  // Polygons
+  FName TexName = 0;
+  FName OldName = 0;
+  for ( int i = 0; i < Faces.Size(); i++ )
+  {
+    FLodFace Face = Faces[i];
+
+    FLodWedge TriWedges[3];
+    TriWedges[0] = Wedges[Face.WedgeIndex[0]];
+    TriWedges[1] = Wedges[Face.WedgeIndex[1]];
+    TriWedges[2] = Wedges[Face.WedgeIndex[2]];
+
+    // Change mtl assignment
+    int MaterialIndex = Face.MaterialIndex;
+    TexName = Textures[Materials[Face.MaterialIndex].TextureIndex]->Name;
+    if ( TexName != OldName )
+      Out.Printf("usemtl %s\n", TexName.Data());
+    OldName = TexName;
+
+    Out.Printf("f %i/%i/%i %i/%i/%i %i/%i/%i\n", 
+      TriWedges[0].VertexIndex+1, Face.WedgeIndex[0]+1, TriWedges[0].VertexIndex+1,
+      TriWedges[1].VertexIndex+1, Face.WedgeIndex[1]+1, TriWedges[1].VertexIndex+1,
+      TriWedges[2].VertexIndex+1, Face.WedgeIndex[2]+1, TriWedges[2].VertexIndex+1
+    );
+  }
+
+  Out.Close();
+
+  FString MtlFileName = Filename;
+  MtlFileName += ".mtl";
+
+  if ( Out.Open( MtlFileName ) != 0 )
+  {
+    Logf( LOG_WARN, "Failed to generate MTL file for LOD mesh '%s'", Name.Data() );
+    return false;
+  }
+ 
+  Out.Printf("# MTL File generated with libunr LODMesh exporter\n");
+  Out.Printf("# Materials: %i\n", Materials.Size());
+
+  for ( int i = 0; i < Materials.Size(); i++ )
+  {
+    Out.Printf("newmtl %s\n", Textures[Materials[i].TextureIndex]->Name.Data());
+    Out.Printf("Ns 0\n");
+    Out.Printf("Ka %.6f %.6f %.6f\n", 0.0f, 0.0f, 0.0f); /// ???
+    Out.Printf("Kd %.1f %.1f %.1f\n", 0.1f, 0.1f, 0.1f); /// ???
+    Out.Printf("Ks %.1f %.1f %.1f\n", 0.1f, 0.1f, 0.1f); /// ???
+    Out.Printf("d 1\n");
+    Out.Printf("illum 1\n\n");
+  }
+
+  Out.Close();
+  return true;
 }
 
 bool ULodMesh::ExportToFile( const char* Dir, const char* Type, int Frame )

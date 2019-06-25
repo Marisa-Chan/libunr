@@ -55,6 +55,10 @@ struct DLL_EXPORT FVector
     Out << Vector.Z;
     return Out;
   }
+
+  friend void operator+=( FVector& A, FVector& B );
+  friend FVector operator+( FVector& A, FVector& B );
+  friend FVector operator-( FVector& A, FVector& B );
 };
 
 struct DLL_EXPORT FPlane : public FVector
