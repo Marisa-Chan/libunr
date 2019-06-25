@@ -210,6 +210,8 @@ bool ULodMesh::ExportObjMesh( const char* Dir, int Frame )
   // Export obj mesh
 
   FString ObjFileName = Filename;
+  ObjFileName += "_";
+  ObjFileName += FString(Frame);
   ObjFileName += ".obj";
 
   if ( Out.Open( ObjFileName ) != 0 )
@@ -217,7 +219,7 @@ bool ULodMesh::ExportObjMesh( const char* Dir, int Frame )
     Logf( LOG_WARN, "Failed to export LOD mesh to obj file '%s'", ObjFileName.Data() );
     return false;
   }
- 
+  
   Out.Printf("# OBJ File generated with libunr LODMesh exporter\n");
   Out.Printf("mtllib %s.mtl\n", Name.Data());
   Out.Printf("o %s\n", Name.Data());
@@ -385,12 +387,30 @@ bool ULodMesh::ExportObjMesh( const char* Dir, int Frame )
 
 bool ULodMesh::ExportToFile( const char* Dir, const char* Type, int Frame )
 {
+  if ( Type == NULL )
+    Type = "U3D";
+
   if ( stricmp( Type, "U3D" ) == 0 )
+  {
     return ExportUnreal3DMesh( Dir, Frame );
+  }
   else if ( stricmp( Type, "OBJ" ) == 0 )
+  {
+    if ( Frame < 0 )
+    {
+      for ( int i = 0; i < AnimFrames; i++ )
+      {
+        if ( !ExportObjMesh( Dir, i ) )
+          return false;
+      }
+      return true;
+    }
     return ExportObjMesh( Dir, Frame );
+  }
   else
+  {
     Logf( LOG_WARN, "Unknown LODMesh export extension '%s'", Type );
+  }
 
   return false;
 }
