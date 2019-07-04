@@ -116,6 +116,7 @@ const char* const LogLevelStrings[] =
 #define ERR_BAD_DATA       2
 #define ERR_FILE_CREATE    3
 
+extern xstl::FileStreamOut* GLogFile;
 DLL_EXPORT void Logf( int Type, const char* Str, ... );
 DLL_EXPORT bool CreateLogFile( const char* Path );
 DLL_EXPORT void CloseLogFile();

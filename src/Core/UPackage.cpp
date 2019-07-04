@@ -428,7 +428,7 @@ bool UPackage::StaticInit()
 
 void UPackage::StaticExit( bool bCrashExit )
 {
-  if ( UPackage::Packages == NULL )
+  if ( UPackage::Packages != NULL && !bCrashExit )
     delete Packages;
 }
 

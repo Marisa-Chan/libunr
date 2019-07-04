@@ -23,6 +23,8 @@
  *========================================================================
 */
 
+#include <signal.h>
+#include <libxstl/XBacktrace.h>
 #include "Core/FConfig.h"
 #include "Core/USystem.h"
 #include "Core/UPackage.h"
@@ -37,6 +39,18 @@
 USystem* GSystem = NULL;
 int USystem::LogLevel = LOG_INFO;
 bool USystem::bIsEditor = false;
+
+// Some niche platforms later supported in the future may not support sigaction
+static void SigsegvHandler( int sig, siginfo_t* si, void *raw_uctx )
+{
+  ucontext_t* uctx = (ucontext_t*)raw_uctx;
+
+  Logf( LOG_CRIT, "CAUGHT SIGSEGV!!!" );
+  DumpRegisters( &uctx->uc_mcontext, false, GLogFile );
+  DumpBacktrace( &uctx->uc_mcontext, GLogFile );
+
+  GSystem->Exit( -1 );
+}
 
 USubsystem::USubsystem()
 {
@@ -655,6 +669,17 @@ const char* USystem::GetHomeDir()
 
 bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool bIsEditor, char* GameName )
 {
+  // Set up SIGSEGV handler
+  struct sigaction sa;
+  sa.sa_sigaction = &SigsegvHandler;
+  sa.sa_flags = SA_SIGINFO;
+
+  if (sigaction(SIGSEGV, &sa, NULL) < 0)
+  {
+    Logf( LOG_CRIT, "Failed to register SIGSEGV handler!\n");
+    return false;
+  }
+
   if ( UNLIKELY( !USystem::StaticInit( GPC, DPC, bIsEditor, GameName ) ) )
   {
     Logf( LOG_CRIT, "USystem::StaticInit() failed!" );

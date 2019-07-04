@@ -142,7 +142,7 @@ set (SOURCES ${UNR_SRC}/Core/FConfig.cpp
 )
 
 include_directories (${UNR_INC} ${XSTL_INC})
-add_definitions("-std=c++11" "-DXSTL_ARRAY_STD" "-DXSTL_STRING_STD"
+add_definitions("-rdynamic -std=c++11" "-DXSTL_ARRAY_STD" "-DXSTL_STRING_STD"
   "-DXSTL_FILESTREAM_STD" "-DXSTL_STACK_STD" "-DXSTL_MAP_STD"
   "-DXSTL_QUEUE_STD" "-DINSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"" )
 message(STATUS "Install prefix: " ${CMAKE_INSTALL_PREFIX})
@@ -155,7 +155,7 @@ add_library( unr SHARED ${SOURCES} tags )
 if ( TARGET_PLATFORM STREQUAL "Windows" )
 	target_link_libraries(unr libxstl.dll.a)
 else()
-	target_link_libraries(unr xstl)
+	target_link_libraries(unr xstl dl)
 endif()
 
 # Debug symbols & optimization levels
