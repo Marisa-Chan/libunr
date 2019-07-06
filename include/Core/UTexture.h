@@ -29,7 +29,6 @@
 
 #pragma once
 
-#include <libxstl/XMemory.h>
 #include "Core/UObject.h"
 #include "Core/UPackage.h"
 #include "Core/USound.h"
@@ -107,11 +106,11 @@ public:
   
   void Clear()
   {
-    xstl::Set( DataArray.Data(), 0, USize * VSize );
+    memset( DataArray.data(), 0, USize * VSize );
   }
   
   int USize, VSize;
-  Array<u8> DataArray;
+  std::vector<u8> DataArray;
 };
 
 class DLL_EXPORT UPalette : public UObject
@@ -257,8 +256,8 @@ class DLL_EXPORT UTexture : public UBitmap
   float MinFrameRate, MaxFrameRate;
   float Accumulator;
   
-  Array<FMipmap> Mips;
-  Array<FMipmap> DecompMips;
+  std::vector<FMipmap> Mips;
+  std::vector<FMipmap> DecompMips;
   ETextureFormat DecompFormat;
 
   ESurfaceType SurfaceType;
@@ -303,10 +302,10 @@ class DLL_EXPORT UFont : public UObject
     }
 
     UTexture* Texture;
-    Array<FFontCharInfo>* Characters;
+    std::vector<FFontCharInfo>* Characters;
   };
 
-  Array<FFontTexture>* FontTextures;
+  std::vector<FFontTexture>* FontTextures;
 
   virtual void Load();
 };

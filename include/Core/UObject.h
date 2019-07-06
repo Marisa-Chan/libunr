@@ -25,14 +25,9 @@
 */
 
 #pragma once
-
-#include <libxstl/XArray.h>
-#include <libxstl/XMemory.h>
-#include <libxstl/XStream.h>
-#include <libxstl/XStack.h>
-#include "Core/FUtil.h"
-
-using namespace xstl;
+#include "Core/FLogFile.h"
+#include <vector>
+#include <stack>
 
 // Flags for loading objects.
 enum ELoadFlags
@@ -228,17 +223,21 @@ public: \
   typedef supcls Super; \
   void* operator new( size_t sz ) \
   { \
-    return Malloc( sz ); \
+    return malloc( sz ); \
   } \
   void* operator new( size_t sz, size_t ObjSize ) \
   { \
-    void* Mem = xstl::Malloc( ObjSize ); \
-    xstl::Set( Mem, 0, ObjSize ); \
+    void* Mem = malloc( ObjSize ); \
+    memset( Mem, 0, ObjSize ); \
     return Mem; \
   } \
   void operator delete( void* Obj ) \
   { \
-    xstl::Free( Obj );  \
+    free( Obj );  \
+  } \
+  void operator delete[]( void* Obj ) \
+  { \
+    free( Obj ); \
   } \
   static UClass* StaticClass() \
   { return ObjectClass; } \
@@ -256,7 +255,7 @@ public: \
         NumProperties ); \
       if ( StaticNativePropList != NULL ) \
       { \
-        NativePropertyLists.PushBack( StaticNativePropList ); \
+        NativePropertyLists.push_back( StaticNativePropList ); \
         return true; \
       } \
       return false; \
@@ -268,19 +267,19 @@ public: \
   { \
     if ( !StaticCreateClass() ) \
     { \
-      Logf( LOG_CRIT, "%s::StaticCreateClass() failed!", TEXT(cls) ); \
+      GLogf( LOG_CRIT, "%s::StaticCreateClass() failed!", TEXT(cls) ); \
       return false; \
     } \
     if ( !( (clsflags) & CLASS_NoExport ) ) \
     { \
       if ( !StaticLinkNativeProperties() ) \
       { \
-        Logf( LOG_CRIT, "%s::StaticLinkNativeProperties() failed!", TEXT(cls) ); \
+        GLogf( LOG_CRIT, "%s::StaticLinkNativeProperties() failed!", TEXT(cls) ); \
         return false; \
       } \
       if ( !StaticSetPackageProperties() ) \
       { \
-        Logf( LOG_CRIT, "%s::StaticSetPackageProperties() failed!", TEXT(cls) ); \
+        GLogf( LOG_CRIT, "%s::StaticSetPackageProperties() failed!", TEXT(cls) ); \
         return false; \
       } \
     } \
@@ -304,7 +303,7 @@ public: \
     ObjectClass->Pkg = UPackage::StaticLoadPackage( NativePkgName ); \
     if ( ObjectClass->Pkg == NULL ) \
     { \
-      Logf( LOG_CRIT, "Failed to load package '%s' for class '%s'.", NativePkgName, ObjectClass->Name ); \
+      GLogf( LOG_CRIT, "Failed to load package '%s' for class '%s'.", NativePkgName, ObjectClass->Name ); \
       return false; \
     } \
     ObjectClass->Export = ObjectClass->Pkg->GetClassExport( ObjectClass->Name.Data() ); \
@@ -325,7 +324,7 @@ public: \
       UPackage* ClsPkg = UPackage::StaticLoadPackage( NativePkgName ); \
       if (!ClsPkg) \
       { \
-        Logf( LOG_CRIT, "Package '%s' for class '%s' could not be opened", \
+        GLogf( LOG_CRIT, "Package '%s' for class '%s' could not be opened", \
           NativePkgName, TEXT(cls) ); \
         return false; \
       } \
@@ -341,7 +340,7 @@ public: \
         NativeSize, NativeConstructor ); \
       if ( ObjectClass != NULL ) \
       { \
-        ClassPool.PushBack( ObjectClass ); \
+        ClassPool.push_back( ObjectClass ); \
         return true; \
       } \
       return false; \
@@ -389,7 +388,7 @@ bool cls::StaticLinkNativeProperties() \
   { \
     UClass* ExpCls = cls::StaticClass(); \
     ptype* ExpProp = (ptype*)ptype::StaticClass()->CreateObject(); \
-    ExpProp->ArrayDim = 1; \
+    ExpProp->std::vectorDim = 1; \
     ExpProp->ElementSize = size; \
     ExpProp->PropertyFlags = CPF_Native; \
     ExpProp->Outer = ExpCls; \
@@ -454,11 +453,11 @@ public:
     size_t InStructSize, UObject *(*NativeCtor)(size_t) );
   static UObject* StaticFindObject( UPackage* Pkg, FName ObjName );
 
-  static Array<UObject*> ObjectPool;
-  static Array<UClass*>  ClassPool; 
-  static Array<FNativePropertyList*> NativePropertyLists;
-  static Array<UFunction*> NativeFunctions;
-  static Array<FNameEntry*> NameTable;
+  static std::vector<UObject*> ObjectPool;
+  static std::vector<UClass*>  ClassPool; 
+  static std::vector<FNativePropertyList*> NativePropertyLists;
+  static std::vector<UFunction*> NativeFunctions;
+  static std::vector<FNameEntry*> NameTable;
 
   FName     Name;     // Name of the object stored in the global name table 
   int       Index;    // Index of the object in object pool
@@ -490,7 +489,7 @@ public:
 
 protected:
   int RefCnt;
-  Stack<size_t>* OldPkgFileOffsets;
+  std::stack<size_t>* OldPkgFileOffsets;
 
   static bool bStaticBootstrapped;
 };

@@ -125,16 +125,16 @@ class DLL_EXPORT AActor : public UObject
   void* LightDataPtr;
   void* MeshDataPtr;
   FVector DrawScale3D;
-  Array<AProjector*>* ProjectorList;
+  std::vector<AProjector*>* ProjectorList;
   void* NetInitialProperties;
-  Array<AActor*>* RealTouching;
+  std::vector<AActor*>* RealTouching;
 
   struct MultiTimerType
   {
     idx Func;
     float Rate, Counter;
   };
-  Array<MultiTimerType>* MultiTimers;
+  std::vector<MultiTimerType>* MultiTimers;
 
   // Current physics mode
   enum EPhysics
@@ -610,9 +610,9 @@ class DLL_EXPORT ABlockingActor : public AActor
   ABlockingActor();
 
   bool bBlockSubClasses;
-  Array<UClass*>* BlockingClasses;
-  Array<UClass*>* IgnoreSubClasses;
-  Array<UClass*>* ScriptBlocking;
+  std::vector<UClass*>* BlockingClasses;
+  std::vector<UClass*>* IgnoreSubClasses;
+  std::vector<UClass*>* ScriptBlocking;
 };
 
 class DLL_EXPORT ADecoration : public AActor
@@ -759,11 +759,11 @@ class DLL_EXPORT ALight : public AActor
   struct ShadowMoverInfo
   {
     class AMover* Mover;
-    Array<int>* BspSurfs;
+    std::vector<int>* BspSurfs;
   };
 
-  Array<idx>* ShadowMoverTags;
-  Array<ShadowMoverInfo>* MoverShadowSurfs;
+  std::vector<idx>* ShadowMoverTags;
+  std::vector<ShadowMoverInfo>* MoverShadowSurfs;
 };
 
 class DLL_EXPORT ADynamicCorona : public ALight

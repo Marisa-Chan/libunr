@@ -39,43 +39,6 @@ endif()
 
 #Check for libxstl, Use <> by default, if not found, use ../xstl
 
-#Headers
-set (XSTL_INC "${SYS_INC_PATH}/libxstl")
-
-if( NOT EXISTS ${XSTL_INC} )
-    set (XSTL_INC "${UNR_ROOT}/../xstl/include")
-
-    if( NOT EXISTS ${XSTL_INC} )
-    message( FATAL_ERROR "Libunr Requires libxstl: library headers not found in ${SYS_INC_PATH}/libxstl or ../xstl/include" )
-    endif()
-
-endif()
-
-#DLL/SO
-
-#64-bit
-if ( NOT BUILD32 )
-    find_library( XSTL_LIB_PATH 
-    NAMES xstl libxstl 
-    HINTS "/usr/local/lib64/libxstl" "/usr/lib64/libxstl" "C:\\Program Files\\libxstl" "${UNR_ROOT}/../xstl/" 
-    )
-endif()
-
-#32-bit
-if ( BUILD32 )
-find_library( XSTL_LIB_PATH 
-NAMES xstl libxstl 
-HINTS "/usr/local/lib32/libxstl" "/usr/lib32/libxstl" "C:\\Program Files (x86)\\libxstl" "${UNR_ROOT}/../xstl" 
-)
-endif()
-
-if( NOT XSTL_LIB_PATH )
-    message( FATAL_ERROR "Libunr Requires libxstl: library file not found!" )
-endif()
-
-add_library( xstl SHARED IMPORTED )
-set_target_properties( xstl PROPERTIES IMPORTED_LOCATION "${XSTL_LIB_PATH}" )
-
 if ( TARGET_PLATFORM STREQUAL "Windows" )
   add_definitions("-Wno-invalid-offsetof")
 elseif ( TARGET_PLATFORM STREQUAL "POSIX" )
@@ -87,6 +50,7 @@ else()
 endif()
 
 set (SOURCES ${UNR_SRC}/Core/FConfig.cpp
+             ${UNR_SRC}/Core/FLogFile.cpp
              ${UNR_SRC}/Core/FUtil.cpp
              ${UNR_SRC}/Core/UAudio.cpp
              ${UNR_SRC}/Core/UCanvas.cpp
@@ -142,9 +106,7 @@ set (SOURCES ${UNR_SRC}/Core/FConfig.cpp
 )
 
 include_directories (${UNR_INC} ${XSTL_INC})
-add_definitions("-rdynamic -std=c++11" "-DXSTL_ARRAY_STD" "-DXSTL_STRING_STD"
-  "-DXSTL_FILESTREAM_STD" "-DXSTL_STACK_STD" "-DXSTL_MAP_STD"
-  "-DXSTL_QUEUE_STD" "-DINSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"" )
+add_definitions("-fmax-errors=10" "-std=c++11" "-DINSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"" )
 message(STATUS "Install prefix: " ${CMAKE_INSTALL_PREFIX})
 add_definitions ("-Wno-attributes")
 set_source_files_properties( tags PROPERTIES GENERATED true )
@@ -153,9 +115,9 @@ add_custom_target( tags COMMAND ctags --c++-kinds=+p --fields=+iaS --extra=+q
 add_library( unr SHARED ${SOURCES} tags )
 
 if ( TARGET_PLATFORM STREQUAL "Windows" )
-	target_link_libraries(unr libxstl.dll.a)
+	target_link_libraries(unr)
 else()
-	target_link_libraries(unr xstl dl)
+	target_link_libraries(unr dl)
 endif()
 
 # Debug symbols & optimization levels

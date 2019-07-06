@@ -26,15 +26,13 @@
 #pragma once
 
 #include <unistd.h>
+#include <ctype.h>
 #include <string.h>
 #include <float.h>
 #include <math.h>
 #include <sys/stat.h>
 #include <time.h>
-
-#include <libxstl/XTypes.h>
-#include <libxstl/XFileStream.h>
-#include <libxstl/XString.h>
+#include <string>
 
 #if defined __linux__ || defined __unix__
   #define LIBUNR_POSIX
@@ -50,6 +48,10 @@
 
 // TODO: architecture defines for non-x86 platforms
 #if defined __GNUG__
+ 
+  #define FORCEINLINE __attribute__((always_inline))
+  #define LIKELY(condition) __builtin_expect(!!(condition), 1)
+  #define UNLIKELY(condition) __builtin_expect(!!(condition), 0)
   
   #if defined __x86_64__
     #define LIBUNR_64BIT
@@ -58,7 +60,18 @@
   #else
     #error "Currently unsupported architecture"
   #endif
-  
+ 
+  // MinGW
+  #if defined __MINGW32__ && !defined __MINGW64__
+    #define DLL_EXPORT __declspec(dllexport)
+	# if defined __i386__
+		#define ftello ftello64
+		#define fseeko fseeko64
+	#endif
+  #else
+    #define DLL_EXPORT
+  #endif
+ 
 #else
   #error "Unsupported compiler type, read more here"
   
@@ -70,6 +83,68 @@
   // supported.
   
 #endif
+
+// pointer arithmetic helpers
+#define PtrAdd(ptr1, ptr2) \
+  (void*)((uintptr_t)ptr1 + (uintptr_t)ptr2)
+  
+#define PtrSubtract(ptr1, ptr2) \
+  (void*)((uintptr_t)ptr1 - (uintptr_t)ptr2)
+
+#define PtrDistance(ptr1, ptr2) \
+  ((uintptr_t)ptr1 - (uintptr_t)ptr2)
+
+#define MIN(a, b) \
+  ((a < b) ? a : b)
+
+#define MAX(a, b) \
+  ((a > b) ? a : b)
+
+#define OFFSET_OF(cls, member) \
+ ((uintptr_t)&(((cls*)0)->member))
+
+#define BLOCK_COPY_CTOR(cls) \
+private: \
+  cls (const cls & copy); \
+
+// short hand data types
+typedef unsigned char  u8;
+typedef unsigned short u16;
+typedef unsigned int   u32;
+typedef unsigned long long u64;
+
+typedef signed char  i8;
+typedef signed short i16;
+typedef signed int   i32;
+typedef signed long long i64;
+
+#define MAX_UINT8  0xff
+#define MAX_UINT16 0xffff
+#define MAX_UINT32 0xffffffff
+#define MAX_UINT64 0xfffffffffffffff
+
+#define MAX_INT8  0x7f
+#define MAX_INT16 0x7fff
+#define MAX_INT32 0x7fffffff
+#define MAX_INT64 0x7fffffffffffffff
+
+#define MIN_INT8  0x80
+#define MIN_INT16 0x8000
+#define MIN_INT32 0x80000000
+#define MIN_INT64 0x8000000000000000
+
+#if defined LIBUNR_64BIT
+  #define MAX_SIZE MAX_UINT64
+  #if defined __MINGW32__
+    typedef i64 ssize_t;
+  #endif
+#elif defined LIBUNR_32BIT
+  #define MAX_SIZE MAX_UINT32
+  #if defined __MINGW32__
+    typedef i32 ssize_t;
+  #endif
+#endif
+
 
 // TODO: make type 'idx' cast automatically to FCompactIndex
 typedef i32 idx;
@@ -95,31 +170,10 @@ typedef i32 idx;
 #define PKG_VER_UT_400 68
 #define PKG_VER_UT_432 69
 
-// Log levels
-#define LOG_DEV  0
-#define LOG_INFO 1
-#define LOG_WARN 2
-#define LOG_ERR  3
-#define LOG_CRIT 4
-
-const char* const LogLevelStrings[] =
-{
-  "D",
-  "I",
-  "W",
-  "E",
-  "!"
-};
-
 // Error codes
 #define ERR_FILE_NOT_EXIST 1
 #define ERR_BAD_DATA       2
 #define ERR_FILE_CREATE    3
-
-extern xstl::FileStreamOut* GLogFile;
-DLL_EXPORT void Logf( int Type, const char* Str, ... );
-DLL_EXPORT bool CreateLogFile( const char* Path );
-DLL_EXPORT void CloseLogFile();
 
 static inline int CalcObjRefValue( idx ObjRef )
 {
@@ -214,47 +268,8 @@ static inline FHash FnvHashString( const char* Data )
 }
 
 #define ZERO_HASH {0, 0}
-class UPackage;
-using namespace xstl;
-
-/*-----------------------------------------------------------------------------
- * FPackageFileIn
- * Keeps track of package specifics when reading a package from a file
------------------------------------------------------------------------------*/
-class DLL_EXPORT FPackageFileIn : public FileStreamIn
-{
-public:
-  int Ver;
-  UPackage* Pkg;
-};
-
-int ReadArrayIndex( FPackageFileIn& PkgFile );
-
-/*-----------------------------------------------------------------------------
- * FPackageFileOut
- * Keeps track of package specifics when writing a package to a file
------------------------------------------------------------------------------*/
-class DLL_EXPORT FPackageFileOut : public FileStreamOut
-{
-public:
-  int Ver;
-  UPackage* Pkg;
-};
-
-/*-----------------------------------------------------------------------------
- * FCompactIndex
- * https://wiki.beyondunreal.com/Legacy:Package_File_Format/Data_Details
------------------------------------------------------------------------------*/
-class DLL_EXPORT FCompactIndex
-{
-public:
-  int Value;
-  friend FPackageFileIn&  operator>>( FPackageFileIn& Ar,  FCompactIndex& Index );
-  friend FPackageFileOut& operator<<( FPackageFileOut& Ar, FCompactIndex& Index );
-};
-
-#define CINDEX(val) (*(FCompactIndex*)&val)
-
+class FPackageFileIn;
+class FPackageFileOut;
 /*-----------------------------------------------------------------------------
  * FNameEntry
  * An entry into a name table
@@ -314,6 +329,7 @@ struct DLL_EXPORT FName
  * FString
  * A string with support for libunr data types
 -----------------------------------------------------------------------------*/
+typedef std::string String;
 class FString : public String
 {
 public:
@@ -328,13 +344,13 @@ public:
   FString( const char* s ) : String( s ) {}
   FString( const char* s, size_t n ) : String( s, n ) {}
   FString( size_t n, char c ) : String( n, c ) {}
-  FString( int I ) : String( (int)I ) {}
-  FString( i64 I ) : String( (i64)I ) {}
-  FString( u32 U ) : String( (u32)U ) {}
-  FString( u64 U ) : String( (u64)U ) {}
-  FString( float F ) : String( (float)F ) {}
-  FString( double D ) : String( (double)D ) {}
-  FString( bool B ) : String( (bool)B ) {}
+  FString( int I ) : String( std::to_string( (int)I )) {}
+  FString( i64 I ) : String( std::to_string( (i64)I )) {}
+  FString( u32 U ) : String( std::to_string( (u32)U )) {}
+  FString( u64 U ) : String( std::to_string( (u64)U )) {}
+  FString( float F ) : String( std::to_string( (float)F )) {}
+  FString( double D ) : String( std::to_string( (double)D )) {}
+  FString( bool B ) : String( std::to_string( (bool)B )) {}
   
   FString& operator+=( const FString& Str );
   FString& operator+=( const String& Str );
@@ -369,6 +385,12 @@ FString operator+( const char* lhs, const FString& rhs );
 FString operator+( char lhs, const String& rhs );
 FString operator+( char lhs, const FString& rhs );
 
+#ifndef __MINGW64__
+DLL_EXPORT int stricmp ( const char* str1, const char* str2 );
+DLL_EXPORT int strnicmp( const char* str1, const char* str2, size_t count ); 
+#endif
+DLL_EXPORT char* strupper( const char* str );
+DLL_EXPORT char* GetDateString( const char* Fmt );
 
 //========================================================================
 // EOF

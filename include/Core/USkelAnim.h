@@ -74,22 +74,22 @@ class DLL_EXPORT USkeletalMeshInstance : public UObject
     idx     AnimName;
   };
 
-  Array<FCoords>*          SpaceBases; // Last computed skeleton coordinates.
-  Array<int>*              CachedLinks; // Initialized links with animation and skeleton
+  std::vector<FCoords>*    SpaceBases; // Last computed skeleton coordinates.
+  std::vector<int>*        CachedLinks; // Initialized links with animation and skeleton
   u8                       bHasUpdated; // Has this mesh been updated this tick yet?
   USkeletalMesh*           LastDrawnMesh; // Last mesh used on this render actor.
   UAnimation*              CachedAnim; // Last used animation on the render actor.
-  Array<FCoords>*          CachedOrientations; // Cached data (for tweening)
-  Array<FVector>*          CachedPositions; // Cached data (for tweening)
+  std::vector<FCoords>*    CachedOrientations; // Cached data (for tweening)
+  std::vector<FVector>*    CachedPositions; // Cached data (for tweening)
   float                    TweenStartFrame; // Starting frame for tweening
   Matrix                   Base; // Temp data
   u8                       bHasCachedFrame, bWasTweening; // Temp data
   idx                      CachedTweenSeq; // Temp data
-  Array<MeshModifierType>* Modifiers; // Bone rotation/scale modifiers
-  Array<AnimationChannel>* Channels; // Animation channels effected on this actor.
+  std::vector<MeshModifierType>* Modifiers; // Bone rotation/scale modifiers
+  std::vector<AnimationChannel>* Channels; // Animation channels effected on this actor.
   int                      TChannelPtr; // Temp data
 
-  Array<AActor*>* AttachedActors; // Actors attached to this skeletal mesh.
+  std::vector<AActor*>* AttachedActors; // Actors attached to this skeletal mesh.
   int AttachedBoneIndex; // Bone where this actor is attached to.
   idx AttachedBoneName; // Cached attached bone name (in case mesh changes).
   AActor* MyAttachment; // Actor this actor is currently being attached to.

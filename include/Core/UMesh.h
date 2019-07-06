@@ -65,7 +65,7 @@ struct DLL_EXPORT FMeshAnim
   FName Group;
   u32   StartFrame;
   u32   NumFrames;
-  Array<FMeshAnimFunc> Functions;
+  std::vector<FMeshAnimFunc> Functions;
   float Rate;
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FMeshAnim& MA );
@@ -86,15 +86,15 @@ class DLL_EXPORT UMesh : public UPrimitive
   UMesh();
   virtual void Load();
 
-  Array<FMeshVert> Verts;
-  Array<FMeshTri>  Tris;
-  Array<FMeshAnim> Anims;
-  Array<FMeshVertConnect> Connects;
-  Array<u32> VertLinks;
-  Array<UTexture*> Textures;
-  Array<FBox> BoundingBoxes; // Boundaries per frame, need to store?
-  Array<FSphere> BoundingSpheres; // ''
-  Array<float> TextureLODs;
+  std::vector<FMeshVert> Verts;
+  std::vector<FMeshTri>  Tris;
+  std::vector<FMeshAnim> Anims;
+  std::vector<FMeshVertConnect> Connects;
+  std::vector<u32> VertLinks;
+  std::vector<UTexture*> Textures;
+  std::vector<FBox> BoundingBoxes; // Boundaries per frame, need to store?
+  std::vector<FSphere> BoundingSpheres; // ''
+  std::vector<float> TextureLODs;
   u32 FrameVerts;
   u32 AnimFrames;
   FVector Scale;

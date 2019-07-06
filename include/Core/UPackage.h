@@ -24,17 +24,47 @@
 */
 
 #pragma once
-
-#include <libxstl/XArray.h>
-#include <libxstl/XFileStream.h>
-#include <libxstl/XStack.h>
-#include <libxstl/XString.h>
-
 #include "Core/UObject.h"
 
 #define UE1_PKG_SIG 0x9e2a83c1
 
-using namespace xstl;
+/*-----------------------------------------------------------------------------
+ * FPackageFileIn
+ * Keeps track of package specifics when reading a package from a file
+-----------------------------------------------------------------------------*/
+class DLL_EXPORT FPackageFileIn : public FFileArchiveIn
+{
+public:
+  int Ver;
+  UPackage* Pkg;
+};
+
+int ReadArrayIndex( FPackageFileIn& PkgFile );
+
+/*-----------------------------------------------------------------------------
+ * FPackageFileOut
+ * Keeps track of package specifics when writing a package to a file
+-----------------------------------------------------------------------------*/
+class DLL_EXPORT FPackageFileOut : public FFileArchiveOut
+{
+public:
+  int Ver;
+  UPackage* Pkg;
+};
+
+/*-----------------------------------------------------------------------------
+ * FCompactIndex
+ * https://wiki.beyondunreal.com/Legacy:Package_File_Format/Data_Details
+-----------------------------------------------------------------------------*/
+class DLL_EXPORT FCompactIndex
+{
+public:
+  int Value;
+  friend FPackageFileIn&  operator>>( FPackageFileIn& Ar,  FCompactIndex& Index );
+  friend FPackageFileOut& operator<<( FPackageFileOut& Ar, FCompactIndex& Index );
+};
+
+#define CINDEX(val) (*(FCompactIndex*)&val)
 
 /*-----------------------------------------------------------------------------
  * FExport
@@ -126,9 +156,9 @@ class DLL_EXPORT UPackage : public UObject
   FNameEntry*     GetNameEntryByObjRef( int ObjRef );
   FExport*        GetExportByName( size_t Name );
   FExport*        GetClassExport( const char* ExportName );
-  Array<FNameEntry>& GetNameTable();
-  Array<FExport>& GetExportTable();
-  Array<FImport>& GetImportTable();
+  std::vector<FNameEntry>& GetNameTable();
+  std::vector<FExport>& GetExportTable();
+  std::vector<FImport>& GetImportTable();
   u32             GetGlobalName( u32 PkgNameIdx );
   const char*     GetFilePath();
   const char*     GetFileName();
@@ -156,15 +186,15 @@ class DLL_EXPORT UPackage : public UObject
 
 protected:    
   FString Path;
-  Array<FNameEntry> Names;
-  Array<FExport>    Exports;
-  Array<FImport>    Imports;
-  FileStream* Stream;
+  std::vector<FNameEntry> Names;
+  std::vector<FExport>    Exports;
+  std::vector<FImport>    Imports;
+  FFileArchive* Stream;
   UPackageHeader Header;
   u32 NameTableStart; // The index at which this package's name table appears in the global name table
 
   // Global package variables
   static EPkgLoadOpts LoadOpts;
-  static Array<UPackage*>* Packages;
+  static std::vector<UPackage*>* Packages;
 };
 

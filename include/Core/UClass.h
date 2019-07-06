@@ -25,13 +25,10 @@
 
 #pragma once
 
-#include <libxstl/XArray.h>
-#include <libxstl/XString.h>
-#include <libxstl/XQueue.h>
+#include <vector>
+#include <queue>
 #include "Core/FConfig.h"
 #include "Core/UObject.h"
-
-using namespace xstl;
 
 class DLL_EXPORT UTextBuffer : public UObject
 {
@@ -72,7 +69,7 @@ class DLL_EXPORT UEnum : public UField
   UEnum();
   virtual void Load();
 
-  Array<const char*> Names;
+  std::vector<const char*> Names;
 };
 
 struct FScriptLabel
@@ -101,7 +98,7 @@ class DLL_EXPORT UStruct : public UField
   
   // Runtime variables
   u32 StructSize;
-  Array<FScriptLabel>* LabelTable;
+  std::vector<FScriptLabel>* LabelTable;
   bool bFinalizedLoad; // So FinalizeClassLoad doesn't needlessly recurse
 };
 
@@ -195,8 +192,8 @@ class DLL_EXPORT UClass : public UState
   u32 OldClassRecordSize; // PackageVersion <= 61
   u32 ClassFlags;
   u32 ClassGuid[4];
-  Array<FDependency> Dependencies;
-  Array<int> PackageImports;
+  std::vector<FDependency> Dependencies;
+  std::vector<int> PackageImports;
   UClass* ClassWithin;
   const char* ClassConfigName;
   
@@ -213,6 +210,6 @@ class DLL_EXPORT UClass : public UState
 private:
   UObject* CreateDefaultObject();
   char* CreateDefaultObjectName();
-  static Queue<UClass*> DefPropQueue;
+  static std::queue<UClass*> DefPropQueue;
 };
 

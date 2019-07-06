@@ -4,7 +4,7 @@
 |*                                                                           *|
 |*  This program is free software: you can redistribute it and/or modify     *|
 |*  it under the terms of the GNU Affero General Public License as           *|
-|*  published by the Free Software Foundation, either version 3 of the       *|
+|*  published by the free Software Foundation, either version 3 of the       *|
 |*  License, or (at your option) any later version.                          *|
 |*                                                                           *|
 |*  This program is distributed in the hope that it will be useful,          *|
@@ -24,7 +24,8 @@
 */
 
 #include "Core/FConfig.h"
-#include "XMemory.h"
+#include "Core/FFileArchive.h"
+#include "Core/FLogFile.h"
 
 FConfigManager* GConfigManager = NULL;
 FConfig* GLibunrConfig = NULL;
@@ -48,7 +49,7 @@ static inline bool IsAcceptedChar( char C, const char* Accepted )
 
 // Why does windows have '\r\n' instead of just '\n' -____-
 
-static inline void ReadNewLine( FileStreamIn& In, const char* Filename )
+static inline void ReadNewLine( FFileArchiveIn& In, const char* Filename )
 {
   if ( In.Eof() )
     return;
@@ -60,20 +61,20 @@ static inline void ReadNewLine( FileStreamIn& In, const char* Filename )
     In.Read( &C, 1 );
     if ( UNLIKELY ( C != '\n' ) )
     {
-      Logf( LOG_WARN, "Unpaired carriage return in config file '%s' (Pos = %llu, C = %c)", 
+      GLogf( LOG_WARN, "Unpaired carriage return in config file '%s' (Pos = %llu, C = %c)", 
           Filename, In.Tell(), C );
     }
   }
   else if ( C != '\n' )
   {
-    Logf( LOG_WARN, "Expected newline in config file '%s' (Pos = %llu, C = %c)",
+    GLogf( LOG_WARN, "Expected newline in config file '%s' (Pos = %llu, C = %c)",
         Filename, In.Tell(), C );
   }
   else
     NumLines++;
 }
 
-static inline bool IsNextCharSeqNewline( FileStreamIn& In, const char* Filename )
+static inline bool IsNextCharSeqNewline( FFileArchiveIn& In, const char* Filename )
 {
   char C = In.Peek();
   if ( C == '\r' )
@@ -82,7 +83,7 @@ static inline bool IsNextCharSeqNewline( FileStreamIn& In, const char* Filename 
     C = In.Peek();
     if ( UNLIKELY ( C != '\n' ) )
     {
-      Logf( LOG_WARN, "Unpaired carriage return in config file '%s' (Pos = %llu, C = %c)", 
+      GLogf( LOG_WARN, "Unpaired carriage return in config file '%s' (Pos = %llu, C = %c)", 
           Filename, In.Tell(), C );
       In.Close();
       return false;
@@ -109,10 +110,10 @@ FConfig::FConfig( const char* Filename )
 
 FConfig::~FConfig()
 {
-  for ( size_t i = 0; i < Categories.Size(); i++ )
+  for ( size_t i = 0; i < Categories.size(); i++ )
     delete Categories[i];
 
-  Categories.Clear();
+  Categories.clear();
 }
 
 int FConfig::Load( const char* Filename )
@@ -125,20 +126,20 @@ int FConfig::Load( const char* Filename )
   FHash PreviousHash = {0, 0};
   NumLines = 0;
 
-  FileStreamIn IniFile;
+  FFileArchiveIn IniFile;
   int Status = IniFile.Open( Filename );
   if ( Status != 0 )
   {
-    Logf( LOG_WARN, "Can't open ini file '%s' (errno = %s)", Filename, strerror( Status ) );
+    GLogf( LOG_WARN, "Can't open ini file '%s' (errno = %s)", Filename, strerror( Status ) );
     return ERR_FILE_NOT_EXIST;
   }
 
   // Read until the end of the file
   FConfigCategory* Category = NULL;
   FConfigEntry* Entry = NULL;
-  xstl::Set( CategoryBuf, 0, sizeof( CategoryBuf ) );
-  xstl::Set( VariableBuf, 0, sizeof( VariableBuf ) );
-  xstl::Set( ValueBuf, 0, sizeof( ValueBuf ) );
+  memset( CategoryBuf, 0, sizeof( CategoryBuf ) );
+  memset( VariableBuf, 0, sizeof( VariableBuf ) );
+  memset( ValueBuf, 0, sizeof( ValueBuf ) );
 
   char Probe = '\0';
   while ( !IniFile.Eof() ) // why doesn't Eof() work??
@@ -146,7 +147,7 @@ int FConfig::Load( const char* Filename )
     Status = IniFile.Read( &Probe, 1 );
     if ( Status == MAX_UINT64 )
     {
-      Logf( LOG_WARN, "Failed to read from INI file '%s'", Filename );
+      GLogf( LOG_WARN, "Failed to read from INI file '%s'", Filename );
       IniFile.Close();
       return ERR_BAD_DATA;
     }
@@ -174,7 +175,7 @@ int FConfig::Load( const char* Filename )
     else if ( Probe == '[' )
     {
       char* CategoryPtr = CategoryBuf;
-      xstl::Set( CategoryBuf, 0, sizeof( CategoryBuf ) );
+      memset( CategoryBuf, 0, sizeof( CategoryBuf ) );
       while ( PtrDistance( CategoryPtr, CategoryBuf ) < sizeof( CategoryBuf ) )
       {
         IniFile.Read( &Probe, 1 );
@@ -183,7 +184,7 @@ int FConfig::Load( const char* Filename )
 
         if ( !isalnum( Probe ) && !IsAcceptedChar( Probe, "_./* " ) )
         {
-          Set( CategoryBuf, 0, sizeof( CategoryBuf ) );
+          memset( CategoryBuf, 0, sizeof( CategoryBuf ) );
           break;
         }
 
@@ -192,7 +193,7 @@ int FConfig::Load( const char* Filename )
 
       if ( CategoryBuf[0] == '\0' )
       {
-        Logf( LOG_WARN, 
+        GLogf( LOG_WARN, 
             "Malformed or corrupted category in file '%s' (Line = %llu)", 
             Filename, NumLines );
         IniFile.Close();
@@ -200,9 +201,9 @@ int FConfig::Load( const char* Filename )
       }
 
       Category = new FConfigCategory();
-      Category->Name = StringDup( CategoryBuf );
+      Category->Name = strdup( CategoryBuf );
       Category->Hash = FnvHashString( Category->Name );
-      Categories.PushBack( Category );
+      Categories.push_back( Category );
 
       ReadNewLine( IniFile, Filename );
     }
@@ -211,7 +212,7 @@ int FConfig::Load( const char* Filename )
     {
       if ( Category == NULL )
       {
-        Logf( LOG_WARN, 
+        GLogf( LOG_WARN, 
             "Got non-category character, but no category in config file '%s' (Line = %llu)",
             Filename, NumLines );
         IniFile.Close();
@@ -219,7 +220,7 @@ int FConfig::Load( const char* Filename )
       }
       // Read the variable name
       char* VariablePtr = VariableBuf;
-      xstl::Set( VariableBuf, 0, sizeof( VariableBuf ) );
+      memset( VariableBuf, 0, sizeof( VariableBuf ) );
       while ( PtrDistance( VariablePtr, VariableBuf ) < sizeof( VariableBuf ) )
       {
         // Put the character we just read first
@@ -238,14 +239,14 @@ int FConfig::Load( const char* Filename )
 
         if ( !isalnum( Probe ) && !IsAcceptedChar( Probe, "./_ " ) )
         {
-          Set( VariableBuf, 0, sizeof( VariableBuf ) );
+          memset( VariableBuf, 0, sizeof( VariableBuf ) );
           break;
         }        
       }
 
       if ( VariableBuf[0] == '\0' )
       {
-        Logf( LOG_WARN, 
+        GLogf( LOG_WARN, 
             "Malformed or corrupted variable in file '%s' (Line = %llu)", 
             Filename, NumLines );
         IniFile.Close();
@@ -256,8 +257,8 @@ int FConfig::Load( const char* Filename )
       if ( LIKELY( VarHash != PreviousHash ) )
       {
         Entry = new FConfigEntry();
-        Category->Entries->PushBack( Entry );
-        Entry->Name = StringDup( VariableBuf );
+        Category->Entries->push_back( Entry );
+        Entry->Name = strdup( VariableBuf );
         Entry->Hash = VarHash;
       }
 
@@ -277,7 +278,7 @@ int FConfig::Load( const char* Filename )
         IniFile.Read( &Probe, 1 );
         if ( Probe != '=' )
         {
-          Logf( LOG_WARN, "Missing equals sign after indexed variable in file '%s' (Line = %llu)",
+          GLogf( LOG_WARN, "Missing equals sign after indexed variable in file '%s' (Line = %llu)",
               Filename, NumLines );
           IniFile.Close();
           return ERR_BAD_DATA;
@@ -285,23 +286,23 @@ int FConfig::Load( const char* Filename )
 
         if ( IndexBuf[0] == '\0' )
         {
-          Logf( LOG_WARN, 
-              "Array indexed variable, but no index found in file '%s' (Line = %llu, C = '%c')", 
+          GLogf( LOG_WARN, 
+              "std::vector indexed variable, but no index found in file '%s' (Line = %llu, C = '%c')", 
               Filename, NumLines, Probe );
           IniFile.Close();
           return ERR_BAD_DATA;
         }
 
         Index = strtol( IndexBuf, NULL, 10 );
-        Entry->Values->Resize( Index+1 );
-        xstl::Set( IndexBuf, 0, sizeof( IndexBuf ) );
+        Entry->Values->resize( Index+1 );
+        memset( IndexBuf, 0, sizeof( IndexBuf ) );
 
         Entry->bWriteIndices = true;
       }
       
       // Read the value
       char* ValuePtr = ValueBuf;
-      xstl::Set( ValueBuf, 0, sizeof( ValueBuf ) );
+      memset( ValueBuf, 0, sizeof( ValueBuf ) );
       while ( PtrDistance( ValuePtr, ValueBuf ) < sizeof( ValueBuf ) )
       {
         if ( IsNextCharSeqNewline( IniFile, Filename ) || IniFile.Eof() )
@@ -312,18 +313,18 @@ int FConfig::Load( const char* Filename )
       }
 
       if ( !bIndexed )
-        Entry->Values->PushBack( xstl::StringDup( ValueBuf ) );
+        Entry->Values->push_back( strdup( ValueBuf ) );
       else
-        (*Entry->Values)[Index] = xstl::StringDup( ValueBuf );
+        (*Entry->Values)[Index] = strdup( ValueBuf );
 
       ReadNewLine( IniFile, Filename );
       bIndexed = false;
       PreviousHash = VarHash;
     }
   }
-  Logf( LOG_INFO, "Successfully read config file '%s'", Filename );
+  GLogf( LOG_INFO, "Successfully read config file '%s'", Filename );
 
-  Name = StringDup( Filename );
+  Name = strdup( Filename );
   char* Dot = strrchr( Name, '.' );
   if ( Dot )
     *Dot = '\0';
@@ -334,7 +335,7 @@ int FConfig::Load( const char* Filename )
 
 int FConfig::Save()
 {
-  FileStreamOut IniFile;
+  FFileArchiveOut IniFile;
   String Filename( Name );
 
   Filename += ".ini";
@@ -342,27 +343,27 @@ int FConfig::Save()
   int Status = IniFile.Open( Filename );
   if ( Status != 0 )
   {
-    Logf( LOG_WARN, "Failed to open ini file '%s' for saving (errno = %s)", Name, strerror( Status ) );
+    GLogf( LOG_WARN, "Failed to open ini file '%s' for saving (errno = %s)", Name, strerror( Status ) );
     return ERR_FILE_CREATE;
   }
 
   int WriteLen = 0;
   char WriteBuf[512];
   char NewLine[] = "\r\n";
-  for( size_t i = 0; i < Categories.Size(); i++ )
+  for( size_t i = 0; i < Categories.size(); i++ )
   {
-    Set( WriteBuf, 0, sizeof( WriteBuf ) );
+    memset( WriteBuf, 0, sizeof( WriteBuf ) );
     FConfigCategory* Category = Categories[i];
     WriteLen = snprintf( WriteBuf, sizeof( WriteBuf ), "[%s]\r\n", Category->Name );
     IniFile.Write( WriteBuf, MIN( WriteLen, sizeof( WriteBuf ) ) );
 
-    for( size_t j = 0; j < Category->Entries->Size(); j++ )
+    for( size_t j = 0; j < Category->Entries->size(); j++ )
     {
       FConfigEntry* Entry = (*Category->Entries)[j];
-      for ( size_t k = 0; k < Entry->Values->Size(); k++ )
+      for ( size_t k = 0; k < Entry->Values->size(); k++ )
       {
         char* Value = (*Entry->Values)[k];
-        Set( WriteBuf, 0, sizeof( WriteBuf ) );
+        memset( WriteBuf, 0, sizeof( WriteBuf ) );
         if ( UNLIKELY( Entry->bWriteIndices ) )
         {
           WriteLen = snprintf( WriteBuf, sizeof( WriteBuf ), "%s[%lu]=%s\r\n", 
@@ -388,22 +389,22 @@ int FConfig::Save()
 char* FConfig::ReadString( const char* Category, const char* Variable, size_t Index )
 {
   FHash CatHash = FnvHashString( Category ); // meow
-  for ( size_t i = 0; i < Categories.Size(); i++ )
+  for ( size_t i = 0; i < Categories.size(); i++ )
   {
     FConfigCategory* CatIter = Categories[i];
     if ( CatIter->Hash == CatHash )
     {
       FHash VarHash = FnvHashString( Variable );
-      for ( size_t j = 0; j < CatIter->Entries->Size(); j++ )
+      for ( size_t j = 0; j < CatIter->Entries->size(); j++ )
       {
         FConfigEntry* Entry = (*CatIter->Entries)[j];
         if ( Entry->Hash == VarHash )
         {
-          if ( UNLIKELY( Index >= Entry->Values->Size() ) )
+          if ( UNLIKELY( Index >= Entry->Values->size() ) )
             return NULL;
 
           char* Value = (*Entry->Values)[Index];
-          return StringDup( Value );
+          return strdup( Value );
         }
       }
     }
@@ -420,7 +421,7 @@ bool FConfig::ReadBool( const char* Category, const char* Variable, size_t Index
     if ( strncmp( StrVar, "true", 4 ) == 0 )
       Value = true;
 
-    Free( StrVar );
+    free( StrVar );
   }
   return Value;
 }
@@ -435,7 +436,7 @@ static inline u64 ReadUInt( FConfig* Config, const char* Category, const char* V
     if ( Value == MAX_UINT64 )
       Value = 0;
 
-    Free( StrVar );
+    free( StrVar );
   }
   return Value;
 }
@@ -470,7 +471,7 @@ static inline i64 ReadInt( FConfig* Config, const char* Category, const char* Va
     if ( Value == MAX_INT64 || Value == MIN_INT64 )
       Value = 0;
 
-    Free( StrVar );
+    free( StrVar );
   }
   return Value;
 }
@@ -502,7 +503,7 @@ float FConfig::ReadFloat( const char* Category, const char* Variable, size_t Ind
   if ( LIKELY( StrVar ) )
   {
     Value = strtof( StrVar, NULL );
-    Free( StrVar );
+    free( StrVar );
   }
   return Value;
 }
@@ -514,7 +515,7 @@ double FConfig::ReadDouble( const char* Category, const char* Variable, size_t I
   if ( LIKELY( StrVar ) )
   {
     Value = strtod( StrVar, NULL );
-    Free( StrVar );
+    free( StrVar );
   }
   return Value;
 }
@@ -532,7 +533,7 @@ void FConfig::WriteString( const char* Category, const char* Variable, const cha
   FConfigCategory* Cat = NULL; // meow
   FConfigEntry* Entry = NULL;
   FHash CatHash = FnvHashString( Category );
-  for ( size_t i = 0; i < Categories.Size(); i++ )
+  for ( size_t i = 0; i < Categories.size(); i++ )
   {
     FConfigCategory* CatIter = Categories[i];
     if ( CatIter->Hash == CatHash )
@@ -545,12 +546,12 @@ void FConfig::WriteString( const char* Category, const char* Variable, const cha
   if ( Cat == NULL )
   {
     Cat = new FConfigCategory();
-    Cat->Name = StringDup( Category );
+    Cat->Name = strdup( Category );
     Cat->Hash = CatHash;
   }
 
   FHash VarHash = FnvHashString( Variable );
-  for ( size_t j = 0; j < Cat->Entries->Size(); j++ )
+  for ( size_t j = 0; j < Cat->Entries->size(); j++ )
   {
     FConfigEntry* EntryIter = (*Cat->Entries)[j];
     if ( EntryIter->Hash == VarHash )
@@ -563,33 +564,33 @@ void FConfig::WriteString( const char* Category, const char* Variable, const cha
   if ( Entry == NULL )
   {
     Entry = new FConfigEntry();
-    Entry->Name = StringDup( Variable );
+    Entry->Name = strdup( Variable );
     Entry->Hash = VarHash;
-    Cat->Entries->PushBack( Entry );
+    Cat->Entries->push_back( Entry );
   }
 
-  if ( Index >= Entry->Values->Size() )
+  if ( Index >= Entry->Values->size() )
   {
     const char* Empty = "";
-    Entry->Values->Resize( Index+1, (char*)Empty );
+    Entry->Values->resize( Index+1, (char*)Empty );
   }
      
-  char** Val = &Entry->Values->Data()[ Index ];
-  *Val = StringDup( Value );
+  char** Val = &Entry->Values->data()[ Index ];
+  *Val = strdup( Value );
 }
 
-Array<char*>* FConfig::CreateEntry( const char* Category, const char* Variable )
+std::vector<char*>* FConfig::CreateEntry( const char* Category, const char* Variable )
 {
   FConfigCategory* CatIter;
   FConfigEntry* Entry;
   FHash CatHash = FnvHashString( Category ); // meow
-  for ( size_t i = 0; i < Categories.Size(); i++ )
+  for ( size_t i = 0; i < Categories.size(); i++ )
   {
     CatIter = Categories[i];
     if ( CatIter->Hash == CatHash )
     {
       FHash VarHash = FnvHashString( Variable );
-      for ( size_t j = 0; j < CatIter->Entries->Size(); j++ )
+      for ( size_t j = 0; j < CatIter->Entries->size(); j++ )
       {
         Entry = (*CatIter->Entries)[j];
         if ( Entry->Hash == VarHash )
@@ -600,15 +601,15 @@ Array<char*>* FConfig::CreateEntry( const char* Category, const char* Variable )
   }
 
   CatIter = new FConfigCategory();
-  CatIter->Name = StringDup( Category );
+  CatIter->Name = strdup( Category );
   CatIter->Hash = FnvHashString( CatIter->Name );
-  Categories.PushBack( CatIter );
+  Categories.push_back( CatIter );
 
 makeEntry:
   Entry = new FConfigEntry();
-  Entry->Name = StringDup( Variable );
+  Entry->Name = strdup( Variable );
   Entry->Hash = FnvHashString( Entry->Name );
-  CatIter->Entries->PushBack( Entry );
+  CatIter->Entries->push_back( Entry );
   return Entry->Values;
 }
 
@@ -621,7 +622,7 @@ FConfig::FConfigEntry::FConfigEntry()
 {
   Name = NULL;
   Hash = ZERO_HASH;
-  Values = new Array<char*>();
+  Values = new std::vector<char*>();
   StructVars = NULL;
   bWriteIndices = false; // TODO: Make libunr.ini option
 }
@@ -632,7 +633,7 @@ FConfig::FConfigEntry::~FConfigEntry()
     delete Name;
 
   if ( Values != NULL )
-    for ( int i = 0; i < Values->Size(); i++ )
+    for ( int i = 0; i < Values->size(); i++ )
       delete (*Values)[i];
   
   if ( StructVars != NULL )
@@ -645,7 +646,7 @@ FConfig::FConfigCategory::FConfigCategory()
 {
   Name = NULL;
   Hash = ZERO_HASH;
-  Entries = new Array<FConfigEntry*>();
+  Entries = new std::vector<FConfigEntry*>();
   //Entries->Reserve( 4 );
 }
 
@@ -655,7 +656,7 @@ FConfig::FConfigCategory::~FConfigCategory()
     delete Name;
 
   if ( Entries != NULL )
-    for ( int i = 0; i < Entries->Size(); i++ )
+    for ( int i = 0; i < Entries->size(); i++ )
       delete (*Entries)[i];
 }
 
@@ -669,13 +670,13 @@ FConfigManager::~FConfigManager()
 
 void FConfigManager::AddConfig( FConfig* Cfg )
 {
-  Configs.PushBack( Cfg );
+  Configs.push_back( Cfg );
 }
 
 FConfig* FConfigManager::GetConfig( const char* Name )
 {
   size_t NameLen = strlen( Name );
-  for ( int i = 0; i < Configs.Size(); i++ )
+  for ( int i = 0; i < Configs.size(); i++ )
   {
     if ( strnicmp( Name, Configs[i]->GetName(), NameLen ) == 0 )
       return Configs[i];
@@ -686,38 +687,36 @@ FConfig* FConfigManager::GetConfig( const char* Name )
 
 void FConfigManager::DelConfig( FConfig* Cfg )
 {
-  for ( int i = 0; i < Configs.Size(); i++ )
+  for ( int i = 0; i < Configs.size(); i++ )
   {
     if ( Configs[i] == Cfg )
     {
       delete Cfg;
-      Configs.Data()[i] = NULL;
-
-      // TODO: See ArrayBase.h and use here
+      Configs.data()[i] = NULL;
     }
   }
 }
 
 void FConfigManager::SaveAndCloseConfigs()
 {
-  for ( int i = 0; i < Configs.Size(); i++ )
+  for ( int i = 0; i < Configs.size(); i++ )
   {
     if ( !Configs[i]->Save() )
-      Logf( LOG_WARN, "Failed to save config file '%s'", Configs[i]->GetName() );
+      GLogf( LOG_WARN, "Failed to save config file '%s'", Configs[i]->GetName() );
     
     delete Configs[i];
   }
 
-  Configs.Clear();
-  Configs.Reclaim();
+  Configs.clear();
+  Configs.shrink_to_fit();
 }
 
 void FConfigManager::CloseConfigs()
 {
-  for ( int i = 0; i < Configs.Size(); i++ )
+  for ( int i = 0; i < Configs.size(); i++ )
     delete Configs[i];
 
-  Configs.Clear();
-  Configs.Reclaim();
+  Configs.clear();
+  Configs.shrink_to_fit();
 }
 

@@ -25,11 +25,9 @@
 
 #pragma once
 
+#include <vector>
 #include "Core/FUtil.h"
-#include <libxstl/XArray.h>
-#include <libxstl/XFileStream.h>
 
-using namespace xstl;
 class UObject;
 class UStruct;
 
@@ -85,7 +83,7 @@ public:
 
   void WriteObject( const char* Category, const char* Variable, UObject* Obj, size_t Index = 0 );
 
-  Array<char*>* CreateEntry( const char* Category, const char* Variable );
+  std::vector<char*>* CreateEntry( const char* Category, const char* Variable );
 
   // Accessors
   const char* GetName();
@@ -98,8 +96,8 @@ private:
 
     char*  Name;
     FHash  Hash;
-    Array<char*>* Values;
-    Array<FConfigEntry*>* StructVars;
+    std::vector<char*>* Values;
+    std::vector<FConfigEntry*>* StructVars;
     bool bWriteIndices;
   };
 
@@ -110,10 +108,10 @@ private:
 
     char*  Name;
     FHash  Hash;
-    Array<FConfigEntry*>* Entries;
+    std::vector<FConfigEntry*>* Entries;
   };
 
-  Array<FConfigCategory*> Categories;
+  std::vector<FConfigCategory*> Categories;
   char* Name;
 };
 
@@ -134,7 +132,7 @@ public:
   void CloseConfigs();
 
 private:
-  Array<FConfig*> Configs;
+  std::vector<FConfig*> Configs;
 };
 
 extern FConfigManager* GConfigManager;

@@ -100,14 +100,14 @@ class DLL_EXPORT ULodMesh : public UMesh
   virtual bool ExportToFile( const char* Dir, const char* Type );
   virtual bool ExportToFile( const char* Dir, const char* Type, int Frame = -1 );
 
-  Array<u16> CollapsePoints;
-  Array<u16> FaceLevels;
-  Array<FLodFace> Faces;
-  Array<u16> CollapseWedges;
-  Array<FLodWedge> Wedges;
-  Array<FLodMaterial> Materials;
-  Array<FLodFace> SpecialFaces;
-  Array<u16> ReMapAnimVerts;
+  std::vector<u16> CollapsePoints;
+  std::vector<u16> FaceLevels;
+  std::vector<FLodFace> Faces;
+  std::vector<u16> CollapseWedges;
+  std::vector<FLodWedge> Wedges;
+  std::vector<FLodMaterial> Materials;
+  std::vector<FLodFace> SpecialFaces;
+  std::vector<u16> ReMapAnimVerts;
   u32 ModelVerts;
   u32 SpecialVerts;
   float MeshScaleMax;

@@ -28,90 +28,17 @@
 #include "Core/UPackage.h"
 #include "stdarg.h"
 
-#define MAX_MSG_LEN  512
-#define MAX_TYPE_LEN 32
-#define MAX_LINE_LEN (MAX_MSG_LEN + MAX_TYPE_LEN - 1)
-
 #define CI_6_BIT_LIMIT  64 - 1
 #define CI_13_BIT_LIMIT 8192 - 1
 #define CI_20_BIT_LIMIT 1048576 - 1
 #define CI_27_BIT_LIMIT 134217728  - 1
-
-FileStreamOut* GLogFile = NULL;
-
-bool CreateLogFile( const char* Path )
-{
-  char FullPath[4096];
-  USystem::RealPath( Path, FullPath, sizeof(FullPath) );
-  GLogFile = new FileStreamOut();
-  if ( GLogFile->Open( FullPath ) < 0 )
-  {
-    delete GLogFile;
-    GLogFile = NULL;
-    return false;
-  }
-
-  char TimeStr[32];
-  time_t TimeVal;
-  struct tm* TimeInfo;
-  time( &TimeVal );
-  TimeInfo = localtime( &TimeVal );
-  strftime( TimeStr, sizeof(TimeStr), "%Y-%m-%d %H:%M:%S", TimeInfo );
-
-  Logf( LOG_INFO, "Log file opened on %s", TimeStr );
-  return true;
-}
-
-void CloseLogFile()
-{
-  if ( GLogFile )
-  {
-    char TimeStr[32];
-    time_t TimeVal;
-    struct tm* TimeInfo;
-    time( &TimeVal );
-    TimeInfo = localtime( &TimeVal );
-    strftime( TimeStr, sizeof(TimeStr), "%Y-%m-%d %H:%M:%S", TimeInfo );
-  
-    Logf( LOG_INFO, "Log file closed on %s", TimeStr );
-    GLogFile->Close();
-    delete GLogFile;
-    GLogFile = NULL;
-  }
-}
-
-void Logf( int Type, const char* Str, ... )
-{
-  if ( Type < USystem::LogLevel )
-    return;
-
-  static char StrBuf[MAX_MSG_LEN];
-  static char Msg[MAX_LINE_LEN];
-  
-  va_list vl;
-  va_start( vl, Str );
-  vsnprintf( StrBuf, MAX_MSG_LEN, Str, vl );
-  va_end( vl );
-  
-  size_t MsgLen = snprintf( Msg, MAX_LINE_LEN, "[%s] %s\n", LogLevelStrings[Type], StrBuf );
-  size_t WriteLen = MsgLen;
-  if ( MsgLen > MAX_LINE_LEN ) 
-  {
-    Logf( LOG_CRIT, "Following log message exceeds maximum length" );
-    WriteLen = MAX_LINE_LEN;
-  }
-
-  printf( "%s", Msg );
-  if ( GLogFile )
-    GLogFile->Printf( "%s", Msg );
-}
 
 /*-----------------------------------------------------------------------------
  * FNameEntry
 -----------------------------------------------------------------------------*/
 FNameEntry::FNameEntry()
 {
-  xstl::Set( Data, 0, NAME_LEN );
+  memset( Data, 0, NAME_LEN );
   Hash = ZERO_HASH;
   Flags = 0;
 }
@@ -174,8 +101,8 @@ FPackageFileOut& operator<<( FPackageFileOut& Out, FNameEntry& Name )
 FName FName::CreateName( const char* InName, int InFlags )
 {
   FNameEntry* NewEntry = new FNameEntry( InName, InFlags );
-  FName Out = UObject::NameTable.Size();
-  UObject::NameTable.PushBack( NewEntry );
+  FName Out = UObject::NameTable.size();
+  UObject::NameTable.push_back( NewEntry );
   return Out;
 }
 
@@ -205,112 +132,6 @@ DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FName& Name )
   In >> CINDEX( NameIdx );
   Name = In.Pkg->GetGlobalName( NameIdx );
   return In;
-}
-
-/*-----------------------------------------------------------------------------
- * FCompactIndex
------------------------------------------------------------------------------*/
-DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FCompactIndex& Index )
-{
-  bool negate = false;
- 
-  Index.Value = 0;
-  for (int i = 0; i < 5; i++)
-  {
-    u8 x = 0;
-    if ( In.Read ((char*)&x, 1) == 0 )
-    {
-      Logf( LOG_WARN, "Failed to read byte for FCompactIndex" );
-      return In;    
-    }
-    
-    // First byte
-    if (i == 0)
-    {
-      // Bit: X0000000
-      if ((x & 0x80) > 0)
-        negate = true;
-      // Bits: 00XXXXXX
-      Index.Value |= (x & 0x3f);
-      // Bit: 0X000000
-      if ((x & 0x40) == 0)
-        break;
-    }
-    
-    // Last byte
-    else if (i == 4)
-    {
-      // Bits: 000XXXXX
-      Index.Value |= (x & 0x1f) << (6 + (3 * 7));
-    }
-    
-    // Middle bytes
-    else
-    {
-      // Bits: 0XXXXXXX
-      Index.Value |= (x & 0x7f) << (6 + ((i - 1) * 7));
-      // Bit: X0000000
-      if ((x & 0x80) == 0)
-        break;
-    }
-  }
-  
-  if (negate)
-    Index.Value = -Index.Value;
-  
-  return In;
-}
-
-DLL_EXPORT FPackageFileOut& operator<<( FPackageFileOut& Out, FCompactIndex& Index )
-{
-  // looks bad but it's faster than calling pow() potentially 4 times
-  u8 num_bytes = 0;
-  if (Index.Value <= (CI_6_BIT_LIMIT - 1) && Index.Value >= (-CI_6_BIT_LIMIT))
-    num_bytes = 1;
-  else if (Index.Value <= (CI_13_BIT_LIMIT - 1) && Index.Value >= (-CI_13_BIT_LIMIT))
-    num_bytes = 2;
-  else if (Index.Value <= (CI_20_BIT_LIMIT - 1) && Index.Value >= (-CI_20_BIT_LIMIT))
-    num_bytes = 3;
-  else if (Index.Value <= (CI_27_BIT_LIMIT - 1) && Index.Value >= (-CI_27_BIT_LIMIT))
-    num_bytes = 4;
-  else
-    num_bytes = 5;
-    
-  u8 byte_out;
-  for (int j = 0; j < num_bytes; j++)
-  {
-    byte_out = 0;
-    // First byte
-    if (j == 0)
-    {
-      if (Index.Value < 0)
-        byte_out |= 0x80;
-        
-      if (j+1 < num_bytes)
-        byte_out |= 0x40;
-        
-      byte_out |= (Index.Value & 0x3F);
-    }
-    
-    // Last byte
-    else if (j == 4)
-    {
-      byte_out |= ((Index.Value & 0x7F000000) >> 24);
-    }
-    
-    // Middle bytes
-    else
-    {
-      if (j+1 < num_bytes)
-        byte_out |= 0x80;
-        
-      byte_out |= ((Index.Value >> (6 + ((j - 1) * 7))) & 0x7F);
-    }
-    
-    Out << byte_out;
-  }
-
-  return Out;
 }
 
 /*-----------------------------------------------------------------------------
@@ -358,7 +179,7 @@ DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FString& Str )
 
   if ( Size > 0 )
   {
-    Str.Reserve( Size-1 );
+    Str.reserve( Size-1 );
     
     // Slow but secure
     for ( int i = 0; i < Size; i++ )
@@ -378,9 +199,9 @@ DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FString& Str )
 
 DLL_EXPORT FPackageFileOut& operator<<( FPackageFileOut& Out, FString& Str )
 {
-  size_t Length = Str.Length();
+  size_t Length = Str.length();
   Out << CINDEX( Length );
-  Out.Write( Str.Data(), Length+1 );
+  Out.Write( (void*)Str.data(), Length+1 );
   return Out;
 }
 
