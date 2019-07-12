@@ -27,7 +27,7 @@
 
 #include <vector>
 #include <queue>
-#include "Core/FConfig.h"
+#include "Util/FConfig.h"
 #include "Core/UObject.h"
 
 class DLL_EXPORT UTextBuffer : public UObject
@@ -69,7 +69,7 @@ class DLL_EXPORT UEnum : public UField
   UEnum();
   virtual void Load();
 
-  std::vector<const char*> Names;
+  TArray<const char*> Names;
 };
 
 struct FScriptLabel
@@ -98,7 +98,7 @@ class DLL_EXPORT UStruct : public UField
   
   // Runtime variables
   u32 StructSize;
-  std::vector<FScriptLabel>* LabelTable;
+  TArray<FScriptLabel>* LabelTable;
   bool bFinalizedLoad; // So FinalizeClassLoad doesn't needlessly recurse
 };
 
@@ -192,8 +192,8 @@ class DLL_EXPORT UClass : public UState
   u32 OldClassRecordSize; // PackageVersion <= 61
   u32 ClassFlags;
   u32 ClassGuid[4];
-  std::vector<FDependency> Dependencies;
-  std::vector<int> PackageImports;
+  TArray<FDependency> Dependencies;
+  TArray<int> PackageImports;
   UClass* ClassWithin;
   const char* ClassConfigName;
   

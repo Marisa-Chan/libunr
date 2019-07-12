@@ -25,8 +25,10 @@
 */
 
 #pragma once
-#include "Core/FLogFile.h"
-#include <vector>
+#include "Util/FLogFile.h"
+#include "Util/FHash.h"
+#include "Util/FName.h"
+#include "Util/TArray.h"
 #include <stack>
 
 // Flags for loading objects.
@@ -43,7 +45,7 @@ enum ELoadFlags
   LOAD_Forgiving     = 0x1000, // Forgive missing imports (set them to NULL).
   LOAD_Quiet         = 0x2000, // No log warnings.
   LOAD_NoRemap       = 0x4000, // No remapping of packages.
-  LOAD_Propagate     = 0,
+  LOAD_Propagate     = 0x8000,
 };
 
 // Package flags.
@@ -453,11 +455,11 @@ public:
     size_t InStructSize, UObject *(*NativeCtor)(size_t) );
   static UObject* StaticFindObject( UPackage* Pkg, FName ObjName );
 
-  static std::vector<UObject*> ObjectPool;
-  static std::vector<UClass*>  ClassPool; 
-  static std::vector<FNativePropertyList*> NativePropertyLists;
-  static std::vector<UFunction*> NativeFunctions;
-  static std::vector<FNameEntry*> NameTable;
+  static TArray<UObject*> ObjectPool;
+  static TArray<UClass*>  ClassPool; 
+  static TArray<FNativePropertyList*> NativePropertyLists;
+  static TArray<UFunction*> NativeFunctions;
+  static TArray<FNameEntry*> NameTable;
 
   FName     Name;     // Name of the object stored in the global name table 
   int       Index;    // Index of the object in object pool

@@ -24,7 +24,7 @@
 */
 
 #include "stdarg.h"
-#include "Core/FLogFile.h"
+#include "Util/FLogFile.h"
 #include "Core/USystem.h"
 
 #define MAX_MSG_LEN  512

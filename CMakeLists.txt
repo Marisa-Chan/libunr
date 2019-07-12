@@ -49,38 +49,39 @@ else()
   message( FATAL_ERROR, "Unknown target platform: " ${TARGET_PLATFORM} )
 endif()
 
-set (SOURCES ${UNR_SRC}/Core/FConfig.cpp
-             ${UNR_SRC}/Core/FLogFile.cpp
-             ${UNR_SRC}/Core/FUtil.cpp
-             ${UNR_SRC}/Core/UAudio.cpp
-             ${UNR_SRC}/Core/UCanvas.cpp
+set (SOURCES ${UNR_SRC}/Util/FConfig.cpp
+             ${UNR_SRC}/Util/FLogFile.cpp
+             ${UNR_SRC}/Util/FName.cpp
+             ${UNR_SRC}/Util/FString.cpp
              ${UNR_SRC}/Core/UClass.cpp
-             ${UNR_SRC}/Core/UConsole.cpp
-             ${UNR_SRC}/Core/UEngine.cpp
-             ${UNR_SRC}/Core/UFire.cpp
-             ${UNR_SRC}/Core/UGesture.cpp
              ${UNR_SRC}/Core/ULocale.cpp
-             ${UNR_SRC}/Core/ULodMesh.cpp
-             ${UNR_SRC}/Core/ULevel.cpp
              ${UNR_SRC}/Core/UMath.cpp
-             ${UNR_SRC}/Core/UMesh.cpp
-             ${UNR_SRC}/Core/UModel.cpp
-             ${UNR_SRC}/Core/UMusic.cpp
-             ${UNR_SRC}/Core/UNet.cpp
              ${UNR_SRC}/Core/UObject.cpp
              ${UNR_SRC}/Core/UPackage.cpp
-             ${UNR_SRC}/Core/UPlayer.cpp
              ${UNR_SRC}/Core/UPrimitive.cpp
              ${UNR_SRC}/Core/UProperty.cpp
-             ${UNR_SRC}/Core/URender.cpp
-             ${UNR_SRC}/Core/USkelAnim.cpp
-             ${UNR_SRC}/Core/USkelMesh.cpp
-             ${UNR_SRC}/Core/USound.cpp
              ${UNR_SRC}/Core/UStaticClassInit.cpp
-             ${UNR_SRC}/Core/UStaticMesh.cpp
              ${UNR_SRC}/Core/USystem.cpp
-             ${UNR_SRC}/Core/UTexture.cpp
-             ${UNR_SRC}/Core/UViewport.cpp
+             ${UNR_SRC}/Engine/UAudio.cpp
+             ${UNR_SRC}/Engine/UCanvas.cpp
+             ${UNR_SRC}/Engine/UConsole.cpp
+             ${UNR_SRC}/Engine/UEngine.cpp
+             ${UNR_SRC}/Engine/UFire.cpp
+             ${UNR_SRC}/Engine/UGesture.cpp
+             ${UNR_SRC}/Engine/ULodMesh.cpp
+             ${UNR_SRC}/Engine/ULevel.cpp
+             ${UNR_SRC}/Engine/UMesh.cpp
+             ${UNR_SRC}/Engine/UModel.cpp
+             ${UNR_SRC}/Engine/UMusic.cpp
+             ${UNR_SRC}/Engine/UNet.cpp
+             ${UNR_SRC}/Engine/UPlayer.cpp
+             ${UNR_SRC}/Engine/URender.cpp
+             ${UNR_SRC}/Engine/USkelAnim.cpp
+             ${UNR_SRC}/Engine/USkelMesh.cpp
+             ${UNR_SRC}/Engine/USound.cpp
+             ${UNR_SRC}/Engine/UStaticMesh.cpp
+             ${UNR_SRC}/Engine/UTexture.cpp
+             ${UNR_SRC}/Engine/UViewport.cpp
              ${UNR_SRC}/Actors/AActor.cpp
              ${UNR_SRC}/Actors/ABrush.cpp
              ${UNR_SRC}/Actors/ADecal.cpp

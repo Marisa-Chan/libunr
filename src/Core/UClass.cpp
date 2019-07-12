@@ -53,10 +53,10 @@ void UTextBuffer::Load()
   *PkgFile >> CINDEX( TextSize );
   if ( TextSize > 0 )
   {
-    char* TextBuf = (char*)xstl::Malloc( TextSize + 1 );
+    char* TextBuf = (char*)malloc( TextSize + 1 );
     PkgFile->Read( TextBuf, TextSize + 1 );
     Text = new FString( TextBuf );
-    xstl::Free( TextBuf );
+    free( TextBuf );
   }
 }
 
@@ -112,11 +112,11 @@ void UConst::Load()
   *PkgFile >> CINDEX( Size );
 
   // Size includes null terminator
-  char* Str = (char*)xstl::Malloc( Size ); 
+  char* Str = (char*)malloc( Size ); 
   PkgFile->Read( Str, Size );
 
   Value = new FString( Str );
-  xstl::Free( Str );
+  free( Str );
 }
 
 UEnum::UEnum()
@@ -158,7 +158,7 @@ UStruct::UStruct()
   ScriptSize = 0;
   ScriptCode = NULL;
   StructSize = 0;
-  LabelTable = new Array<FScriptLabel>();
+  LabelTable = new TArray<FScriptLabel>();
   bFinalizedLoad = false;
 }
 
@@ -173,7 +173,7 @@ UStruct::UStruct( size_t InNativeSize )
   ScriptSize = 0;
   ScriptCode = NULL;
   StructSize = 0;
-  LabelTable = new Array<FScriptLabel>();
+  LabelTable = new TArray<FScriptLabel>();
   bFinalizedLoad = false;
 }
 
@@ -527,8 +527,8 @@ static u8 LoadScriptToken( UStruct* Struct, FPackageFileIn* PkgFile, u32* Parsed
       case EX_Unk5d:
       case EX_Unk5e:
       case EX_Unk5f:
-        Logf( LOG_WARN, "Loading unknown UnrealScript opcode 0x%x, loading may not finish properly", Token );
-        Logf( LOG_WARN, "Unknown opcode located at offset 0x%x", PkgFile->Tell() );
+        GLogf( LOG_WARN, "Loading unknown UnrealScript opcode 0x%x, loading may not finish properly", Token );
+        GLogf( LOG_WARN, "Unknown opcode located at offset 0x%x", PkgFile->Tell() );
         break;
       // Everything else loads another token or nothing at all,
       // so we don't need explicit cases for them
@@ -566,7 +566,7 @@ void UStruct::Load()
 
   if ( !Pkg->bIntrinsicPackage && ObjectFlags & RF_Native )
   {
-    Logf( LOG_WARN, "Native class '%s' missing in non-intrinsic package '%s'",
+    GLogf( LOG_WARN, "Native class '%s' missing in non-intrinsic package '%s'",
         Name.Data(), Pkg->Name.Data() );
     ObjectFlags &= ~(RF_Native);
   }
@@ -814,13 +814,13 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
   Filename += Pkg->ResolveNameFromIdx( Export->ObjectName );
   Filename += ".uc"; // Scripts won't get exported to any other type
 
-  Logf( LOG_INFO, "Exporting %s.uc", Name.Data() ); 
+  GLogf( LOG_INFO, "Exporting %s.uc", Name.Data() ); 
 
   // Write script text
-  FileStreamOut* Out = new FileStreamOut();
+  FFileArchiveOut* Out = new FFileArchiveOut();
   if ( Out->Open( Filename ) != 0 )
   {
-    Logf( LOG_WARN, "Failed to export script to file '%s'", Filename.Data() );
+    GLogf( LOG_WARN, "Failed to export script to file '%s'", Filename.Data() );
     return false;
   }
   Out->Write( ScriptText->Text->Data(), ScriptText->Text->Size() );
@@ -835,7 +835,7 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
       UProperty* PropIter = (UProperty*)Iter;
       if ( UNLIKELY( PropIter->Offset & 0x80000000 ) )
       {
-        Logf( LOG_WARN, "Bad offset for property '%s' (Offset = %x)",
+        GLogf( LOG_WARN, "Bad offset for property '%s' (Offset = %x)",
               PropIter->Name.Data(), PropIter->Offset );
         continue;
       }
@@ -1016,7 +1016,7 @@ bool UClass::ClassIsA( UClass* ClassType )
   {
     if ( UNLIKELY( Cls->Class != UClass::StaticClass() ) )
     {
-      Logf( LOG_CRIT, "CLASS SUPERFIELD IS NOT A UCLASS INSTANCE!!!" );
+      GLogf( LOG_CRIT, "CLASS SUPERFIELD IS NOT A UCLASS INSTANCE!!!" );
       GSystem->Exit( -1 );
     }
 
@@ -1053,7 +1053,7 @@ void UClass::SetSuperClassProperties()
   SuperClass = SafeCast<UClass>( SuperField );
   if ( SuperClass == NULL )
   {
-    Logf( LOG_CRIT, "SuperField of class '%s' is not a class!!!", Name );
+    GLogf( LOG_CRIT, "SuperField of class '%s' is not a class!!!", Name );
   }
   else
   {

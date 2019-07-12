@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include "Core/FUtil.h"
+#include "Util/FTypes.h"
 #include "Core/UPackage.h"
 
 // Floating point math functions

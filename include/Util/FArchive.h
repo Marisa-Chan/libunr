@@ -25,7 +25,9 @@
 
 #pragma once
 
-#include "FUtil.h"
+#include "Util/FMacro.h"
+#include "Util/FTypes.h"
+#include "Util/FString.h"
 
 #ifdef LIBUNR_BIG_ENDIAN
   #define conditional_bswap_16 bswap_16
@@ -51,7 +53,7 @@ public:
   virtual ~FArchive() {};
 
   virtual int Open( const char* Filename ) { return -1; }
-  virtual int Open( const String& Filename ) { return -1; }
+  virtual int Open( const FString& Filename ) { return -1; }
   virtual void Close() {}
   virtual size_t Read( void* Dest, size_t Len ) { return 0; }
   virtual size_t Write( void* Src, size_t Len ) { return 0; }

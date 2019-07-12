@@ -17,59 +17,43 @@
 \*===========================================================================*/
 
 /*========================================================================
- * FFileArchive.h - Class for serializing bytes to and from files
+ * FLogFile.h - Class for serializing text to a log file
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
 #pragma once
-#include "Core/FArchive.h"
+#include "Util/FFileArchive.h"
 
-/*-----------------------------------------------------------------------------
- * FFileArchive
- * Provides generic interface for reading and writing to a file
------------------------------------------------------------------------------*/
-class DLL_EXPORT FFileArchive : public FArchive
+// Log levels
+#define LOG_DEV  0
+#define LOG_INFO 1
+#define LOG_WARN 2
+#define LOG_ERR  3
+#define LOG_CRIT 4
+
+const char* const LogLevelStrings[] =
+{
+  "D",
+  "I",
+  "W",
+  "E",
+  "!"
+};
+
+class DLL_EXPORT FLogFile : public FFileArchiveOut
 {
 public:
   virtual int Open( const char* Filename );
-  virtual int Open( const String& Filename );
   virtual void Close();
-  
-  virtual size_t Read( void* Dest, size_t Len );
-  virtual size_t Write( void* Src, size_t Len );
-  virtual size_t Seek( ssize_t Off, ESeekBase Base );
-  virtual char   Peek();
-  virtual size_t Tell();
-  virtual bool Eof();
-  virtual void Flush();
-
-  virtual size_t Printf( const char* Str, ... );
+  virtual void Logf( int Type, const char* Str, ... );
+  virtual void SetLogLevel( int Level );
 
 protected:
-  FILE* File;
+  int LogLevel;
 };
 
-/*-----------------------------------------------------------------------------
- * FFileArchiveIn
- * Provides interface to read from a file
------------------------------------------------------------------------------*/
-class DLL_EXPORT FFileArchiveIn : public FFileArchive
-{
-public:
-  virtual int Open( const char* Filename );
-  virtual int Open( const String& Filename );
-};
-
-/*-----------------------------------------------------------------------------
- * FFileArchiveOut
- * Provides interface to write to a file
------------------------------------------------------------------------------*/
-class DLL_EXPORT FFileArchiveOut : public FFileArchive
-{
-public:
-  virtual int Open( const char* Filename );
-  virtual int Open( const String& Filename );
-};
+extern FLogFile* GLogFile;
+#define GLogf GLogFile->Logf
 

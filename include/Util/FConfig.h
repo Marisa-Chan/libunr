@@ -25,8 +25,10 @@
 
 #pragma once
 
-#include <vector>
-#include "Core/FUtil.h"
+#include "Util/TArray.h"
+#include "Util/FMacro.h"
+#include "Util/FTypes.h"
+#include "Util/FHash.h"
 
 class UObject;
 class UStruct;
@@ -83,7 +85,7 @@ public:
 
   void WriteObject( const char* Category, const char* Variable, UObject* Obj, size_t Index = 0 );
 
-  std::vector<char*>* CreateEntry( const char* Category, const char* Variable );
+  TArray<char*>* CreateEntry( const char* Category, const char* Variable );
 
   // Accessors
   const char* GetName();
@@ -96,8 +98,8 @@ private:
 
     char*  Name;
     FHash  Hash;
-    std::vector<char*>* Values;
-    std::vector<FConfigEntry*>* StructVars;
+    TArray<char*>* Values;
+    TArray<FConfigEntry*>* StructVars;
     bool bWriteIndices;
   };
 
@@ -108,10 +110,10 @@ private:
 
     char*  Name;
     FHash  Hash;
-    std::vector<FConfigEntry*>* Entries;
+    TArray<FConfigEntry*>* Entries;
   };
 
-  std::vector<FConfigCategory*> Categories;
+  TArray<FConfigCategory*> Categories;
   char* Name;
 };
 
@@ -132,7 +134,7 @@ public:
   void CloseConfigs();
 
 private:
-  std::vector<FConfig*> Configs;
+  TArray<FConfig*> Configs;
 };
 
 extern FConfigManager* GConfigManager;

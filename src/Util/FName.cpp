@@ -17,21 +17,17 @@
 \*===========================================================================*/
 
 /*========================================================================
- * FUtil.cpp - Utility functions
+ * FName.cpp - Global name table implementation
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#include "Core/FUtil.h"
+#include "Util/FName.h"
+#include "Util/FHash.h"
 #include "Core/USystem.h"
 #include "Core/UPackage.h"
 #include "stdarg.h"
-
-#define CI_6_BIT_LIMIT  64 - 1
-#define CI_13_BIT_LIMIT 8192 - 1
-#define CI_20_BIT_LIMIT 1048576 - 1
-#define CI_27_BIT_LIMIT 134217728  - 1
 
 /*-----------------------------------------------------------------------------
  * FNameEntry
@@ -132,77 +128,6 @@ DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FName& Name )
   In >> CINDEX( NameIdx );
   Name = In.Pkg->GetGlobalName( NameIdx );
   return In;
-}
-
-/*-----------------------------------------------------------------------------
- * FString
------------------------------------------------------------------------------*/
-FString& FString::operator+=( const FString& Str )
-{
-  *(String*)this += Str;
-  return *this;
-}
-
-FString& FString::operator+=( const String& Str )
-{
-  *(String*)this += Str;
-  return *this;
-}
-
-FString& FString::operator+=( const char* s )
-{
-  *(String*)this += s;
-  return *this;
-}
-
-FString& FString::operator+=( char c )
-{
-  *(String*)this += c;
-  return *this;
-}
-
-FString& FString::operator+=( FName Name )
-{
-  *(String*)this += Name.Data();
-  return *this;
-}
-
-bool operator!=( const FString& lhs, const FString& rhs )
-{
-  return (String&)lhs != (String&)rhs;
-}
-
-DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FString& Str )
-{
-  idx Size = 0;
-  In >> CINDEX( Size );
-
-  if ( Size > 0 )
-  {
-    Str.reserve( Size-1 );
-    
-    // Slow but secure
-    for ( int i = 0; i < Size; i++ )
-    {
-      char C = '\0';
-      In.Read( &C, 1 );
-
-      if ( C == '\0' )
-        break;
-
-      Str += C;
-    }
-  }
-
-  return In;
-}
-
-DLL_EXPORT FPackageFileOut& operator<<( FPackageFileOut& Out, FString& Str )
-{
-  size_t Length = Str.length();
-  Out << CINDEX( Length );
-  Out.Write( (void*)Str.data(), Length+1 );
-  return Out;
 }
 
 

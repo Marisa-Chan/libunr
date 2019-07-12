@@ -23,9 +23,9 @@
  *========================================================================
 */
 
-#include "Core/FConfig.h"
-#include "Core/FFileArchive.h"
-#include "Core/FLogFile.h"
+#include "Util/FConfig.h"
+#include "Util/FFileArchive.h"
+#include "Util/FLogFile.h"
 
 FConfigManager* GConfigManager = NULL;
 FConfig* GLibunrConfig = NULL;
@@ -579,7 +579,7 @@ void FConfig::WriteString( const char* Category, const char* Variable, const cha
   *Val = strdup( Value );
 }
 
-std::vector<char*>* FConfig::CreateEntry( const char* Category, const char* Variable )
+TArray<char*>* FConfig::CreateEntry( const char* Category, const char* Variable )
 {
   FConfigCategory* CatIter;
   FConfigEntry* Entry;
@@ -622,7 +622,7 @@ FConfig::FConfigEntry::FConfigEntry()
 {
   Name = NULL;
   Hash = ZERO_HASH;
-  Values = new std::vector<char*>();
+  Values = new TArray<char*>();
   StructVars = NULL;
   bWriteIndices = false; // TODO: Make libunr.ini option
 }
@@ -646,7 +646,7 @@ FConfig::FConfigCategory::FConfigCategory()
 {
   Name = NULL;
   Hash = ZERO_HASH;
-  Entries = new std::vector<FConfigEntry*>();
+  Entries = new TArray<FConfigEntry*>();
   //Entries->Reserve( 4 );
 }
 
@@ -656,7 +656,7 @@ FConfig::FConfigCategory::~FConfigCategory()
     delete Name;
 
   if ( Entries != NULL )
-    for ( int i = 0; i < Entries->size(); i++ )
+    for ( int i = 0; i < Entries->Size(); i++ )
       delete (*Entries)[i];
 }
 

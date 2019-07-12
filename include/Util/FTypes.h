@@ -17,43 +17,54 @@
 \*===========================================================================*/
 
 /*========================================================================
- * FLogFile.h - Class for serializing text to a log file
+ * FName.h - Primitive data type declarations
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#pragma once
-#include "Core/FFileArchive.h"
+// short hand data types
+typedef unsigned char  u8;
+typedef unsigned short u16;
+typedef unsigned int   u32;
+typedef unsigned long long u64;
 
-// Log levels
-#define LOG_DEV  0
-#define LOG_INFO 1
-#define LOG_WARN 2
-#define LOG_ERR  3
-#define LOG_CRIT 4
+typedef signed char  i8;
+typedef signed short i16;
+typedef signed int   i32;
+typedef signed long long i64;
 
-const char* const LogLevelStrings[] =
-{
-  "D",
-  "I",
-  "W",
-  "E",
-  "!"
-};
+#define MAX_UINT8  0xff
+#define MAX_UINT16 0xffff
+#define MAX_UINT32 0xffffffff
+#define MAX_UINT64 0xfffffffffffffff
 
-class DLL_EXPORT FLogFile : public FFileArchiveOut
-{
-public:
-  virtual int Open( const char* Filename );
-  virtual void Close();
-  virtual void Logf( int Type, const char* Str, ... );
-  virtual void SetLogLevel( int Level );
+#define MAX_INT8  0x7f
+#define MAX_INT16 0x7fff
+#define MAX_INT32 0x7fffffff
+#define MAX_INT64 0x7fffffffffffffff
 
-protected:
-  int LogLevel;
-};
+#define MIN_INT8  0x80
+#define MIN_INT16 0x8000
+#define MIN_INT32 0x80000000
+#define MIN_INT64 0x8000000000000000
 
-extern FLogFile* GLogFile;
-#define GLogf GLogFile->Logf
+#if defined LIBUNR_64BIT
+  #define MAX_SIZE MAX_UINT64
+  #if defined __MINGW32__
+    typedef i64 ssize_t;
+  #endif
+#elif defined LIBUNR_32BIT
+  #define MAX_SIZE MAX_UINT32
+  #if defined __MINGW32__
+    typedef i32 ssize_t;
+  #endif
+#endif
 
+
+// TODO: make type 'idx' cast automatically to FCompactIndex
+typedef i32 idx;
+
+//========================================================================
+// EOF
+//========================================================================
