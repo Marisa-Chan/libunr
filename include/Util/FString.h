@@ -76,30 +76,105 @@ public:
   using std::string::find_first_of;
   using std::string::find_last_of;
   using std::string::find_first_not_of;
-  using std::string::first_last_not_of;
+  using std::string::find_last_not_of;
   using std::string::substr;
 
-  DECLARE_FUNCTION_ALIAS( size_t, Size )() const { return Internal.size(); }
-  DECLARE_FUNCTION_ALIAS( size_t, Length )() const { return Internal.length(); }
-  DECLARE_FUNCTION_ALIAS( void, Resize )( size_t n ) { Internal.resize( n ); }
-  DECLARE_FUNCTION_ALIAS( void, Resize )( size_t n, char c ) { Internal.resize( n, c ); }
-  DECLARE_FUNCTION_ALIAS( size_t, Capacity )() const { return Internal.capacity(); }
-  DECLARE_FUNCTION_ALIAS( bool, IsEmpty )() const { return Internal.empty(); }
-  DECLARE_FUNCTION_ALIAS( void, Reserve )( size_t n ) { Internal.reserve( n ); }
-  DECLARE_FUNCTION_ALIAS( void, Reclaim )() { Internal.shrink_to_fit(); }
+  DECLARE_FUNCTION_ALIAS( size_t, Size )() const { return size(); }
+  DECLARE_FUNCTION_ALIAS( size_t, Length )() const { return length(); }
+  DECLARE_FUNCTION_ALIAS( void, Resize )( size_t n ) { resize( n ); }
+  DECLARE_FUNCTION_ALIAS( void, Resize )( size_t n, char c ) { resize( n, c ); }
+  DECLARE_FUNCTION_ALIAS( size_t, Capacity )() const { return capacity(); }
+  DECLARE_FUNCTION_ALIAS( bool, IsEmpty )() const { return empty(); }
+  DECLARE_FUNCTION_ALIAS( void, Reserve )( size_t n ) { reserve( n ); }
+  DECLARE_FUNCTION_ALIAS( void, Reclaim )() { shrink_to_fit(); }
   
-  DECLARE_FUNCTION_ALIAS( char&, operator[] )( size_t n ) { return Internal[n]; }
-  DECLARE_FUNCTION_ALIAS( char, At )( size_t n ) { return Internal.at( n ); }
-  DECLARE_FUNCTION_ALIAS( char, Front )() { return Internal.front(); }
-  DECLARE_FUNCTION_ALIAS( char, Back )() { return Internal.back(); }
-  DECLARE_FUNCTION_ALIAS( char*, Data )() { return (char*)Internal.data(); }
+  DECLARE_FUNCTION_ALIAS( char, At )( size_t n ) { return at( n ); }
+  DECLARE_FUNCTION_ALIAS( char, Front )() { return front(); }
+  DECLARE_FUNCTION_ALIAS( char, Back )() { return back(); }
+  DECLARE_FUNCTION_ALIAS( char*, Data )() { return (char*)data(); }
   
-  DECLARE_FUNCTION_ALIAS( const char&, operator[] )( size_t n ) const { return Internal[n]; }
-  DECLARE_FUNCTION_ALIAS( const char, At )( size_t n ) const { return Internal.at( n ); }
-  DECLARE_FUNCTION_ALIAS( const char, Front )() const { return Internal.front(); }
-  DECLARE_FUNCTION_ALIAS( const char, Back )() const { return Internal.back(); }
-  DECLARE_FUNCTION_ALIAS( const char*, Data )() const { return Internal.data(); }
+  DECLARE_FUNCTION_ALIAS( const char, At )( size_t n ) const { return at( n ); }
+  DECLARE_FUNCTION_ALIAS( const char, Front )() const { return front(); }
+  DECLARE_FUNCTION_ALIAS( const char, Back )() const { return back(); }
+  DECLARE_FUNCTION_ALIAS( const char*, Data )() const { return data(); }
+
+  DECLARE_FUNCTION_ALIAS( FString&, Append )( const FString& Str )       { append( Str ); return *this; }
+  DECLARE_FUNCTION_ALIAS( FString&, Append )( const FString& Str, size_t SubPos, size_t SubLen = MAX_SIZE ) 
+    { append ( Str, SubPos, SubLen ); return *this; }
+  DECLARE_FUNCTION_ALIAS( FString&, Append )( const char* s )           { append ( s ); return *this; }
+  DECLARE_FUNCTION_ALIAS( FString&, Append )( const char* s, size_t n ) { append( s, n ); return *this; }
+  DECLARE_FUNCTION_ALIAS( FString&, Append )( size_t n, char c )        { append( n, c ); return *this; }
   
+  DECLARE_FUNCTION_ALIAS( void, PushBack )( char c ) { push_back( c ); }
+  
+  DECLARE_FUNCTION_ALIAS( FString&, Assign )( const FString& Str )       { assign( Str ); return *this; }
+  DECLARE_FUNCTION_ALIAS( FString&, Assign )( const FString& Str, size_t SubPos, size_t SubLen = MAX_SIZE )
+    { assign( Str, SubPos, SubLen ); return *this; }
+
+  DECLARE_FUNCTION_ALIAS( FString&, Assign )( const char* s )           { assign( s ); return *this; }
+  DECLARE_FUNCTION_ALIAS( FString&, Assign )( const char* s, size_t n ) { assign( s, n ); return *this; }
+  DECLARE_FUNCTION_ALIAS( FString&, Assign )( size_t n, char c )        { assign( n, c ); return *this; }
+  DECLARE_FUNCTION_ALIAS( FString&, Insert )( size_t Pos, const FString& Str )        { insert( Pos, Str ); return *this; }
+  DECLARE_FUNCTION_ALIAS( FString&, Insert )( size_t Pos, const FString& Str, size_t SubPos, size_t SubLen )
+    { insert( Pos, Str, SubPos, SubLen ); return *this; }
+
+
+  DECLARE_FUNCTION_ALIAS( FString&, Insert )( size_t Pos, const char* s )            { insert( Pos, s ); return *this; }
+  DECLARE_FUNCTION_ALIAS( FString&, Insert )( size_t Pos, const char* s, size_t n )  { insert( Pos, s, n ); return *this; }
+  DECLARE_FUNCTION_ALIAS( FString&, Insert )( size_t Pos, size_t n, char c )         { insert( Pos, n, c ); return *this; }
+  
+  DECLARE_FUNCTION_ALIAS( FString&, Erase )( size_t Pos = 0, size_t Len = MAX_SIZE ) { erase( Pos, Len ); return *this; }
+    
+  DECLARE_FUNCTION_ALIAS( FString&, Replace )( size_t Pos, size_t Len, const String& Str ){ replace( Pos, Len, Str ); return *this; }
+  DECLARE_FUNCTION_ALIAS( FString&, Replace )( size_t Pos, size_t Len, const String& Str, size_t SubPos, size_t SubLen ) { replace( Pos, Len, Str, SubPos, SubLen ); return *this; }
+  DECLARE_FUNCTION_ALIAS( FString&, Replace )( size_t Pos, size_t Len, const char* s )                   { replace( Pos, Len, s ); return *this; }
+  DECLARE_FUNCTION_ALIAS( FString&, Replace )( size_t Pos, size_t Len, const char* s, size_t n )         { replace( Pos, Len, s, n ); return *this; }
+  DECLARE_FUNCTION_ALIAS( FString&, Replace )( size_t Pos, size_t Len, size_t n, char c )                { replace( Pos, Len, n, c ); return *this; } 
+
+  FORCEINLINE void Swap( FString& Str ) { swap( Str ); }
+  
+  FORCEINLINE void PopBack() { pop_back(); }
+  
+  FORCEINLINE size_t Find( const FString& Str, size_t Pos = 0 )  { return find( Str, Pos ); }
+  FORCEINLINE size_t Find( const char* s, size_t Pos = 0 )       { return find( s, Pos ); }
+  FORCEINLINE size_t Find( const char* s, size_t Pos, size_t n ) { return find( s, Pos, n ); }
+  FORCEINLINE size_t Find( char  c, size_t Pos = 0 )             { return find( c, Pos ); }
+  
+  FORCEINLINE size_t RFind( const FString& Str, size_t Pos = 0 )  { return rfind( Str, Pos ); }
+  FORCEINLINE size_t RFind( const char* s, size_t Pos = 0 )       { return rfind( s, Pos ); }
+  FORCEINLINE size_t RFind( const char* s, size_t Pos, size_t n ) { return rfind( s, Pos, n ); }
+  FORCEINLINE size_t RFind( char  c, size_t Pos = 0 )             { return rfind( c, Pos ); }
+  
+  FORCEINLINE size_t FindFirstOf( const FString& Str, size_t Pos = 0 )  { return find_first_of( Str, Pos ); }
+  FORCEINLINE size_t FindFirstOf( const char* s, size_t Pos = 0 )       { return find_first_of( s, Pos ); }
+  FORCEINLINE size_t FindFirstOf( const char* s, size_t Pos, size_t n ) { return find_first_of( s, Pos, n ); }
+  FORCEINLINE size_t FindFirstOf( char  c, size_t Pos = 0 )             { return find_first_of( c, Pos ); }
+ 
+  FORCEINLINE size_t FindLastOf( const FString& Str, size_t Pos = -1 )  { return find_last_of( Str, Pos ); }
+  FORCEINLINE size_t FindLastOf( const char* s, size_t Pos = -1 )       { return find_last_of( s, Pos ); }
+  FORCEINLINE size_t FindLastOf( const char* s, size_t Pos, size_t n )  { return find_last_of( s, Pos, n ); }
+  FORCEINLINE size_t FindLastOf( char  c, size_t Pos = -1 )             { return find_last_of( c, Pos ); }
+ 
+  FORCEINLINE size_t FindFirstNotOf( const FString& Str, size_t Pos = 0 )  { return find_first_not_of( Str, Pos ); }
+  FORCEINLINE size_t FindFirstNotOf( const char* s, size_t Pos = 0 )       { return find_first_not_of( s, Pos ); }
+  FORCEINLINE size_t FindFirstNotOf( const char* s, size_t Pos, size_t n ) { return find_first_not_of( s, Pos, n ); }
+  FORCEINLINE size_t FindFirstNotOf( char  c, size_t Pos = 0 )             { return find_first_not_of( c, Pos ); }
+ 
+  FORCEINLINE size_t FindLastNotOf( const FString& Str, size_t Pos = -1 )  { return find_last_not_of( Str, Pos ); }
+  FORCEINLINE size_t FindLastNotOf( const char* s, size_t Pos = -1 )       { return find_last_not_of( s, Pos ); }
+  FORCEINLINE size_t FindLastNotOf( const char* s, size_t Pos, size_t n )  { return find_last_not_of( s, Pos, n ); }  
+  FORCEINLINE size_t FindLastNotOf( char  c, size_t Pos = -1 )             { return find_last_not_of( c, Pos ); }
+   
+  FORCEINLINE String Substr( size_t Pos = 0, size_t Len = MAX_SIZE ) const { return FString( substr( Pos, Len ) ); }
+  FORCEINLINE void ReplaceChars( char Old, char New )
+  {
+    for (std::string::iterator it = begin(); it != end(); ++it)
+    {
+      if (*it == Old)
+        *it = New;
+    }
+  }
+
   FString& operator+=( const FString& Str );
   FString& operator+=( const String& Str );
   FString& operator+=( const char* s );
@@ -139,5 +214,4 @@ DLL_EXPORT int strnicmp( const char* str1, const char* str2, size_t count );
 #endif
 DLL_EXPORT char* strupper( const char* str );
 DLL_EXPORT char* GetDateString( const char* Fmt );
-
 

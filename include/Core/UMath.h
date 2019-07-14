@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include <float.h>
+#include <math.h>
 #include "Util/FTypes.h"
 #include "Core/UPackage.h"
 

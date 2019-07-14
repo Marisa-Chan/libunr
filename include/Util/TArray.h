@@ -27,9 +27,6 @@
 #include <vector>
 #include "Util/FMacro.h"
 
-#define DECLARE_FUNCTION_ALIAS(rettype, newf) \
-  FORCEINLINE rettype newf
-
 template<class T> class TArray : public std::vector<T>
 {
 public:
@@ -53,6 +50,7 @@ public:
   using std::vector<T>::front;
   using std::vector<T>::back;
   using std::vector<T>::data;
+  using std::vector<T>::push_back;
   using std::vector<T>::pop_back;
   using std::vector<T>::clear;
 

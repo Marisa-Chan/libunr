@@ -51,7 +51,7 @@ template <> inline UObject* UObject::GetProperty<UObject*>( UProperty* Prop, int
   if ( Out && !Out->IsA( UObject::StaticClass() ) )
   {
     // Maybe make a config way for this check to be optional? Could get very slow
-    Logf( LOG_CRIT, "OBJECT PROPERTY DOES NOT POINT TO AN OBJECT!!!" );
+    GLogf( LOG_CRIT, "OBJECT PROPERTY DOES NOT POINT TO AN OBJECT!!!" );
     GSystem->Exit( -1 );
   }
   return Out;
@@ -63,7 +63,7 @@ template<> inline UClass* UObject::GetProperty<UClass*>( UProperty* Prop, int Id
   if ( Out && Out->StaticClass() != UClass::StaticClass() )
   {
     // see GetObjProperty for same comment
-    Logf( LOG_CRIT, "CLASS PROPERTY DOES NOT POINT TO A CLASS!!!" );
+    GLogf( LOG_CRIT, "CLASS PROPERTY DOES NOT POINT TO A CLASS!!!" );
     GSystem->Exit( -1 );
   }
   return Out;
@@ -76,7 +76,7 @@ template<> inline UStruct* UObject::GetProperty<UStruct*>( UProperty* Prop, int 
   UStructProperty* StructProp = SafeCast<UStructProperty>( Prop );
   if ( !StructProp )
   {
-    Logf( LOG_CRIT, "GetProperty<UStruct*> did not get a StructProperty" );
+    GLogf( LOG_CRIT, "GetProperty<UStruct*> did not get a StructProperty" );
     GSystem->Exit( -1 );
   }
   return (UStruct*)( (u8*)this + Prop->Offset + ( Idx * StructProp->Struct->StructSize ) );
@@ -99,7 +99,7 @@ inline void UObject::SetProperty<UObject*>( UProperty* Prop, UObject* NewVal, in
   //if ( !(*Out)->IsA( UObject::StaticClass() ) )
   //{
   //  // Maybe make a config way for this check to be optional? Could get very slow
-  //  Logf( LOG_CRIT, "OBJECT PROPERTY DOES NOT POINT TO AN OBJECT!!!" );
+  //  GLogf( LOG_CRIT, "OBJECT PROPERTY DOES NOT POINT TO AN OBJECT!!!" );
   //  GSystem->Exit( -1 );
   //}
   *Out = NewVal;
@@ -112,7 +112,7 @@ inline void UObject::SetProperty<UClass*>( UProperty* Prop, UClass* NewVal, int 
   if ( !(*Out)->IsA( UClass::StaticClass() ) )
   {
     // Maybe make a config way for this check to be optional? Could get very slow
-    Logf( LOG_CRIT, "CLASS PROPERTY DOES NOT POINT TO A CLASS!!!" );
+    GLogf( LOG_CRIT, "CLASS PROPERTY DOES NOT POINT TO A CLASS!!!" );
     GSystem->Exit( -1 );
   }
   *Out = NewVal;
