@@ -25,8 +25,8 @@
 
 #pragma once
 
-#include <vector>
-#include <queue>
+#include "Util/TArray.h"
+#include "Util/TQueue.h"
 #include "Util/FConfig.h"
 #include "Core/UObject.h"
 
@@ -210,6 +210,6 @@ class DLL_EXPORT UClass : public UState
 private:
   UObject* CreateDefaultObject();
   char* CreateDefaultObjectName();
-  static std::queue<UClass*> DefPropQueue;
+  static TQueue<UClass*> DefPropQueue;
 };
 

@@ -27,4 +27,20 @@
 #include <queue>
 #include "Util/FMacro.h"
 
+using std::queue;
+template<class T> class TQueue : public queue<T>
+{
+public:
+  TQueue<T>() : queue<T>() {}
+
+  FORCEINLINE bool   Empty() const   { return queue::empty(); }
+  FORCEINLINE size_t Size() const    { return queue::size(); }
+  FORCEINLINE T&     Front const     { return queue::front(); }
+  FORCEINLINE T&     Back() const    { return queue::back(); }
+  FORCEINLINE const T& Front() const { return queue::front(); }
+  FORCEINLINE const T& Back() const  { return queue:back(); }
+  FORCEINLINE void Pop()             { return queue::pop(); }
+  FORCEINLINE void Push( const T& Value ) { return queue::push(Value); }
+  FORCEINLINE void Swap( TQueue<T>& x ){ queue::swap(x); }
+};
 
