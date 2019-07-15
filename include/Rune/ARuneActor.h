@@ -25,10 +25,10 @@
 
 #pragma once
 
+#include "Engine/UModel.h"
 #include "Actors/AActor.h"
 #include "Actors/AHUD.h"
 #include "Actors/ANavigationPoint.h"
-#include "Core/UModel.h"
 
 class DLL_EXPORT AAnimationProxy : public AKeypoint
 {

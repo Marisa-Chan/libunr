@@ -27,51 +27,37 @@
 #include <vector>
 #include "Util/FMacro.h"
 
-template<class T> class TArray : public std::vector<T>
+using std::vector;
+template<class T> class TArray : public vector<T>
 {
 public:
-  TArray<T>() : std::vector<T>() 
+  TArray<T>() : vector<T>() 
   { ElementSize = sizeof(T); }
 
-  TArray<T>( size_t n ) : std::vector<T>( n ) 
+  TArray<T>( size_t n ) : vector<T>( n ) 
   { ElementSize = sizeof(T); }
   
-  TArray<T>( size_t n, const T& Value ) : std::vector<T>( n, Value ) 
+  TArray<T>( size_t n, const T& Value ) : vector<T>( n, Value ) 
   { ElementSize = sizeof(T); }
 
-  using std::vector<T>::size;
-  using std::vector<T>::max_size;
-  using std::vector<T>::resize;
-  using std::vector<T>::capacity;
-  using std::vector<T>::empty;
-  using std::vector<T>::reserve;
-  using std::vector<T>::shrink_to_fit;
-  using std::vector<T>::at;
-  using std::vector<T>::front;
-  using std::vector<T>::back;
-  using std::vector<T>::data;
-  using std::vector<T>::push_back;
-  using std::vector<T>::pop_back;
-  using std::vector<T>::clear;
-
-  DECLARE_FUNCTION_ALIAS( size_t, Size )()    { return size(); }
-  DECLARE_FUNCTION_ALIAS( size_t, MaxSize )() { return max_size(); }
-  DECLARE_FUNCTION_ALIAS( void, Resize )( size_t n ) { resize(n); }
-  DECLARE_FUNCTION_ALIAS( void, Resize )( size_t n, const T& Value ) { resize(n,Value); }
-  DECLARE_FUNCTION_ALIAS( size_t, Capacity )() { return capacity(); }
-  DECLARE_FUNCTION_ALIAS( bool, IsEmpty )() { return empty(); }
-  DECLARE_FUNCTION_ALIAS( void, Reserve )( size_t n ) { reserve(n); }
-  DECLARE_FUNCTION_ALIAS( void, Reclaim )() { shrink_to_fit(); }
-  DECLARE_FUNCTION_ALIAS( T&, At )( size_t n ) { return at(n); }
-  DECLARE_FUNCTION_ALIAS( T&, Front )() { return front(); }
-  DECLARE_FUNCTION_ALIAS( T&, Back )() { return back(); }
-  DECLARE_FUNCTION_ALIAS( T*, Data )() { return data(); }
-  DECLARE_FUNCTION_ALIAS( void, Assign )( size_t n, const T& Value ) { assign(n,Value); }
-  DECLARE_FUNCTION_ALIAS( void, PushBack )( const T& Val ) { push_back(Val); }
-  DECLARE_FUNCTION_ALIAS( void, PushBack )( T& Val ) { push_back(Val); }
-  DECLARE_FUNCTION_ALIAS( void, PopBack )() { pop_back(); }
-  DECLARE_FUNCTION_ALIAS( void, Swap )( TArray<T>& x ) { swap((std::vector<T>&)x); }
-  DECLARE_FUNCTION_ALIAS( void, Clear )() { clear(); }
+  FORCEINLINE size_t Size()                           { return vector<T>::size(); }
+  FORCEINLINE size_t MaxSize()                        { return vector<T>::max_size(); }
+  FORCEINLINE void Resize( size_t n )                 { vector<T>::resize(n); }
+  FORCEINLINE void Resize( size_t n, const T& Value ) { vector<T>::resize(n,Value); }
+  FORCEINLINE size_t Capacity()                       { return vector<T>::capacity(); }
+  FORCEINLINE bool IsEmpty()                          { return vector<T>::empty(); }
+  FORCEINLINE void Reserve( size_t n )                { vector<T>::reserve(n); }
+  FORCEINLINE void Reclaim ()                         { vector<T>::shrink_to_fit(); }
+  FORCEINLINE T& At ( size_t n )                      { return vector<T>::at(n); }
+  FORCEINLINE T& Front ()                             { return vector<T>::front(); }
+  FORCEINLINE T& Back ()                              { return vector<T>::back(); }
+  FORCEINLINE T* Data ()                              { return vector<T>::data(); }
+  FORCEINLINE void Assign( size_t n, const T& Value ) { vector<T>::assign(n,Value); }
+  FORCEINLINE void PushBack( const T& Val )           { vector<T>::push_back(Val); }
+  FORCEINLINE void PushBack( T& Val )                 { vector<T>::push_back(Val); }
+  FORCEINLINE void PopBack()                          { vector<T>::pop_back(); }
+  FORCEINLINE void Swap( TArray<T>& x )               { vector<T>::swap(x); }
+  FORCEINLINE void Clear()                            { vector<T>::clear(); }
 
   size_t ElementSize;
 };
@@ -79,5 +65,17 @@ public:
 class FGenericArray : public TArray<unsigned char>
 {
 public:
-  size_t Size() { return std::vector<unsigned char>::size() / ElementSize; }
+  FORCEINLINE size_t Size() const    { return vector<unsigned char>::size() / ElementSize; }
+  FORCEINLINE size_t MaxSize() const { return vector<unsigned char>::max_size() / ElementSize; }
+  FORCEINLINE void   Resize( size_t n )  { vector<unsigned char>::resize( n * ElementSize ); }
+  FORCEINLINE void   Reserve( size_t n ) { vector<unsigned char>::reserve( n * ElementSize ); }
+  
+  FORCEINLINE void* operator[]( size_t n ) { return PtrAdd( Data(), n * ElementSize ); }
+
+private:
+  void  Resize( size_t n, const char& Value );
+  void  Assign( size_t n, const char& Value );
+  void  PushBack( const char& Val );
+  void  PushBack( char& Val );
+  void  PopBack();
 };

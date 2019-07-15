@@ -17,7 +17,7 @@
 \*===========================================================================*/
 
 /*========================================================================
- * FString.cpp - String helper implementation
+ * FString.cpp - string helper implementation
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
@@ -32,37 +32,37 @@
 -----------------------------------------------------------------------------*/
 FString& FString::operator+=( const FString& Str )
 {
-  *(String*)this += Str;
+  *(string*)this += Str;
   return *this;
 }
 
-FString& FString::operator+=( const String& Str )
+FString& FString::operator+=( const string& Str )
 {
-  *(String*)this += Str;
+  *(string*)this += Str;
   return *this;
 }
 
 FString& FString::operator+=( const char* s )
 {
-  *(String*)this += s;
+  *(string*)this += s;
   return *this;
 }
 
 FString& FString::operator+=( char c )
 {
-  *(String*)this += c;
+  *(string*)this += c;
   return *this;
 }
 
 FString& FString::operator+=( FName Name )
 {
-  *(String*)this += Name.Data();
+  *(string*)this += Name.Data();
   return *this;
 }
 
 bool operator!=( const FString& lhs, const FString& rhs )
 {
-  return (String&)lhs != (String&)rhs;
+  return (string&)lhs != (string&)rhs;
 }
 
 DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FString& Str )

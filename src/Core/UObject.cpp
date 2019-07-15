@@ -23,7 +23,6 @@
  *========================================================================
 */
 
-#include "XMemory.h"
 #include "Core/UObject.h"
 #include "Core/UObjGetSet.h"
 #include "Core/UClass.h"
@@ -56,7 +55,7 @@ void FNativePropertyList::AddProperty( const char* Name, u32 Offset )
     Properties[Added].Hash = FnvHashString( UpperName );
     Properties[Added].Offset = Offset;
     Added++;
-    xstl::Free( UpperName );
+    free( UpperName );
   }
 }
 
@@ -67,9 +66,8 @@ void FNativePropertyList::AppendList( FNativePropertyList* List )
 
   Num += List->Num;
 
-  Properties = (FNativePropertyLink*)xstl::Realloc( Properties, sizeof(FNativePropertyLink) * Num );
-  xstl::Copy( &Properties[Added], sizeof(FNativePropertyLink)*List->Added, 
-                List->Properties, sizeof(FNativePropertyLink)*List->Added );
+  Properties = (FNativePropertyLink*)realloc( Properties, sizeof(FNativePropertyLink) * Num );
+  memcpy( &Properties[Added], List->Properties, sizeof(FNativePropertyLink)*List->Added );
 
   Added += List->Added;
 }
@@ -77,11 +75,11 @@ void FNativePropertyList::AppendList( FNativePropertyList* List )
 /*-----------------------------------------------------------------------------
  * UObject
 -----------------------------------------------------------------------------*/
-Array<UObject*> UObject::ObjectPool;
-Array<UClass*>  UObject::ClassPool;
-Array<FNativePropertyList*> UObject::NativePropertyLists;
-Array<UFunction*> UObject::NativeFunctions;
-Array<FNameEntry*> UObject::NameTable;
+TArray<UObject*> UObject::ObjectPool;
+TArray<UClass*>  UObject::ClassPool;
+TArray<FNativePropertyList*> UObject::NativePropertyLists;
+TArray<UFunction*> UObject::NativeFunctions;
+TArray<FNameEntry*> UObject::NameTable;
 bool UObject::bStaticBootstrapped = false;
 
 UObject* UObject::StaticConstructObject( FName InName, UClass* InClass, UObject* InOuter, 
@@ -105,7 +103,7 @@ UObject* UObject::StaticConstructObject( FName InName, UClass* InClass, UObject*
   {
     if ( UNLIKELY( InClass->Default == NULL ) )
     {
-      Logf( LOG_CRIT, "Can't construct object '%s.%s'; Default object missing for class '%s'",
+      GLogf( LOG_CRIT, "Can't construct object '%s.%s'; Default object missing for class '%s'",
           InPkg->Name, InName, InClass->Name );
       GSystem->Exit( -1 );
     }
@@ -136,7 +134,7 @@ UObject::UObject()
   Class = NULL;
   Pkg = NULL;
   RefCnt = 1;
-  OldPkgFileOffsets = new Stack<size_t>();
+  OldPkgFileOffsets = new TStack<size_t>();
   Name = 0;
 }
 
@@ -209,13 +207,13 @@ void UObject::DelRef()
 {
   if ( UNLIKELY( RefCnt == 0 ) )
   {
-    Logf( LOG_WARN, "Reference count decrement on irrelevant object '%s'", Name );
+    GLogf( LOG_WARN, "Reference count decrement on irrelevant object '%s'", Name );
     return;
   }
 
   RefCnt--;
   if ( RefCnt == 0 && GSystem->bLogRefCntZero )
-    Logf( LOG_INFO, "Reference count is zero for '%s'", Name );
+    GLogf( LOG_INFO, "Reference count is zero for '%s'", Name );
 }
 
 bool UObject::IsA( UClass* ClassType )
@@ -224,7 +222,7 @@ bool UObject::IsA( UClass* ClassType )
   {
     if ( UNLIKELY( Cls->Class != UClass::StaticClass() ) )
     {
-      Logf( LOG_CRIT, "CLASS SUPERFIELD IS NOT A UCLASS INSTANCE!!!" );
+      GLogf( LOG_CRIT, "CLASS SUPERFIELD IS NOT A UCLASS INSTANCE!!!" );
       GSystem->Exit( -1 );
     }
 
@@ -313,19 +311,19 @@ void UObject::ReadDefaultProperties()
     if ( !Prop )
     {
       if ( Outer )
-        Logf( LOG_CRIT, "Property '%s' in '%s.%s.%s' does not exist",
+        GLogf( LOG_CRIT, "Property '%s' in '%s.%s.%s' does not exist",
           PropName.Data(), Pkg->Name.Data(), Outer->Name.Data(), Name.Data() );
       else
-        Logf( LOG_CRIT, "Property '%s' in '%s.%s' does not exist",
+        GLogf( LOG_CRIT, "Property '%s' in '%s.%s' does not exist",
           PropName.Data(), Pkg->Name.Data(), Name.Data() );
     }
     else if ( Prop->Offset == MAX_UINT32 )
     {
       if ( Outer )
-        Logf( LOG_WARN, "Property '%s' in '%s.%s.%s' has no native component",
+        GLogf( LOG_WARN, "Property '%s' in '%s.%s.%s' has no native component",
           PropName.Data(), Pkg->Name.Data(), Outer->Name.Data(), Name.Data() );
       else
-        Logf( LOG_WARN, "Property '%s' in '%s.%s' has no native component",
+        GLogf( LOG_WARN, "Property '%s' in '%s.%s' has no native component",
           PropName.Data(), Pkg->Name.Data(), Name.Data() );
 
       Prop = NULL;
@@ -393,7 +391,7 @@ void UObject::ReadDefaultProperties()
     }
     else if ( !Prop->LoadDefaultPropertySafe( this, *PkgFile, PropType, RealSize, ArrayIdx ) )
     {
-      Logf( LOG_CRIT, "Cannot continue parsing defaultproperty list for object '%s'", Name.Data() );
+      GLogf( LOG_CRIT, "Cannot continue parsing defaultproperty list for object '%s'", Name.Data() );
       return;
     }
   }
@@ -434,7 +432,7 @@ UObject* UObject::Clone()
 
   // MAKE SURE STRUCTSIZE IS SAFE!!!
   if ( LIKELY( ClonedObj != NULL ) )
-    xstl::Copy( ClonedObj, Class->StructSize, this, Class->StructSize );
+    memcpy( ClonedObj, this, Class->StructSize );
 
   Class->AddRef();
   return ClonedObj;
@@ -451,7 +449,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, const char* ObjName, UClass* 
   FExport* Export = Pkg->GetExportByName( Pkg->FindName( ObjName ) );
   if ( UNLIKELY( Export == NULL ) )
   {
-    Logf( LOG_WARN, "Can't load object '%s.%s', object does not exist", Pkg->Name, ObjName );
+    GLogf( LOG_WARN, "Can't load object '%s.%s', object does not exist", Pkg->Name, ObjName );
     return NULL;
   }
 
@@ -528,7 +526,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
         if ( ClsPkg == NULL )
         {
           // We can't find the package we need, bail out
-          Logf( LOG_CRIT, "Can't load class '%s.%s', package is missing", ClsPkgName, ClsName );
+          GLogf( LOG_CRIT, "Can't load class '%s.%s', package is missing", ClsPkgName, ClsName );
           return NULL;
         }
 
@@ -539,14 +537,14 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
         if ( UNLIKELY( ObjClass == NULL ) )
         {
           // Class doesn't exist in that package, bail out
-          Logf( LOG_CRIT, "Can't load class '%s.%s', class does not exist", ClsPkgName, ClsName );
+          GLogf( LOG_CRIT, "Can't load class '%s.%s', class does not exist", ClsPkgName, ClsName );
           return NULL;
         }
       }
     }
 
     FImport* PkgImport = Import;
-    Array<FImport>& PkgImports = Pkg->GetImportTable();
+    TArray<FImport>& PkgImports = Pkg->GetImportTable();
     do
     {
       // The 'Package' field for FImport does not actually tell what package it is in,
@@ -563,15 +561,15 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
     ObjPkg = UPackage::StaticLoadPackage( ObjPkgName );
     if ( UNLIKELY( ObjPkg == NULL ) )
     {
-      Logf( LOG_CRIT, "Can't load object '%s.%s', package is missing", ObjPkgName, ObjName );
+      GLogf( LOG_CRIT, "Can't load object '%s.%s', package is missing", ObjPkgName, ObjName );
       return NULL;
     } 
 
     // Get the corresponding export index for this package
     // Optimization: Get the package tables here rather than inside of the loop
-    Array<FExport>& Exports = ObjPkg->GetExportTable();
-    Array<FImport>& Imports = ObjPkg->GetImportTable();
-    Array<FNameEntry>& Names = ObjPkg->GetNameTable();
+    TArray<FExport>& Exports = ObjPkg->GetExportTable();
+    TArray<FImport>& Imports = ObjPkg->GetImportTable();
+    TArray<FNameEntry>& Names = ObjPkg->GetNameTable();
     for ( int i = 0; i < Exports.Size(); i++ )
     {
       FExport* ExpIter = &Exports[i];
@@ -642,7 +640,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
     }
 
   Error:
-    Logf( LOG_CRIT, "Can't load object '%s.%s', object does not exist", ObjPkgName, ObjName );
+    GLogf( LOG_CRIT, "Can't load object '%s.%s', object does not exist", ObjPkgName, ObjName );
     return NULL;
   }
 
@@ -685,7 +683,7 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
       ObjClass = (UClass*)StaticLoadObject( ObjPkg, ObjExport->Class, UClass::StaticClass(), NULL, true );
       if ( UNLIKELY( ObjClass == NULL ) )
       {
-        Logf( LOG_CRIT, "Can't load object '%s.%s', cannot load class", 
+        GLogf( LOG_CRIT, "Can't load object '%s.%s', cannot load class", 
           ObjPkg->Name, ObjName );
         return NULL;
       }
@@ -701,7 +699,7 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
     ClassType = (UClass*)StaticLoadObject( ObjPkg, ObjExport->Class, UClass::StaticClass(), NULL, true );
     if ( UNLIKELY( ClassType == NULL ) )
     {
-      Logf( LOG_WARN, "Can't load object '%s.%s', cannot load class",
+      GLogf( LOG_WARN, "Can't load object '%s.%s', cannot load class",
           ObjPkg->Name.Data(), ObjName.Data() );
       return NULL;
     }
@@ -709,7 +707,7 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
 
   if ( UNLIKELY( !ClassType->Default->IsA( ObjClass ) ) )
   {
-    Logf( LOG_WARN, "Object '%s.%s' was expected to be of type '%s' but was '%s'",
+    GLogf( LOG_WARN, "Object '%s.%s' was expected to be of type '%s' but was '%s'",
         ObjPkg->Name.Data(), ObjName.Data(), ObjClass->Name.Data(), ClassName.Data() );
     return NULL;
   }

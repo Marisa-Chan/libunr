@@ -38,7 +38,7 @@ class DLL_EXPORT ADecal : public AActor
   bool bAttachPanningSurfs;
   bool bAttachUnlitSurfs;
   bool bBloodyDecal;
-  Array<int>* SurfList;
+  TArray<int>* SurfList;
   float LastRenderedTime;
 
   UTexture* AttachDecal( float TraceDistance, FVector* DecalDir = NULL );

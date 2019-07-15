@@ -25,25 +25,26 @@
 
 #include "Core/UObject.h"
 #include "Core/UClass.h"
-#include "Core/UAudio.h"
-#include "Core/UCanvas.h"
-#include "Core/UConsole.h"
-#include "Core/UEngine.h"
-#include "Core/UFire.h"
-#include "Core/UGesture.h"
 #include "Core/ULocale.h"
-#include "Core/ULevel.h"
-#include "Core/UMesh.h"
-#include "Core/UMusic.h"
-#include "Core/UNet.h"
-#include "Core/UPlayer.h"
-#include "Core/UProperty.h"
-#include "Core/URender.h"
-#include "Core/USound.h"
-#include "Core/UStaticMesh.h"
 #include "Core/USystem.h"
-#include "Core/UTexture.h"
-#include "Core/UViewport.h"
+#include "Core/UProperty.h"
+
+#include "Engine/UAudio.h"
+#include "Engine/UCanvas.h"
+#include "Engine/UConsole.h"
+#include "Engine/UEngine.h"
+#include "Engine/UFire.h"
+#include "Engine/UGesture.h"
+#include "Engine/ULevel.h"
+#include "Engine/UMesh.h"
+#include "Engine/UMusic.h"
+#include "Engine/UNet.h"
+#include "Engine/UPlayer.h"
+#include "Engine/URender.h"
+#include "Engine/USound.h"
+#include "Engine/UStaticMesh.h"
+#include "Engine/UTexture.h"
+#include "Engine/UViewport.h"
 
 #include "Actors/AActor.h"
 #include "Actors/ABrush.h"
@@ -77,11 +78,11 @@ bool UObject::StaticInit()
 {
   bool Result = true;
 
-  ObjectPool = Array<UObject*>();
-  ClassPool  = Array<UClass*> ();
-  NativePropertyLists = Array<FNativePropertyList*>();
-  NativeFunctions = Array<UFunction*>();
-  NameTable = Array<FNameEntry*>();
+  ObjectPool = TArray<UObject*>();
+  ClassPool  = TArray<UClass*> ();
+  NativePropertyLists = TArray<FNativePropertyList*>();
+  NativeFunctions = TArray<UFunction*>();
+  NameTable = TArray<FNameEntry*>();
 
   ObjectPool.Reserve( 64 );
   ClassPool.Reserve( 64 );
@@ -137,7 +138,7 @@ bool UObject::StaticInit()
   // (The only reason we have to do this is because Unreal does it, 
   // lets not do this if we add custom stuff in the future, it's not very elegant)
   // Expose the description property
-  EXPOSE_PROPERTY( UProperty, Description, UStrProperty, sizeof(String*), PROP_Ascii );
+  EXPOSE_PROPERTY( UProperty, Description, UStrProperty, sizeof(FString*), PROP_Ascii );
 
   // All previously created classes need their properties linked with Object
   ULanguage::StaticClass()->LinkSuperClassChildren();

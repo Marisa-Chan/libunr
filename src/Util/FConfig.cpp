@@ -336,7 +336,7 @@ int FConfig::Load( const char* Filename )
 int FConfig::Save()
 {
   FFileArchiveOut IniFile;
-  String Filename( Name );
+  FString Filename( Name );
 
   Filename += ".ini";
 

@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include "Core/UTexture.h"
+#include "Engine/UTexture.h"
 
 class DLL_EXPORT UFractalTexture : public UTexture
 {
@@ -123,7 +123,7 @@ class DLL_EXPORT UFireTexture : public UFractalTexture
   int   SparksLimit;
 
   int NumSparks;
-  Array<Spark>* Sparks;
+  TArray<Spark>* Sparks;
 
   int OldRenderHeat;
   u8  RenderTable[1028];

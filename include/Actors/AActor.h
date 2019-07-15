@@ -26,11 +26,11 @@
 #pragma once
 
 #include "Core/UMath.h"
-#include "Core/UMesh.h"
-#include "Core/URender.h"
-#include "Core/USkelAnim.h"
 #include "Core/UObject.h"
-#include "Core/UTexture.h"
+#include "Engine/UMesh.h"
+#include "Engine/URender.h"
+#include "Engine/USkelAnim.h"
+#include "Engine/UTexture.h"
 
 class APlayerReplicationInfo;
 class AProjector;

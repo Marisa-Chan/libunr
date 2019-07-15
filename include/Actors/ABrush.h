@@ -33,7 +33,7 @@ class DLL_EXPORT ABrush : public AActor
   EXPOSE_TO_USCRIPT()
 
   ABrush();
-  void ExportToLevelText( FileStreamOut* Out );
+  void ExportToLevelText( FFileArchiveOut* Out );
   virtual bool ExportToFile( const char* Dir, const char* Type );
 
   enum ECsgOper
@@ -133,7 +133,7 @@ class DLL_EXPORT AMover : public ABrush
   FRotator KeyRot[16];
   FVector  BasePos, OldPos, OldPrePivot, SavedPos;
   FRotator BaseRot, OldRot, SavedRot;
-  Array<int> NotifyLightMaps;
+  TArray<int> NotifyLightMaps;
 
   ANavigationPoint* MyMarker;
   AActor*   TriggerActor;

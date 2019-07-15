@@ -43,7 +43,7 @@ class DLL_EXPORT AHUD : public AActor
   FString* HUDConfigWindowType;
 
   AMenu* MainMenu;
-  Array<AHUDOverlay*>* Overlays;
+  TArray<AHUDOverlay*>* Overlays;
 
   // UT99 Variables
   FColor WhiteColor;

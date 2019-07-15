@@ -25,11 +25,11 @@
 
 #pragma once
 
-#include <libxstl/XMap.h>
+#include "Util/TMap.h"
 #include "Core/UClass.h"
-#include "Core/UEngine.h"
-#include "Core/UModel.h"
-#include "Core/UNet.h"
+#include "Engine/UEngine.h"
+#include "Engine/UModel.h"
+#include "Engine/UNet.h"
 
 struct DLL_EXPORT FReachSpec
 {
@@ -52,7 +52,7 @@ struct DLL_EXPORT FURL
   FString Host;
   FString Map;
   FString Portal;
-  Array<FString> Op;
+  TArray<FString> Op;
   int    Port;
   bool   bValid;
 };
@@ -62,7 +62,7 @@ class DLL_EXPORT ULevelBase : public UObject
   DECLARE_NATIVE_CLASS( ULevelBase, UObject, CLASS_Abstract | CLASS_NoExport, Engine )
   ULevelBase();
 
-  Array<AActor*> Actors;
+  TArray<AActor*> Actors;
 
   virtual void Load();
 
@@ -82,10 +82,10 @@ class DLL_EXPORT ULevel : public ULevelBase
   virtual void Load();
   virtual bool ExportToFile( const char* Dir, const char* Type );
 
-  Array<FReachSpec> ReachSpecs;
+  TArray<FReachSpec> ReachSpecs;
   UModel* Model;
   UTextBuffer* TextBlocks[16];
   double TimeSeconds;
-  Map<FString,FString> TravelInfo;
+  TMap<FString,FString> TravelInfo;
 };
 

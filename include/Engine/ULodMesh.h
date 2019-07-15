@@ -27,7 +27,7 @@
 
 #pragma once
 
-#include "Core/UMesh.h"
+#include "Engine/UMesh.h"
 
 // "James Mesh Types"
 // See http://paulbourke.net/dataformats/unreal/ for more info

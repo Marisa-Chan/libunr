@@ -31,8 +31,8 @@
 
 #include "Core/UObject.h"
 #include "Core/UPackage.h"
-#include "Core/USound.h"
 #include "Core/UMath.h"
+#include "Engine/USound.h"
 
 // Order is dictated by Engine.Bitmap.ETextureFormat
 // if this order is broken for some reason, that game

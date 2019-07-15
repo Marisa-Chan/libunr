@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include "Core/ULodMesh.h"
+#include "Engine/ULodMesh.h"
 
 class DLL_EXPORT USkeletalMesh : public ULodMesh
 {

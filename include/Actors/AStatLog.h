@@ -68,7 +68,7 @@ class DLL_EXPORT AStatLogFile : public AStatLog
   AStatLogFile();
 
   bool bWatermark;
-  Stream* LogAr;
+  FLogFile* LogAr;
 
   FString* StatLogFile;
   FString* StatLogFinal;

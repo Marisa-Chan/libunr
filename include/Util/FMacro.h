@@ -72,6 +72,7 @@
 #endif
 
 // pointer arithmetic helpers
+#include <stdint.h>
 #define PtrAdd(ptr1, ptr2) \
   (void*)((uintptr_t)ptr1 + (uintptr_t)ptr2)
   
@@ -93,9 +94,6 @@
 #define BLOCK_COPY_CTOR(cls) \
 private: \
   cls (const cls & copy); \
-
-#define DECLARE_FUNCTION_ALIAS(rettype, newf) \
-  FORCEINLINE rettype newf
 
 // Package version defs
 // Unreal Beta

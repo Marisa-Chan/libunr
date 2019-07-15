@@ -24,8 +24,7 @@
 */
 
 #include <signal.h>
-#include <libxstl/XBacktrace.h>
-#include "Core/FConfig.h"
+#include "Util/FConfig.h"
 #include "Core/USystem.h"
 #include "Core/UPackage.h"
 
@@ -45,7 +44,7 @@ static void SigsegvHandler( int sig, siginfo_t* si, void *raw_uctx )
 {
   ucontext_t* uctx = (ucontext_t*)raw_uctx;
 
-  Logf( LOG_CRIT, "CAUGHT SIGSEGV!!!" );
+  GLogf( LOG_CRIT, "CAUGHT SIGSEGV!!!" );
   DumpRegisters( &uctx->uc_mcontext, false, GLogFile );
   DumpBacktrace( &uctx->uc_mcontext, GLogFile );
 
@@ -143,7 +142,7 @@ const char* USystem::ResolvePath( const char* PkgName )
     }
 #endif
     perror("ResolvePath");
-    Logf( LOG_WARN, "Error resolving path '%s'", PkgName );
+    GLogf( LOG_WARN, "Error resolving path '%s'", PkgName );
   }
 
   return GoodPath;
@@ -190,7 +189,7 @@ bool USystem::PromptForGameInfo( char* InGameName )
     if ( i == Names->Size() )
     {
       // Didn't find the game they asked for, let them know
-      Logf( LOG_WARN, "Specified game '%s' does not exist", InGameName );
+      GLogf( LOG_WARN, "Specified game '%s' does not exist", InGameName );
       i = DoGamePrompt( Names );
     }
   }
@@ -253,7 +252,7 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool
   if ( IniStatus == ERR_FILE_NOT_EXIST )
   {
     // Create an ini if its missing
-    Logf( LOG_WARN, "Main ini file '%s' does not exist; creating one", LibunrIniPath );
+    GLogf( LOG_WARN, "Main ini file '%s' does not exist; creating one", LibunrIniPath );
 #if defined LIBUNR_POSIX
     String* ConfigLibunr = new String( GetHomeDir() );
     ConfigLibunr->Append( "/.config/libunr/" );
@@ -265,7 +264,7 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool
     const char* DefaultLibunrIniPath = GetDefaultLibunrIniPath();
     if ( !CopyFile( DefaultLibunrIniPath, LibunrIniPath ) )
     {
-      Logf( LOG_CRIT, "Default ini file '%s' does not exist; aborting", 
+      GLogf( LOG_CRIT, "Default ini file '%s' does not exist; aborting", 
           DefaultLibunrIniPath );
       return false;
     }
@@ -273,7 +272,7 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool
     // If we can't make a new one, fail
     if ( GLibunrConfig->Load( LibunrIniPath ) != 0 )
     {
-      Logf( LOG_CRIT, "Error creating new main ini file '%s'; aborting",
+      GLogf( LOG_CRIT, "Error creating new main ini file '%s'; aborting",
           LibunrIniPath );
       return false;
     }
@@ -281,7 +280,7 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool
   else if ( IniStatus != 0 )
   {
     // Something else went wrong with the ini file that already exists
-    Logf( LOG_CRIT, "Error parsing main ini file '%s'; aborting",
+    GLogf( LOG_CRIT, "Error parsing main ini file '%s'; aborting",
         LibunrIniPath );
     return false;
   }
@@ -294,13 +293,13 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool
   //      strnicmp( GSystem->AudioDevice, None ) == 0 )
   // {
   //   if ( !GSystem->PromptForDeviceInfo() )
-  //     Logf( LOG_WARN, "DoDevicePrompt() callback is not set" );
+  //     GLogf( LOG_WARN, "DoDevicePrompt() callback is not set" );
   // }
 
   // Get game info
   if ( !GSystem->PromptForGameInfo( InGameName ) )
   {
-    Logf( LOG_CRIT, "DoGamePrompt() callback is not set; aborting" );
+    GLogf( LOG_CRIT, "DoGamePrompt() callback is not set; aborting" );
     return false;
   }
   
@@ -316,7 +315,7 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool
   if ( chdir( GameSysPath.Data() ) < 0 )
 #endif
   {
-    Logf( LOG_WARN, "Game directory system folder '%s' does not exist; aborting (errno = %s)", GameSysPath.Data(), strerror( errno ) );
+    GLogf( LOG_WARN, "Game directory system folder '%s' does not exist; aborting (errno = %s)", GameSysPath.Data(), strerror( errno ) );
     return false;
   }
 
@@ -328,26 +327,26 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool
   IniStatus = GGameConfig->Load( GameCfgPath.Data() );
   if ( IniStatus == ERR_FILE_NOT_EXIST )
   {
-    Logf( LOG_WARN, "Game ini file '%s' does not exist; creating one", GameCfgPath.Data() );
+    GLogf( LOG_WARN, "Game ini file '%s' does not exist; creating one", GameCfgPath.Data() );
 
     // Create a new one from the default
     if ( !CopyFile( "Default.ini", GameCfgPath.Data() ) )
     {
-      Logf( LOG_CRIT, "Default game ini '%s' is missing; aborting", GameCfgPath.Data() );
+      GLogf( LOG_CRIT, "Default game ini '%s' is missing; aborting", GameCfgPath.Data() );
       return false;
     }
 
     // If we can't make a new one, fail
     if ( GGameConfig->Load( GameCfgPath.Data() ) != 0 )
     {
-      Logf( LOG_CRIT, "Error creating new game ini '%s'; aborting", GameCfgPath.Data() );
+      GLogf( LOG_CRIT, "Error creating new game ini '%s'; aborting", GameCfgPath.Data() );
       return false;
     }
   }
   else if ( IniStatus != 0 )
   {
     // Something else went wrong with the ini file that already exists
-    Logf( LOG_CRIT, "Error parsing game ini '%s'; aborting", GameCfgPath.Data() );
+    GLogf( LOG_CRIT, "Error parsing game ini '%s'; aborting", GameCfgPath.Data() );
     return false;
   }
   
@@ -398,13 +397,13 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool
 
     else if ( !CopyFile( "DefUser.ini", "User.ini" ) )
     {
-      Logf( LOG_CRIT, "Could not create new User.ini; aborting" );
+      GLogf( LOG_CRIT, "Could not create new User.ini; aborting" );
       return false;
     }
 
     if ( GUserConfig->Load( "User.ini" ) != 0 )
     {
-      Logf( LOG_CRIT, "Error creating new User.ini; aborting" );
+      GLogf( LOG_CRIT, "Error creating new User.ini; aborting" );
       return false;
     }
   }
@@ -452,14 +451,14 @@ bool USystem::CopyFile( const char* OrigFile, const char* NewFile )
   int Status = Orig.Open( OrigFile );
   if ( Status != 0 )
   {
-    Logf( LOG_WARN, "Copy operation failed: can't open original file '%s' (errno = %s)", OrigFile, strerror( Status ) );
+    GLogf( LOG_WARN, "Copy operation failed: can't open original file '%s' (errno = %s)", OrigFile, strerror( Status ) );
     return false;
   }
 
   Status = New.Open( NewFile );
   if ( Status != 0 )
   {
-    Logf( LOG_WARN, "Copy operation failed: can't create new file '%s' (errno = %s)", NewFile, strerror( Status ) );
+    GLogf( LOG_WARN, "Copy operation failed: can't create new file '%s' (errno = %s)", NewFile, strerror( Status ) );
     return false;
   }
 
@@ -583,7 +582,7 @@ bool USystem::MakeDir( const char* Path )
   size_t PathLen = strlen( Path );
   if ( PathLen >= 4096 )
   {
-    Logf( LOG_WARN, "Can't create directory '%s'; path is too long", Path );
+    GLogf( LOG_WARN, "Can't create directory '%s'; path is too long", Path );
     return false;
   }
   
@@ -631,7 +630,7 @@ bool USystem::MakeDir( const char* Path )
       {
         if ( !S_ISDIR(sb.st_mode) )
         {
-          Logf( LOG_WARN, "Failed to create directory '%s'; '%s' is a file",
+          GLogf( LOG_WARN, "Failed to create directory '%s'; '%s' is a file",
                 Path, CurrentPath );
           return false;
         }
@@ -646,7 +645,7 @@ bool USystem::MakeDir( const char* Path )
 	  #endif
         {
           int err = errno;
-          Logf( LOG_WARN, "Failed to create directory '%s'; couldn't create directory '%s'",
+          GLogf( LOG_WARN, "Failed to create directory '%s'; couldn't create directory '%s'",
                 Path, CurrentPath );
           return false;
         }
@@ -676,25 +675,25 @@ bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool bIsEdito
 
   if (sigaction(SIGSEGV, &sa, NULL) < 0)
   {
-    Logf( LOG_CRIT, "Failed to register SIGSEGV handler!\n");
+    GLogf( LOG_CRIT, "Failed to register SIGSEGV handler!\n");
     return false;
   }
 
   if ( UNLIKELY( !USystem::StaticInit( GPC, DPC, bIsEditor, GameName ) ) )
   {
-    Logf( LOG_CRIT, "USystem::StaticInit() failed!" );
+    GLogf( LOG_CRIT, "USystem::StaticInit() failed!" );
     return false;
   }
 
   if ( UNLIKELY( !UPackage::StaticInit() ) )
   {
-    Logf( LOG_CRIT, "UPackage::StaticInit() failed!" );
+    GLogf( LOG_CRIT, "UPackage::StaticInit() failed!" );
     return false;
   }
 
   if ( UNLIKELY( !UObject::StaticInit() ) )
   {
-    Logf( LOG_CRIT, "UObject::StaticInit() failed!" );
+    GLogf( LOG_CRIT, "UObject::StaticInit() failed!" );
     return false;
   } 
 

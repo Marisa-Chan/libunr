@@ -25,8 +25,8 @@
 
 #pragma once
 
-#include "Core/UPlayer.h"
 #include "Core/USystem.h"
+#include "Engine/UPlayer.h"
 
 class DLL_EXPORT UNetConnection : public UPlayer
 {
@@ -80,9 +80,9 @@ class DLL_EXPORT USecurityData : public UObject
     int IPAddress;
   };
 
-  Array<BanEntry>* BanList;
-  Array<TempBanEntry>* TempBanList;
-  Array<ClientLogEntry>* LogList;
+  TArray<BanEntry>* BanList;
+  TArray<TempBanEntry>* TempBanList;
+  TArray<ClientLogEntry>* LogList;
   int MaxIPLogLen;
 };
 

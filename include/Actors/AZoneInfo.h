@@ -25,8 +25,8 @@
 
 #pragma once
 
+#include "Engine/UMusic.h"
 #include "Actors/AActor.h"
-#include "Core/UMusic.h"
 
 class ASkyZoneInfo;
 
@@ -379,7 +379,7 @@ class DLL_EXPORT ALevelInfo : public AZoneInfo
   bool bCheckWalkSurfaces;
   ASpawnNotify* SpawnNotify;
   UClass* FootprintManager;
-  Array<UObject*>* ObjList;
+  TArray<UObject*>* ObjList;
   class ADynamicZoneInfo* DynamicZonesList;
   APlayerPawn* ReplicationTarget;
 

@@ -24,8 +24,9 @@
 */
 
 #pragma once
+
+#include "Engine/UGesture.h"
 #include "Actors/AActor.h"
-#include "Core/UGesture.h"
 #include "HPSS/UParticleList.h"
 
 class DLL_EXPORT AParticleFX : public AActor

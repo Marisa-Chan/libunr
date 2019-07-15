@@ -17,34 +17,28 @@
 \*===========================================================================*/
 
 /*========================================================================
- * UStaticMesh.h - 227 Static Mesh Class
+ * TStack.h - Template stack class helpers
  * 
  * written by Adam 'Xaleros' Smith
- * StaticMesh definitions from 227i public headers
  *========================================================================
 */
 
 #pragma once
-#include "Engine/UMesh.h"
+#include <stack>
+#include "Util/FMacro.h"
 
-enum EStaticMeshFlags
+using std::stack;
+template<class T> class TStack : public stack<T>
 {
-  SMFL_Masked      = 0x0001,
-  SMFL_Translucent = 0x0002,
-  SMFL_AlphaBlend  = 0x0004,
-  SMFL_Modulated   = 0x0008,
-  SMFL_MeshEnvMap  = 0x0010,
-  SMFL_Invisible   = 0x0020,
-  SMFL_NoCollision = 0x0040,
-  SMFL_TwoSided    = 0x0080,
-  SMFL_Unlit       = 0x0100
-};
+public:
+  TStack<T>() : stack<T>() {}
 
-class DLL_EXPORT UStaticMesh : public UMesh
-{
-  DECLARE_NATIVE_CLASS( UStaticMesh, UMesh, CLASS_NoExport, Engine )
-  UStaticMesh();
-
-  // TODO:
+  FORCEINLINE bool   Empty() const          { return stack<T>::empty(); }
+  FORCEINLINE void   Pop()                  { stack<T>::pop(); }
+  FORCEINLINE void   Push( const T& Value ) { stack<T>::push(Value); }
+  FORCEINLINE size_t Size() const           { return stack<T>::size(); }
+  FORCEINLINE void Swap( TStack<T>& x )     { stack<T>::swap(x); }
+  FORCEINLINE T& Top()                      { return stack<T>::top(); }
+  FORCEINLINE const T& Top() const          { return stack<T>::top(); }
 };
 

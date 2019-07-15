@@ -26,8 +26,8 @@
 #pragma once
 
 #include "Core/UMath.h"
-#include "Core/UTexture.h"
-#include "Core/UViewport.h"
+#include "Engine/UTexture.h"
+#include "Engine/UViewport.h"
 #include "Actors/AActor.h"
 
 class DLL_EXPORT UCanvas : public UObject

@@ -995,10 +995,9 @@ void UClass::PostLoad()
 
         // Copy property values from SuperClass default object
         if ( LIKELY( SuperClass != NULL ) )
-          xstl::Copy( PtrAdd( QueuedClass->Default, UObject::StaticClass()->StructSize ),
-                      QueuedClass->SuperClass->StructSize - UObject::StaticClass()->StructSize,
-                      PtrAdd( QueuedClass->SuperClass->Default, UObject::StaticClass()->StructSize ),
-                      QueuedClass->SuperClass->StructSize - UObject::StaticClass()->StructSize );
+          memcpy( PtrAdd( QueuedClass->Default, UObject::StaticClass()->StructSize ),
+                  PtrAdd( QueuedClass->SuperClass->Default, UObject::StaticClass()->StructSize ),
+                  QueuedClass->SuperClass->StructSize - UObject::StaticClass()->StructSize );
 
         QueuedClass->Default->ReadDefaultProperties();
         QueuedClass->Default->PkgFile = NULL;
@@ -1098,7 +1097,7 @@ void UClass::LinkSuperClassChildren()
   }
 }
 
-Queue<UClass*> UClass::DefPropQueue;
+TQueue<UClass*> UClass::DefPropQueue;
 
 IMPLEMENT_NATIVE_CLASS( UField );
   IMPLEMENT_NATIVE_CLASS( UConst );

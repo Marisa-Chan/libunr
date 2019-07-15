@@ -156,9 +156,9 @@ class DLL_EXPORT UPackage : public UObject
   FNameEntry*     GetNameEntryByObjRef( int ObjRef );
   FExport*        GetExportByName( size_t Name );
   FExport*        GetClassExport( const char* ExportName );
-  std::vector<FNameEntry>& GetNameTable();
-  std::vector<FExport>& GetExportTable();
-  std::vector<FImport>& GetImportTable();
+  TArray<FNameEntry>& GetNameTable();
+  TArray<FExport>& GetExportTable();
+  TArray<FImport>& GetImportTable();
   u32             GetGlobalName( u32 PkgNameIdx );
   const char*     GetFilePath();
   const char*     GetFileName();
@@ -186,15 +186,15 @@ class DLL_EXPORT UPackage : public UObject
 
 protected:    
   FString Path;
-  std::vector<FNameEntry> Names;
-  std::vector<FExport>    Exports;
-  std::vector<FImport>    Imports;
+  TArray<FNameEntry> Names;
+  TArray<FExport>    Exports;
+  TArray<FImport>    Imports;
   FFileArchive* Stream;
   UPackageHeader Header;
   u32 NameTableStart; // The index at which this package's name table appears in the global name table
 
   // Global package variables
   static EPkgLoadOpts LoadOpts;
-  static std::vector<UPackage*>* Packages;
+  static TArray<UPackage*>* Packages;
 };
 

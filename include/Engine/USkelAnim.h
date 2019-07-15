@@ -27,7 +27,7 @@
 
 #include "Core/UObject.h"
 #include "Core/UMath.h"
-#include "Core/USkelMesh.h"
+#include "Engine/USkelMesh.h"
 
 class AActor;
 

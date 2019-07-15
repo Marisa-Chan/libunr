@@ -99,7 +99,7 @@ class DLL_EXPORT ATcpLink : public AInternetLink
 
   IpAddr RemoteAddr;
   UClass* AcceptClass;
-  Array<u8>* SendFIFO;
+  TArray<u8>* SendFIFO;
 
   // Native functions
   bool BindPort( int Port, bool bUseNextAvailable );

@@ -29,7 +29,7 @@
 #include "Util/FHash.h"
 #include "Util/FName.h"
 #include "Util/TArray.h"
-#include <stack>
+#include "Util/TStack.h"
 
 // Flags for loading objects.
 enum ELoadFlags
@@ -390,7 +390,7 @@ bool cls::StaticLinkNativeProperties() \
   { \
     UClass* ExpCls = cls::StaticClass(); \
     ptype* ExpProp = (ptype*)ptype::StaticClass()->CreateObject(); \
-    ExpProp->std::vectorDim = 1; \
+    ExpProp->ArrayDim = 1; \
     ExpProp->ElementSize = size; \
     ExpProp->PropertyFlags = CPF_Native; \
     ExpProp->Outer = ExpCls; \
@@ -491,7 +491,7 @@ public:
 
 protected:
   int RefCnt;
-  std::stack<size_t>* OldPkgFileOffsets;
+  TStack<size_t>* OldPkgFileOffsets;
 
   static bool bStaticBootstrapped;
 };

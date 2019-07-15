@@ -25,10 +25,10 @@
 
 #pragma once
 
-#include "Core/UAudio.h"
-#include "Core/URender.h"
 #include "Core/USystem.h"
 #include "Core/UPrimitive.h"
+#include "Engine/UAudio.h"
+#include "Engine/URender.h"
 
 class DLL_EXPORT UClient : public UObject
 {

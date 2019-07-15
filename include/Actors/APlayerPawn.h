@@ -25,8 +25,8 @@
 
 #pragma once
 
+#include "Engine/UPlayer.h"
 #include "Actors/APawn.h"
-#include "Core/UPlayer.h"
 
 class DLL_EXPORT APlayerPawn : public APawn
 {

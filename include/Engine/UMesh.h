@@ -26,7 +26,7 @@
 #pragma once
 
 #include "Core/UPrimitive.h"
-#include "Core/UTexture.h"
+#include "Engine/UTexture.h"
 
 class AActor;
 

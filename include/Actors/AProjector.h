@@ -41,8 +41,8 @@ class DLL_EXPORT AProjector : public AActor
   void DeattachAllActors();
 
   FPlane FrustrumPlanes[6];
-  Array<AActor*> DecalActors;
-  Array<int>     DecalNodes;
+  TArray<AActor*> DecalActors;
+  TArray<int>     DecalNodes;
   FBox           Box;
   FVector        VisBox[8];
   void*          TexData;

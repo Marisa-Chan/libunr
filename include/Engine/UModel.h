@@ -26,7 +26,7 @@
 #pragma once
 
 #include "Core/UPrimitive.h"
-#include "Core/UTexture.h"
+#include "Engine/UTexture.h"
 
 // 227i limits
 #define MAX_NODES  131072
@@ -103,20 +103,20 @@ enum EPolyFlags
 struct FProjector
 {
   class AProjector* Projector;
-  Array<int> Nodes;
+  TArray<int> Nodes;
 };
 
 struct FDecal
 {
   FVector Vertices[4];
   class ADecal* Decal;
-  Array<int> Nodes;
+  TArray<int> Nodes;
 };
 
 struct DLL_EXPORT FPoly
 {
   friend FPackageFileIn& operator>>( FPackageFileIn& Ar, FPoly& P );
-  void ExportToLevelText( FileStreamOut* Out );
+  void ExportToLevelText( FFileArchiveOut* Out );
 
   FVector Base;
   FVector Normal;
@@ -139,9 +139,9 @@ class DLL_EXPORT UPolys : public UObject
   UPolys();
 
   virtual void Load();
-  void ExportToLevelText( FileStreamOut* Out );
+  void ExportToLevelText( FFileArchiveOut* Out );
 
-  Array<FPoly> Element;
+  TArray<FPoly> Element;
 };
 
 struct DLL_EXPORT FBspNode
@@ -184,9 +184,9 @@ struct DLL_EXPORT FBspSurf
   i16 PanU;
   i16 PanV;
   class ABrush* Brush;
-  Array<FDecal> Decals;
-  Array<FProjector> Projectors;
-  Array<int> Nodes;
+  TArray<FDecal> Decals;
+  TArray<FProjector> Projectors;
+  TArray<int> Nodes;
 };
 
 struct DLL_EXPORT FLightMapIndex
@@ -263,7 +263,7 @@ class DLL_EXPORT UVectors : public UObject
 
   virtual void Load();
 
-  Array<FVector>* Data;
+  TArray<FVector>* Data;
 };
 
 /*-----------------------------------------------------------------------------
@@ -277,7 +277,7 @@ class DLL_EXPORT UBspNodes : public UObject
 
   virtual void Load();
 
-  Array<FBspNode>* Data;
+  TArray<FBspNode>* Data;
 };
 
 /*-----------------------------------------------------------------------------
@@ -291,7 +291,7 @@ class DLL_EXPORT UBspSurfs : public UObject
 
   virtual void Load();
 
-  Array<FBspSurf>* Data;
+  TArray<FBspSurf>* Data;
 };
 
 /*-----------------------------------------------------------------------------
@@ -305,7 +305,7 @@ class DLL_EXPORT UVerts : public UObject
 
   virtual void Load();
 
-  Array<FVert>* Data;
+  TArray<FVert>* Data;
 };
 
 /*-----------------------------------------------------------------------------
@@ -320,17 +320,17 @@ class DLL_EXPORT UModel : public UPrimitive
   virtual void Load();
 
   UPolys* Polys;
-  Array<FBspNode> Nodes;
-  Array<FVert>    Verts;
-  Array<FVector>  Vectors;
-  Array<FVector>  Points;
-  Array<FBspSurf> Surfs;
-  Array<FLightMapIndex> LightMap;
-  Array<u8> LightBits;
-  Array<FBox>  Bounds;
-  Array<int>   LeafHulls;
-  Array<FLeaf> Leaves;
-  Array<AActor*> Lights;
+  TArray<FBspNode> Nodes;
+  TArray<FVert>    Verts;
+  TArray<FVector>  Vectors;
+  TArray<FVector>  Points;
+  TArray<FBspSurf> Surfs;
+  TArray<FLightMapIndex> LightMap;
+  TArray<u8> LightBits;
+  TArray<FBox>  Bounds;
+  TArray<int>   LeafHulls;
+  TArray<FLeaf> Leaves;
+  TArray<AActor*> Lights;
 
   bool RootOutside;
   bool Linked;

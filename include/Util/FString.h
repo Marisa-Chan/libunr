@@ -30,142 +30,134 @@ class FName;
 class FPackageFileIn;
 class FPackageFileOut;
 
-typedef std::string String;
-class FString : public String
+using std::string;
+class FString : public string
 {
 public:
-  FString() : String() {}
-  FString( const String& Str ) : String( Str ) {}
-  FString( const String& Str, size_t Pos, size_t Len = MAX_SIZE )
-    : String( Str, Pos, Len ) {}
+  FString() : string() {}
+  FString( const string& Str ) : string( Str ) {}
+  FString( const string& Str, size_t Pos, size_t Len = MAX_SIZE )
+    : string( Str, Pos, Len ) {}
   FString( const FString& Str )
-    : String( (String&)Str ) {}
+    : string( (string&)Str ) {}
   FString( const FString& Str, size_t Pos, size_t Len = MAX_SIZE )
-    : String( (String&)Str, Pos, Len ) {}
-  FString( const char* s ) : String( s ) {}
-  FString( const char* s, size_t n ) : String( s, n ) {}
-  FString( size_t n, char c ) : String( n, c ) {}
-  FString( int I ) : String( std::to_string( (int)I )) {}
-  FString( i64 I ) : String( std::to_string( (i64)I )) {}
-  FString( u32 U ) : String( std::to_string( (u32)U )) {}
-  FString( u64 U ) : String( std::to_string( (u64)U )) {}
-  FString( float F ) : String( std::to_string( (float)F )) {}
-  FString( double D ) : String( std::to_string( (double)D )) {}
-  FString( bool B ) : String( std::to_string( (bool)B )) {}
+    : string( (string&)Str, Pos, Len ) {}
+  FString( const char* s ) : string( s ) {}
+  FString( const char* s, size_t n ) : string( s, n ) {}
+  FString( size_t n, char c ) : string( n, c ) {}
+  FString( int I ) : string( std::to_string( (int)I )) {}
+  FString( i64 I ) : string( std::to_string( (i64)I )) {}
+  FString( u32 U ) : string( std::to_string( (u32)U )) {}
+  FString( u64 U ) : string( std::to_string( (u64)U )) {}
+  FString( float F ) : string( std::to_string( (float)F )) {}
+  FString( double D ) : string( std::to_string( (double)D )) {}
+  FString( bool B ) : string( std::to_string( (bool)B )) {}
 
-  using std::string::size;
-  using std::string::length;
-  using std::string::resize;
-  using std::string::capacity;
-  using std::string::empty;
-  using std::string::reserve;
-  using std::string::shrink_to_fit;
-  using std::string::at;
-  using std::string::front;
-  using std::string::back;
-  using std::string::data;
-  using std::string::append;
-  using std::string::insert;
-  using std::string::erase;
-  using std::string::replace;
-  using std::string::swap;
-  using std::string::pop_back;
-  using std::string::push_back;
-  using std::string::find;
-  using std::string::rfind;
-  using std::string::find_first_of;
-  using std::string::find_last_of;
-  using std::string::find_first_not_of;
-  using std::string::find_last_not_of;
-  using std::string::substr;
-
-  DECLARE_FUNCTION_ALIAS( size_t, Size )() const { return size(); }
-  DECLARE_FUNCTION_ALIAS( size_t, Length )() const { return length(); }
-  DECLARE_FUNCTION_ALIAS( void, Resize )( size_t n ) { resize( n ); }
-  DECLARE_FUNCTION_ALIAS( void, Resize )( size_t n, char c ) { resize( n, c ); }
-  DECLARE_FUNCTION_ALIAS( size_t, Capacity )() const { return capacity(); }
-  DECLARE_FUNCTION_ALIAS( bool, IsEmpty )() const { return empty(); }
-  DECLARE_FUNCTION_ALIAS( void, Reserve )( size_t n ) { reserve( n ); }
-  DECLARE_FUNCTION_ALIAS( void, Reclaim )() { shrink_to_fit(); }
+  FORCEINLINE size_t Size() const             { return string::size(); }
+  FORCEINLINE size_t Length() const           { return string::length(); }
+  FORCEINLINE void Resize( size_t n )         { string::resize( n ); }
+  FORCEINLINE void Resize( size_t n, char c ) { string::resize( n, c ); }
+  FORCEINLINE size_t Capacity() const         { return string::capacity(); }
+  FORCEINLINE bool IsEmpty() const            { return string::empty(); }
+  FORCEINLINE void Reserve( size_t n )        { string::reserve( n ); }
+  FORCEINLINE void Reclaim()                  { string::shrink_to_fit(); }
   
-  DECLARE_FUNCTION_ALIAS( char, At )( size_t n ) { return at( n ); }
-  DECLARE_FUNCTION_ALIAS( char, Front )() { return front(); }
-  DECLARE_FUNCTION_ALIAS( char, Back )() { return back(); }
-  DECLARE_FUNCTION_ALIAS( char*, Data )() { return (char*)data(); }
+  FORCEINLINE char At( size_t n ) { return string::at( n ); }
+  FORCEINLINE char Front()        { return string::front(); }
+  FORCEINLINE char Back()         { return string::back(); }
+  FORCEINLINE char* Data()        { return (char*)string::data(); }
   
-  DECLARE_FUNCTION_ALIAS( const char, At )( size_t n ) const { return at( n ); }
-  DECLARE_FUNCTION_ALIAS( const char, Front )() const { return front(); }
-  DECLARE_FUNCTION_ALIAS( const char, Back )() const { return back(); }
-  DECLARE_FUNCTION_ALIAS( const char*, Data )() const { return data(); }
+  FORCEINLINE const char At( size_t n ) const { return string::at( n ); }
+  FORCEINLINE const char Front() const        { return string::front(); }
+  FORCEINLINE const char Back() const         { return string::back(); }
+  FORCEINLINE const char* Data() const        { return string::data(); }
 
-  DECLARE_FUNCTION_ALIAS( FString&, Append )( const FString& Str )       { append( Str ); return *this; }
-  DECLARE_FUNCTION_ALIAS( FString&, Append )( const FString& Str, size_t SubPos, size_t SubLen = MAX_SIZE ) 
-    { append ( Str, SubPos, SubLen ); return *this; }
-  DECLARE_FUNCTION_ALIAS( FString&, Append )( const char* s )           { append ( s ); return *this; }
-  DECLARE_FUNCTION_ALIAS( FString&, Append )( const char* s, size_t n ) { append( s, n ); return *this; }
-  DECLARE_FUNCTION_ALIAS( FString&, Append )( size_t n, char c )        { append( n, c ); return *this; }
+  FORCEINLINE FString& Append( const FString& Str )
+    { string::append( Str ); return *this; }
+  FORCEINLINE FString& Append( const FString& Str, size_t SubPos, size_t SubLen = MAX_SIZE ) 
+    { string::append ( Str, SubPos, SubLen ); return *this; }
+  FORCEINLINE FString& Append( const char* s )
+    { string::append ( s ); return *this; }
+  FORCEINLINE FString& Append( const char* s, size_t n )
+    { string::append( s, n ); return *this; }
+  FORCEINLINE FString& Append( size_t n, char c )
+    { string::append( n, c ); return *this; }
   
-  DECLARE_FUNCTION_ALIAS( void, PushBack )( char c ) { push_back( c ); }
+  FORCEINLINE void PushBack( char c ) { string::push_back( c ); }
   
-  DECLARE_FUNCTION_ALIAS( FString&, Assign )( const FString& Str )       { assign( Str ); return *this; }
-  DECLARE_FUNCTION_ALIAS( FString&, Assign )( const FString& Str, size_t SubPos, size_t SubLen = MAX_SIZE )
-    { assign( Str, SubPos, SubLen ); return *this; }
+  FORCEINLINE FString& Assign( const FString& Str )
+    { string::assign( Str ); return *this; }
+  FORCEINLINE FString& Assign( const FString& Str, size_t SubPos, size_t SubLen = MAX_SIZE )
+    { string::assign( Str, SubPos, SubLen ); return *this; }
+  FORCEINLINE FString& Assign( const char* s )
+    { string::assign( s ); return *this; }
+  FORCEINLINE FString& Assign( const char* s, size_t n )
+    { string::assign( s, n ); return *this; }
+  FORCEINLINE FString& Assign( size_t n, char c )
+    { string::assign( n, c ); return *this; }
 
-  DECLARE_FUNCTION_ALIAS( FString&, Assign )( const char* s )           { assign( s ); return *this; }
-  DECLARE_FUNCTION_ALIAS( FString&, Assign )( const char* s, size_t n ) { assign( s, n ); return *this; }
-  DECLARE_FUNCTION_ALIAS( FString&, Assign )( size_t n, char c )        { assign( n, c ); return *this; }
-  DECLARE_FUNCTION_ALIAS( FString&, Insert )( size_t Pos, const FString& Str )        { insert( Pos, Str ); return *this; }
-  DECLARE_FUNCTION_ALIAS( FString&, Insert )( size_t Pos, const FString& Str, size_t SubPos, size_t SubLen )
-    { insert( Pos, Str, SubPos, SubLen ); return *this; }
-
-
-  DECLARE_FUNCTION_ALIAS( FString&, Insert )( size_t Pos, const char* s )            { insert( Pos, s ); return *this; }
-  DECLARE_FUNCTION_ALIAS( FString&, Insert )( size_t Pos, const char* s, size_t n )  { insert( Pos, s, n ); return *this; }
-  DECLARE_FUNCTION_ALIAS( FString&, Insert )( size_t Pos, size_t n, char c )         { insert( Pos, n, c ); return *this; }
+  FORCEINLINE FString& Insert( size_t Pos, const FString& Str )
+    { string::insert( Pos, Str ); return *this; }
+  FORCEINLINE FString& Insert( size_t Pos, const FString& Str, size_t SubPos, size_t SubLen )
+    { string::insert( Pos, Str, SubPos, SubLen ); return *this; }
+  FORCEINLINE FString& Insert( size_t Pos, const char* s )
+    { string::insert( Pos, s ); return *this; }
+  FORCEINLINE FString& Insert( size_t Pos, const char* s, size_t n )
+    { string::insert( Pos, s, n ); return *this; }
+  FORCEINLINE FString& Insert( size_t Pos, size_t n, char c )
+    { string::insert( Pos, n, c ); return *this; }
   
-  DECLARE_FUNCTION_ALIAS( FString&, Erase )( size_t Pos = 0, size_t Len = MAX_SIZE ) { erase( Pos, Len ); return *this; }
+  FORCEINLINE FString& Erase( size_t Pos = 0, size_t Len = MAX_SIZE )
+    { erase( Pos, Len ); return *this; }
     
-  DECLARE_FUNCTION_ALIAS( FString&, Replace )( size_t Pos, size_t Len, const String& Str ){ replace( Pos, Len, Str ); return *this; }
-  DECLARE_FUNCTION_ALIAS( FString&, Replace )( size_t Pos, size_t Len, const String& Str, size_t SubPos, size_t SubLen ) { replace( Pos, Len, Str, SubPos, SubLen ); return *this; }
-  DECLARE_FUNCTION_ALIAS( FString&, Replace )( size_t Pos, size_t Len, const char* s )                   { replace( Pos, Len, s ); return *this; }
-  DECLARE_FUNCTION_ALIAS( FString&, Replace )( size_t Pos, size_t Len, const char* s, size_t n )         { replace( Pos, Len, s, n ); return *this; }
-  DECLARE_FUNCTION_ALIAS( FString&, Replace )( size_t Pos, size_t Len, size_t n, char c )                { replace( Pos, Len, n, c ); return *this; } 
+  FORCEINLINE FString& Replace( size_t Pos, size_t Len, const string& Str )
+    { string::replace( Pos, Len, Str ); return *this; }
+  FORCEINLINE FString& Replace( size_t Pos, size_t Len, const string& Str, size_t SubPos, size_t SubLen )
+    { string::replace( Pos, Len, Str, SubPos, SubLen ); return *this; }
+  FORCEINLINE FString& Replace( size_t Pos, size_t Len, const char* s )
+    { string::replace( Pos, Len, s ); return *this; }
+  FORCEINLINE FString& Replace( size_t Pos, size_t Len, const char* s, size_t n )
+    { string::replace( Pos, Len, s, n ); return *this; }
+  FORCEINLINE FString& Replace( size_t Pos, size_t Len, size_t n, char c )
+    { string::replace( Pos, Len, n, c ); return *this; } 
 
-  FORCEINLINE void Swap( FString& Str ) { swap( Str ); }
+  FORCEINLINE void Swap( FString& Str ) { string::swap( Str ); }
   
-  FORCEINLINE void PopBack() { pop_back(); }
+  FORCEINLINE void PopBack() { string::pop_back(); }
   
-  FORCEINLINE size_t Find( const FString& Str, size_t Pos = 0 )  { return find( Str, Pos ); }
-  FORCEINLINE size_t Find( const char* s, size_t Pos = 0 )       { return find( s, Pos ); }
-  FORCEINLINE size_t Find( const char* s, size_t Pos, size_t n ) { return find( s, Pos, n ); }
-  FORCEINLINE size_t Find( char  c, size_t Pos = 0 )             { return find( c, Pos ); }
+  FORCEINLINE size_t Find( const FString& Str, size_t Pos = 0 )  { return string::find( Str, Pos ); }
+  FORCEINLINE size_t Find( const char* s, size_t Pos = 0 )       { return string::find( s, Pos ); }
+  FORCEINLINE size_t Find( const char* s, size_t Pos, size_t n ) { return string::find( s, Pos, n ); }
+  FORCEINLINE size_t Find( char  c, size_t Pos = 0 )             { return string::find( c, Pos ); }
   
-  FORCEINLINE size_t RFind( const FString& Str, size_t Pos = 0 )  { return rfind( Str, Pos ); }
-  FORCEINLINE size_t RFind( const char* s, size_t Pos = 0 )       { return rfind( s, Pos ); }
-  FORCEINLINE size_t RFind( const char* s, size_t Pos, size_t n ) { return rfind( s, Pos, n ); }
-  FORCEINLINE size_t RFind( char  c, size_t Pos = 0 )             { return rfind( c, Pos ); }
+  FORCEINLINE size_t RFind( const FString& Str, size_t Pos = 0 )  { return string::rfind( Str, Pos ); }
+  FORCEINLINE size_t RFind( const char* s, size_t Pos = 0 )       { return string::rfind( s, Pos ); }
+  FORCEINLINE size_t RFind( const char* s, size_t Pos, size_t n ) { return string::rfind( s, Pos, n ); }
+  FORCEINLINE size_t RFind( char  c, size_t Pos = 0 )             { return string::rfind( c, Pos ); }
   
-  FORCEINLINE size_t FindFirstOf( const FString& Str, size_t Pos = 0 )  { return find_first_of( Str, Pos ); }
-  FORCEINLINE size_t FindFirstOf( const char* s, size_t Pos = 0 )       { return find_first_of( s, Pos ); }
-  FORCEINLINE size_t FindFirstOf( const char* s, size_t Pos, size_t n ) { return find_first_of( s, Pos, n ); }
-  FORCEINLINE size_t FindFirstOf( char  c, size_t Pos = 0 )             { return find_first_of( c, Pos ); }
+  FORCEINLINE size_t FindFirstOf( const FString& Str, size_t Pos = 0 )  { return string::find_first_of( Str, Pos ); }
+  FORCEINLINE size_t FindFirstOf( const char* s, size_t Pos = 0 )       { return string::find_first_of( s, Pos ); }
+  FORCEINLINE size_t FindFirstOf( const char* s, size_t Pos, size_t n ) { return string::find_first_of( s, Pos, n ); }
+  FORCEINLINE size_t FindFirstOf( char  c, size_t Pos = 0 )             { return string::find_first_of( c, Pos ); }
  
-  FORCEINLINE size_t FindLastOf( const FString& Str, size_t Pos = -1 )  { return find_last_of( Str, Pos ); }
-  FORCEINLINE size_t FindLastOf( const char* s, size_t Pos = -1 )       { return find_last_of( s, Pos ); }
-  FORCEINLINE size_t FindLastOf( const char* s, size_t Pos, size_t n )  { return find_last_of( s, Pos, n ); }
-  FORCEINLINE size_t FindLastOf( char  c, size_t Pos = -1 )             { return find_last_of( c, Pos ); }
+  FORCEINLINE size_t FindLastOf( const FString& Str, size_t Pos = -1 )  { return string::find_last_of( Str, Pos ); }
+  FORCEINLINE size_t FindLastOf( const char* s, size_t Pos = -1 )       { return string::find_last_of( s, Pos ); }
+  FORCEINLINE size_t FindLastOf( const char* s, size_t Pos, size_t n )  { return string::find_last_of( s, Pos, n ); }
+  FORCEINLINE size_t FindLastOf( char  c, size_t Pos = -1 )             { return string::find_last_of( c, Pos ); }
  
-  FORCEINLINE size_t FindFirstNotOf( const FString& Str, size_t Pos = 0 )  { return find_first_not_of( Str, Pos ); }
-  FORCEINLINE size_t FindFirstNotOf( const char* s, size_t Pos = 0 )       { return find_first_not_of( s, Pos ); }
-  FORCEINLINE size_t FindFirstNotOf( const char* s, size_t Pos, size_t n ) { return find_first_not_of( s, Pos, n ); }
-  FORCEINLINE size_t FindFirstNotOf( char  c, size_t Pos = 0 )             { return find_first_not_of( c, Pos ); }
+  FORCEINLINE size_t FindFirstNotOf( const FString& Str, size_t Pos = 0 )  { return string::find_first_not_of( Str, Pos ); }
+  FORCEINLINE size_t FindFirstNotOf( const char* s, size_t Pos = 0 )       { return string::find_first_not_of( s, Pos ); }
+  FORCEINLINE size_t FindFirstNotOf( const char* s, size_t Pos, size_t n ) { return string::find_first_not_of( s, Pos, n ); }
+  FORCEINLINE size_t FindFirstNotOf( char  c, size_t Pos = 0 )             { return string::find_first_not_of( c, Pos ); }
  
-  FORCEINLINE size_t FindLastNotOf( const FString& Str, size_t Pos = -1 )  { return find_last_not_of( Str, Pos ); }
-  FORCEINLINE size_t FindLastNotOf( const char* s, size_t Pos = -1 )       { return find_last_not_of( s, Pos ); }
-  FORCEINLINE size_t FindLastNotOf( const char* s, size_t Pos, size_t n )  { return find_last_not_of( s, Pos, n ); }  
-  FORCEINLINE size_t FindLastNotOf( char  c, size_t Pos = -1 )             { return find_last_not_of( c, Pos ); }
+  FORCEINLINE size_t FindLastNotOf( const FString& Str, size_t Pos = -1 )  { return string::find_last_not_of( Str, Pos ); }
+  FORCEINLINE size_t FindLastNotOf( const char* s, size_t Pos = -1 )       { return string::find_last_not_of( s, Pos ); }
+  FORCEINLINE size_t FindLastNotOf( const char* s, size_t Pos, size_t n )  { return string::find_last_not_of( s, Pos, n ); }  
+  FORCEINLINE size_t FindLastNotOf( char  c, size_t Pos = -1 )             { return string::find_last_not_of( c, Pos ); }
    
-  FORCEINLINE String Substr( size_t Pos = 0, size_t Len = MAX_SIZE ) const { return FString( substr( Pos, Len ) ); }
+  FORCEINLINE string Substr( size_t Pos = 0, size_t Len = MAX_SIZE ) const 
+    { return FString( string::substr( Pos, Len ) ); }
+  
   FORCEINLINE void ReplaceChars( char Old, char New )
   {
     for (std::string::iterator it = begin(); it != end(); ++it)
@@ -176,13 +168,13 @@ public:
   }
 
   FString& operator+=( const FString& Str );
-  FString& operator+=( const String& Str );
+  FString& operator+=( const string& Str );
   FString& operator+=( const char* s );
   FString& operator+=( char c );
   FString& operator+=( FName Name );
  
   FString operator+( const FString& Str ) const;
-  FString operator+( const String& Str ) const;
+  FString operator+( const string& Str ) const;
   FString operator+( const char* s ) const;
   FString operator+( char c ) const;
   FString& operator+( FName Name );
@@ -193,19 +185,19 @@ public:
   friend bool operator==( const FString& lhs, const FString& rhs );
   friend bool operator==( const char* lhs,    const FString& rhs );
   friend bool operator==( const FString& lhs, const char*   rhs );
-  friend bool operator==( const FString& lhs, const String& rhs );
-  friend bool operator==( const String& lhs,  const FString& rhs );
+  friend bool operator==( const FString& lhs, const string& rhs );
+  friend bool operator==( const string& lhs,  const FString& rhs );
 
   friend bool operator!=( const FString& lhs, const FString& rhs );
   friend bool operator!=( const char* lhs,    const FString& rhs );
   friend bool operator!=( const FString& lhs, const char*   rhs );
-  friend bool operator!=( const FString& lhs, const String& rhs );
-  friend bool operator!=( const String& lhs,  const FString& rhs );
+  friend bool operator!=( const FString& lhs, const string& rhs );
+  friend bool operator!=( const string& lhs,  const FString& rhs );
 };
   
-FString operator+( const char* lhs, const String& rhs );
+FString operator+( const char* lhs, const string& rhs );
 FString operator+( const char* lhs, const FString& rhs );
-FString operator+( char lhs, const String& rhs );
+FString operator+( char lhs, const string& rhs );
 FString operator+( char lhs, const FString& rhs );
 
 #ifndef __MINGW64__

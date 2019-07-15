@@ -34,10 +34,10 @@ class DLL_EXPORT UGesture : public UObject
 
   UGesture();
 
-  float CompareGesture( Array<FVector>* InMousePoints, float Accuracy );
+  float CompareGesture( TArray<FVector>* InMousePoints, float Accuracy );
   float CompareGesturePoint( FVector InMousePoint, float Accuracy );
 
-  Array<FVector>* Points;
-  Array<int>*     Segments;
+  TArray<FVector>* Points;
+  TArray<int>*     Segments;
 };
 

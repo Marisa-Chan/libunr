@@ -34,7 +34,7 @@ class DLL_EXPORT FFileArchive : public FArchive
 {
 public:
   virtual int Open( const char* Filename );
-  virtual int Open( const String& Filename );
+  virtual int Open( const FString& Filename );
   virtual void Close();
   
   virtual size_t Read( void* Dest, size_t Len );
@@ -59,7 +59,7 @@ class DLL_EXPORT FFileArchiveIn : public FFileArchive
 {
 public:
   virtual int Open( const char* Filename );
-  virtual int Open( const String& Filename );
+  virtual int Open( const FString& Filename );
 };
 
 /*-----------------------------------------------------------------------------
@@ -70,6 +70,6 @@ class DLL_EXPORT FFileArchiveOut : public FFileArchive
 {
 public:
   virtual int Open( const char* Filename );
-  virtual int Open( const String& Filename );
+  virtual int Open( const FString& Filename );
 };
 

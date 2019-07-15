@@ -85,7 +85,7 @@ bool UProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8 Ty
   bool Ret = false;
   if ( Type != PropertyType )
   {
-    Logf( LOG_CRIT, "Default property '%s' expected '%s' but got '%s'", 
+    GLogf( LOG_CRIT, "Default property '%s' expected '%s' but got '%s'", 
         Name.Data(), PropNames[Type], Class->Name.Data() );
     return false;
   }
@@ -308,7 +308,7 @@ bool UStrProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8
     case PROP_FString:
       break;
     default:
-      Logf( LOG_CRIT, "Default property expected '%s' but got 'StrProperty'", PropNames[Type] );
+      GLogf( LOG_CRIT, "Default property expected '%s' but got 'StrProperty'", PropNames[Type] );
       return true;
   }
 
@@ -506,7 +506,7 @@ bool UStructProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int
     }
     else if ( !Child->IsA( UEnum::StaticClass() ) )
     {
-      Logf( LOG_CRIT, "Pure struct of type '%s' has a bad child type of '%s'", Struct->Name, Child->Class->Name );
+      GLogf( LOG_CRIT, "Pure struct of type '%s' has a bad child type of '%s'", Struct->Name, Child->Class->Name );
       return false;
     }
 
@@ -521,7 +521,7 @@ bool UStructProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In,
   // Check if type in default property list matches
   if ( Type != PropertyType )
   {
-    Logf( LOG_CRIT, "Default property expected '%s' but got 'StructProperty'", PropNames[Type] );
+    GLogf( LOG_CRIT, "Default property expected '%s' but got 'StructProperty'", PropNames[Type] );
     return false;
   }
 
@@ -530,14 +530,14 @@ bool UStructProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In,
   In >> CINDEX( StructName );
   if ( StructName < 0 )
   {
-    Logf( LOG_CRIT, "Bad struct name index for StructProperty '%s'", Name );
+    GLogf( LOG_CRIT, "Bad struct name index for StructProperty '%s'", Name );
     return false;
   }
 
   FHash StructHash = In.Pkg->GetNameEntry( StructName )->Hash;
   if ( Struct->Name.Hash() != StructHash )
   {
-    Logf( LOG_CRIT, "Default property expected struct type '%s' but got '%s'", 
+    GLogf( LOG_CRIT, "Default property expected struct type '%s' but got '%s'", 
       In.Pkg->ResolveNameFromIdx( StructName ), Struct->Name );
     return false;
   }
@@ -614,7 +614,7 @@ void UStructProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int
   FString InnerBuf;
 
   // Check if it's worth writing anything at all
-  if ( DefMem == NULL || !xstl::Compare( ValMem, DefMem, Struct->StructSize ) )
+  if ( DefMem == NULL || !memcmp( ValMem, DefMem, Struct->StructSize ) )
   {
     for ( UField* Iter = Struct->Children; Iter != NULL; Iter = Iter->Next )
     {
@@ -667,7 +667,7 @@ void UArrayProperty::Load()
   Inner = (UProperty*)LoadObject( InnerIdx, NULL, this );
   Inner->Offset = 0;
 
-  ElementSize = sizeof( ArrayNoType* );
+  ElementSize = sizeof( FGenericArray* );
   PropertyType = PROP_Array;
 }
 
@@ -676,9 +676,9 @@ bool UArrayProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int 
   u8 NumElem = 0;
   In >> NumElem;
 
-  // Maybe ArrayNoType can be modified when the type is not used?
-  Array<u8>** Arr = (Array<u8>**)PtrAdd( ObjMem, Offset + ( MAX(Idx,0) * ElementSize ) );
-  *Arr = new Array<u8>( NumElem * Inner->ElementSize );
+  // Maybe FGenericArray can be modified when the type is not used?
+  TArray<u8>** Arr = (TArray<u8>**)PtrAdd( ObjMem, Offset + ( MAX(Idx,0) * ElementSize ) );
+  *Arr = new TArray<u8>( NumElem * Inner->ElementSize );
   (*Arr)->ElementSize = Inner->ElementSize;
 
   void* Data = (*Arr)->Data();
@@ -690,7 +690,7 @@ bool UArrayProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int 
 
 void UArrayProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int Idx )
 {
-  ArrayNoType* GenericArray = Obj->GetProperty<ArrayNoType*>( this, Idx );
+  FGenericArray* GenericArray = Obj->GetProperty<FGenericArray*>( this, Idx );
   if ( GenericArray == NULL )
     return;
 
@@ -698,7 +698,7 @@ void UArrayProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int 
   // as one property themselves, we have to cheat by writing the name and value for
   // each value that is different
   FString InnerBuf;
-  ArrayNoType* DefGenericArray = (Default) ? Default->GetProperty<ArrayNoType*>( this, Idx ) : NULL;
+  FGenericArray* DefGenericArray = (Default) ? Default->GetProperty<FGenericArray*>( this, Idx ) : NULL;
 
   size_t Num = GenericArray->Size();
   for ( size_t i = 0; i < Num; i++ )
@@ -733,7 +733,7 @@ void UArrayProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int 
 
 void UFixedArrayProperty::Load()
 {
-  Logf( LOG_CRIT, "Go pop '%s' in UTPT and see how to load a FixedArrayProperty", Pkg->Name );
+  GLogf( LOG_CRIT, "Go pop '%s' in UTPT and see how to load a FixedArrayProperty", Pkg->Name );
   exit( -1 ); // <- can we not do this
 }
 
@@ -748,7 +748,7 @@ void UFixedArrayProperty::GetText( FString& Buf, UObject* Obj, UObject* Default,
 
 void UMapProperty::Load()
 {
-  Logf( LOG_CRIT, "Go pop '%s' in UTPT and see how to load a MapProperty", Pkg->Name );
+  GLogf( LOG_CRIT, "Go pop '%s' in UTPT and see how to load a MapProperty", Pkg->Name );
   exit( -1 ); // <- can we not do this
 }
 

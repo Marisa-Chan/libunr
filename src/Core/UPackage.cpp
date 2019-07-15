@@ -23,11 +23,9 @@
  *========================================================================
 */
 
-#include "XMemory.h"
 #include "Core/UClass.h"
 #include "Core/UPackage.h"
 #include "Core/USystem.h"
-#include "Core/UTexture.h"
 
 #define CI_6_BIT_LIMIT  64 - 1
 #define CI_13_BIT_LIMIT 8192 - 1
@@ -142,7 +140,7 @@ DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FCompactIndex& Index 
     u8 x = 0;
     if ( In.Read ((char*)&x, 1) == 0 )
     {
-      Logf( LOG_WARN, "Failed to read byte for FCompactIndex" );
+      GLogf( LOG_WARN, "Failed to read byte for FCompactIndex" );
       return In;    
     }
     
@@ -238,14 +236,14 @@ DLL_EXPORT FPackageFileOut& operator<<( FPackageFileOut& Out, FCompactIndex& Ind
 /*-----------------------------------------------------------------------------
  * UPackage
 -----------------------------------------------------------------------------*/
-Array<UPackage*>* UPackage::Packages = NULL;
+TArray<UPackage*>* UPackage::Packages = NULL;
 
 UPackage::UPackage()
 {
-  xstl::Set( &Header, 0, sizeof ( UPackageHeader ) );
-  Names = Array<FNameEntry>();
-  Exports = Array<FExport>();
-  Imports = Array<FImport>();
+  memset( &Header, 0, sizeof ( UPackageHeader ) );
+  Names = TArray<FNameEntry>();
+  Exports = TArray<FExport>();
+  Imports = TArray<FImport>();
   bIntrinsicPackage = false;
 }
 
@@ -263,7 +261,7 @@ bool UPackage::Load( const char* File )
   
   u64 LastDirSlash = Path.FindLastOf( "/" );
  
-  String PkgName;
+  FString PkgName;
   if (LastDirSlash != MAX_SIZE)
     PkgName = Path.Substr( Path.FindLastOf( "/" ) );
   else
@@ -284,7 +282,7 @@ bool UPackage::Load( const char* File )
 
   if ( Header.Signature != UE1_PKG_SIG )
   {
-    Logf( LOG_WARN, "File '%s' has a bad package signature", File );
+    GLogf( LOG_WARN, "File '%s' has a bad package signature", File );
     PackageFile->Close();
     return false;
   }
@@ -357,7 +355,7 @@ FNameEntry* UPackage::GetNameEntryByObjRef( int ObjRef )
   return &Names[Index];
 }
 
-Array<FNameEntry>& UPackage::GetNameTable()
+TArray<FNameEntry>& UPackage::GetNameTable()
 {
   return Names;
 }
@@ -421,7 +419,7 @@ FExport* UPackage::GetClassExport( const char* ExportName )
   return Export;
 }
 
-Array<FExport>& UPackage::GetExportTable()
+TArray<FExport>& UPackage::GetExportTable()
 {
   return Exports;
 }
@@ -431,7 +429,7 @@ u32 UPackage::GetGlobalName( u32 PkgNameIdx )
   return NameTableStart + PkgNameIdx;
 }
 
-Array<FImport>& UPackage::GetImportTable()
+TArray<FImport>& UPackage::GetImportTable()
 {
   return Imports;
 }
@@ -449,7 +447,7 @@ const char* UPackage::GetFileName()
 FString* UPackage::GetFullObjName( FExport* ObjExp )
 {
   // Get all names into a stack
-  static Stack<const char*>* Names = new Stack<const char*>();
+  static TStack<const char*>* Names = new TStack<const char*>();
   FExport* Exp = ObjExp;
 
   Names->Push( GetNameEntry( Exp->ObjectName )->Data );
@@ -528,7 +526,7 @@ bool UPackage::StaticInit()
   if ( !Packages )
   {
     LoadOpts = PO_OpenOnLoad;
-    Packages = new Array<UPackage*>();
+    Packages = new TArray<UPackage*>();
     if ( Packages == NULL )
       return false;
     Packages->Reserve( 8 );

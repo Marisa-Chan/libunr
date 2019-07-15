@@ -33,14 +33,14 @@ template<class T> class TQueue : public queue<T>
 public:
   TQueue<T>() : queue<T>() {}
 
-  FORCEINLINE bool   Empty() const   { return queue::empty(); }
-  FORCEINLINE size_t Size() const    { return queue::size(); }
-  FORCEINLINE T&     Front const     { return queue::front(); }
-  FORCEINLINE T&     Back() const    { return queue::back(); }
-  FORCEINLINE const T& Front() const { return queue::front(); }
-  FORCEINLINE const T& Back() const  { return queue:back(); }
-  FORCEINLINE void Pop()             { return queue::pop(); }
-  FORCEINLINE void Push( const T& Value ) { return queue::push(Value); }
-  FORCEINLINE void Swap( TQueue<T>& x ){ queue::swap(x); }
+  FORCEINLINE bool   Empty() const   { return queue<T>::empty(); }
+  FORCEINLINE size_t Size() const    { return queue<T>::size(); }
+  FORCEINLINE T&     Front()         { return queue<T>::front(); }
+  FORCEINLINE T&     Back()          { return queue<T>::back(); }
+  FORCEINLINE const T& Front() const { return queue<T>::front(); }
+  FORCEINLINE const T& Back() const  { return queue<T>::back(); }
+  FORCEINLINE void Pop()             { return queue<T>::pop(); }
+  FORCEINLINE void Push( const T& Value ) { return queue<T>::push(Value); }
+  FORCEINLINE void Swap( TQueue<T>& x ){ queue<T>::swap(x); }
 };
 
