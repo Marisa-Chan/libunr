@@ -25,7 +25,7 @@
 
 #include "Core/UClass.h"
 #include "Core/UPackage.h"
-#include "Core/UConsole.h"
+#include "Engine/UConsole.h"
 
 UConsole::UConsole()
   : UObject()

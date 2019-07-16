@@ -25,7 +25,7 @@
 */
 
 #include "Core/UClass.h"
-#include "Core/UStaticMesh.h"
+#include "Engine/UStaticMesh.h"
 
 UStaticMesh::UStaticMesh()
   : UMesh()

@@ -29,7 +29,7 @@
 ADecal::ADecal()
   : AActor()
 {
-  SurfList = new Array<int>();
+  SurfList = new TArray<int>();
 }
 
 ADecal::~ADecal()

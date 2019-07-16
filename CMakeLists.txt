@@ -49,7 +49,8 @@ else()
   message( FATAL_ERROR, "Unknown target platform: " ${TARGET_PLATFORM} )
 endif()
 
-set (SOURCES ${UNR_SRC}/Util/FConfig.cpp
+set (SOURCES ${UNR_SRC}/Util/FBacktrace.cpp
+             ${UNR_SRC}/Util/FConfig.cpp
              ${UNR_SRC}/Util/FLogFile.cpp
              ${UNR_SRC}/Util/FName.cpp
              ${UNR_SRC}/Util/FString.cpp

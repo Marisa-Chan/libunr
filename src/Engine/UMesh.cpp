@@ -23,7 +23,7 @@
  *========================================================================
 */
 
-#include "Core/UMesh.h"
+#include "Engine/UMesh.h"
 
 FPackageFileIn& operator>>( FPackageFileIn& In, FMeshVert& MV )
 {

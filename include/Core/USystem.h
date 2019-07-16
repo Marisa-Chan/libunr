@@ -43,7 +43,7 @@ class DLL_EXPORT USubsystem : public UObject
 };
 
 // Prompt callback for if the game has not been picked 
-typedef int(*GamePromptCallback)( std::vector<char*>* );
+typedef int(*GamePromptCallback)( TArray<char*>* );
 
 // Prompt callback for if audio/render devices have not been picked
 typedef void(*DevicePromptCallback)(char*, char*); // RenderBuf, AudioBuf
@@ -87,7 +87,7 @@ class DLL_EXPORT USystem : public USubsystem
   FString* SavePath;
   FString* CachePath;
   FString* CacheExt;
-  std::vector<FString*> Paths;
+  TArray<FString*> Paths;
 
   static int LogLevel;
 

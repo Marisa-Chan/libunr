@@ -25,10 +25,9 @@
 */
 
 //#include "FLog.h"
-#include "Core/UMusic.h"
 #include "Core/UPackage.h"
 #include "Core/UProperty.h"
-#include "Core/UTexture.h"
+#include "Engine/UTexture.h"
 
 UPalette::UPalette()
   : UObject()
@@ -47,7 +46,7 @@ void UPalette::Load()
   *PkgFile >> CINDEX( PaletteSize );
   
   if ( PaletteSize != 256 )
-    Logf( LOG_WARN, "Palette does not have 256 entries!" );
+    GLogf( LOG_WARN, "Palette does not have 256 entries!" );
   
   // Load colors
   for (int i = 0; i < PaletteSize; i++) {
@@ -127,17 +126,17 @@ bool UTexture::ExportToFile( const char* Dir, const char* Type )
     Type = "bmp";
   else if ( strnicmp( Type, "bmp", 3 ) != 0 )
   {
-    Logf( LOG_WARN, "Can't export texture to file type '%s'", Type );
+    GLogf( LOG_WARN, "Can't export texture to file type '%s'", Type );
     return false;
   }
   Filename += Type;
  
-  Logf( LOG_INFO, "Exporting %s.%s", Name.Data(), Type );
+  GLogf( LOG_INFO, "Exporting %s.%s", Name.Data(), Type );
 
-  FileStreamOut* Out = new FileStreamOut();
+  FFileArchiveOut* Out = new FFileArchiveOut();
   if ( Out->Open( Filename ) != 0 )
   {
-    Logf( LOG_WARN, "Failed to export texture to bitmap file '%s'", Filename.Data() );
+    GLogf( LOG_WARN, "Failed to export texture to bitmap file '%s'", Filename.Data() );
     return false;
   }
   
@@ -210,7 +209,7 @@ bool UTexture::ExportToFile( const char* Dir, const char* Type )
 UFont::UFont()
   : UObject()
 {
-  FontTextures = new Array<FFontTexture>();
+  FontTextures = new TArray<FFontTexture>();
   FontTextures->Reserve( 1 ); // there's not even a way to access subfonts???
 }
 
@@ -238,7 +237,7 @@ void UFont::Load()
     *PkgFile >> CINDEX( CharCount );
 
     FontTexture->Texture = (UTexture*)LoadObject( TextureIdx, UTexture::StaticClass(), this );
-    FontTexture->Characters = new Array<FFontCharInfo>();
+    FontTexture->Characters = new TArray<FFontCharInfo>();
     FontTexture->Characters->Reserve( CharCount );
 
     for ( int j = 0; j < CharCount; j++ )

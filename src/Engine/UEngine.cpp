@@ -23,7 +23,7 @@
  *========================================================================
 */
 
-#include "Core/UEngine.h"
+#include "Engine/UEngine.h"
 
 UClient::UClient()
   : UObject()

@@ -24,8 +24,8 @@
 */
 
 #include "Core/UClass.h"
-#include "Core/UModel.h"
-#include "Core/ULodMesh.h"
+#include "Engine/UModel.h"
+#include "Engine/ULodMesh.h"
 
 ULodMesh::ULodMesh()
   : UMesh()
@@ -92,7 +92,7 @@ void ULodMesh::Load()
 
 bool ULodMesh::ExportUnreal3DMesh( const char* Dir, int Frame )
 {
-  FileStreamOut Out;
+  FFileArchiveOut Out;
   FString Filename( Dir );
 #if defined LIBUNR_WIN32
   Filename.ReplaceChars( '\\', '/' );
@@ -108,12 +108,12 @@ bool ULodMesh::ExportUnreal3DMesh( const char* Dir, int Frame )
   
   if ( Out.Open( DataFileName ) != 0 )
   {
-    Logf( LOG_WARN, "Failed to export LOD mesh to data file '%s'", DataFileName.Data() );
+    GLogf( LOG_WARN, "Failed to export LOD mesh to data file '%s'", DataFileName.Data() );
     return false;
   }
 
   FVertexDataHeader DataHdr;
-  xstl::Set( &DataHdr, 0, sizeof(DataHdr) ); // Everything else goes unused
+  memset( &DataHdr, 0, sizeof(DataHdr) ); // Everything else goes unused
   DataHdr.NumPolygons = Faces.Size();
   DataHdr.NumVertices = ModelVerts;
   
@@ -170,7 +170,7 @@ bool ULodMesh::ExportUnreal3DMesh( const char* Dir, int Frame )
 
   if ( Out.Open( AnivFileName ) != 0 )
   {
-    Logf( LOG_WARN, "Failed to export LOD mesh to aniv file '%s'", AnivFileName.Data() );
+    GLogf( LOG_WARN, "Failed to export LOD mesh to aniv file '%s'", AnivFileName.Data() );
     return false;
   }
   
@@ -197,7 +197,7 @@ bool ULodMesh::ExportUnreal3DMesh( const char* Dir, int Frame )
 
 bool ULodMesh::ExportObjMesh( const char* Dir, int Frame )
 {
-  FileStreamOut Out;
+  FFileArchiveOut Out;
   FString Filename( Dir );
 #if defined LIBUNR_WIN32
   Filename.ReplaceChars( '\\', '/' );
@@ -216,7 +216,7 @@ bool ULodMesh::ExportObjMesh( const char* Dir, int Frame )
 
   if ( Out.Open( ObjFileName ) != 0 )
   {
-    Logf( LOG_WARN, "Failed to export LOD mesh to obj file '%s'", ObjFileName.Data() );
+    GLogf( LOG_WARN, "Failed to export LOD mesh to obj file '%s'", ObjFileName.Data() );
     return false;
   }
   
@@ -241,7 +241,7 @@ bool ULodMesh::ExportObjMesh( const char* Dir, int Frame )
 
   // Vertex Normals
   FVector* VertNormals = new FVector[FrameVerts];
-  xstl::Set( VertNormals, 0, sizeof(FVector)*FrameVerts );
+  memset( VertNormals, 0, sizeof(FVector)*FrameVerts );
 
   {
     FVector FaceNormals[2];
@@ -363,7 +363,7 @@ bool ULodMesh::ExportObjMesh( const char* Dir, int Frame )
 
   if ( Out.Open( MtlFileName ) != 0 )
   {
-    Logf( LOG_WARN, "Failed to generate MTL file for LOD mesh '%s'", Name.Data() );
+    GLogf( LOG_WARN, "Failed to generate MTL file for LOD mesh '%s'", Name.Data() );
     return false;
   }
  
@@ -395,7 +395,7 @@ bool ULodMesh::ExportToFile( const char* Dir, const char* Type, int Frame )
   if ( Type == NULL )
     Type = "U3D";
 
-  Logf( LOG_INFO, "Exporting %s.3d", Name.Data() );
+  GLogf( LOG_INFO, "Exporting %s.3d", Name.Data() );
 
   if ( stricmp( Type, "U3D" ) == 0 )
   {
@@ -416,7 +416,7 @@ bool ULodMesh::ExportToFile( const char* Dir, const char* Type, int Frame )
   }
   else
   {
-    Logf( LOG_WARN, "Unknown LODMesh export extension '%s'", Type );
+    GLogf( LOG_WARN, "Unknown LODMesh export extension '%s'", Type );
   }
 
   return false;

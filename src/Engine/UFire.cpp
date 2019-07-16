@@ -24,7 +24,7 @@
 */
 
 #include "Core/UClass.h"
-#include "Core/UFire.h"
+#include "Engine/UFire.h"
 
 UFractalTexture::UFractalTexture()
   : UTexture()

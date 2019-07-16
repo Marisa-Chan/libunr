@@ -66,6 +66,12 @@ void FLogFile::Close()
   
 }
 
+void FLogFile::Flush()
+{
+  FFileArchiveOut::Flush();
+  fflush(stdout);
+}
+
 void FLogFile::Logf( int Type, const char* Str, ... )
 {
   if ( Type < LogLevel )

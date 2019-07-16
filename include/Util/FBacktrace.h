@@ -17,42 +17,19 @@
 \*===========================================================================*/
 
 /*========================================================================
- * UPlayer.cpp - Player object functionality
+ * FBacktrace.h - Helper code for getting backtrace info from the stack
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#include "Core/UClass.h"
-#include "Core/UPackage.h"
-#include "Engine/UPlayer.h"
+#pragma once
 
-UPlayer::UPlayer()
-  : UObject()
-{
-}
+#include <ucontext.h>
+#include "Util/FMacro.h"
 
-UPlayer::~UPlayer()
-{
-}
-
-IMPLEMENT_NATIVE_CLASS( UPlayer );
-
-BEGIN_PROPERTY_LINK( UPlayer, 15 )
-  LINK_USELESS_PROPERTY( vfOut );
-  LINK_USELESS_PROPERTY( vfExec );
-  LINK_NATIVE_PROPERTY( Actor );
-  LINK_NATIVE_PROPERTY( Console );
-  LINK_NATIVE_PROPERTY( bWindowsMouseAvailable );
-  LINK_NATIVE_PROPERTY( bShowWindowsMouse );
-  LINK_NATIVE_PROPERTY( WindowsMouseX );
-  LINK_NATIVE_PROPERTY( WindowsMouseY );
-  LINK_NATIVE_PROPERTY( SelectedCursor );
-  LINK_NATIVE_PROPERTY( bSuspendPrecaching );
-  LINK_NATIVE_PROPERTY( CurrentNetSpeed );
-  LINK_NATIVE_PROPERTY( ConfiguredInternetSpeed );
-  LINK_NATIVE_PROPERTY( ConfiguredLanSpeed );
-  LINK_NATIVE_PROPERTY( StaticUpdateInterval );
-  LINK_NATIVE_PROPERTY( DynamicUpdateInterval );
-END_PROPERTY_LINK()
+DLL_EXPORT const char* GetSymbolName( void* Addr );
+DLL_EXPORT const char* GetSymbolModule( void* Addr );
+DLL_EXPORT void DumpRegisters( mcontext_t* Regs, bool bPrintFpu );
+DLL_EXPORT void DumpBacktrace( mcontext_t* Regs );
 

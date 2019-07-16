@@ -23,7 +23,7 @@
  *========================================================================
 */
 
-#include "Core/UCanvas.h"
+#include "Engine/UCanvas.h"
 
 UCanvas::UCanvas()
   : UObject()

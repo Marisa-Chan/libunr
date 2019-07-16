@@ -23,7 +23,7 @@
  *========================================================================
 */
 
-#include "Core/USkelAnim.h"
+#include "Engine/USkelAnim.h"
 
 UAnimation::UAnimation()
   : UObject()

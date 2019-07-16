@@ -110,7 +110,7 @@ public:
   }
   
   int USize, VSize;
-  std::vector<u8> DataArray;
+  TArray<u8> DataArray;
 };
 
 class DLL_EXPORT UPalette : public UObject
@@ -256,8 +256,8 @@ class DLL_EXPORT UTexture : public UBitmap
   float MinFrameRate, MaxFrameRate;
   float Accumulator;
   
-  std::vector<FMipmap> Mips;
-  std::vector<FMipmap> DecompMips;
+  TArray<FMipmap> Mips;
+  TArray<FMipmap> DecompMips;
   ETextureFormat DecompFormat;
 
   ESurfaceType SurfaceType;
@@ -302,10 +302,10 @@ class DLL_EXPORT UFont : public UObject
     }
 
     UTexture* Texture;
-    std::vector<FFontCharInfo>* Characters;
+    TArray<FFontCharInfo>* Characters;
   };
 
-  std::vector<FFontTexture>* FontTextures;
+  TArray<FFontTexture>* FontTextures;
 
   virtual void Load();
 };

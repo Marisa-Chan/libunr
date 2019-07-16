@@ -47,6 +47,7 @@ class DLL_EXPORT FLogFile : public FFileArchiveOut
 public:
   virtual int Open( const char* Filename );
   virtual void Close();
+  virtual void Flush();
   virtual void Logf( int Type, const char* Str, ... );
   virtual void SetLogLevel( int Level );
 

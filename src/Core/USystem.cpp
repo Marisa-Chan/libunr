@@ -23,7 +23,13 @@
  *========================================================================
 */
 
+#include <dirent.h>
+#include <pwd.h>
 #include <signal.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include "Util/FBacktrace.h"
 #include "Util/FConfig.h"
 #include "Core/USystem.h"
 #include "Core/UPackage.h"
@@ -45,8 +51,8 @@ static void SigsegvHandler( int sig, siginfo_t* si, void *raw_uctx )
   ucontext_t* uctx = (ucontext_t*)raw_uctx;
 
   GLogf( LOG_CRIT, "CAUGHT SIGSEGV!!!" );
-  DumpRegisters( &uctx->uc_mcontext, false, GLogFile );
-  DumpBacktrace( &uctx->uc_mcontext, GLogFile );
+  DumpRegisters( &uctx->uc_mcontext, false );
+  DumpBacktrace( &uctx->uc_mcontext );
 
   GSystem->Exit( -1 );
 }
@@ -93,15 +99,15 @@ const char* USystem::ResolvePath( const char* PkgName )
   const char* GoodPath = NULL;
   for ( int i = 0; i < Paths.Size(); i++ )
   {
-    String* PathIter = Paths[i]; 
+    FString* PathIter = Paths[i]; 
     size_t Asterisk = PathIter->FindFirstOf( '*' );
-    String RealPath = PathIter->Substr( 0, Asterisk );
+    FString RealPath = PathIter->Substr( 0, Asterisk );
     RealPath += PkgName;
     RealPath += PathIter->Substr( Asterisk + 1 );
 
     if ( FileExists( RealPath.Data() ) )
     {
-      GoodPath = StringDup( RealPath.Data() );
+      GoodPath = strdup( RealPath.Data() );
       break;
     }
   }
@@ -116,11 +122,11 @@ const char* USystem::ResolvePath( const char* PkgName )
     // Didn't find the package but that could be due to case sensitivity
     for ( int i = 0; i < Paths.Size(); i++ )
     {
-      String* PathIter = Paths[i]; 
+      FString* PathIter = Paths[i]; 
       size_t Asterisk = PathIter->FindFirstOf( '*' );
-      String RealPath = PathIter->Substr( 0, Asterisk );
+      FString RealPath = PathIter->Substr( 0, Asterisk );
 
-      String FullPkgName( PkgName );
+      FString FullPkgName( PkgName );
       FullPkgName += PathIter->Substr( Asterisk + 1 );
 
       dir = opendir( RealPath.Data() );
@@ -134,7 +140,7 @@ const char* USystem::ResolvePath( const char* PkgName )
           if ( stricmp( ent->d_name, FullPkgName.Data() ) == 0 )
           {
             RealPath += ent->d_name;
-            return StringDup( RealPath.Data() );
+            return strdup( RealPath.Data() );
           }
         }
         closedir(dir);
@@ -162,7 +168,7 @@ void USystem::Exit( int ExitCode )
   // TODO: Print some kind of message box showing an error
 
   // Exit
-  CloseLogFile();
+  GLogFile->Close();
   exit( ExitCode );
 }
 
@@ -171,7 +177,7 @@ bool USystem::PromptForGameInfo( char* InGameName )
   if ( DoGamePrompt == NULL )
     return false;
 
-  Array<char*>* Names = GLibunrConfig->CreateEntry( "Game", "Name" );
+  TArray<char*>* Names = GLibunrConfig->CreateEntry( "Game", "Name" );
   char* NameBuf = NULL;
   char* ExecBuf = NULL;
   char* PathBuf = NULL;
@@ -206,7 +212,7 @@ bool USystem::PromptForGameInfo( char* InGameName )
 
   // Get real path 
   GamePath = new char[4096];
-  xstl::Set( (char*)GamePath, 0, 4096 );
+  memset( (char*)GamePath, 0, 4096 );
   RealPath( PathBuf, (char*)GamePath, 4096 );
 
   // Detect specific game support
@@ -254,7 +260,7 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool
     // Create an ini if its missing
     GLogf( LOG_WARN, "Main ini file '%s' does not exist; creating one", LibunrIniPath );
 #if defined LIBUNR_POSIX
-    String* ConfigLibunr = new String( GetHomeDir() );
+    FString* ConfigLibunr = new FString( GetHomeDir() );
     ConfigLibunr->Append( "/.config/libunr/" );
     DIR* ConfigLibunrDir = opendir( ConfigLibunr->Data() );
     if ( ConfigLibunrDir == NULL )
@@ -304,7 +310,7 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool
   }
   
   // Change directory to the game's system folder
-  String GameSysPath( GSystem->GamePath );
+  FString GameSysPath( GSystem->GamePath );
   GameSysPath += DIRECTORY_SEPARATOR;
   GameSysPath += "System";
   GameSysPath += DIRECTORY_SEPARATOR;
@@ -320,7 +326,7 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool
   }
 
   // Read the game ini
-  String GameCfgPath( GSystem->GameName );
+  FString GameCfgPath( GSystem->GameName );
   GameCfgPath += ".ini";
 
   GGameConfig = new FConfig();
@@ -359,9 +365,9 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool
   GSystem->CachePath = new FString( ( CachePath != NULL ) ? CachePath : "" );
   GSystem->CacheExt  = new FString( ( CacheExt != NULL ) ? CacheExt : "" );
 
-  xstl::Free( SavePath );
-  xstl::Free( CachePath );
-  xstl::Free( CacheExt );
+  delete SavePath;
+  delete CachePath;
+  delete CacheExt;
 
   char* PkgPath = NULL;
   int i = 0;
@@ -376,7 +382,7 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool
     PkgPathString->ReplaceChars( '\\', '/' );
 #endif
     GSystem->Paths.PushBack( PkgPathString );
-    xstl::Free( PkgPath );
+    free( PkgPath );
   }
 
   // Set up config manager
@@ -445,8 +451,8 @@ const char* USystem::GetDefaultLibunrIniPath()
 
 bool USystem::CopyFile( const char* OrigFile, const char* NewFile )
 {
-  FileStreamIn Orig;
-  FileStreamOut New;
+  FFileArchiveIn Orig;
+  FFileArchiveOut New;
 
   int Status = Orig.Open( OrigFile );
   if ( Status != 0 )
@@ -477,7 +483,7 @@ bool USystem::CopyFile( const char* OrigFile, const char* NewFile )
 
 bool USystem::FileExists( const char* Filename )
 {
-  FileStreamIn File;
+  FFileArchiveIn File;
   
   int Status = File.Open( Filename );
   File.Close();
@@ -607,7 +613,7 @@ bool USystem::MakeDir( const char* Path )
 
   char FullPath[4096] = { 0 };
   RealPath( CurrentPath, FullPath, sizeof(FullPath) );
-  xstl::Set( CurrentPath, 0, sizeof(CurrentPath) );
+  memset( CurrentPath, 0, sizeof(CurrentPath) );
 
   struct stat sb;
   char* s = FullPath;

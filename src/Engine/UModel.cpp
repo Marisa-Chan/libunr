@@ -24,7 +24,7 @@
 */
 
 #include "Core/UClass.h"
-#include "Core/UModel.h"
+#include "Engine/UModel.h"
 #include "Actors/ABrush.h"
 #include "Actors/AZoneInfo.h"
 
@@ -35,7 +35,7 @@ DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FPoly& P )
   // TODO: Make a macro to check for stuff like this
   if ( P.NumVertices < 3 || P.NumVertices > MAX_VERTICES )
   {
-    Logf( LOG_CRIT, "NumVertices < 3 || NumVertices > MAX_VERTICES" );
+    GLogf( LOG_CRIT, "NumVertices < 3 || NumVertices > MAX_VERTICES" );
     GSystem->Exit( -1 );
   }
 
@@ -253,7 +253,7 @@ void UPolys::Load()
     *PkgFile >> Element[i];
 }
 
-void UPolys::ExportToLevelText( FileStreamOut* Out )
+void UPolys::ExportToLevelText( FFileArchiveOut* Out )
 {
   Out->Printf( "\t\tBegin PolyList\r\n" );
   for ( int i = 0; i < Element.Size(); i++ )
@@ -264,7 +264,7 @@ void UPolys::ExportToLevelText( FileStreamOut* Out )
       Out->Printf(" Item=%s", Pkg->GetNameEntry( Poly.ItemName )->Data );
     if ( Poly.Texture != NULL )
     {
-      String* TexName = Poly.Texture->Pkg->GetFullObjName( Poly.Texture->Export );
+      FString* TexName = Poly.Texture->Pkg->GetFullObjName( Poly.Texture->Export );
       Out->Printf(" Texture=%s", TexName->Data() );
     }
     if ( Poly.PolyFlags != 0 )

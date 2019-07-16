@@ -24,8 +24,8 @@
 */
 
 #include "Core/UClass.h"
-#include "Core/ULevel.h"
 #include "Core/UProperty.h"
+#include "Engine/ULevel.h"
 #include "Actors/AActor.h"
 #include "Actors/ABrush.h"
 #include "Actors/ANavigationPoint.h"
@@ -141,7 +141,7 @@ void ULevelBase::Load()
   // left of the community.
   if ( bDeletedBrushwork )
   {
-    Array<FExport>& Exports = Pkg->GetExportTable();
+    TArray<FExport>& Exports = Pkg->GetExportTable();
     for ( int i = 0; i < Exports.Size(); i++ )
     {
       FExport* Export = &Exports[i];
@@ -213,10 +213,10 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
   Filename += Pkg->Name;
   Filename += ".t3d"; // Levels won't get exported to any other type
  
-  FileStreamOut* Out = new FileStreamOut();
+  FFileArchiveOut* Out = new FFileArchiveOut();
   if ( Out->Open( Filename ) != 0 )
   {
-    Logf( LOG_WARN, "Failed to export level to file '%s'", Filename.Data() );
+    GLogf( LOG_WARN, "Failed to export level to file '%s'", Filename.Data() );
     return false;
   }
 
@@ -249,7 +249,7 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
       {
         if ( UNLIKELY( Prop->Offset & 0x80000000 ) )
         {
-          Logf( LOG_WARN, "Bad offset for property '%s' in Actor '%s' (Offset = %x)",
+          GLogf( LOG_WARN, "Bad offset for property '%s' in Actor '%s' (Offset = %x)",
               Prop->Name.Data(), Actor->Name.Data(), Prop->Offset );
           continue;
         }

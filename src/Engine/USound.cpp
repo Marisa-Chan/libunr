@@ -24,8 +24,8 @@
  *========================================================================
 */
 
-#include "Core/USound.h"
 #include "Core/UPackage.h"
+#include "Engine/USound.h"
 
 USound::USound()
 {
@@ -71,13 +71,13 @@ bool USound::ExportToFile( const char* Dir, const char* Type )
   Filename += ".";
   Filename += Ext;
 
-  Logf( LOG_INFO, "Exporting %s.%s", Name.Data(), Ext );
+  GLogf( LOG_INFO, "Exporting %s.%s", Name.Data(), Ext );
 
   // Open file
-  FileStreamOut* Out = new FileStreamOut();
+  FFileArchiveOut* Out = new FFileArchiveOut();
   if ( Out->Open( Filename ) != 0 )
   {
-    Logf( LOG_WARN, "Failed to export sound to wav file '%s'", Filename.Data() );
+    GLogf( LOG_WARN, "Failed to export sound to wav file '%s'", Filename.Data() );
     return false;
   }
 

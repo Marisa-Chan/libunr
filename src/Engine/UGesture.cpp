@@ -23,7 +23,7 @@
  *========================================================================
 */
 
-#include "Core/UGesture.h"
+#include "Engine/UGesture.h"
 
 UGesture::UGesture()
   : UObject()

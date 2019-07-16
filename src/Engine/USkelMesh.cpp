@@ -24,7 +24,7 @@
 */
 
 #include "Core/UClass.h"
-#include "Core/USkelMesh.h"
+#include "Engine/USkelMesh.h"
 
 USkeletalMesh::USkeletalMesh()
   : ULodMesh()

@@ -23,9 +23,9 @@
  *========================================================================
 */
 
-#include "Core/UPackage.h"
 #include "Core/UClass.h"
-#include "Core/UNet.h"
+#include "Core/UPackage.h"
+#include "Engine/UNet.h"
 
 UNetConnection::UNetConnection()
   : UPlayer()
