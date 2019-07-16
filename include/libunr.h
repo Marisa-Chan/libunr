@@ -25,7 +25,18 @@
 
 #pragma once 
 
-#include "Core/FConfig.h"
+#include "Util/FMacro.h"
+#include "Util/FTypes.h"
+#include "Util/FArchive.h"
+#include "Util/FFileArchive.h"
+#include "Util/FLogFile.h"
+#include "Util/FConfig.h"
+#include "Util/FString.h"
+#include "Util/TArray.h"
+#include "Util/TMap.h"
+#include "Util/TQueue.h"
+#include "Util/TStack.h"
+
 #include "Core/UClass.h"
 #include "Core/ULocale.h"
 #include "Core/UMath.h"
@@ -33,6 +44,7 @@
 #include "Core/UPackage.h"
 #include "Core/UPrimitive.h"
 #include "Core/UProperty.h"
+#include "Core/UScript.h"
 #include "Core/USystem.h"
 
 #include "Engine/UAudio.h"
@@ -46,7 +58,6 @@
 #include "Engine/UNet.h"
 #include "Engine/UPlayer.h"
 #include "Engine/URender.h"
-#include "Engine/UScript.h"
 #include "Engine/USkelAnim.h"
 #include "Engine/USound.h"
 #include "Engine/UTexture.h"

@@ -679,6 +679,12 @@ bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool bIsEdito
   sa.sa_sigaction = &SigsegvHandler;
   sa.sa_flags = SA_SIGINFO;
 
+  if ( GLogFile == NULL )
+  {
+    GLogFile = new FLogFile();
+    GLogFile->Open("libunr.log");
+  }
+
   if (sigaction(SIGSEGV, &sa, NULL) < 0)
   {
     GLogf( LOG_CRIT, "Failed to register SIGSEGV handler!\n");

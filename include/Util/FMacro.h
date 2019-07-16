@@ -95,6 +95,26 @@
 private: \
   cls (const cls & copy); \
 
+// Timers
+#if defined __linux__
+#include <time.h>
+#define TIMER_DECLARE(name) \
+  timespec name##_start; \
+  timespec name##_end; \
+
+#define TIMER_START(name) \
+  clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &name##_start)
+
+#define TIMER_END(name) \
+  clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &name##_end)
+
+#define TIMER_PRINT(name) \
+  printf("Time for %s: %ld.%.9ld\n", #name, \
+    name##_end.tv_sec - name##_start.tv_sec, \
+    name##_end.tv_nsec - name##_start.tv_nsec) \
+
+#endif
+
 // Package version defs
 // Unreal Beta
 #define PKG_VER_UB_OLD  21
