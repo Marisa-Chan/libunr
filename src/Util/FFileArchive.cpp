@@ -4,7 +4,7 @@
 |*                                                                           *|
 |*  This program is free software: you can redistribute it and/or modify     *|
 |*  it under the terms of the GNU Affero General Public License as           *|
-|*  published by the Free Software Foundation, either version 3 of the       *|
+|*  published by the free Software Foundation, either version 3 of the       *|
 |*  License, or (at your option) any later version.                          *|
 |*                                                                           *|
 |*  This program is distributed in the hope that it will be useful,          *|
@@ -17,62 +17,121 @@
 \*===========================================================================*/
 
 /*========================================================================
- * FFileArchive.h - Class for serializing bytes to and from files
+ * FFileArchiveOut.cpp - FFileArchiveOut implementation
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#pragma once
-#include "Util/FArchive.h"
+#include <stdarg.h>
+#include "Util/FFileArchive.h"
 
 /*-----------------------------------------------------------------------------
- * FFileArchive
- * Provides generic interface for reading and writing to a file
+  FFileArchive
 -----------------------------------------------------------------------------*/
-class DLL_EXPORT FFileArchive : public FArchive
+FFileArchive::FFileArchive() 
 {
-public:
-  FFileArchive();
-  virtual ~FFileArchive();
+  File = NULL;
+}
 
-  virtual int Open( const char* Filename );
-  virtual int Open( const FString& Filename );
-  virtual void Close();
-  
-  virtual size_t Read( void* Dest, size_t Len );
-  virtual size_t Write( void* Src, size_t Len );
-  virtual size_t Seek( ssize_t Off, ESeekBase Base );
-  virtual char   Peek();
-  virtual size_t Tell();
-  virtual bool Eof();
-  virtual void Flush();
+FFileArchive::~FFileArchive() 
+{ 
+  Close();
+}
 
-  virtual size_t Printf( const char* Str, ... );
+int FFileArchive::Open( const char* Filename ) 
+{ 
+  return -1;
+}
 
-protected:
-  FILE* File;
-};
+int FFileArchive::Open( const FString& Filename ) 
+{ 
+  return -1; 
+}
+
+void FFileArchive::Close()
+{
+  if (File)
+  {
+    fclose( File );
+    File = NULL;
+  }
+}
+
+size_t FFileArchive::Read( void* Dest, size_t Len )
+{
+  return fread( Dest, 1, Len, File );
+}
+
+size_t FFileArchive::Write( void* Src, size_t Len )
+{
+  return fwrite( Src, 1, Len, File );
+}
+
+size_t FFileArchive::Printf( const char* Str, ... )
+{
+  va_list vl;
+  va_start( vl, Str );
+  size_t Num = vfprintf( File, Str, vl );
+  va_end( vl );
+  return Num;
+}
+
+size_t FFileArchive::Seek( ssize_t Off, ESeekBase Base )
+{
+  fseeko( File, Off, (int)Base );
+  return ftello( File );
+}
+
+char FFileArchive::Peek()
+{
+  char Char = (char)fgetc( File );
+  ungetc( Char, File );
+  return Char;
+}
+
+size_t FFileArchive::Tell()
+{
+  return ftello( File );
+}
+
+bool FFileArchive::Eof()
+{
+  return feof( File );
+}
+
+void FFileArchive::Flush()
+{
+  fflush( File );
+}
 
 /*-----------------------------------------------------------------------------
- * FFileArchiveIn
- * Provides interface to read from a file
+  FFileArchiveIn
 -----------------------------------------------------------------------------*/
-class DLL_EXPORT FFileArchiveIn : public FFileArchive
+int FFileArchiveIn::Open( const char* Filename )
 {
-public:
-  virtual int Open( const char* Filename );
-  virtual int Open( const FString& Filename );
-};
+  File = fopen( Filename, "rb" );
+  return (File == NULL) ? errno : 0;
+}
+
+int FFileArchiveIn::Open( const FString& Filename )
+{
+  File = fopen( Filename.Data(), "rb" );
+  return (File == NULL) ? errno : 0;
+}
 
 /*-----------------------------------------------------------------------------
- * FFileArchiveOut
- * Provides interface to write to a file
+  FFileArchiveOut
 -----------------------------------------------------------------------------*/
-class DLL_EXPORT FFileArchiveOut : public FFileArchive
+int FFileArchiveOut::Open( const char* Filename )
 {
-public:
-  virtual int Open( const char* Filename );
-  virtual int Open( const FString& Filename );
-};
+  File = fopen( Filename, "wb" );
+  return (File == NULL) ? errno : 0;
+}
+
+int FFileArchiveOut::Open( const FString& Filename )
+{
+  File = fopen( Filename.Data(), "wb" );
+  return (File == NULL) ? errno : 0;
+}
 

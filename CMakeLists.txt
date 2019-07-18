@@ -51,6 +51,7 @@ endif()
 
 set (SOURCES ${UNR_SRC}/Util/FBacktrace.cpp
              ${UNR_SRC}/Util/FConfig.cpp
+             ${UNR_SRC}/Util/FFileArchive.cpp
              ${UNR_SRC}/Util/FLogFile.cpp
              ${UNR_SRC}/Util/FName.cpp
              ${UNR_SRC}/Util/FString.cpp

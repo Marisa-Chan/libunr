@@ -674,10 +674,10 @@ const char* USystem::GetHomeDir()
 
 bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool bIsEditor, char* GameName )
 {
-  // Set up SIGSEGV handler
-  struct sigaction sa;
-  sa.sa_sigaction = &SigsegvHandler;
-  sa.sa_flags = SA_SIGINFO;
+//  // Set up SIGSEGV handler
+//  struct sigaction sa;
+//  sa.sa_sigaction = &SigsegvHandler;
+//  sa.sa_flags = SA_SIGINFO;
 
   if ( GLogFile == NULL )
   {
@@ -685,11 +685,11 @@ bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool bIsEdito
     GLogFile->Open("libunr.log");
   }
 
-  if (sigaction(SIGSEGV, &sa, NULL) < 0)
-  {
-    GLogf( LOG_CRIT, "Failed to register SIGSEGV handler!\n");
-    return false;
-  }
+//  if (sigaction(SIGSEGV, &sa, NULL) < 0)
+//  {
+//    GLogf( LOG_CRIT, "Failed to register SIGSEGV handler!\n");
+//    return false;
+//  }
 
   if ( UNLIKELY( !USystem::StaticInit( GPC, DPC, bIsEditor, GameName ) ) )
   {

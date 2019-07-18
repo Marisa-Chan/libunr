@@ -60,10 +60,6 @@ void FLogFile::Close()
   strftime( TimeStr, sizeof(TimeStr), "%Y-%m-%d %H:%M:%S", TimeInfo );
   
   Logf( LOG_INFO, "Log file closed on %s", TimeStr );
-  GLogFile->Close();
-  delete GLogFile;
-  GLogFile = NULL;
-  
 }
 
 void FLogFile::Flush()
