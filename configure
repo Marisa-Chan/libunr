@@ -98,6 +98,7 @@ echo "# Begin generated Makefile" >> Makefile
 echo "#################################################" >> Makefile
 echo "CC="$BUILD_COMPILER >> Makefile
 echo "CFLAGS="$CONFIG_CFLAGS >> Makefile
+echo "INSTALL_PREFIX="$BUILD_INSTALL_PATH >> Makefile
 echo "LDFLAGS=-ldl" >> Makefile
 echo "BUILDDIR=build" >> Makefile
 echo "SRCDIR=src" >> Makefile
