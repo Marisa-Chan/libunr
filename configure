@@ -114,4 +114,4 @@ echo >> Makefile
 echo "clean:" >> Makefile
 echo "	rm -r build/objs" >> Makefile
 echo >> Makefile
-cat build/Makefile.template >> Makefile
+cat res/Makefile.template >> Makefile
