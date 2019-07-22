@@ -23,11 +23,11 @@
  *========================================================================
 */
 
+#include <stdarg.h>
 #include "Util/FName.h"
 #include "Util/FHash.h"
 #include "Core/USystem.h"
 #include "Core/UPackage.h"
-#include "stdarg.h"
 
 /*-----------------------------------------------------------------------------
  * FNameEntry

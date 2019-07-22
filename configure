@@ -1,0 +1,117 @@
+#!/bin/sh
+
+#################################################
+# Globals
+#################################################
+BUILD_DEBUG=0
+BUILD_SYMBOLS=0
+BUILD_32BIT=0
+BUILD_VERBOSE=0
+BUILD_COMPILER="g++"
+BUILD_INSTALL_PATH="/usr"
+
+#################################################
+# Functions
+#################################################
+print_help()
+{
+  echo
+  echo "libunr configure script - Written by Adam Smith"
+  echo "Usage: ./configure [options]"
+  echo
+  echo "Options:"
+  echo "   -h  Show help"
+  echo "   -d  Configure makefile with debug symbols and no optimization"
+  echo "   -s  Configure makefile with debug symbols"
+  echo "   -m  Configure makefile with 32-bit"
+  echo "   -c  Configure makefile to use a specified compiler"
+  echo "   -i  Configure makefile to install to specified directory"
+  echo "   -v  Configure makefile with verbose output"
+  echo
+}
+
+#################################################
+# Main
+#################################################
+OPTIND=1
+while getopts "hdsc:vim" opt; do
+  case "$opt" in
+  h) print_help; exit 0 ;;
+  d) BUILD_DEBUG=1 ;;
+  s) BUILD_SYMBOLS=1 ;;
+  m) BUILD_32BIT=1 ;;
+  c) BUILD_COMPILER="$OPTARG" ;;
+  i) BUILD_INSTALL_PATH="$OPTARG" ;;
+  v) BUILD_VERBOSE=1 ;;
+  esac
+done
+
+# Print build state
+echo "--------------------------------------------------------------"
+echo "Environment settings:"
+echo "--------------------------------------------------------------"
+echo "BUILD_DEBUG="$BUILD_DEBUG
+echo "BUILD_SYMBOLS="$BUILD_SYMBOLS
+echo "BUILD_32BIT="$BUILD_32BIT
+echo "BUILD_VERBOSE="$BUILD_VERBOSE
+echo "BUILD_COMPILER="$BUILD_COMPILER
+echo "BUILD_INSTALL_PATH="$BUILD_INSTALL_PATH
+
+CONFIG_CFLAGS=""
+
+# Compiler specific options
+if [ "$BUILD_COMPILER" = "g++" ] || [ "$BUILD_COMPILER" = "clang++" ] 
+then
+  CONFIG_CFLAGS="-fPIC -I/usr/include -I./include -fmax-errors=10 -std=c++11 -Wno-attributes -DINSTALL_PREFIX=\\\"$BUILD_INSTALL_PATH\\\""
+  if [ "$BUILD_DEBUG" -eq 1 ]
+  then
+    CONFIG_CFLAGS="$CONFIG_CFLAGS -g -O0"
+  else
+    CONFIG_CFLAGS="$CONFIG_CFLAGS -O2"
+  fi
+  
+  if [ "$BUILD_SYMBOLS" -eq 1 ] && [ "$BUILD_DEBUG" -eq 0 ]
+  then
+    CONFIG_CFLAGS="$CONFIG_CFLAGS -g"
+  fi
+
+  if [ "$BUILD_32BIT" -eq 1 ]
+  then
+    CONFIG_CFLAGS="$CONFIG_CFLAGS -m32"
+  fi
+fi
+
+# Create build output directories
+mkdir build/objs
+mkdir build/objs/Actors
+mkdir build/objs/Asm
+mkdir build/objs/Core
+mkdir build/objs/DeusEx
+mkdir build/objs/Engine
+mkdir build/objs/HPSS
+mkdir build/objs/Rune
+mkdir build/objs/Util
+
+# Create makefile
+echo "#################################################" > Makefile
+echo "# Begin generated Makefile" >> Makefile
+echo "#################################################" >> Makefile
+echo "CC="$BUILD_COMPILER >> Makefile
+echo "CFLAGS="$CONFIG_CFLAGS >> Makefile
+echo "LDFLAGS=-ldl" >> Makefile
+echo "BUILDDIR=build" >> Makefile
+echo "SRCDIR=src" >> Makefile
+echo "SRCS="$(find src/ | grep cpp) >> Makefile
+echo "OBJS=\$(SRCS:\$(SRCDIR)/%.cpp=\$(BUILDDIR)/objs/%.o)" >> Makefile
+echo >> Makefile
+echo "OUTPUT="${PWD##*/}".so" >> Makefile
+echo "\$(OUTPUT): \$(OBJS)" >> Makefile
+echo "	\$(CC) \$(CFLAGS) \$(LDFLAGS) \$(OBJS) -shared -o \$(OUTPUT)" >> Makefile
+echo >> Makefile
+echo "\$(BUILDDIR)/objs/%.o: \$(SRCDIR)/%.cpp" >> Makefile
+echo "	\$(CC) \$(CFLAGS) \$(LDFLAGS) -c \$< -o \$@" >> Makefile
+echo >> Makefile
+echo "clean:" >> Makefile
+echo "	rm -r build/objs" >> Makefile
+echo >> Makefile
+cat build/Makefile.template >> Makefile
