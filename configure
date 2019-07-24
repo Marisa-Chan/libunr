@@ -88,6 +88,16 @@ echo "#################################################" >> Makefile
 echo "CC="$BUILD_COMPILER >> Makefile
 echo "CFLAGS="$CONFIG_CFLAGS >> Makefile
 echo "INSTALL_PREFIX="$BUILD_INSTALL_PATH >> Makefile
+echo "VERBOSE="$BUILD_VERBOSE >> Makefile
+echo >> Makefile
+echo "ifeq (\"\$(VERBOSE)\", \"1\")" >> Makefile
+echo "V := " >> Makefile
+echo "P = @true" >> Makefile
+echo "else" >> Makefile
+echo "V := @" >> Makefile
+echo "P = @echo" >> Makefile
+echo "endif" >> Makefile
+echo >> Makefile
 echo "LDFLAGS=-ldl" >> Makefile
 echo "BUILDDIR=build" >> Makefile
 echo "SUBDIRS="$(ls src/) >> Makefile
@@ -98,10 +108,12 @@ echo "OBJS=\$(SRCS:\$(SRCDIR)/%.cpp=\$(BUILDDIR)/%.o)" >> Makefile
 echo >> Makefile
 echo "OUTPUT="${PWD##*/}".so" >> Makefile
 echo "\$(OUTPUT): \$(OBJDIR) \$(OBJS)" >> Makefile
-echo "	\$(CC) \$(CFLAGS) \$(LDFLAGS) \$(OBJS) -shared -o \$(OUTPUT)" >> Makefile
+echo "	\$(P) \"  LD  \$(OUTPUT)\"" >> Makefile
+echo "	\$(V)\$(CC) \$(CFLAGS) \$(LDFLAGS) \$(OBJS) -shared -o \$(OUTPUT)" >> Makefile
 echo >> Makefile
 echo "\$(BUILDDIR)/%.o: \$(SRCDIR)/%.cpp" >> Makefile
-echo "	\$(CC) \$(CFLAGS) \$(LDFLAGS) -c \$< -o \$@" >> Makefile
+echo "	\$(P) \"  CC  \$<\"" >> Makefile
+echo "	\$(V)\$(CC) \$(CFLAGS) \$(LDFLAGS) -c \$< -o \$@" >> Makefile
 echo >> Makefile
 echo "clean:" >> Makefile
 echo "	@rm -rvf build" >> Makefile
