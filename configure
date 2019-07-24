@@ -81,17 +81,6 @@ then
   fi
 fi
 
-# Create build output directories
-mkdir build/objs
-mkdir build/objs/Actors
-mkdir build/objs/Asm
-mkdir build/objs/Core
-mkdir build/objs/DeusEx
-mkdir build/objs/Engine
-mkdir build/objs/HPSS
-mkdir build/objs/Rune
-mkdir build/objs/Util
-
 # Create makefile
 echo "#################################################" > Makefile
 echo "# Begin generated Makefile" >> Makefile
@@ -101,18 +90,26 @@ echo "CFLAGS="$CONFIG_CFLAGS >> Makefile
 echo "INSTALL_PREFIX="$BUILD_INSTALL_PATH >> Makefile
 echo "LDFLAGS=-ldl" >> Makefile
 echo "BUILDDIR=build" >> Makefile
+echo "SUBDIRS="$(ls src/) >> Makefile
 echo "SRCDIR=src" >> Makefile
 echo "SRCS="$(find src/ | grep cpp) >> Makefile
-echo "OBJS=\$(SRCS:\$(SRCDIR)/%.cpp=\$(BUILDDIR)/objs/%.o)" >> Makefile
+echo "OBJDIR=\$(patsubst %, \$(BUILDDIR)/%, \$(SUBDIRS))" >> Makefile
+echo "OBJS=\$(SRCS:\$(SRCDIR)/%.cpp=\$(BUILDDIR)/%.o)" >> Makefile
+echo >> Makefile
+echo "\$(OBJDIR):" >> Makefile
+echo "	mkdir -p \$@" >> Makefile
 echo >> Makefile
 echo "OUTPUT="${PWD##*/}".so" >> Makefile
-echo "\$(OUTPUT): \$(OBJS)" >> Makefile
+echo "\$(OUTPUT): \$(OBJDIR) \$(OBJS)" >> Makefile
 echo "	\$(CC) \$(CFLAGS) \$(LDFLAGS) \$(OBJS) -shared -o \$(OUTPUT)" >> Makefile
 echo >> Makefile
-echo "\$(BUILDDIR)/objs/%.o: \$(SRCDIR)/%.cpp" >> Makefile
+echo "\$(BUILDDIR)/%.o: \$(SRCDIR)/%.cpp" >> Makefile
 echo "	\$(CC) \$(CFLAGS) \$(LDFLAGS) -c \$< -o \$@" >> Makefile
 echo >> Makefile
 echo "clean:" >> Makefile
-echo "	rm -r build/objs" >> Makefile
+echo "	@rm -rvf build" >> Makefile
+echo >> Makefile
+echo ".PHONY: clean \$(OBJDIR)" >> Makefile
+echo "default: \$(OUTPUT)" >> Makefile
 echo >> Makefile
 cat res/Makefile.template >> Makefile
