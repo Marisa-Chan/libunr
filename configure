@@ -96,9 +96,6 @@ echo "SRCS="$(find src/ | grep cpp) >> Makefile
 echo "OBJDIR=\$(patsubst %, \$(BUILDDIR)/%, \$(SUBDIRS))" >> Makefile
 echo "OBJS=\$(SRCS:\$(SRCDIR)/%.cpp=\$(BUILDDIR)/%.o)" >> Makefile
 echo >> Makefile
-echo "\$(OBJDIR):" >> Makefile
-echo "	mkdir -p \$@" >> Makefile
-echo >> Makefile
 echo "OUTPUT="${PWD##*/}".so" >> Makefile
 echo "\$(OUTPUT): \$(OBJDIR) \$(OBJS)" >> Makefile
 echo "	\$(CC) \$(CFLAGS) \$(LDFLAGS) \$(OBJS) -shared -o \$(OUTPUT)" >> Makefile
@@ -109,7 +106,10 @@ echo >> Makefile
 echo "clean:" >> Makefile
 echo "	@rm -rvf build" >> Makefile
 echo >> Makefile
-echo ".PHONY: clean \$(OBJDIR)" >> Makefile
+echo "\$(OBJDIR):" >> Makefile
+echo "	mkdir -p \$@" >> Makefile
+echo >> Makefile
+echo ".PHONY: clean" >> Makefile
 echo "default: \$(OUTPUT)" >> Makefile
 echo >> Makefile
 cat res/Makefile.template >> Makefile
