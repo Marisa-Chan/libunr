@@ -3,6 +3,9 @@
 #################################################
 
 install: $(OUTPUT)
-	-@sudo cp -v $(OUTPUT) $(INSTALL_PREFIX)/lib/$(OUTPUT)
-	-@sudo cp -v res/DefaultLibunr.ini $(INSTALL_PREFIX)/share/DefaultLibunr.ini
+	-@mkdir $(INSTALL_PREFIX)/share/libunr
+	-@mkdir $(INSTALL_PREFIX)/include/libunr
+	@cp -v $< $(INSTALL_PREFIX)/lib/$<
+	@cp -v res/DefaultLibunr.ini $(INSTALL_PREFIX)/share/libunr/DefaultLibunr.ini
+	@cp -rv include/* $(INSTALL_PREFIX)/include/libunr/
 
