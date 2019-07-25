@@ -9,3 +9,7 @@ install: $(OUTPUT)
 	@cp -v res/DefaultLibunr.ini $(INSTALL_PREFIX)/share/libunr/DefaultLibunr.ini
 	@cp -rv include/* $(INSTALL_PREFIX)/include/libunr/
 
+tags:
+	ctags --c++-kinds=+p --fields=+iaS --extra=+q --language-force=C++ --recurse=yes .
+
+.PHONY: tags
