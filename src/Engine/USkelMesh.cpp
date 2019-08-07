@@ -35,6 +35,77 @@ USkeletalMesh::~USkeletalMesh()
 {
 }
 
+FPackageFileIn& operator>>( FPackageFileIn& In, FSkeletalWedge& SW )
+{
+  In >> SW.VertexIndex; 
+  In >> SW.Flags;
+  In >> SW.U;
+  In >> SW.V;
+  return In;
+}
+
+FPackageFileIn& operator>>( FPackageFileIn& In, FBonePos& BP )
+{
+  In >> BP.Orientation;
+  In >> BP.Position; 
+  In >> BP.Length;
+  In >> BP.Size;
+  return In;
+}
+
+FPackageFileIn& operator>>( FPackageFileIn& In, FRefSkeleton& RS )
+{
+  In >> RS.Name;
+  In >> RS.Flags;
+  In >> RS.BonePos;
+  In >> RS.NumChildren;
+  In >> RS.ParentIndex;
+  return In;
+}
+
+FPackageFileIn& operator>>( FPackageFileIn& In, FBoneWeightIndex& BWI )
+{
+  In >> BWI.WeightIndex;
+  In >> BWI.Number;
+  In >> BWI.DetailA;
+  In >> BWI.DetailB;
+  return In;
+}
+
+FPackageFileIn& operator>>( FPackageFileIn& In, FBoneWeight& BW )
+{
+  In >> BW.PointIndex;
+  In >> BW.BoneWeight;
+  return In;
+}
+
+void USkeletalMesh::Load()
+{
+  Super::Load();
+  FPackageFileIn& In = *PkgFile;
+
+  READ_ARRAY( In, ExtWedges );
+  READ_ARRAY( In, Points );
+  READ_ARRAY( In, Refs );
+  READ_ARRAY( In, WeightIndices );
+  READ_ARRAY( In, Weights );
+  READ_ARRAY( In, LocalPoints );
+
+  In >> SkeletalDepth;
+
+  idx DefAnimIdx; 
+  In >> CINDEX( DefAnimIdx );
+  DefaultAnimation = (UAnimation*)LoadObject( DefAnimIdx, UAnimation::StaticClass(), NULL );
+
+  In >> WeaponBoneIndex;
+  In >> WeaponAdjust;
+}
+
+bool USkeletalMesh::ExportToFile( const char* Dir, const char* Type )
+{
+  return true;
+}
+
 #include "Core/UClass.h"
 #include "Core/UPackage.h"
 IMPLEMENT_NATIVE_CLASS( USkeletalMesh );

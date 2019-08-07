@@ -428,13 +428,26 @@ UProperty* UObject::FindProperty( const char* PropName )
 // (or memory corruption) woes later in the future...
 UObject* UObject::Clone()
 {
-  UObject* ClonedObj = Class->Constructor( Class->StructSize );
+  // Enforce explicitly that both classes are the same.
+  UClass* ThisClass = Class;
+  UClass* ClonedClass;
 
-  // MAKE SURE STRUCTSIZE IS SAFE!!!
-  if ( LIKELY( ClonedObj != NULL ) )
-    memcpy( ClonedObj, this, Class->StructSize );
+  UObject* ClonedObj = ThisClass->Constructor( Class->StructSize );
+  ClonedClass = ClonedObj->Class;
 
-  Class->AddRef();
+#ifdef __clang__
+  // Yes this looks spooky, but it should be enforced that the cloned
+  // and parent classes are the same. In this case, it is fine
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdynamic-class-memaccess"
+#endif
+  if ( ClonedObj != NULL && ThisClass == ClonedClass )
+    memcpy( ClonedObj, this, ThisClass->StructSize );
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
+  ThisClass->AddRef();
   return ClonedObj;
 }
 

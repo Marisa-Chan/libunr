@@ -26,13 +26,74 @@
 #pragma once
 
 #include "Engine/ULodMesh.h"
+#include "Engine/USkelAnim.h"
+
+struct DLL_EXPORT FSkeletalWedge
+{
+  u16 VertexIndex;
+  u16 Flags;
+  float U;
+  float V;
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FSkeletalWedge& SW );
+};
+
+struct DLL_EXPORT FBonePos
+{
+  FPlane Orientation;
+  FVector Position;
+  float Length;
+  FVector Size;
+  
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FBonePos& BP );
+};
+
+struct DLL_EXPORT FRefSkeleton
+{
+  FName Name;
+  u32 Flags;
+  FBonePos BonePos;
+  u32 NumChildren;
+  u32 ParentIndex;
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FRefSkeleton& RS );
+};
+
+struct DLL_EXPORT FBoneWeightIndex
+{
+  u16 WeightIndex;
+  u16 Number;
+  u16 DetailA;
+  u16 DetailB;
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FBoneWeightIndex& BWI );
+};
+
+struct DLL_EXPORT FBoneWeight
+{
+  u16 PointIndex;
+  u16 BoneWeight;
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FBoneWeight& BW );
+};
 
 class DLL_EXPORT USkeletalMesh : public ULodMesh
 {
   DECLARE_NATIVE_CLASS( USkeletalMesh, ULodMesh, CLASS_NoExport, Engine )
 
   USkeletalMesh();
+  virtual void Load();
+  virtual bool ExportToFile( const char* Dir, const char* Type );
 
-  // TODO: Fill out variables when we get to implementing this
+  TArray<FSkeletalWedge> ExtWedges;
+  TArray<FVector> Points;
+  TArray<FRefSkeleton> Refs;
+  TArray<FBoneWeightIndex> WeightIndices;
+  TArray<FBoneWeight> Weights;
+  TArray<FVector> LocalPoints;
+  u32 SkeletalDepth;
+  UAnimation* DefaultAnimation;
+  u32 WeaponBoneIndex;
+  FCoords WeaponAdjust;
 };
 

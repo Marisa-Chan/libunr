@@ -52,6 +52,7 @@
 #include "Engine/UConsole.h"
 #include "Engine/UEngine.h"
 #include "Engine/ULevel.h"
+#include "Engine/ULodMesh.h"
 #include "Engine/UMesh.h"
 #include "Engine/UModel.h"
 #include "Engine/UMusic.h"

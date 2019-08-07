@@ -63,6 +63,12 @@ CONFIG_CFLAGS=""
 if [ "$BUILD_COMPILER" = "g++" ] || [ "$BUILD_COMPILER" = "clang++" ] 
 then
   CONFIG_CFLAGS="-fPIC -I/usr/include -I./include -fmax-errors=10 -std=c++11 -Wno-attributes -DINSTALL_PREFIX=\\\"$BUILD_INSTALL_PATH\\\""
+
+  if [ "$BUILD_COMPILER" = "clang++" ]
+  then
+    CONFIG_CFLAGS="$CONFIG_CFLAGS -Wno-unused-command-line-argument -Wno-unused-value"
+  fi
+
   if [ "$BUILD_DEBUG" -eq 1 ]
   then
     CONFIG_CFLAGS="$CONFIG_CFLAGS -g -O0"

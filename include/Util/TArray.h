@@ -27,6 +27,8 @@
 #include <vector>
 #include "Util/FMacro.h"
 
+class FPackageFileIn;
+
 using std::vector;
 template<class T> class TArray : public vector<T>
 {
@@ -58,6 +60,12 @@ public:
   FORCEINLINE void PopBack()                          { vector<T>::pop_back(); }
   FORCEINLINE void Swap( TArray<T>& x )               { vector<T>::swap(x); }
   FORCEINLINE void Clear()                            { vector<T>::clear(); }
+  FORCEINLINE void Append( TArray<T>& x )
+  {
+    vector<T>::insert( vector<T>::end(), x.begin(), x.end() );
+  }
+
+  FPackageFileIn& ReadArray( FPackageFileIn& In );
 
   size_t ElementSize;
 };

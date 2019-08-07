@@ -27,17 +27,58 @@
 
 #include "Core/UObject.h"
 #include "Core/UMath.h"
-#include "Engine/USkelMesh.h"
 
 class AActor;
+class USkeletalMesh;
+
+struct DLL_EXPORT FRefBone
+{
+  FName Name;
+  u32 Flags;
+  u32 ParentIndex;
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FRefBone& RB );
+};
+
+struct DLL_EXPORT FAnalogTrack
+{
+  u32 Flags;
+  TArray<FPlane>  KeyQuats;
+  TArray<FVector> KeyPositions;
+  TArray<float>   KeyTimes;
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FAnalogTrack& AAT );
+};
+
+struct DLL_EXPORT FAnimAnalogTrack
+{
+  FAnalogTrack Track;
+  FAnalogTrack Root;
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FAnimAnalogTrack& AAT );
+};
+
+struct DLL_EXPORT FAnimMove
+{
+  FVector RootSpeed3D;
+  float TrackTime;
+  u32 StartBone;
+  TArray<u32> BoneIndices;
+  TArray<FAnimAnalogTrack> AnalogTracks;
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FAnimMove& AM );
+};
 
 class DLL_EXPORT UAnimation : public UObject
 {
   DECLARE_NATIVE_CLASS( UAnimation, UObject, CLASS_NoExport, Engine )
 
   UAnimation();
+  virtual void Load();
+  virtual bool ExportToFile( const char* Path, const char* Dir );
 
-  // TODO: Fill out variables when we get to implementing this
+  TArray<FRefBone> RefBones;
+  TArray<FAnimMove> AnimMoves;
 };
 
 class DLL_EXPORT USkeletalMeshInstance : public UObject
@@ -74,22 +115,22 @@ class DLL_EXPORT USkeletalMeshInstance : public UObject
     idx     AnimName;
   };
 
-  std::vector<FCoords>*    SpaceBases; // Last computed skeleton coordinates.
-  std::vector<int>*        CachedLinks; // Initialized links with animation and skeleton
+  TArray<FCoords>*    SpaceBases; // Last computed skeleton coordinates.
+  TArray<int>*        CachedLinks; // Initialized links with animation and skeleton
   u8                       bHasUpdated; // Has this mesh been updated this tick yet?
   USkeletalMesh*           LastDrawnMesh; // Last mesh used on this render actor.
   UAnimation*              CachedAnim; // Last used animation on the render actor.
-  std::vector<FCoords>*    CachedOrientations; // Cached data (for tweening)
-  std::vector<FVector>*    CachedPositions; // Cached data (for tweening)
+  TArray<FCoords>*    CachedOrientations; // Cached data (for tweening)
+  TArray<FVector>*    CachedPositions; // Cached data (for tweening)
   float                    TweenStartFrame; // Starting frame for tweening
   Matrix                   Base; // Temp data
   u8                       bHasCachedFrame, bWasTweening; // Temp data
   idx                      CachedTweenSeq; // Temp data
-  std::vector<MeshModifierType>* Modifiers; // Bone rotation/scale modifiers
-  std::vector<AnimationChannel>* Channels; // Animation channels effected on this actor.
+  TArray<MeshModifierType>* Modifiers; // Bone rotation/scale modifiers
+  TArray<AnimationChannel>* Channels; // Animation channels effected on this actor.
   int                      TChannelPtr; // Temp data
 
-  std::vector<AActor*>* AttachedActors; // Actors attached to this skeletal mesh.
+  TArray<AActor*>* AttachedActors; // Actors attached to this skeletal mesh.
   int AttachedBoneIndex; // Bone where this actor is attached to.
   idx AttachedBoneName; // Cached attached bone name (in case mesh changes).
   AActor* MyAttachment; // Actor this actor is currently being attached to.

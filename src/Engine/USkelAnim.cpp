@@ -34,6 +34,58 @@ UAnimation::~UAnimation()
 {
 }
 
+FPackageFileIn& operator>>( FPackageFileIn& In, FRefBone& RB )
+{
+  In >> RB.Name;
+  In >> RB.Flags;
+  In >> RB.ParentIndex;
+
+  return In;
+}
+
+FPackageFileIn& operator>>( FPackageFileIn& In, FAnalogTrack& AT )
+{
+  In >> AT.Flags;
+  AT.KeyQuats.ReadArray( In );
+  AT.KeyPositions.ReadArray( In );
+  AT.KeyTimes.ReadArray( In );
+  
+  return In;
+}
+
+FPackageFileIn& operator>>( FPackageFileIn& In, FAnimAnalogTrack& AAT )
+{
+  In >> AAT.Track;
+  In >> AAT.Root;
+
+  return In;
+}
+
+FPackageFileIn& operator>>( FPackageFileIn& In, FAnimMove& AM )
+{
+  In >> AM.RootSpeed3D;
+  In >> AM.TrackTime;
+  In >> AM.StartBone;
+  AM.BoneIndices.ReadArray( In );
+  AM.AnalogTracks.ReadArray( In );
+
+  return In;
+}
+
+void UAnimation::Load()
+{
+  Super::Load();
+
+  FPackageFileIn& In = *PkgFile;
+  RefBones.ReadArray( In );
+  AnimMoves.ReadArray( In );
+}
+
+bool UAnimation::ExportToFile( const char* Path, const char* Dir )
+{
+  return true;
+}
+
 USkeletalMeshInstance::USkeletalMeshInstance()
   : UObject()
 {

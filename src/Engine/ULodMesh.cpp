@@ -20,6 +20,8 @@
  * ULodMesh.cpp - "Level of Detail" Mesh functionality
  * 
  * written by Adam 'Xaleros' Smith
+ * with a good deal of help from this source file of UModel
+ * https://github.com/gildor2/UModel/blob/master/Unreal/UnMesh1.cpp
  *========================================================================
 */
 
@@ -77,17 +79,37 @@ void ULodMesh::Load()
   In >> CINDEX( SpecialFaceCount );
   SpecialFaces.Resize( SpecialFaceCount );
   In.Read( SpecialFaces.Data(), SpecialFaceCount * sizeof(FLodFace) );
+ 
+  // 227 seems to change the material type to 0x81, I guess
+  // for clearly identifying weapon triangles. Can't rely on this
+  // behavior as it isn't seen anywhere else
+  for ( int i = 0; i < SpecialFaceCount; i++ )
+  {
+    if ( SpecialFaces[i].MaterialIndex == 0x81 )
+      SpecialFaces[i].MaterialIndex = 0;
+  }
+
+  Faces.Append( SpecialFaces );
 
   In >> ModelVerts >> SpecialVerts;
   In >> MeshScaleMax >> LODHysteresis;
   In >> LODStrength >> LODMinVerts;
   In >> LODMorph >> LODZDisplace;
 
+  // TODO: We will probably have to make use of this somehow
   In >> CINDEX( ReMapAnimVertCount );
   ReMapAnimVerts.Resize( ReMapAnimVertCount );
   In.Read( ReMapAnimVerts.Data(), ReMapAnimVertCount * sizeof(u16) );
 
   In >> OldFrameVerts;
+
+  if ( SpecialFaces.Size() > 0 )
+  {
+    // Ugh, need to remap all of the wedges for special vertices
+    // Behavior observed in UModel source
+    for ( int i = 0; i < Wedges.Size(); i++ )
+      Wedges[i].VertexIndex += SpecialVerts;
+  }
 };
 
 bool ULodMesh::ExportUnreal3DMesh( const char* Dir, int Frame )
@@ -115,13 +137,14 @@ bool ULodMesh::ExportUnreal3DMesh( const char* Dir, int Frame )
   FVertexDataHeader DataHdr;
   memset( &DataHdr, 0, sizeof(DataHdr) ); // Everything else goes unused
   DataHdr.NumPolygons = Faces.Size();
-  DataHdr.NumVertices = ModelVerts;
+  DataHdr.NumVertices = FrameVerts;
   
   Out.Write( &DataHdr, sizeof(DataHdr) );
 
   FVertexDataTri TriOut;
   for ( int i = 0; i < DataHdr.NumPolygons; i++ )
   {
+    // Maybe inline this so it's a bit neater
     FLodWedge TriWedges[3];
     TriWedges[0] = Wedges[Faces[i].WedgeIndex[0]];
     TriWedges[1] = Wedges[Faces[i].WedgeIndex[1]];
@@ -142,9 +165,8 @@ bool ULodMesh::ExportUnreal3DMesh( const char* Dir, int Frame )
     TriOut.Type = 0;
     FLodMaterial Mat = Materials[Faces[i].MaterialIndex];
 
-    // Weapon triangles are invisible, so maybe that's the only thing the engine
-    // checks for? Might need to look into this some more...
-    if ( Mat.Flags & PF_Invisible && SpecialVerts > 0 )
+    // Weapon triangles are only in the special faces array
+    if ( SpecialFaces.Size() == 1 && i == Faces.Size()-1 )
       TriOut.Type = JMT_WeaponTriangle;
     else if ( Mat.Flags & PF_TwoSided )
     {
@@ -327,7 +349,7 @@ bool ULodMesh::ExportObjMesh( const char* Dir, int Frame )
 
       Out.Printf("vn %.6f %.6f %.6f\n", Normal.X, Normal.Y, Normal.Z);
     }
-    delete VertNormals;
+    delete[] VertNormals;
   }
 
   // Polygons

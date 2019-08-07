@@ -145,7 +145,7 @@ int FConfig::Load( const char* Filename )
   while ( !IniFile.Eof() ) // why doesn't Eof() work??
   {
     Status = IniFile.Read( &Probe, 1 );
-    if ( Status == MAX_UINT64 )
+    if ( Status == MAX_UINT32 )
     {
       GLogf( LOG_WARN, "Failed to read from INI file '%s'", Filename );
       IniFile.Close();
