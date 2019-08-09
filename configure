@@ -59,6 +59,15 @@ echo "BUILD_INSTALL_PATH="$BUILD_INSTALL_PATH
 
 CONFIG_CFLAGS=""
 
+# Get sources in desired order
+BUILD_SRCS="$(find src/Util | grep cpp)"
+BUILD_SRCS="$BUILD_SRCS $(find src/Core | grep cpp)"
+BUILD_SRCS="$BUILD_SRCS $(find src/Engine | grep cpp)"
+BUILD_SRCS="$BUILD_SRCS $(find src/Actors | grep cpp)"
+BUILD_SRCS="$BUILD_SRCS $(find src/DeusEx | grep cpp)"
+BUILD_SRCS="$BUILD_SRCS $(find src/Rune   | grep cpp)"
+BUILD_SRCS="$BUILD_SRCS $(find src/HPSS   | grep cpp)"
+
 # Compiler specific options
 if [ "$BUILD_COMPILER" = "g++" ] || [ "$BUILD_COMPILER" = "clang++" ] 
 then
@@ -108,7 +117,7 @@ echo "LDFLAGS=-ldl" >> Makefile
 echo "BUILDDIR=build" >> Makefile
 echo "SUBDIRS="$(ls src/) >> Makefile
 echo "SRCDIR=src" >> Makefile
-echo "SRCS="$(find src/ | grep cpp) >> Makefile
+echo "SRCS="$BUILD_SRCS >> Makefile
 echo "OBJDIR=\$(patsubst %, \$(BUILDDIR)/%, \$(SUBDIRS))" >> Makefile
 echo "OBJS=\$(SRCS:\$(SRCDIR)/%.cpp=\$(BUILDDIR)/%.o)" >> Makefile
 echo >> Makefile
