@@ -84,12 +84,12 @@ void USkeletalMesh::Load()
   Super::Load();
   FPackageFileIn& In = *PkgFile;
 
-  READ_ARRAY( In, ExtWedges );
-  READ_ARRAY( In, Points );
-  READ_ARRAY( In, Refs );
-  READ_ARRAY( In, WeightIndices );
-  READ_ARRAY( In, Weights );
-  READ_ARRAY( In, LocalPoints );
+  In >> ExtWedges; 
+  In >> Points;
+  In >> Refs;
+  In >> WeightIndices;
+  In >> Weights;
+  In >> LocalPoints;
 
   In >> SkeletalDepth;
 

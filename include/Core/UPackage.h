@@ -53,20 +53,6 @@ public:
 };
 
 /*-----------------------------------------------------------------------------
- * FCompactIndex
- * https://wiki.beyondunreal.com/Legacy:Package_File_Format/Data_Details
------------------------------------------------------------------------------*/
-class DLL_EXPORT FCompactIndex
-{
-public:
-  int Value;
-  friend FPackageFileIn&  operator>>( FPackageFileIn& Ar,  FCompactIndex& Index );
-  friend FPackageFileOut& operator<<( FPackageFileOut& Ar, FCompactIndex& Index );
-};
-
-#define CINDEX(val) (*(FCompactIndex*)&val)
-
-/*-----------------------------------------------------------------------------
  * FExport
  * A data struct that contains information about a single object
  * that a package will expose to outside sources

@@ -26,8 +26,7 @@
 #pragma once
 #include <vector>
 #include "Util/FMacro.h"
-
-class FPackageFileIn;
+#include "Util/FTypes.h"
 
 using std::vector;
 template<class T> class TArray : public vector<T>
@@ -65,7 +64,16 @@ public:
     vector<T>::insert( vector<T>::end(), x.begin(), x.end() );
   }
 
-  FPackageFileIn& ReadArray( FPackageFileIn& In );
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, TArray<T>& Array )
+  {
+    idx ArrCount;
+    In >> CINDEX( ArrCount );
+    Array.Resize( ArrCount );
+    for ( int i = 0; i < ArrCount; i++ )
+      In >> Array[i];
+
+    return In;
+  }
 
   size_t ElementSize;
 };

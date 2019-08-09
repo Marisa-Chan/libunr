@@ -23,6 +23,10 @@
  *========================================================================
 */
 
+#pragma once
+
+#include "Util/FMacro.h"
+
 // short hand data types
 typedef unsigned char  u8;
 typedef unsigned short u16;
@@ -64,6 +68,22 @@ typedef signed long long i64;
 
 // TODO: make type 'idx' cast automatically to FCompactIndex
 typedef i32 idx;
+
+class FPackageFileIn;
+class FPackageFileOut;
+/*-----------------------------------------------------------------------------
+ * FCompactIndex
+ * https://wiki.beyondunreal.com/Legacy:Package_File_Format/Data_Details
+-----------------------------------------------------------------------------*/
+class DLL_EXPORT FCompactIndex
+{
+public:
+  int Value;
+  friend FPackageFileIn&  operator>>( FPackageFileIn& Ar,  FCompactIndex& Index );
+  friend FPackageFileOut& operator<<( FPackageFileOut& Ar, FCompactIndex& Index );
+};
+
+#define CINDEX(val) (*(FCompactIndex*)&val)
 
 //========================================================================
 // EOF

@@ -234,20 +234,6 @@ DLL_EXPORT FPackageFileOut& operator<<( FPackageFileOut& Out, FCompactIndex& Ind
 }
 
 /*-----------------------------------------------------------------------------
- * TArray serialization
------------------------------------------------------------------------------*/
-template<class T> FPackageFileIn& TArray<T>::ReadArray( FPackageFileIn& In )
-{
-  idx ArrCount;
-  In >> CINDEX( ArrCount );
-  Resize( ArrCount );
-  for ( int i = 0; i < ArrCount; i++ )
-    In >> (*this)[i];
-
-  return In;
-}
-
-/*-----------------------------------------------------------------------------
  * UPackage
 -----------------------------------------------------------------------------*/
 TArray<UPackage*>* UPackage::Packages = NULL;

@@ -25,6 +25,7 @@
 
 #pragma once
 #include <string>
+#include "Util/FTypes.h"
 
 class FName;
 class FPackageFileIn;

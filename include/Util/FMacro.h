@@ -141,9 +141,7 @@ private: \
 #define ERR_BAD_DATA       2
 #define ERR_FILE_CREATE    3
 
-#include "Util/FTypes.h"
-
-static inline int CalcObjRefValue( idx ObjRef )
+static inline int CalcObjRefValue( int ObjRef )
 {
   if ( ObjRef == 0 )
     return ObjRef;
