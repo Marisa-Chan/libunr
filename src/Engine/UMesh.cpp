@@ -78,7 +78,7 @@ FPackageFileIn& operator>>( FPackageFileIn& In, FMeshAnimFunc& MAF )
   return In; 
 }
 
-FPackageFileIn& operator>>( FPackageFileIn& In, FMeshAnim& MA )
+FPackageFileIn& operator>>( FPackageFileIn& In, FMeshAnimSeq& MA )
 {
   In >> MA.Name;
   In >> MA.Group;
@@ -153,23 +153,13 @@ void UMesh::Load()
   if ( PkgFile->Ver > PKG_VER_UN_200 )
     In >> TrisJump;
 
-  In >> CINDEX( TrisCount );
-  Tris.Resize( TrisCount );
-  for ( int i = 0; i < TrisCount; i++ )  
-    In >> Tris[i];
-
-  In >> CINDEX( AnimsCount );
-  Anims.Resize( AnimsCount );
-  for ( int i = 0; i < AnimsCount; i++ )
-    In >> Anims[i];
+  In >> Tris;
+  In >> Anims;
 
   if ( PkgFile->Ver > PKG_VER_UN_200 )
     In >> ConnectsJump;
 
-  In >> CINDEX( ConnectsCount );
-  Connects.Resize( ConnectsCount );
-  for ( int i = 0; i < ConnectsCount; i++ )
-    In >> Connects[i];
+  In >> Connects;
 
   // Why are these stored twice???
   FBox BBox2;
@@ -178,10 +168,7 @@ void UMesh::Load()
   In >> BBox2 >> Sphere2; 
 
   In >> VertLinksJump;
-  In >> CINDEX( VertLinksCount );
-  VertLinks.Resize( VertLinksCount );
-  for ( int i = 0; i < VertLinksCount; i++ )
-    In >> VertLinks[i];
+  In >> VertLinks;
 
   In >> CINDEX( TexturesCount );
   Textures.Resize( TexturesCount );
@@ -192,16 +179,8 @@ void UMesh::Load()
     Textures[i] = (UTexture*)LoadObject( ObjRef, UTexture::StaticClass(), NULL );
   }
 
-  In >> CINDEX( BoundBoxCount );
-  BoundingBoxes.Resize( BoundBoxCount );
-  for ( int i = 0; i < BoundBoxCount; i++ )
-    In >> BoundingBoxes[i];
-
-  In >> CINDEX( BoundSphereCount );
-  BoundingSpheres.Resize( BoundSphereCount );
-  for ( int i = 0; i < BoundSphereCount; i++ )
-    In >> BoundingSpheres[i];
-
+  In >> BoundingBoxes;
+  In >> BoundingSpheres;
   In >> FrameVerts >> AnimFrames;
 
   u32 ANDFlags, ORFlags; // ???

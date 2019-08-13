@@ -27,17 +27,18 @@
 
 #include "Core/UObject.h"
 #include "Core/UMath.h"
+#include "Engine/UMesh.h"
 
 class AActor;
 class USkeletalMesh;
 
-struct DLL_EXPORT FRefBone
+struct DLL_EXPORT FNamedBone
 {
   FName Name;
   u32 Flags;
-  u32 ParentIndex;
+  int ParentIndex;
 
-  friend FPackageFileIn& operator>>( FPackageFileIn& In, FRefBone& RB );
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FNamedBone& NB );
 };
 
 struct DLL_EXPORT FAnalogTrack
@@ -50,23 +51,18 @@ struct DLL_EXPORT FAnalogTrack
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FAnalogTrack& AAT );
 };
 
-struct DLL_EXPORT FAnimAnalogTrack
-{
-  FAnalogTrack Track;
-  FAnalogTrack Root;
-
-  friend FPackageFileIn& operator>>( FPackageFileIn& In, FAnimAnalogTrack& AAT );
-};
-
-struct DLL_EXPORT FAnimMove
+struct DLL_EXPORT FMotionChunk
 {
   FVector RootSpeed3D;
   float TrackTime;
-  u32 StartBone;
-  TArray<u32> BoneIndices;
-  TArray<FAnimAnalogTrack> AnalogTracks;
+  int StartBone;
+  u32 Flags;
 
-  friend FPackageFileIn& operator>>( FPackageFileIn& In, FAnimMove& AM );
+  TArray<int> BoneIndices;
+  TArray<FAnalogTrack> AnalogTracks;
+  FAnalogTrack RootTrack;
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FMotionChunk& AM );
 };
 
 class DLL_EXPORT UAnimation : public UObject
@@ -77,8 +73,16 @@ class DLL_EXPORT UAnimation : public UObject
   virtual void Load();
   virtual bool ExportToFile( const char* Path, const char* Dir );
 
-  TArray<FRefBone> RefBones;
-  TArray<FAnimMove> AnimMoves;
+  TArray<FNamedBone> RefBones;
+  TArray<FMotionChunk> Moves;
+  TArray<FMeshAnimSeq> AnimSeqs;
+
+  // Purpose currently unknown
+  //TArray<FMotionChunkDigestInfo> MovesInfo;
+  //int RawNumFrames;
+  //TArray<FQuatAnimKey> RawAnimKeys;
+  //TArray<FAnimInfoBinary> RawAnimSeqInfo;
+  //float CompFactor;
 };
 
 class DLL_EXPORT USkeletalMeshInstance : public UObject

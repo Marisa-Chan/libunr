@@ -59,7 +59,7 @@ struct DLL_EXPORT FMeshAnimFunc
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FMeshAnimFunc& MAF );
 };
 
-struct DLL_EXPORT FMeshAnim
+struct DLL_EXPORT FMeshAnimSeq
 {
   FName Name;
   FName Group;
@@ -68,7 +68,7 @@ struct DLL_EXPORT FMeshAnim
   TArray<FMeshAnimFunc> Functions;
   float Rate;
 
-  friend FPackageFileIn& operator>>( FPackageFileIn& In, FMeshAnim& MA );
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FMeshAnimSeq& MA );
 };
 
 struct DLL_EXPORT FMeshVertConnect
@@ -88,7 +88,7 @@ class DLL_EXPORT UMesh : public UPrimitive
 
   TArray<FMeshVert> Verts;
   TArray<FMeshTri>  Tris;
-  TArray<FMeshAnim> Anims;
+  TArray<FMeshAnimSeq> Anims;
   TArray<FMeshVertConnect> Connects;
   TArray<u32> VertLinks;
   TArray<UTexture*> Textures;

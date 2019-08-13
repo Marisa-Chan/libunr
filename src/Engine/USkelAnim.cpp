@@ -34,11 +34,11 @@ UAnimation::~UAnimation()
 {
 }
 
-FPackageFileIn& operator>>( FPackageFileIn& In, FRefBone& RB )
+FPackageFileIn& operator>>( FPackageFileIn& In, FNamedBone& NB )
 {
-  In >> RB.Name;
-  In >> RB.Flags;
-  In >> RB.ParentIndex;
+  In >> NB.Name;
+  In >> NB.Flags;
+  In >> NB.ParentIndex;
 
   return In;
 }
@@ -53,21 +53,15 @@ FPackageFileIn& operator>>( FPackageFileIn& In, FAnalogTrack& AT )
   return In;
 }
 
-FPackageFileIn& operator>>( FPackageFileIn& In, FAnimAnalogTrack& AAT )
+FPackageFileIn& operator>>( FPackageFileIn& In, FMotionChunk& MC )
 {
-  In >> AAT.Track;
-  In >> AAT.Root;
-
-  return In;
-}
-
-FPackageFileIn& operator>>( FPackageFileIn& In, FAnimMove& AM )
-{
-  In >> AM.RootSpeed3D;
-  In >> AM.TrackTime;
-  In >> AM.StartBone;
-  In >> AM.BoneIndices;
-  In >> AM.AnalogTracks;
+  In >> MC.RootSpeed3D;
+  In >> MC.TrackTime;
+  In >> MC.StartBone;
+  In >> MC.Flags;
+  In >> MC.BoneIndices;
+  In >> MC.AnalogTracks;
+  In >> MC.RootTrack;
 
   return In;
 }
@@ -78,7 +72,8 @@ void UAnimation::Load()
 
   FPackageFileIn& In = *PkgFile;
   In >> RefBones;
-  In >> AnimMoves;
+  In >> Moves;
+  In >> AnimSeqs;
 }
 
 bool UAnimation::ExportToFile( const char* Path, const char* Dir )
