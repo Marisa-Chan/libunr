@@ -32,6 +32,23 @@
 class AActor;
 class USkeletalMesh;
 
+/*-----------------------------------------------------------------------------
+ * FChunkHeader
+ * Header for both PSK and PSA files
+-----------------------------------------------------------------------------*/
+#define SKELETAL_CHUNK_TYPE_FLAGS 0x1e83b9 
+struct FChunkHeader
+{
+  char ChunkID[20];
+  int  TypeFlags;
+  int  DataSize;
+  int  DataCount;
+};
+
+/*-----------------------------------------------------------------------------
+ * FNamedBone
+ * Describes a bone within an animation object
+-----------------------------------------------------------------------------*/
 struct DLL_EXPORT FNamedBone
 {
   FName Name;
@@ -41,6 +58,10 @@ struct DLL_EXPORT FNamedBone
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FNamedBone& NB );
 };
 
+/*-----------------------------------------------------------------------------
+ * FAnalogTrack
+ * Describes animation for a single bone
+-----------------------------------------------------------------------------*/
 struct DLL_EXPORT FAnalogTrack
 {
   u32 Flags;
@@ -51,6 +72,10 @@ struct DLL_EXPORT FAnalogTrack
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FAnalogTrack& AAT );
 };
 
+/*-----------------------------------------------------------------------------
+ * FMotionChunk
+ * A group of analog chunks to describe motion for a single frame (?)
+-----------------------------------------------------------------------------*/
 struct DLL_EXPORT FMotionChunk
 {
   FVector RootSpeed3D;
@@ -65,6 +90,10 @@ struct DLL_EXPORT FMotionChunk
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FMotionChunk& AM );
 };
 
+/*-----------------------------------------------------------------------------
+ * UAnimation
+ * An object for skeletal animations
+-----------------------------------------------------------------------------*/
 class DLL_EXPORT UAnimation : public UObject
 {
   DECLARE_NATIVE_CLASS( UAnimation, UObject, CLASS_NoExport, Engine )

@@ -76,3 +76,13 @@ public:
   virtual int Open( const FString& Filename );
 };
 
+/*-----------------------------------------------------------------------------
+ * FStringFilePath
+ * An FString variant that ensures consistent state for a file path
+-----------------------------------------------------------------------------*/
+class DLL_EXPORT FStringFilePath : public FString
+{
+public:
+  FStringFilePath( const char* Dir, const char* Name, const char* Ext=NULL );
+};
+

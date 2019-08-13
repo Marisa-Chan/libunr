@@ -135,3 +135,20 @@ int FFileArchiveOut::Open( const FString& Filename )
   return (File == NULL) ? errno : 0;
 }
 
+/*-----------------------------------------------------------------------------
+  FStringFilePath
+-----------------------------------------------------------------------------*/
+FStringFilePath::FStringFilePath( const char* Dir, const char* Name, const char* Ext )
+  : FString()
+{
+  Append( Dir );
+#if defined LIBUNR_WIN32
+  ReplaceChars( '\\', '/' );
+#endif
+  if ( Back() != '/' )
+    Append('/');
+
+  Append( Name );
+  Append( '.' );
+  Append( Ext );
+}

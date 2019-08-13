@@ -103,7 +103,31 @@ void USkeletalMesh::Load()
 
 bool USkeletalMesh::ExportToFile( const char* Dir, const char* Type )
 {
-  return true;
+  if ( stricmp( Type, "psk" ) != 0 )
+  {
+    GLogf( LOG_ERR, "Can't export skeletal mesh to file type '%s'", Type );
+    return false;
+  }
+
+  // Open psk file
+  FStringFilePath Filename( Dir, Name.Data(), Type );
+  FFileArchiveOut* Out = new FFileArchiveOut();
+  if ( Out->Open( Filename ) != 0 )
+  {
+    GLogf( LOG_WARN, "Failed to export skeletal mesh to file '%s'", Filename.Data() );
+    return false;
+  }
+
+  // Write chunk header
+  FChunkHeader Hdr;
+  memset( &Hdr, 0, sizeof(FChunkHeader) );
+  strcpy( Hdr.ChunkID, "ACTRHEAD" );
+  Hdr.TypeFlags = SKELETAL_CHUNK_TYPE_FLAGS;
+  Hdr.DataSize = 0;
+  Hdr.DataCount = 0;
+
+  // Write points
+  
 }
 
 #include "Core/UClass.h"
