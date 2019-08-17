@@ -34,6 +34,13 @@ UAnimation::~UAnimation()
 {
 }
 
+FFileArchiveOut& operator<<( FFileArchiveOut& Out, FChunkHeaderOut& Hdr )
+{
+  Out.Write( Hdr.ChunkId, sizeof(Hdr.ChunkId) );
+  Out << TypeFlags << DataSize << DataCount;
+  return Out;
+}
+
 FPackageFileIn& operator>>( FPackageFileIn& In, FNamedBone& NB )
 {
   In >> NB.Name;

@@ -44,6 +44,21 @@ FPackageFileIn& operator>>( FPackageFileIn& In, FSkeletalWedge& SW )
   return In;
 }
 
+FWedgeChunk::FWedgeChunk( FLodWedge& LodWedge )
+{
+  VertexIndex = LodWedge.VertexIndex;
+  U = (float)LodWedge.S / 255.f;
+  V = (255.f - (float)LodWedge.T) / 255.f;
+  MaterialIndex = 0; // Can this go unused?
+  _pad0 = 0;
+}
+
+FFileArchiveOut& operator<<( FFileArchiveOut& Out, FWedgeChunk& Wedge )
+{
+  Out << Wedge.VertexIndex << Wedge.U << Wedge.V << Wedge.MaterialIndex << Wedge._pad0;
+  return Out;
+}
+
 FPackageFileIn& operator>>( FPackageFileIn& In, FBonePos& BP )
 {
   In >> BP.Orientation;
@@ -118,16 +133,77 @@ bool USkeletalMesh::ExportToFile( const char* Dir, const char* Type )
     return false;
   }
 
-  // Write chunk header
-  FChunkHeader Hdr;
-  memset( &Hdr, 0, sizeof(FChunkHeader) );
-  strcpy( Hdr.ChunkID, "ACTRHEAD" );
-  Hdr.TypeFlags = SKELETAL_CHUNK_TYPE_FLAGS;
-  Hdr.DataSize = 0;
-  Hdr.DataCount = 0;
+  FChunkHeaderOut ChunkHdr;
+
+  // Write PSK header
+  strcpy( ChunkHdr.ChunkId, "ACTRHEAD" );
+  ChunkHdr.TypeFlags = PSK_PSA_TYPE_FLAGS;
+  ChunkHdr.DataSize = 0;
+  ChunkHdr.DataCount = 0;
+
+  Out << ChunkHdr;
 
   // Write points
+  strcpy( ChunkHdr.ChunkId, "PNTS0000" );
+  ChunkHdr.DataSize = sizeof(FVector);
+  ChunkHdr.DataCount = Points.Size();
   
+  Out << ChunkHdr;
+  Out << Points;
+
+  // Write wedges
+  strcpy( ChunkHdr.ChunkId, "VTXW0000" );
+  ChunkHdr.DataSize = sizeof(FWedgeChunk);
+  ChunkHdr.DataCount = Wedges.Size();
+
+  Out << ChunkHdr;
+
+  for ( int i = 0; i < ExtWedges.Size(); i++ )
+  {
+    FWedgeChunk Wedge( Wedges[i] );
+    Out << Wedge;
+  }
+
+  // Write faces
+  strcpy( ChunkHdr.ChunkId, "FACE0000" );
+  ChunkHdr.DataSize = sizeof(FFaceChunk);
+  ChunkHdr.DataCount = Faces.Size();
+
+  Out << ChunkHdr;
+
+  for ( int i = 0; i < Faces.Size(); i++ )
+  {
+    FFaceChunk Face( Faces[i] );
+    Out << Face;
+  }
+
+  // Write materials
+  strcpy( ChunkHdr.ChunkId, "MATT0000" );
+  ChunkHdr.DataSize = sizeof(FMaterialChunk);
+  ChunkHdr.DataCount = Materials.Size();
+
+  Out << ChunkHdr;
+
+  for ( int i = 0; i < Materials.Size(); i++ )
+  {
+    FMaterialChunk Mat( Materials[i] );
+    Out << Mat;
+  }
+
+  // Write bone data
+  strcpy( ChunkHdr.ChunkId, "REFSKELT" );
+  ChunkHdr.DataSize = sizeof(FBoneChunk);
+  ChunkHdr.DataCount = Refs.Size();
+
+  Out << ChunkHdr;
+
+  for ( int i = 0; i < Refs.Size(); i++ )
+  {
+    FBoneChunk Bone( Refs[i] );
+    Out << Bone;
+  }
+
+
 }
 
 #include "Core/UClass.h"

@@ -75,6 +75,19 @@ public:
     return In;
   }
 
+  friend FPackageFileOut& operator>>( FPackageFileOut& Out, TArray<T>& Array )
+  {
+    Out << CINDEX( Array.Size() );
+    for ( int i = 0; i < Array.Size(); i++ )
+      Out << Array[i];
+  }
+
+  friend FFileArchiveOut& operator>>( FFileArchiveOut& Out, TArray<T>& Array )
+  {
+    for ( int i = 0; i < Array.Size(); i++ )
+      Out << Array[i];
+  }
+
   size_t ElementSize;
 };
 

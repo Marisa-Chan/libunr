@@ -34,15 +34,17 @@ class USkeletalMesh;
 
 /*-----------------------------------------------------------------------------
  * FChunkHeader
- * Header for both PSK and PSA files
+ * Header for different sectiosn of PSK and PSA files
 -----------------------------------------------------------------------------*/
-#define SKELETAL_CHUNK_TYPE_FLAGS 0x1e83b9 
-struct FChunkHeader
+#define PSK_PSA_TYPE_FLAGS 0x1e83b9 
+struct FChunkHeaderOut
 {
-  char ChunkID[20];
-  int  TypeFlags;
-  int  DataSize;
-  int  DataCount;
+  char  ChunkId[20];
+  int   TypeFlags;
+  int   DataSize;
+  int   DataCount;
+
+  friend FFileArchiveOut& operator<<( FFileArchiveOut& Out, FChunkHeaderOut& Hdr );
 };
 
 /*-----------------------------------------------------------------------------

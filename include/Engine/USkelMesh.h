@@ -28,6 +28,42 @@
 #include "Engine/ULodMesh.h"
 #include "Engine/USkelAnim.h"
 
+struct DLL_EXPORT FWedgeChunk
+{
+  FWedgeChunk( FLodWedge& LodWedge );
+
+  u16 VertexIndex;
+  float U;
+  float V;
+  byte MaterialIndex;
+  byte _pad0;
+
+  friend FFileArchiveOut& operator<<( FFileArchiveOut& Out, FWedgeChunk& Wedge );
+};
+
+struct DLL_EXPORT FFaceChunk
+{
+  FFaceChunk( FLodFace& LodFace );
+
+  u16 WedgeIndex[3];
+  u8  MatIndex;
+  u8  AuxMatIndex;
+  int SmoothingGroups;
+};
+
+struct DLL_EXPORT FMaterialChunk
+{
+  FMaterialChunk( FLodMaterial& LodMaterial );
+
+  char Name[64];
+  int  TextureIndex;
+  int  PolyFlags;
+  int  AuxMaterialIndex;
+  int  AuxFlags;
+  int  LodBias;
+  int  LodStyle;
+};
+
 struct DLL_EXPORT FSkeletalWedge
 {
   u16 VertexIndex;
