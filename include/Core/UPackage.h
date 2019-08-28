@@ -178,6 +178,7 @@ protected:
   FFileArchive* Stream;
   UPackageHeader Header;
   u32 NameTableStart; // The index at which this package's name table appears in the global name table
+  UNativeModule* NativeModule; // May be NULL if there is no native component (or if package is intrinsic)
 
   // Global package variables
   static EPkgLoadOpts LoadOpts;
