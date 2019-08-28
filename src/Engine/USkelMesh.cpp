@@ -126,8 +126,8 @@ bool USkeletalMesh::ExportToFile( const char* Dir, const char* Type )
 
   // Open psk file
   FStringFilePath Filename( Dir, Name.Data(), Type );
-  FFileArchiveOut* Out = new FFileArchiveOut();
-  if ( Out->Open( Filename ) != 0 )
+  FFileArchiveOut Out();
+  if ( Out.Open( Filename ) != 0 )
   {
     GLogf( LOG_WARN, "Failed to export skeletal mesh to file '%s'", Filename.Data() );
     return false;
@@ -203,7 +203,21 @@ bool USkeletalMesh::ExportToFile( const char* Dir, const char* Type )
     Out << Bone;
   }
 
+  // Write weight data
+  strcpy( ChunkHdr.ChunkId, "RAWWEIGHTS" );
+  ChunkHdr.DataSize = sizeof(FWeightChunk);
+  ChunkHdr.DataCount = Weights.Size();
 
+  Out << ChunkHdr;
+
+  for ( int i = 0; i < Weights.Size(); i++ )
+  {
+    Out << Weights[i];
+  }
+
+  // Close file
+  Out.Close();
+  return true;
 }
 
 #include "Core/UClass.h"

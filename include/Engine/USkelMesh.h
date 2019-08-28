@@ -107,10 +107,12 @@ struct DLL_EXPORT FBoneWeightIndex
 
 struct DLL_EXPORT FBoneWeight
 {
+  float Weight;
   u16 PointIndex;
   u16 BoneWeight;
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FBoneWeight& BW );
+  friend FFileArchiveOut& operator<<( FFileArchiveOut& Out, FBoneWeight& BW );
 };
 
 class DLL_EXPORT USkeletalMesh : public ULodMesh

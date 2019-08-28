@@ -108,3 +108,4 @@ private:
   void  PushBack( char& Val );
   void  PopBack();
 };
+
