@@ -25,6 +25,7 @@
 
 #pragma once
 #include "Core/UObject.h"
+#include "Core/UNativeModule.h"
 
 #define UE1_PKG_SIG 0x9e2a83c1
 

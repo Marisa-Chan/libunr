@@ -27,6 +27,7 @@
 #include <vector>
 #include "Util/FMacro.h"
 #include "Util/FTypes.h"
+#include "Util/FFileArchive.h"
 
 using std::vector;
 template<class T> class TArray : public vector<T>

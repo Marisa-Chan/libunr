@@ -25,6 +25,8 @@
 */
 
 #pragma once
+
+#include "Util/FTypes.h"
 #include "Util/FLogFile.h"
 #include "Util/FHash.h"
 #include "Util/FName.h"
