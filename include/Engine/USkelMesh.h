@@ -35,8 +35,8 @@ struct DLL_EXPORT FWedgeChunk
   u16 VertexIndex;
   float U;
   float V;
-  byte MaterialIndex;
-  byte _pad0;
+  u8 MaterialIndex;
+  u8 _pad0;
 
   friend FFileArchiveOut& operator<<( FFileArchiveOut& Out, FWedgeChunk& Wedge );
 };

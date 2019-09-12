@@ -55,12 +55,12 @@ typedef signed long long i64;
 
 #if defined LIBUNR_64BIT
   #define MAX_SIZE MAX_UINT64
-  #if defined __MINGW32__
+  #if defined __MINGW32__ || _MSC_VER
     typedef i64 ssize_t;
   #endif
 #elif defined LIBUNR_32BIT
   #define MAX_SIZE MAX_UINT32
-  #if defined __MINGW32__
+  #if defined __MINGW32__ || _MSC_VER
     typedef i32 ssize_t;
   #endif
 #endif
@@ -79,8 +79,8 @@ class DLL_EXPORT FCompactIndex
 {
 public:
   int Value;
-  friend FPackageFileIn&  operator>>( FPackageFileIn& Ar,  FCompactIndex& Index );
-  friend FPackageFileOut& operator<<( FPackageFileOut& Ar, FCompactIndex& Index );
+  friend DLL_EXPORT FPackageFileIn&  operator>>( FPackageFileIn& Ar,  FCompactIndex& Index );
+  friend DLL_EXPORT FPackageFileOut& operator<<( FPackageFileOut& Ar, FCompactIndex& Index );
 };
 
 #define CINDEX(val) (*(FCompactIndex*)&val)

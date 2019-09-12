@@ -150,7 +150,7 @@ void ULevelBase::Load()
         ABrush* Brush = (ABrush*)StaticLoadObject( Pkg, Export, ABrush::StaticClass(), NULL, true );
         Actors.PushBack( Brush );
       }
-    } 
+    }
   }
 
   *PkgFile >> URL;

@@ -180,8 +180,8 @@ public:
   FString operator+( char c ) const;
   FString& operator+( FName Name );
 
-  friend FPackageFileIn&  operator>>( FPackageFileIn& In, FString& Str );
-  friend FPackageFileOut& operator<<( FPackageFileOut& Out, FString& Str );
+  friend DLL_EXPORT FPackageFileIn&  operator>>( FPackageFileIn& In, FString& Str );
+  friend DLL_EXPORT FPackageFileOut& operator<<( FPackageFileOut& Out, FString& Str );
 
   friend bool operator==( const FString& lhs, const FString& rhs );
   friend bool operator==( const char* lhs,    const FString& rhs );
@@ -201,7 +201,7 @@ FString operator+( const char* lhs, const FString& rhs );
 FString operator+( char lhs, const string& rhs );
 FString operator+( char lhs, const FString& rhs );
 
-#ifndef __MINGW64__
+#ifndef _WIN32
 DLL_EXPORT int stricmp ( const char* str1, const char* str2 );
 DLL_EXPORT int strnicmp( const char* str1, const char* str2, size_t count ); 
 #endif

@@ -1,0 +1,458 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Actors">
+      <UniqueIdentifier>{0ecba802-5bf3-43aa-bd7c-f8670fbbefc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core">
+      <UniqueIdentifier>{3bb94cb1-0eae-4801-b8f6-287c0d33903c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\DeusEx">
+      <UniqueIdentifier>{af07a262-bff1-4a72-bb54-a8148c72a8c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine">
+      <UniqueIdentifier>{8112a56d-2d09-4251-be8d-bac304bf9333}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Util">
+      <UniqueIdentifier>{d492ab40-540d-438c-8655-9e7ea0c3ec05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\HPSS">
+      <UniqueIdentifier>{3181151b-017f-4671-b0ce-02005038d650}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rune">
+      <UniqueIdentifier>{90e2a9c3-1d7c-4df3-87eb-39af7c5544de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Actors">
+      <UniqueIdentifier>{48b46927-d578-4f55-90ab-5c54f2031d85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core">
+      <UniqueIdentifier>{62adcf28-7efe-4da8-8353-ad9c83284401}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DeusEx">
+      <UniqueIdentifier>{e950fe80-1285-464e-adc6-ef0883179e81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine">
+      <UniqueIdentifier>{2ab45821-95e1-49c5-9bc0-0593f3cece61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\HPSS">
+      <UniqueIdentifier>{4bd2ec21-9073-4c10-8de2-91e28b0d2058}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Util">
+      <UniqueIdentifier>{53bf8086-6de1-4fa9-9970-7c5a4fe97adf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rune">
+      <UniqueIdentifier>{5fd94835-8587-460b-a21e-325d0bc3b687}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\libunr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Actors\AActor.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Actors\ABrush.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Actors\ADecal.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Actors\ADynamicZoneInfo.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Actors\AGameInfo.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Actors\AHUD.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Actors\AInternetLink.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Actors\AInventory.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Actors\ANavigationPoint.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Actors\APawn.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Actors\APlayerPawn.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Actors\AProjector.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Actors\AReplicationInfo.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Actors\ASkyZoneInfo.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Actors\AStatLog.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Actors\ATimeDemo.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Actors\AWeapon.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Actors\AZoneInfo.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\UClass.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\ULocale.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\UMath.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\UNativeModule.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\UObject.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\UObjGetSet.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\UPackage.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\UPrimitive.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\UProperty.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\UScript.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\USystem.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DeusEx\ACameraPoint.h">
+      <Filter>Header Files\DeusEx</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DeusEx\UEventManager.h">
+      <Filter>Header Files\DeusEx</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\UAudio.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\UCanvas.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\UConsole.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\UEngine.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\UFire.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\UGesture.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\ULevel.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\ULodMesh.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\UMesh.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\UModel.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\UMusic.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\UNet.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\UPlayer.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\URender.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\USkelAnim.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\USkelMesh.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\USound.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\UStaticMesh.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\UTexture.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\UViewport.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\UViewportWayland.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\UViewportWin.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\UViewportX11.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\HPSS\AParticleFX.h">
+      <Filter>Header Files\HPSS</Filter>
+    </ClInclude>
+    <ClInclude Include="include\HPSS\UParticleList.h">
+      <Filter>Header Files\HPSS</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Util\FArchive.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Util\FBacktrace.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Util\FConfig.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Util\FFileArchive.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Util\FHash.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Util\FLogFile.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Util\FMacro.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Util\FName.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Util\FString.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Util\FTypes.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Util\TArray.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Util\TMap.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Util\TQueue.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Util\TStack.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Rune\ARuneActor.h">
+      <Filter>Header Files\Rune</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Actors\AActor.cpp">
+      <Filter>Source Files\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Actors\ABrush.cpp">
+      <Filter>Source Files\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Actors\ADecal.cpp">
+      <Filter>Source Files\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Actors\ADynamicZoneInfo.cpp">
+      <Filter>Source Files\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Actors\AGameInfo.cpp">
+      <Filter>Source Files\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Actors\AHUD.cpp">
+      <Filter>Source Files\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Actors\AInternetLink.cpp">
+      <Filter>Source Files\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Actors\AInventory.cpp">
+      <Filter>Source Files\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Actors\ANavigationPoint.cpp">
+      <Filter>Source Files\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Actors\APawn.cpp">
+      <Filter>Source Files\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Actors\APlayerPawn.cpp">
+      <Filter>Source Files\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Actors\AProjector.cpp">
+      <Filter>Source Files\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Actors\AReplicationInfo.cpp">
+      <Filter>Source Files\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Actors\AStatLog.cpp">
+      <Filter>Source Files\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Actors\ATimeDemo.cpp">
+      <Filter>Source Files\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Actors\AWeapon.cpp">
+      <Filter>Source Files\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Actors\AZoneInfo.cpp">
+      <Filter>Source Files\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\UClass.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\ULocale.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\UMath.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\UObject.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\UPackage.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\UPrimitive.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\UProperty.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\UStaticClassInit.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\USystem.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DeusEx\ACameraPoint.cpp">
+      <Filter>Source Files\DeusEx</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DeusEx\UEventManager.cpp">
+      <Filter>Source Files\DeusEx</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\UAudio.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\UCanvas.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\UConsole.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\UEngine.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\UFire.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\UGesture.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\ULevel.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\ULodMesh.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\UMesh.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\UModel.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\UMusic.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\UNet.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\UPlayer.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\URender.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\USkelAnim.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\USkelMesh.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\USound.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\UStaticMesh.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\UTexture.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\UViewport.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HPSS\AParticleFX.cpp">
+      <Filter>Source Files\HPSS</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HPSS\UParticleList.cpp">
+      <Filter>Source Files\HPSS</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rune\ARuneActor.cpp">
+      <Filter>Source Files\Rune</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Util\FBacktrace.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Util\FConfig.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Util\FFileArchive.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Util\FLogFile.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Util\FName.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Util\FString.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\UNativeModule.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\DefaultLibunr.ini">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

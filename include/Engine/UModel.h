@@ -115,7 +115,7 @@ struct FDecal
 
 struct DLL_EXPORT FPoly
 {
-  friend FPackageFileIn& operator>>( FPackageFileIn& Ar, FPoly& P );
+  friend DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& Ar, FPoly& P );
   void ExportToLevelText( FFileArchiveOut* Out );
 
   FVector Base;
@@ -146,7 +146,7 @@ class DLL_EXPORT UPolys : public UObject
 
 struct DLL_EXPORT FBspNode
 {
-  friend FPackageFileIn& operator>>( FPackageFileIn& In, FBspNode& BN );
+  friend DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FBspNode& BN );
 
   FPlane Plane;
   u64    ZoneMask;
@@ -171,7 +171,7 @@ struct DLL_EXPORT FBspNode
 
 struct DLL_EXPORT FBspSurf
 {
-  friend FPackageFileIn& operator>>( FPackageFileIn& In, FBspSurf& BS );
+  friend DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FBspSurf& BS );
 
   UTexture* Texture;
   u32 PolyFlags;
@@ -249,7 +249,7 @@ struct DLL_EXPORT FZoneProperties
   u64   Connectivity;
   u64   Visibility;
 
-  friend FPackageFileIn& operator>>( FPackageFileIn& In, FZoneProperties& ZP );
+  friend DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FZoneProperties& ZP );
 };
 
 /*-----------------------------------------------------------------------------

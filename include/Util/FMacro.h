@@ -51,14 +51,37 @@
   // MinGW
   #if defined __MINGW32__ && !defined __MINGW64__
     #define DLL_EXPORT __declspec(dllexport)
-	# if defined __i386__
+	#elif defined __i386__
 		#define ftello ftello64
 		#define fseeko fseeko64
-	#endif
   #else
     #define DLL_EXPORT
   #endif
  
+#elif defined _MSC_VER
+	
+  #pragma warning(disable:4251) // Non dll-interface class 'type' used as based for dll-interface class 'type2'
+  #pragma warning(disable:4275) // Class 'type' needs to have dll-interface to be used by clients of class 'type2'
+
+  #define DLL_EXPORT __declspec(dllexport)
+  #define FORCEINLINE __forceinline
+
+  // Likely/unlikely don't exist on MSVC
+  #define LIKELY(condition) (condition)
+  #define UNLIKELY(condition) (condition)
+
+  #if defined _WIN64
+    #define LIBUNR_64BIT
+    #define fseeko _fseeki64
+    #define ftello _ftelli64
+  #elif defined _WIN32
+    #define LIBUNR_32BIT
+  #else
+    #error "Currently unsupported architecture"
+  #endif
+
+  #define S_ISDIR(mode) (mode & _S_IFDIR)
+
 #else
   #error "Unsupported compiler type, read more here"
   
@@ -66,8 +89,7 @@
   // are supported. Compilers for less common architectures 
   // should also be supported where cross-platform compilers do
   // not have support or if they tend to generate slower code for
-  // said platform. No version of Visual Studio will be officially 
-  // supported.
+  // said platform.
   
 #endif
 
@@ -96,8 +118,8 @@ private: \
   cls (const cls & copy); \
 
 // Timers
-#if defined __linux__
 #include <time.h>
+#if defined __linux__
 #define TIMER_DECLARE(name) \
   timespec name##_start; \
   timespec name##_end; \

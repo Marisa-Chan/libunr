@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Actors\AActor.h" />
+    <ClInclude Include="include\Actors\ABrush.h" />
+    <ClInclude Include="include\Actors\ADecal.h" />
+    <ClInclude Include="include\Actors\ADynamicZoneInfo.h" />
+    <ClInclude Include="include\Actors\AGameInfo.h" />
+    <ClInclude Include="include\Actors\AHUD.h" />
+    <ClInclude Include="include\Actors\AInternetLink.h" />
+    <ClInclude Include="include\Actors\AInventory.h" />
+    <ClInclude Include="include\Actors\ANavigationPoint.h" />
+    <ClInclude Include="include\Actors\APawn.h" />
+    <ClInclude Include="include\Actors\APlayerPawn.h" />
+    <ClInclude Include="include\Actors\AProjector.h" />
+    <ClInclude Include="include\Actors\AReplicationInfo.h" />
+    <ClInclude Include="include\Actors\ASkyZoneInfo.h" />
+    <ClInclude Include="include\Actors\AStatLog.h" />
+    <ClInclude Include="include\Actors\ATimeDemo.h" />
+    <ClInclude Include="include\Actors\AWeapon.h" />
+    <ClInclude Include="include\Actors\AZoneInfo.h" />
+    <ClInclude Include="include\Core\UClass.h" />
+    <ClInclude Include="include\Core\ULocale.h" />
+    <ClInclude Include="include\Core\UMath.h" />
+    <ClInclude Include="include\Core\UNativeModule.h" />
+    <ClInclude Include="include\Core\UObject.h" />
+    <ClInclude Include="include\Core\UObjGetSet.h" />
+    <ClInclude Include="include\Core\UPackage.h" />
+    <ClInclude Include="include\Core\UPrimitive.h" />
+    <ClInclude Include="include\Core\UProperty.h" />
+    <ClInclude Include="include\Core\UScript.h" />
+    <ClInclude Include="include\Core\USystem.h" />
+    <ClInclude Include="include\DeusEx\ACameraPoint.h" />
+    <ClInclude Include="include\DeusEx\UEventManager.h" />
+    <ClInclude Include="include\Engine\UAudio.h" />
+    <ClInclude Include="include\Engine\UCanvas.h" />
+    <ClInclude Include="include\Engine\UConsole.h" />
+    <ClInclude Include="include\Engine\UEngine.h" />
+    <ClInclude Include="include\Engine\UFire.h" />
+    <ClInclude Include="include\Engine\UGesture.h" />
+    <ClInclude Include="include\Engine\ULevel.h" />
+    <ClInclude Include="include\Engine\ULodMesh.h" />
+    <ClInclude Include="include\Engine\UMesh.h" />
+    <ClInclude Include="include\Engine\UModel.h" />
+    <ClInclude Include="include\Engine\UMusic.h" />
+    <ClInclude Include="include\Engine\UNet.h" />
+    <ClInclude Include="include\Engine\UPlayer.h" />
+    <ClInclude Include="include\Engine\URender.h" />
+    <ClInclude Include="include\Engine\USkelAnim.h" />
+    <ClInclude Include="include\Engine\USkelMesh.h" />
+    <ClInclude Include="include\Engine\USound.h" />
+    <ClInclude Include="include\Engine\UStaticMesh.h" />
+    <ClInclude Include="include\Engine\UTexture.h" />
+    <ClInclude Include="include\Engine\UViewport.h" />
+    <ClInclude Include="include\Engine\UViewportWayland.h" />
+    <ClInclude Include="include\Engine\UViewportWin.h" />
+    <ClInclude Include="include\Engine\UViewportX11.h" />
+    <ClInclude Include="include\HPSS\AParticleFX.h" />
+    <ClInclude Include="include\HPSS\UParticleList.h" />
+    <ClInclude Include="include\libunr.h" />
+    <ClInclude Include="include\Rune\ARuneActor.h" />
+    <ClInclude Include="include\Util\FArchive.h" />
+    <ClInclude Include="include\Util\FBacktrace.h" />
+    <ClInclude Include="include\Util\FConfig.h" />
+    <ClInclude Include="include\Util\FFileArchive.h" />
+    <ClInclude Include="include\Util\FHash.h" />
+    <ClInclude Include="include\Util\FLogFile.h" />
+    <ClInclude Include="include\Util\FMacro.h" />
+    <ClInclude Include="include\Util\FName.h" />
+    <ClInclude Include="include\Util\FString.h" />
+    <ClInclude Include="include\Util\FTypes.h" />
+    <ClInclude Include="include\Util\TArray.h" />
+    <ClInclude Include="include\Util\TMap.h" />
+    <ClInclude Include="include\Util\TQueue.h" />
+    <ClInclude Include="include\Util\TStack.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Actors\AActor.cpp" />
+    <ClCompile Include="src\Actors\ABrush.cpp" />
+    <ClCompile Include="src\Actors\ADecal.cpp" />
+    <ClCompile Include="src\Actors\ADynamicZoneInfo.cpp" />
+    <ClCompile Include="src\Actors\AGameInfo.cpp" />
+    <ClCompile Include="src\Actors\AHUD.cpp" />
+    <ClCompile Include="src\Actors\AInternetLink.cpp" />
+    <ClCompile Include="src\Actors\AInventory.cpp" />
+    <ClCompile Include="src\Actors\ANavigationPoint.cpp" />
+    <ClCompile Include="src\Actors\APawn.cpp" />
+    <ClCompile Include="src\Actors\APlayerPawn.cpp" />
+    <ClCompile Include="src\Actors\AProjector.cpp" />
+    <ClCompile Include="src\Actors\AReplicationInfo.cpp" />
+    <ClCompile Include="src\Actors\AStatLog.cpp" />
+    <ClCompile Include="src\Actors\ATimeDemo.cpp" />
+    <ClCompile Include="src\Actors\AWeapon.cpp" />
+    <ClCompile Include="src\Actors\AZoneInfo.cpp" />
+    <ClCompile Include="src\Core\UClass.cpp" />
+    <ClCompile Include="src\Core\ULocale.cpp" />
+    <ClCompile Include="src\Core\UMath.cpp" />
+    <ClCompile Include="src\Core\UNativeModule.cpp" />
+    <ClCompile Include="src\Core\UObject.cpp" />
+    <ClCompile Include="src\Core\UPackage.cpp" />
+    <ClCompile Include="src\Core\UPrimitive.cpp" />
+    <ClCompile Include="src\Core\UProperty.cpp" />
+    <ClCompile Include="src\Core\UStaticClassInit.cpp" />
+    <ClCompile Include="src\Core\USystem.cpp" />
+    <ClCompile Include="src\DeusEx\ACameraPoint.cpp" />
+    <ClCompile Include="src\DeusEx\UEventManager.cpp" />
+    <ClCompile Include="src\Engine\UAudio.cpp" />
+    <ClCompile Include="src\Engine\UCanvas.cpp" />
+    <ClCompile Include="src\Engine\UConsole.cpp" />
+    <ClCompile Include="src\Engine\UEngine.cpp" />
+    <ClCompile Include="src\Engine\UFire.cpp" />
+    <ClCompile Include="src\Engine\UGesture.cpp" />
+    <ClCompile Include="src\Engine\ULevel.cpp" />
+    <ClCompile Include="src\Engine\ULodMesh.cpp" />
+    <ClCompile Include="src\Engine\UMesh.cpp" />
+    <ClCompile Include="src\Engine\UModel.cpp" />
+    <ClCompile Include="src\Engine\UMusic.cpp" />
+    <ClCompile Include="src\Engine\UNet.cpp" />
+    <ClCompile Include="src\Engine\UPlayer.cpp" />
+    <ClCompile Include="src\Engine\URender.cpp" />
+    <ClCompile Include="src\Engine\USkelAnim.cpp" />
+    <ClCompile Include="src\Engine\USkelMesh.cpp" />
+    <ClCompile Include="src\Engine\USound.cpp" />
+    <ClCompile Include="src\Engine\UStaticMesh.cpp" />
+    <ClCompile Include="src\Engine\UTexture.cpp" />
+    <ClCompile Include="src\Engine\UViewport.cpp" />
+    <ClCompile Include="src\HPSS\AParticleFX.cpp" />
+    <ClCompile Include="src\HPSS\UParticleList.cpp" />
+    <ClCompile Include="src\Rune\ARuneActor.cpp" />
+    <ClCompile Include="src\Util\FBacktrace.cpp" />
+    <ClCompile Include="src\Util\FConfig.cpp" />
+    <ClCompile Include="src\Util\FFileArchive.cpp" />
+    <ClCompile Include="src\Util\FLogFile.cpp" />
+    <ClCompile Include="src\Util\FName.cpp" />
+    <ClCompile Include="src\Util\FString.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\DefaultLibunr.ini" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{0B234138-2124-45B7-8401-CF80655FC804}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>libunr</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(ProjectDir)build\$(Configuration)\</OutDir>
+    <IntDir>build\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level2</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>false</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;LIBUNR_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;LIBUNR_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -37,7 +37,7 @@ UAnimation::~UAnimation()
 FFileArchiveOut& operator<<( FFileArchiveOut& Out, FChunkHeaderOut& Hdr )
 {
   Out.Write( Hdr.ChunkId, sizeof(Hdr.ChunkId) );
-  Out << TypeFlags << DataSize << DataCount;
+  Out << Hdr.TypeFlags << Hdr.DataSize << Hdr.DataCount;
   return Out;
 }
 
@@ -85,6 +85,7 @@ void UAnimation::Load()
 
 bool UAnimation::ExportToFile( const char* Path, const char* Dir )
 {
+/*
   if ( stricmp( Type, "psa" ) != 0 )
   {
     GLogf( LOG_ERR, "Can't export skeletal animation to file type '%s'", Type );
@@ -93,7 +94,7 @@ bool UAnimation::ExportToFile( const char* Path, const char* Dir )
 
   // Open psa file
   FStringFilePath Filename( Dir, Name.Data(), Type );
-  FFileArchiveOut Out();
+  FFileArchiveOut Out = FFileArchiveOut();
   if ( Out.Open( Filename ) != 0 )
   {
     GLogf( LOG_WARN, "Failed to export skeletal animation to file '%s'", Filename.Data() );
@@ -135,9 +136,10 @@ bool UAnimation::ExportToFile( const char* Path, const char* Dir )
   }
 
   // Write anim keys
-  strcpy( ChunkHDr.ChunkId, "ANIMKEYS" );
+  strcpy( ChunkHdr.ChunkId, "ANIMKEYS" );
   ChunkHdr.DataSize = sizeof(FAnimKeyChunk);
-  ChunkIdr.DataCount = 
+*/
+  return true;
 }
 
 USkeletalMeshInstance::USkeletalMeshInstance()

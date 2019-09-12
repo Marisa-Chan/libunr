@@ -64,12 +64,13 @@ class DLL_EXPORT USystem : public USubsystem
   static bool StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool InIsEditor, char* InGameName = NULL );
   static const char* GetLibunrIniPath();
   static const char* GetDefaultLibunrIniPath();
+  static const char* GetNativeModulesPath();
   static bool CopyFile( const char* OrigFile, const char* NewFile );
   static bool FileExists( const char* Filename );
   static void RealPath( const char* Path, char* FullPath, size_t FullPathSize );
   static bool MakeDir( const char* Path );
   static bool IsEditor();
-#if defined __linux__ || __unix__
+#if defined LIBUNR_POSIX
   static const char* GetHomeDir();
 #endif
 

@@ -90,7 +90,7 @@ static inline FHash FnvHashString( const char* Data )
   FHash Hash;
   Hash.FnvHash[FNV1A_HASH] = Hash.FnvHash[FNV1_HASH] = FNV_BASIS;
 
-  int Len = strlen( Data );
+  size_t Len = strlen( Data );
   for (int i = 0; i < Len; i++) 
   {
     u8 ConvData = isalpha( Data[i] ) ? toupper( Data[i] ) : Data[i];

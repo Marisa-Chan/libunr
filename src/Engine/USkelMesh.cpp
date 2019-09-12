@@ -118,6 +118,7 @@ void USkeletalMesh::Load()
 
 bool USkeletalMesh::ExportToFile( const char* Dir, const char* Type )
 {
+/*
   if ( stricmp( Type, "psk" ) != 0 )
   {
     GLogf( LOG_ERR, "Can't export skeletal mesh to file type '%s'", Type );
@@ -217,6 +218,7 @@ bool USkeletalMesh::ExportToFile( const char* Dir, const char* Type )
 
   // Close file
   Out.Close();
+*/
   return true;
 }
 

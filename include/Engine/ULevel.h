@@ -33,7 +33,7 @@
 
 struct DLL_EXPORT FReachSpec
 {
-  friend FPackageFileIn& operator>>( FPackageFileIn& In, FReachSpec& RS );
+  friend DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FReachSpec& RS );
 
   int Distance;
   AActor* Start;
@@ -46,7 +46,7 @@ struct DLL_EXPORT FReachSpec
 
 struct DLL_EXPORT FURL
 {
-  friend FPackageFileIn& operator>>( FPackageFileIn& In, FURL& URL );
+  friend DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FURL& URL );
 
   FString Protocol;
   FString Host;

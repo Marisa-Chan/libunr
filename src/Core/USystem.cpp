@@ -23,39 +23,41 @@
  *========================================================================
 */
 
-#include <dirent.h>
-#include <pwd.h>
 #include <signal.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h>
 #include "Util/FBacktrace.h"
 #include "Util/FConfig.h"
 #include "Core/USystem.h"
 #include "Core/UPackage.h"
 
 #ifdef LIBUNR_WIN32
-  #include "Windows.h"
+  #include <Windows.h>
+  #include <direct.h>
   #undef CopyFile
   #undef TEXT
   #define TEXT(s) #s
+#elif defined LIBUNR_POSIX
+  #include <dirent.h>
+  #include <pwd.h>
+  #include <unistd.h>
 #endif
 
 USystem* GSystem = NULL;
 int USystem::LogLevel = LOG_INFO;
 bool USystem::bIsEditor = false;
 
+#ifdef LIBUNR_POSIX
 // Some niche platforms later supported in the future may not support sigaction
 static void SigsegvHandler( int sig, siginfo_t* si, void *raw_uctx )
 {
-  ucontext_t* uctx = (ucontext_t*)raw_uctx;
-
   GLogf( LOG_CRIT, "CAUGHT SIGSEGV!!!" );
+  ucontext_t* uctx = (ucontext_t*)raw_uctx;
   DumpRegisters( &uctx->uc_mcontext, false );
   DumpBacktrace( &uctx->uc_mcontext );
-
   GSystem->Exit( -1 );
 }
+#endif
 
 USubsystem::USubsystem()
 {
@@ -449,6 +451,21 @@ const char* USystem::GetDefaultLibunrIniPath()
 #endif
 }
 
+const char* USystem::GetNativeModulesPath()
+{
+#if defined LIBUNR_POSIX
+  static char DefLibUnrPath[1024] = { 0 };
+  strcpy( DefLibUnrPath, INSTALL_PREFIX );
+  strcat( DefLibUnrPath, "/share/libunr/modules/" );
+  return DefLibUnrPath;
+#elif defined LIBUNR_WIN32
+  return "";
+#else
+  #error "Unknown operating system! Please add a section to USystem::GetNativeModulesPath()"
+  return -1;
+#endif
+}
+
 bool USystem::CopyFile( const char* OrigFile, const char* NewFile )
 {
   FFileArchiveIn Orig;
@@ -502,7 +519,7 @@ void USystem::RealPath( const char* Path, char* FullPath, size_t FullPathSize )
   u16 Len = 0;
 
 #ifdef LIBUNR_WIN32
-  char* FwdSlsh = strchr( Path, '/' );
+  char* FwdSlsh = strchr( (char*)Path, '/' );
   if ( FwdSlsh != NULL )
   {
     *FwdSlsh++ = '\\';
@@ -593,7 +610,7 @@ bool USystem::MakeDir( const char* Path )
   }
   
 #ifdef LIBUNR_WIN32
-  char* FwdSlsh = strchr( Path, '/' );
+  char* FwdSlsh = strchr( (char*)Path, '/' );
   if ( FwdSlsh != NULL )
   {
     *FwdSlsh++ = '\\';
@@ -626,10 +643,10 @@ bool USystem::MakeDir( const char* Path )
     #ifdef LIBUNR_WIN32
       if ( *(s-1) == ':' )
       {
-		*c++ = *s++;
+		    *c++ = *s++;
         continue;
 	  }
-	#endif
+	  #endif
       // Folder should now have the name of our current folder
       // stat() once to check for existence at all
       if (stat(CurrentPath, &sb) == 0)
@@ -644,11 +661,11 @@ bool USystem::MakeDir( const char* Path )
       else
       {
         // Directory does not exist, try to make it
-	  #ifndef LIBUNR_WIN32
+	    #ifndef LIBUNR_WIN32
         if ( mkdir( CurrentPath, S_IRWXU | S_IRGRP | S_IROTH ) < 0 ) 
-	  #else
-		if ( mkdir( CurrentPath ) < 0 ) 
-	  #endif
+	    #else
+		    if ( mkdir( CurrentPath ) < 0 ) 
+	    #endif
         {
           int err = errno;
           GLogf( LOG_WARN, "Failed to create directory '%s'; couldn't create directory '%s'",

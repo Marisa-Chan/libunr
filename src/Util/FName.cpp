@@ -81,13 +81,14 @@ FPackageFileOut& operator<<( FPackageFileOut& Out, FNameEntry& Name )
 {
   Name.Data[NAME_LEN-1] = '\0'; // just in case
   
+  int len = 0;
   if( Out.Ver > PKG_VER_UN_220 )
   {
-    int len = strlen( Name.Data );
+    len = strlen( Name.Data );
     Out << CINDEX( len );
   }
   
-  Out << Name;
+  Out.Write( Name.Data, len );
   return Out;
 }
 

@@ -499,7 +499,7 @@ i8 FConfig::ReadInt8( const char* Category, const char* Variable, size_t Index )
 float FConfig::ReadFloat( const char* Category, const char* Variable, size_t Index )
 {
   float Value = 0.f;
-  char* StrVar = ReadString( Category, Variable, Value );
+  char* StrVar = ReadString( Category, Variable, Index );
   if ( LIKELY( StrVar ) )
   {
     Value = strtof( StrVar, NULL );
@@ -511,7 +511,7 @@ float FConfig::ReadFloat( const char* Category, const char* Variable, size_t Ind
 double FConfig::ReadDouble( const char* Category, const char* Variable, size_t Index )
 {
   double Value = 0.0;
-  char* StrVar = ReadString( Category, Variable, Value );
+  char* StrVar = ReadString( Category, Variable, Index );
   if ( LIKELY( StrVar ) )
   {
     Value = strtod( StrVar, NULL );

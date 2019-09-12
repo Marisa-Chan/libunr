@@ -33,8 +33,9 @@ class FPackageFileOut;
  * An entry into a name table
 -----------------------------------------------------------------------------*/
 #define NAME_LEN 64
-struct DLL_EXPORT FNameEntry
+class DLL_EXPORT FNameEntry
 {
+public:
    FNameEntry();
    FNameEntry( const char* InStr, int InFlags = 0 );
   ~FNameEntry();
@@ -51,8 +52,9 @@ struct DLL_EXPORT FNameEntry
  * FName
  * An index into the global name table
 -----------------------------------------------------------------------------*/
-struct DLL_EXPORT FName
+class DLL_EXPORT FName
 {
+public:
   u32 Index;
 
   FName() { Index = 0; }
@@ -80,7 +82,7 @@ struct DLL_EXPORT FName
 
   friend bool operator==( FName& A, FName& B );
   friend bool operator!=( FName& A, FName& B );
-  friend FPackageFileIn& operator>>( FPackageFileIn& In, FName& Name );
+  friend DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FName& Name );
 };
 
 

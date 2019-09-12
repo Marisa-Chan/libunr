@@ -235,6 +235,10 @@ public: \
     memset( Mem, 0, ObjSize ); \
     return Mem; \
   } \
+  void operator delete( void* Obj, size_t ObjSize ) \
+  { \
+    free( Obj ); \
+  } \
   void operator delete( void* Obj ) \
   { \
     free( Obj );  \
@@ -245,7 +249,7 @@ public: \
   } \
   static UClass* StaticClass() \
   { return ObjectClass; } \
-  static DLL_EXPORT UObject* NativeConstructor( size_t ObjSize ) \
+  static UObject* NativeConstructor( size_t ObjSize ) \
   { \
     return new(ObjSize) cls(); \
   } \

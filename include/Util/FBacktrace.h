@@ -25,11 +25,13 @@
 
 #pragma once
 
-#include <ucontext.h>
-#include "Util/FMacro.h"
+#ifdef LIBUNR_POSIX
+  #include <ucontext.h>
+  #include "Util/FMacro.h"
 
-DLL_EXPORT const char* GetSymbolName( void* Addr );
-DLL_EXPORT const char* GetSymbolModule( void* Addr );
-DLL_EXPORT void DumpRegisters( mcontext_t* Regs, bool bPrintFpu );
-DLL_EXPORT void DumpBacktrace( mcontext_t* Regs );
+  DLL_EXPORT const char* GetSymbolName( void* Addr );
+  DLL_EXPORT const char* GetSymbolModule( void* Addr );
+  DLL_EXPORT void DumpRegisters( mcontext_t* Regs, bool bPrintFpu );
+  DLL_EXPORT void DumpBacktrace( mcontext_t* Regs );
+#endif
 
