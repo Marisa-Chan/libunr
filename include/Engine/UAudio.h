@@ -30,7 +30,6 @@
 class DLL_EXPORT UAudioSubsystem : public USubsystem
 {
   DECLARE_NATIVE_CLASS( UAudioSubsystem, USubsystem, CLASS_NoExport, Engine )
-  EXPOSE_TO_USCRIPT()
 
   UAudioSubsystem();
 
