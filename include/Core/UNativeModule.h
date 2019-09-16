@@ -27,6 +27,10 @@
 
 #include "Core/UObject.h"
 
+#if defined __linux__ || defined __unix__
+  #include <dlfcn.h>
+#endif
+
 class DLL_EXPORT UNativeModule : public UObject
 {
   DECLARE_NATIVE_CLASS( UNativeModule, UObject, CLASS_Abstract | CLASS_NoExport, Core )

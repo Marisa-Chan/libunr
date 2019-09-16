@@ -25,9 +25,10 @@
 
 #pragma once
 
+#include "Util/FMacro.h"
+
 #ifdef LIBUNR_POSIX
   #include <ucontext.h>
-  #include "Util/FMacro.h"
 
   DLL_EXPORT const char* GetSymbolName( void* Addr );
   DLL_EXPORT const char* GetSymbolModule( void* Addr );

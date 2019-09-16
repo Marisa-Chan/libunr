@@ -108,7 +108,7 @@ UClass* UDynamicNativeModule::GetNativeClass( const char* ClsName )
   StaticClassFuncName += "StaticClass";
 
 #if defined __linux__ || defined __unix__
-  UClass* (*StaticClassFunc)(void) = dlsym( ModulePtr, StaticClassFetchFunc.Data() );
+  UClass* (*StaticClassFunc)(void) = reinterpret_cast<UClass* (*)(void)> (dlsym( ModulePtr, StaticClassFuncName.Data() ) );
   if ( StaticClassFunc == NULL )
   {
     GLogf( LOG_ERR, "Class '%s' does not exist in native module '%s'", ClsName, Name.Data() );
