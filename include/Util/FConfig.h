@@ -137,5 +137,5 @@ private:
   TArray<FConfig*> Configs;
 };
 
-extern FConfigManager* GConfigManager;
+extern DLL_EXPORT FConfigManager* GConfigManager;
 

@@ -44,8 +44,8 @@
 #endif
 
 USystem* GSystem = NULL;
-int USystem::LogLevel = LOG_INFO;
-bool USystem::bIsEditor = false;
+DLL_EXPORT int USystem::LogLevel = LOG_INFO;
+DLL_EXPORT bool USystem::bIsEditor = false;
 
 #ifdef LIBUNR_POSIX
 // Some niche platforms later supported in the future may not support sigaction

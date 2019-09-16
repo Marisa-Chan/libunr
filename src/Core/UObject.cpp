@@ -293,7 +293,7 @@ void UObject::ReadDefaultProperties()
   u8  PropType = 0;
   u8  SizeByte = 0;
   u8  IsArray  = 0;
-  int ArrayIdx;
+  int ArrayIdx = 0;
   int RealSize = 0;
 
   while( 1 )

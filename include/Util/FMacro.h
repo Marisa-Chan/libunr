@@ -63,7 +63,12 @@
   #pragma warning(disable:4251) // Non dll-interface class 'type' used as based for dll-interface class 'type2'
   #pragma warning(disable:4275) // Class 'type' needs to have dll-interface to be used by clients of class 'type2'
 
+#ifdef LIBUNR_EXPORTS
   #define DLL_EXPORT __declspec(dllexport)
+#else
+  #define DLL_EXPORT __declspec(dllimport)
+#endif
+
   #define FORCEINLINE __forceinline
 
   // Likely/unlikely don't exist on MSVC
@@ -120,20 +125,35 @@ private: \
 // Timers
 #include <time.h>
 #if defined __linux__
-#define TIMER_DECLARE(name) \
-  timespec name##_start; \
-  timespec name##_end; \
+  #define TIMER_DECLARE(name) \
+    timespec name##_start; \
+    timespec name##_end; \
 
-#define TIMER_START(name) \
-  clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &name##_start)
+  #define TIMER_START(name) \
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &name##_start)
 
-#define TIMER_END(name) \
-  clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &name##_end)
+  #define TIMER_END(name) \
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &name##_end)
 
-#define TIMER_PRINT(name) \
-  printf("Time for %s: %ld.%.9ld\n", #name, \
-    name##_end.tv_sec - name##_start.tv_sec, \
-    name##_end.tv_nsec - name##_start.tv_nsec) \
+  #define TIMER_PRINT(name) \
+    printf("Time for %s: %ld.%.9ld\n", #name, \
+      name##_end.tv_sec - name##_start.tv_sec, \
+      name##_end.tv_nsec - name##_start.tv_nsec) \
+
+#elif defined _WIN32
+
+  #define TIMER_DECLARE(name) \
+    u32 name##_start; \
+    u32 name##_end; \
+
+  #define TIMER_START(name) \
+    name##_start = timeGetTime();
+
+  #define TIMER_END(name) \
+    name##_end = timeGetTime();
+
+  #define TIMER_PRINT(name) \
+    printf("Time for %s: %.9ld\n", #name, (name##_end - name##_start)/1000.0);
 
 #endif
 

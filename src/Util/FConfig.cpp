@@ -27,10 +27,10 @@
 #include "Util/FFileArchive.h"
 #include "Util/FLogFile.h"
 
-FConfigManager* GConfigManager = NULL;
-FConfig* GLibunrConfig = NULL;
-FConfig* GGameConfig = NULL;
-FConfig* GUserConfig = NULL;
+DLL_EXPORT FConfigManager* GConfigManager = NULL;
+DLL_EXPORT FConfig* GLibunrConfig = NULL;
+DLL_EXPORT FConfig* GGameConfig = NULL;
+DLL_EXPORT FConfig* GUserConfig = NULL;
 
 // FIXME: this is NOT thread safe!
 static int NumLines;

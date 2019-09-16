@@ -317,9 +317,6 @@
     <ClCompile Include="src\Actors\AStatLog.cpp">
       <Filter>Source Files\Actors</Filter>
     </ClCompile>
-    <ClCompile Include="src\Actors\ATimeDemo.cpp">
-      <Filter>Source Files\Actors</Filter>
-    </ClCompile>
     <ClCompile Include="src\Actors\AWeapon.cpp">
       <Filter>Source Files\Actors</Filter>
     </ClCompile>
@@ -449,9 +446,15 @@
     <ClCompile Include="src\Core\UNativeModule.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
+    <ClCompile Include="src\Actors\ATimeDemo.cpp">
+      <Filter>Source Files\Actors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\DefaultLibunr.ini">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include=".gitignore">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

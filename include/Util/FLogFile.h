@@ -55,6 +55,6 @@ protected:
   int LogLevel;
 };
 
-extern FLogFile* GLogFile;
+extern DLL_EXPORT FLogFile* GLogFile;
 #define GLogf GLogFile->Logf
 

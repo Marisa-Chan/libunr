@@ -100,6 +100,6 @@ protected:
   static bool bIsEditor;
 };
 
-extern USystem* GSystem;
+DLL_EXPORT extern USystem* GSystem;
 DLL_EXPORT bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool bIsEditor, char* GameName = NULL );
 

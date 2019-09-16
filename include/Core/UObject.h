@@ -174,8 +174,9 @@ struct FNativePropertyLink
   u32 Offset;
 };
 
-struct FNativePropertyList
+class DLL_EXPORT FNativePropertyList
 {
+public:
   FNativePropertyList( FHash InHash, size_t InNum );
   ~FNativePropertyList();
   void AddProperty( const char* Name, u32 InOffset );
@@ -303,9 +304,9 @@ public: \
   DECLARE_NATIVE_CLASS_BASE(cls, supcls, flags, pkg) \
 
 #define IMPLEMENT_NATIVE_CLASS(cls) \
-  UClass* cls::ObjectClass = NULL; \
-  size_t  cls::NativeSize  = sizeof( cls ); \
-  FNativePropertyList* cls::StaticNativePropList = NULL; \
+  DLL_EXPORT UClass* cls::ObjectClass = NULL; \
+  DLL_EXPORT size_t  cls::NativeSize  = sizeof( cls ); \
+  DLL_EXPORT FNativePropertyList* cls::StaticNativePropList = NULL; \
   bool cls::StaticSetPackageProperties() \
   { \
     ObjectClass->Pkg = UPackage::StaticLoadPackage( NativePkgName ); \
