@@ -166,7 +166,7 @@ class DLL_EXPORT UPackage : public UObject
 
   static bool StaticInit();
   static void StaticExit( bool bCrashExit = false );
-  static UPackage* StaticLoadPackage( const char* Filepath );
+  static UPackage* StaticLoadPackage( const char* Filepath, bool bSearch = true );
   
   bool bIntrinsicPackage;
   FNameEntry* NoneNameEntry;

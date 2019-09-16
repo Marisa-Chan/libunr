@@ -540,10 +540,27 @@ void UPackage::StaticExit( bool bCrashExit )
     delete Packages;
 }
 
-UPackage* UPackage::StaticLoadPackage( const char* PkgName )
+UPackage* UPackage::StaticLoadPackage( const char* PkgName, bool bSearch )
 {
   if ( PkgName == NULL )
     return NULL;
+
+  char* ActualName = (char*)PkgName;
+  if ( !bSearch )
+  {
+    ActualName = strdup( PkgName );
+    ActualName = strrchr( ActualName, DIRECTORY_SEPARATOR );
+    
+    char* Dot = (char*)strchr( ActualName, '.' );
+    if ( Dot == NULL )
+    {
+      GLogf( LOG_ERR, "Package name does not have file extension" );
+      free( ActualName );
+      return NULL;
+    }
+
+    *Dot = '\0';
+  }
 
   // See if the package has been loaded before
   UPackage* Pkg = NULL;
@@ -553,7 +570,7 @@ UPackage* UPackage::StaticLoadPackage( const char* PkgName )
     if ( Iter == NULL )
       break;
 
-    if ( stricmp( Iter->Name.Data(), PkgName ) == 0 )
+    if ( stricmp( Iter->Name.Data(), ActualName ) == 0 )
     {
       Pkg = Iter;
       break;
@@ -566,16 +583,18 @@ UPackage* UPackage::StaticLoadPackage( const char* PkgName )
     if ( Pkg == NULL )
       return NULL;
 
-    if ( !Pkg->Load( GSystem->ResolvePath( PkgName ) ) )
+    const char* Path = (bSearch) ? GSystem->ResolvePath( ActualName ) : PkgName;
+
+    if ( Path != NULL && Pkg->Load( Path ) )
     {
       delete Pkg;
       return NULL;
     }
 
-    size_t PkgNameIdx = Pkg->FindName( PkgName );
+    size_t PkgNameIdx = Pkg->FindName( ActualName );
     Pkg->Name = (PkgNameIdx != MAX_SIZE) 
       ? FName( Pkg->GetGlobalName( PkgNameIdx ) )
-      : FName::CreateName( PkgName, RF_LoadContextFlags );
+      : FName::CreateName( ActualName, RF_LoadContextFlags );
     Packages->PushBack( Pkg );
   }
 
