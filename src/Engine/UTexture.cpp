@@ -224,7 +224,7 @@ void UFont::Load()
 
   u8 TextureCount = MAX_UINT8;
   *PkgFile >> TextureCount;
-  FontTextures->Reserve( TextureCount );
+  FontTextures->Resize( TextureCount );
 
   for ( int i = 0; i < TextureCount; i++ )
   {
@@ -238,7 +238,7 @@ void UFont::Load()
 
     FontTexture->Texture = (UTexture*)LoadObject( TextureIdx, UTexture::StaticClass(), this );
     FontTexture->Characters = new TArray<FFontCharInfo>();
-    FontTexture->Characters->Reserve( CharCount );
+    FontTexture->Characters->Resize( CharCount );
 
     for ( int j = 0; j < CharCount; j++ )
     {
