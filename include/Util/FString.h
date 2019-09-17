@@ -201,9 +201,13 @@ FString operator+( const char* lhs, const FString& rhs );
 FString operator+( char lhs, const string& rhs );
 FString operator+( char lhs, const FString& rhs );
 
-#ifndef _WIN32
+#ifdef LIBUNR_WIN32
+#pragma warning(disable:4273)
+#endif
 DLL_EXPORT int stricmp ( const char* str1, const char* str2 );
-DLL_EXPORT int strnicmp( const char* str1, const char* str2, size_t count ); 
+DLL_EXPORT int strnicmp( const char* str1, const char* str2, size_t count );
+#ifdef LIBUNR_WIN32
+#pragma warning(pop)
 #endif
 DLL_EXPORT char* strupper( const char* str );
 DLL_EXPORT char* GetDateString( const char* Fmt );

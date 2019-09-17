@@ -379,6 +379,7 @@ class DLL_EXPORT ALevelInfo : public AZoneInfo
   bool bCheckWalkSurfaces;
   ASpawnNotify* SpawnNotify;
   UClass* FootprintManager;
+  UClass* RealCrouchInfoClass;
   TArray<UObject*>* ObjList;
   class ADynamicZoneInfo* DynamicZonesList;
   APlayerPawn* ReplicationTarget;

@@ -98,7 +98,7 @@ DLL_EXPORT FPackageFileOut& operator<<( FPackageFileOut& Out, FString& Str )
   return Out;
 }
 
-#ifndef LIBUNR_WIN32
+//#ifndef LIBUNR_WIN32
 static const char StricmpTable[] =
 {
   0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
@@ -152,7 +152,7 @@ int strnicmp( const char* str1, const char* str2, size_t count )
   return 0;
 
 }
-#endif
+//#endif
 
 char* strupper( const char* str )
 {

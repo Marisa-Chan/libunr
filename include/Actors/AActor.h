@@ -114,10 +114,16 @@ class DLL_EXPORT AActor : public UObject
   bool bInterpolating, bJustTeleported;
 
   // 227 variables
+  bool bIsPlayerPawn;
+  bool bIsProjectile;
+  bool bZoneNormalLight;
   bool bIsFrobable;
   float RandomDelayTime, RandomValue, LastRandomTime, LastRenderedTime;
   FColor ActorRenderColor;
   FColor ActorGUnlitColor;
+  FColor AmbientGlowColor;
+  float AmbientGlowPulseSpeed;
+  float NormalLightRadius;
   UPrimitive* CollisionOverride;
   USkeletalMeshInstance* MeshInstance;
   FVector RelativeLocation;
@@ -125,16 +131,16 @@ class DLL_EXPORT AActor : public UObject
   void* LightDataPtr;
   void* MeshDataPtr;
   FVector DrawScale3D;
-  std::vector<AProjector*>* ProjectorList;
+  TArray<AProjector*>* ProjectorList;
   void* NetInitialProperties;
-  std::vector<AActor*>* RealTouching;
+  TArray<AActor*>* RealTouching;
 
   struct MultiTimerType
   {
     idx Func;
     float Rate, Counter;
   };
-  std::vector<MultiTimerType>* MultiTimers;
+  TArray<MultiTimerType>* MultiTimers;
 
   // Current physics mode
   enum EPhysics
@@ -610,9 +616,9 @@ class DLL_EXPORT ABlockingActor : public AActor
   ABlockingActor();
 
   bool bBlockSubClasses;
-  std::vector<UClass*>* BlockingClasses;
-  std::vector<UClass*>* IgnoreSubClasses;
-  std::vector<UClass*>* ScriptBlocking;
+  TArray<UClass*>* BlockingClasses;
+  TArray<UClass*>* IgnoreSubClasses;
+  TArray<UClass*>* ScriptBlocking;
 };
 
 class DLL_EXPORT ADecoration : public AActor
@@ -685,6 +691,7 @@ class DLL_EXPORT ASavedMove : public AInfo
   bool bPressedJump;
   bool bSent;
   bool bIsReducedCrouch;
+  UClass* CustomPlayerState;
 
   // UT99 Variables
   bool bFire;
@@ -759,11 +766,11 @@ class DLL_EXPORT ALight : public AActor
   struct ShadowMoverInfo
   {
     class AMover* Mover;
-    std::vector<int>* BspSurfs;
+    TArray<int>* BspSurfs;
   };
 
-  std::vector<idx>* ShadowMoverTags;
-  std::vector<ShadowMoverInfo>* MoverShadowSurfs;
+  TArray<idx>* ShadowMoverTags;
+  TArray<ShadowMoverInfo>* MoverShadowSurfs;
 };
 
 class DLL_EXPORT ADynamicCorona : public ALight
@@ -781,6 +788,7 @@ class DLL_EXPORT ADynamicCorona : public ALight
   };
 
   bool bDirectionalCorona;
+  bool bBrightnessDependent;
   float MaxSize;
   float DisplayDistance;
   float CoronaSize;
@@ -860,6 +868,8 @@ class DLL_EXPORT AMenu : public AActor
   FString* MenuTitle;
   FString* YesString;
   FString* NoString;
+  FString* OnString;
+  FString* OffString;
 };
 
 class DLL_EXPORT AProjectile : public AActor
