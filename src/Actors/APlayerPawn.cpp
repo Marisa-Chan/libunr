@@ -50,7 +50,7 @@ IMPLEMENT_NATIVE_CLASS( APlayerPawn );
 BEGIN_PROPERTY_LINK( ACamera, 0 )
 END_PROPERTY_LINK()
 
-BEGIN_PROPERTY_LINK( APlayerPawn, 186 )
+BEGIN_PROPERTY_LINK( APlayerPawn, 193 )
   LINK_NATIVE_PROPERTY( Player );
   LINK_NATIVE_PROPERTY( Password );
   LINK_NATIVE_PROPERTY( DodgeClickTimer );
@@ -160,6 +160,13 @@ BEGIN_PROPERTY_LINK( APlayerPawn, 186 )
   LINK_NATIVE_PROPERTY( CrouchHeightPct );
   LINK_NATIVE_PROPERTY( bIsReducedCrouch );
   LINK_NATIVE_PROPERTY( CrouchCheckTime );
+  LINK_NATIVE_PROPERTY( SpecialCollisionHeight );
+  LINK_NATIVE_PROPERTY( PrePivotZModifier );
+  LINK_NATIVE_PROPERTY( bCanChangeBehindView );
+  LINK_NATIVE_PROPERTY( bForwardUserCommands );
+  LINK_NATIVE_PROPERTY( AccumulatedHTurn );
+  LINK_NATIVE_PROPERTY( AccumulatedVTurn );
+  LINK_NATIVE_PROPERTY( RealCrouchInfo );
   LINK_NATIVE_PROPERTY( bDistanceFogEnabled );
   LINK_NATIVE_PROPERTY( bBlendingDistanceFog );
   LINK_NATIVE_PROPERTY( DistanceFogColor );

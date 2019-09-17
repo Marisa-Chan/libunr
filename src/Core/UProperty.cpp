@@ -629,7 +629,7 @@ void UStructProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int
         if ( InnerBuf.Length() > 0 )
         {
           // Write the first parenthesis
-          if ( Buf.Front() == '\0' )
+          if ( Buf.Size() == 0 || Buf.Front() == '\0' )
             Buf += '(';
 
           // Write text to buffer

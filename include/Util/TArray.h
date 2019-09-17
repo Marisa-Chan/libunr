@@ -92,6 +92,19 @@ public:
   size_t ElementSize;
 };
 
+template<class T> class TArrayNotify : public TArray<T>
+{
+public:
+  TArrayNotify<T>() : TArray<T>() {}
+  TArrayNotify<T>( size_t n ) : TArray<T>( n ) {}
+  TArrayNotify<T>( size_t n, const T& Value ) : TArray<T>( n, Value ) {}
+
+  typedef void (*NotifyCallback)(int);
+
+protected:
+  NotifyCallback Callback;
+};
+
 class FGenericArray : public TArray<unsigned char>
 {
 public:
