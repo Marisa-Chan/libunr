@@ -53,10 +53,33 @@ void UTextBuffer::Load()
   *PkgFile >> CINDEX( TextSize );
   if ( TextSize > 0 )
   {
-    char* TextBuf = (char*)malloc( TextSize + 1 );
+    char* TextBuf = new char[TextSize + 1];
     PkgFile->Read( TextBuf, TextSize + 1 );
     Text = new FString( TextBuf );
-    free( TextBuf );
+    delete TextBuf;
+  }
+  else if ( TextSize < 0 )
+  {
+    // Some packages store in unicode by storing a negative
+    // length. This is an indicator for unicode text.
+    // Will this actually butcher the text if it has non-ascii
+    // representable characters?
+    TextSize = -TextSize;
+
+    wchar_t* TextBuf = new wchar_t[TextSize+1];
+    PkgFile->Read( TextBuf, (TextSize + 1) * 2 ); 
+
+    char* MbsText = new char[TextSize+1];
+    wcstombs( MbsText, TextBuf, TextSize );
+
+    Text = new FString( MbsText );
+
+    delete TextBuf;
+    delete MbsText;
+  }
+  else
+  {
+    Text = new FString();
   }
 }
 

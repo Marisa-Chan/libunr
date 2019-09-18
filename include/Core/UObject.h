@@ -463,7 +463,7 @@ public:
   static UObject* StaticFindObject( UPackage* Pkg, FName ObjName );
 
   static TArray<UObject*> ObjectPool;
-  static TArray<UClass*>  ClassPool; 
+  static TArray<UClass*>  ClassPool;
   static TArray<FNativePropertyList*> NativePropertyLists;
   static TArray<UFunction*> NativeFunctions;
   static TArray<FNameEntry*> NameTable;

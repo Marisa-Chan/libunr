@@ -552,7 +552,7 @@ void UPackage::LoadEditableTypes()
     for ( int j = 0; j < (sizeof(Types)/sizeof(const char*)); j++ )
     {
       if ( ClassHash == Types[j] )
-        UObject* Obj = UObject::StaticLoadObject( this, Export, NULL, NULL, true );
+        UObject::StaticLoadObject( this, Export, NULL, NULL, true );
     }
   }
 }
