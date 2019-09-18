@@ -25,11 +25,16 @@
 
 #include "Core/UNativeModule.h"
 #include "Core/USystem.h"
+#include "Core/UClass.h"
+#include "Core/UPackage.h"
+IMPLEMENT_NATIVE_CLASS( UNativeModule );
+IMPLEMENT_NATIVE_CLASS( UDynamicNativeModule );
 
 #if defined __linux__ || defined __unix__
   #define NATIVE_MODULE_EXT "so"
 #elif defined _WIN32
   #define NATIVE_MODULE_EXT "dll"
+  #include <Windows.h>
 #elif not defined NO_DYNAMIC_NATIVE_MODULES
   #error "No dynamic native module extension provided"
 #endif
@@ -84,11 +89,18 @@ bool UDynamicNativeModule::Load( const char* Filename )
       Path = SystemPath;
   }
 
-#if defined __linux__ || defined __unix__
+#if defined LIBUNR_POSIX
   ModulePtr = dlopen( Path.Data(), RTLD_LAZY );
   if ( ModulePtr == NULL )
   {
     GLogf( LOG_ERR, "Failed to open native module '%s': %s", Filename, dlerror() );
+    return false;
+  }
+#elif defined LIBUNR_WIN32
+  ModulePtr = LoadLibrary( Path.Data() );
+  if ( ModulePtr == NULL )
+  {
+    GLogf( LOG_ERR, "Failed to open native module '%s': %d", Filename, GetLastError() );
     return false;
   }
 #endif
@@ -107,19 +119,26 @@ UClass* UDynamicNativeModule::GetNativeClass( const char* ClsName )
   StaticClassFuncName += ClsName;
   StaticClassFuncName += "StaticClass";
 
-#if defined __linux__ || defined __unix__
-  UClass* (*StaticClassFunc)(void) = reinterpret_cast<UClass* (*)(void)> (dlsym( ModulePtr, StaticClassFuncName.Data() ) );
+  UClass* (*StaticClassFunc)(void) = NULL;
+
+#if defined LIBUNR_POSIX
+
+  StaticClassFunc = (UClass*(*)(void))dlsym( ModulePtr, StaticClassFuncName.Data() );
   if ( StaticClassFunc == NULL )
   {
     GLogf( LOG_ERR, "Class '%s' does not exist in native module '%s'", ClsName, Name.Data() );
     return NULL;
   }
 
-  return StaticClassFunc();
-#endif
-}
+#elif defined LIBUNR_WIN32
 
-#include "Core/UClass.h"
-#include "Core/UPackage.h"
-IMPLEMENT_NATIVE_CLASS( UNativeModule );
-IMPLEMENT_NATIVE_CLASS( UDynamicNativeModule );
+  StaticClassFunc = (UClass*(*)(void))GetProcAddress( (HMODULE)ModulePtr, StaticClassFuncName.Data() );
+  if ( StaticClassFunc == NULL )
+  {
+    GLogf( LOG_ERR, "Class '%s' does not exist in native module '%s'", ClsName, Name.Data() );
+    return NULL;
+  }
+
+#endif
+  return StaticClassFunc();
+}

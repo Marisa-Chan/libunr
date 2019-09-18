@@ -151,6 +151,7 @@ class DLL_EXPORT UPackage : public UObject
   const char*     GetFileName();
   FString*        GetFullObjName( FExport* ObjExp );
   size_t          GetPackageVer();
+  void            LoadEditableTypes();
 
   size_t FindName( const char* Name );
   

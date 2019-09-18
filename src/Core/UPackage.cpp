@@ -521,6 +521,42 @@ FString UPackage::GetPackageName()
   return Path.Substr( Path.FindLastOf( '/' ) );
 }
 
+void UPackage::LoadEditableTypes()
+{
+  bool bDoGroupPathExport = false;
+  const char* ClassName;
+  const char* ObjName;
+  FHash ClassHash;
+  FHash Types[] =
+  {
+    FnvHashString("None"),
+    FnvHashString("Texture"),
+    FnvHashString("Sound"),
+    FnvHashString("Music"),
+    FnvHashString("Mesh"),
+    FnvHashString("LodMesh"),
+    FnvHashString("SkeletalMesh"),
+    FnvHashString("Animation"),
+    FnvHashString("Level")
+  };
+
+  for ( int i = 0; i < Exports.Size(); i++ )
+  {
+    FExport* Export = &Exports[i];
+    ObjName = Pkg->ResolveNameFromIdx( Export->ObjectName );
+    if ( stricmp( ObjName, "None" ) == 0 )
+      continue;
+
+    ClassName = Pkg->ResolveNameFromObjRef( Export->Class );
+    ClassHash = FnvHashString( ClassName );
+    for ( int j = 0; j < (sizeof(Types)/sizeof(const char*)); j++ )
+    {
+      if ( ClassHash == Types[j] )
+        UObject* Obj = UObject::StaticLoadObject( Pkg, Export, NULL, NULL, true );
+    }
+  }
+}
+
 bool UPackage::StaticInit()
 {
   if ( !Packages )

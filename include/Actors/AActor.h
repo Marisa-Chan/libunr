@@ -114,6 +114,7 @@ class DLL_EXPORT AActor : public UObject
   bool bInterpolating, bJustTeleported;
 
   // 227 variables
+  bool bAlwaysRender;
   bool bIsFrobable;
   float RandomDelayTime, RandomValue, LastRandomTime, LastRenderedTime;
   FColor ActorRenderColor;
