@@ -543,16 +543,16 @@ void UPackage::LoadEditableTypes()
   for ( int i = 0; i < Exports.Size(); i++ )
   {
     FExport* Export = &Exports[i];
-    ObjName = Pkg->ResolveNameFromIdx( Export->ObjectName );
+    ObjName = ResolveNameFromIdx( Export->ObjectName );
     if ( stricmp( ObjName, "None" ) == 0 )
       continue;
 
-    ClassName = Pkg->ResolveNameFromObjRef( Export->Class );
+    ClassName = ResolveNameFromObjRef( Export->Class );
     ClassHash = FnvHashString( ClassName );
     for ( int j = 0; j < (sizeof(Types)/sizeof(const char*)); j++ )
     {
       if ( ClassHash == Types[j] )
-        UObject* Obj = UObject::StaticLoadObject( Pkg, Export, NULL, NULL, true );
+        UObject* Obj = UObject::StaticLoadObject( this, Export, NULL, NULL, true );
     }
   }
 }
