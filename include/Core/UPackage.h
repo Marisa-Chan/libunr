@@ -169,6 +169,8 @@ class DLL_EXPORT UPackage : public UObject
   static void StaticExit( bool bCrashExit = false );
   static UPackage* StaticLoadPackage( const char* Filepath, bool bSearch = true );
   
+  static TArray<UPackage*>* GetLoadedPackages();
+  
   bool bIntrinsicPackage;
   FNameEntry* NoneNameEntry;
 

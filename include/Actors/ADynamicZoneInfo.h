@@ -51,6 +51,8 @@ class DLL_EXPORT ADynamicZoneInfo : public AZoneInfo
   AZoneInfo* MatchOnlyZone;
   bool bUseRelativeToRotation;
   bool bMovesForceTouchUpdate;
+  bool bQuickFilter;
+  bool bScriptEvent;
   bool bUpdateTouchers;
   FVector OldPose;
 };

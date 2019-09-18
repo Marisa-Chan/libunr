@@ -210,6 +210,11 @@
       <EnableUAC>false</EnableUAC>
       <StackReserveSize>4194304</StackReserveSize>
     </Link>
+    <PostBuildEvent>
+      <Command>mkdir $(SolutionDir)dist\
+copy $(SolutionDir)libunr\build\$(Configuration)\libunr.dll $(SolutionDir)dist\libunr.dll
+copy $(SolutionDir)libunr\res\DefaultLibunr.ini $(SolutionDir)dist\DefaultLibunr.ini</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -224,8 +229,9 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <AdditionalIncludeDirectories>$(ProjectDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -234,6 +240,11 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
     </Link>
+    <PostBuildEvent>
+      <Command>mkdir $(SolutionDir)dist\
+copy $(SolutionDir)libunr\build\$(Configuration)\libunr.dll $(SolutionDir)dist\libunr.dll
+copy $(SolutionDir)libunr\res\DefaultLibunr.ini $(SolutionDir)dist\DefaultLibunr.ini</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

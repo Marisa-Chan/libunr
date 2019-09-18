@@ -37,7 +37,7 @@ ADynamicZoneInfo::~ADynamicZoneInfo()
 
 IMPLEMENT_NATIVE_CLASS( ADynamicZoneInfo );
 
-BEGIN_PROPERTY_LINK( ADynamicZoneInfo, 11 )
+BEGIN_PROPERTY_LINK( ADynamicZoneInfo, 13 )
   LINK_NATIVE_PROPERTY( NextDynamicZone );
   LINK_NATIVE_PROPERTY( ZoneAreaType );
   LINK_NATIVE_PROPERTY( BoxMin );
@@ -47,6 +47,8 @@ BEGIN_PROPERTY_LINK( ADynamicZoneInfo, 11 )
   LINK_NATIVE_PROPERTY( MatchOnlyZone );
   LINK_NATIVE_PROPERTY( bUseRelativeToRotation );
   LINK_NATIVE_PROPERTY( bMovesForceTouchUpdate );
+  LINK_NATIVE_PROPERTY( bQuickFilter );
+  LINK_NATIVE_PROPERTY( bScriptEvent );
   LINK_NATIVE_PROPERTY( bUpdateTouchers );
   LINK_NATIVE_PROPERTY( OldPose );
 END_PROPERTY_LINK()

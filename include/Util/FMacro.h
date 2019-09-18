@@ -153,7 +153,7 @@ private: \
     name##_end = timeGetTime();
 
   #define TIMER_PRINT(name) \
-    printf("Time for %s: %.9ld\n", #name, (name##_end - name##_start)/1000.0);
+    printf("Time for %s: %.3f\n", #name, (double)((name##_end - name##_start)/1000.0));
 
 #endif
 

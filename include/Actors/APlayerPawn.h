@@ -149,6 +149,13 @@ class DLL_EXPORT APlayerPawn : public APawn
   float CrouchHeightPct;
   bool bIsReducedCrouch;
   float CrouchCheckTime;
+  float SpecialCollisionHeight;
+  float PrePivotZModifier;
+  bool bCanChangeBehindView;
+  bool bForwardUserCommands;
+  float AccumulatedHTurn;
+  float AccumulatedVTurn;
+  class ARealCrouchInfo* RealCrouchInfo;
   bool bDistanceFogEnabled, bBlendingDistanceFog;
   FPlane DistanceFogColor, DistanceFogBlend;
   float DistanceFogDistance[2];
