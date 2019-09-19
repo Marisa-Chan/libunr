@@ -527,17 +527,17 @@ void UPackage::LoadEditableTypes()
   const char* ClassName;
   const char* ObjName;
   FHash ClassHash;
-  FHash Types[] =
+  const char* Types[] =
   {
-    FnvHashString("None"),
-    FnvHashString("Texture"),
-    FnvHashString("Sound"),
-    FnvHashString("Music"),
-    FnvHashString("Mesh"),
-    FnvHashString("LodMesh"),
-    FnvHashString("SkeletalMesh"),
-    FnvHashString("Animation"),
-    FnvHashString("Level")
+    "None",
+    "Texture",
+    "Sound",
+    "Music",
+    "Mesh",
+    "LodMesh",
+    "SkeletalMesh",
+    "Animation",
+    "Level"
   };
 
   for ( int i = 0; i < Exports.Size(); i++ )
@@ -548,10 +548,9 @@ void UPackage::LoadEditableTypes()
       continue;
 
     ClassName = ResolveNameFromObjRef( Export->Class );
-    ClassHash = FnvHashString( ClassName );
-    for ( int j = 0; j < (sizeof(Types)/sizeof(const char*)); j++ )
+    for ( int j = 0; j < (sizeof(Types)/sizeof(FHash)); j++ )
     {
-      if ( ClassHash == Types[j] )
+      if ( stricmp( ClassName, Types[j] ) == 0 )
       {
         UObject::StaticLoadObject( this, Export, NULL, NULL, true );
         break;
