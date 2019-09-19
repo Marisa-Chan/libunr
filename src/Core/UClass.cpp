@@ -785,6 +785,7 @@ void UClass::BootstrapStage1()
 void UClass::BootstrapStage2()
 {
   ObjectClass->SuperClass = UState::StaticClass();
+  ObjectClass->Pkg = UObject::StaticClass()->Pkg;
 }
 
 UClass::UClass()

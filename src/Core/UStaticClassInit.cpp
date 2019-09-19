@@ -103,8 +103,8 @@ bool UObject::StaticInit()
   Result &= UObject::StaticCreateClass();
 
   // Register low level classes for Core.u
-  Result &= ULanguage::StaticClassInit();
   Result &= UPackage::StaticClassInit(); 
+  Result &= ULanguage::StaticClassInit();
   Result &= UTextBuffer::StaticClassInit();
     Result &= UField::StaticClassInit();
       Result &= UConst::StaticClassInit();
@@ -126,14 +126,14 @@ bool UObject::StaticInit()
       Result &= UStruct::StaticClassInit();
         Result &= UFunction::StaticClassInit();
         Result &= UState::StaticClassInit();
- 
-  UClass::BootstrapStage2();
 
   // Now initialize all of UObject
   Result &= UObject::StaticClassInit();
   UObject::StaticClass()->PreLoad();
   UObject::StaticClass()->Load();
   UObject::StaticClass()->PostLoad();
+
+  UClass::BootstrapStage2();
 
   // Mark the object system as bootstrapped
   bStaticBootstrapped = true;

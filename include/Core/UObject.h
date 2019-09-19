@@ -271,6 +271,7 @@ public: \
     } \
     return true; \
   } \
+  static bool StaticLoadNativePackage( const char* NativePkgName ); \
   static bool StaticSetPackageProperties(); \
   static bool StaticClassInit() \
   { \
@@ -279,6 +280,8 @@ public: \
       GLogf( LOG_CRIT, "%s::StaticCreateClass() failed!", TEXT(cls) ); \
       return false; \
     } \
+    if ( !StaticLoadNativePackage( NativePkgName ) ) \
+      return false; \
     if ( !( (clsflags) & CLASS_NoExport ) ) \
     { \
       if ( !StaticLinkNativeProperties() ) \
@@ -307,6 +310,16 @@ public: \
   DLL_EXPORT UClass* cls::ObjectClass = NULL; \
   DLL_EXPORT size_t  cls::NativeSize  = sizeof( cls ); \
   DLL_EXPORT FNativePropertyList* cls::StaticNativePropList = NULL; \
+  bool cls::StaticLoadNativePackage( const char* NativePkgName ) \
+  { \
+    ObjectClass->Pkg = UPackage::StaticLoadPackage( NativePkgName ); \
+    if ( ObjectClass->Pkg == NULL ) \
+    { \
+      GLogf( LOG_CRIT, "Failed to load package '%s' for class '%s'.", NativePkgName, ObjectClass->Name ); \
+      return false; \
+    } \
+    return true; \
+  } \
   bool cls::StaticSetPackageProperties() \
   { \
     ObjectClass->Pkg = UPackage::StaticLoadPackage( NativePkgName ); \
