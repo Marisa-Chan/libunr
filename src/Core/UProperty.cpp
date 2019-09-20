@@ -614,7 +614,7 @@ void UStructProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int
   FString InnerBuf;
 
   // Check if it's worth writing anything at all
-  if ( DefMem == NULL || !memcmp( (void*)ValMem, (void*)DefMem, Struct->StructSize ) )
+  if ( DefMem == NULL || memcmp( (void*)ValMem, (void*)DefMem, Struct->StructSize ) != 0 )
   {
     for ( UField* Iter = Struct->Children; Iter != NULL; Iter = Iter->Next )
     {

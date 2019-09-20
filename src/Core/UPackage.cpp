@@ -516,11 +516,6 @@ FPackageFileIn* UPackage::GetStream()
   return (FPackageFileIn*)Stream;
 }
 
-FString UPackage::GetPackageName()
-{
-  return Path.Substr( Path.FindLastOf( '/' ) );
-}
-
 void UPackage::LoadEditableTypes()
 {
   bool bDoGroupPathExport = false;
@@ -548,7 +543,7 @@ void UPackage::LoadEditableTypes()
       continue;
 
     ClassName = ResolveNameFromObjRef( Export->Class );
-    for ( int j = 0; j < (sizeof(Types)/sizeof(FHash)); j++ )
+    for ( int j = 0; j < (sizeof(Types)/sizeof(const char*)); j++ )
     {
       if ( stricmp( ClassName, Types[j] ) == 0 )
       {

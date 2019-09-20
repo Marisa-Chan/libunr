@@ -162,7 +162,6 @@ class DLL_EXPORT UPackage : public UObject
   FName ResolveGlobalNameObjRef( int ObjRef );
 
   // Accessors 
-  FString GetPackageName();
   FPackageFileIn* GetStream();
 
   static bool StaticInit();
@@ -171,11 +170,11 @@ class DLL_EXPORT UPackage : public UObject
   
   static TArray<UPackage*>* GetLoadedPackages();
   
+  FString Path;
   bool bIntrinsicPackage;
   FNameEntry* NoneNameEntry;
 
 protected:    
-  FString Path;
   TArray<FNameEntry> Names;
   TArray<FExport>    Exports;
   TArray<FImport>    Imports;
