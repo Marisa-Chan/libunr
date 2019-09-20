@@ -637,7 +637,7 @@ UPackage* UPackage::StaticLoadPackage( const char* PkgName, bool bSearch )
 
 TArray<UPackage*>* UPackage::GetLoadedPackages()
 {
-    return Packages;
+  return Packages;
 }
 
 IMPLEMENT_NATIVE_CLASS( UPackage );

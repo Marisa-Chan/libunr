@@ -138,9 +138,11 @@ UObject::UObject()
   Name = 0;
 }
 
-//TODO: write destructor
 UObject::~UObject()
 {
+  // TODO: Cleanly remove self from object pool or, at least, queue up a removal to be done later
+  Export->Obj = NULL;
+  Export->bNeedsFullLoad = true;
   delete OldPkgFileOffsets;
 }
 
