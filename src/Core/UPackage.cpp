@@ -588,6 +588,7 @@ UPackage* UPackage::StaticLoadPackage( const char* PkgName, bool bSearch )
   {
     ActualName = strdup( PkgName );
     ActualName = strrchr( ActualName, DIRECTORY_SEPARATOR );
+    ActualName++;
     
     char* Dot = (char*)strchr( ActualName, '.' );
     if ( Dot == NULL )

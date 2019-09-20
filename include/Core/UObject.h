@@ -363,6 +363,7 @@ public: \
       if ( ObjectClass != NULL ) \
       { \
         ClassPool.push_back( ObjectClass ); \
+        ObjectClass->bRegistered = true; \
         return true; \
       } \
       return false; \

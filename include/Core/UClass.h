@@ -204,6 +204,7 @@ class DLL_EXPORT UClass : public UState
   FConfig* ClassConfig;
   bool     NativeNeedsPkgLoad;
   bool     bLinkedChildren;
+  bool     bRegistered;
 
   size_t DefPropListOffset;
 

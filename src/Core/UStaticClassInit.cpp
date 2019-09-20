@@ -88,7 +88,7 @@ bool UObject::StaticInit()
   NameTable = TArray<FNameEntry*>();
 
   ObjectPool.Reserve( 64 );
-  ClassPool.Reserve( 64 );
+  ClassPool.Reserve( 128 );
   NativePropertyLists.Reserve( 64 );
   NativeFunctions.Reserve( 4096 );
   NameTable.Reserve( 16384 );

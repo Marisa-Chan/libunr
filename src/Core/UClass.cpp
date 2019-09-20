@@ -779,7 +779,8 @@ void UClass::BootstrapStage1()
   ObjectClass = new UClass( FName::CreateName( "Class", NameFlags ), CLASS_NoExport, NULL, 
       sizeof(UClass), UClass::NativeConstructor );
   ObjectClass->Class = ObjectClass;
-  UObject::ClassPool.PushBack( ObjectClass );
+  ObjectClass->bRegistered = true;
+  ClassPool.PushBack( ObjectClass );
 }
 
 void UClass::BootstrapStage2()
@@ -794,6 +795,7 @@ UClass::UClass()
   Constructor = NULL;
   StructSize = 0;
   bLinkedChildren = false;
+  bRegistered = false;
   Export = NULL;
 }
 
@@ -811,6 +813,7 @@ UClass::UClass( FName ClassName, u32 Flags, UClass* InSuperClass,
   NativeNeedsPkgLoad = true;
   StructSize = InStructSize;
   bLinkedChildren = false;
+  bRegistered = false;
 
   CreateDefaultObject();
   if ( UNLIKELY( bStaticBootstrapped && (Flags & CLASS_NoExport) ) )
@@ -964,6 +967,12 @@ void UClass::Load()
 
   SuperClass = SafeCast<UClass>( SuperField );
   NativeNeedsPkgLoad = false;
+
+  if ( !bRegistered )
+  {
+    bRegistered = true;
+    ClassPool.PushBack( this );
+  }
 }
 
 void UClass::PostLoad()
