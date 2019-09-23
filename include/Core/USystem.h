@@ -40,6 +40,8 @@ class DLL_EXPORT USubsystem : public UObject
   EXPOSE_TO_USCRIPT()
 
   USubsystem();
+
+  bool bInitialized;
 };
 
 // Prompt callback for if the game has not been picked 

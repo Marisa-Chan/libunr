@@ -19,9 +19,6 @@
     <Filter Include="Header Files\Core">
       <UniqueIdentifier>{3bb94cb1-0eae-4801-b8f6-287c0d33903c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\DeusEx">
-      <UniqueIdentifier>{af07a262-bff1-4a72-bb54-a8148c72a8c1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Engine">
       <UniqueIdentifier>{8112a56d-2d09-4251-be8d-bac304bf9333}</UniqueIdentifier>
     </Filter>
@@ -54,6 +51,9 @@
     </Filter>
     <Filter Include="Source Files\Rune">
       <UniqueIdentifier>{5fd94835-8587-460b-a21e-325d0bc3b687}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\DeusEx">
+      <UniqueIdentifier>{af07a262-bff1-4a72-bb54-a8148c72a8c1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

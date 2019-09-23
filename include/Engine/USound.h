@@ -46,8 +46,13 @@ class DLL_EXPORT USound : public UObject
   virtual void Load();
   virtual bool ExportToFile( const char* Dir, const char* Type );
   
+  void* GetRawPcm();
+  
   int SoundFormat;
   u32 OffsetNext;  // PackageVersion >= 63
   idx SoundSize;
   u8* SoundData;
+
+  // Runtime Variables
+  void* RawHandle;
 };

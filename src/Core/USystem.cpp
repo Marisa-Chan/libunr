@@ -61,6 +61,7 @@ static void SigsegvHandler( int sig, siginfo_t* si, void *raw_uctx )
 
 USubsystem::USubsystem()
 {
+  bInitialized = false;
 }
 
 USubsystem::~USubsystem()

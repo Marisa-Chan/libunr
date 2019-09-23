@@ -50,6 +50,8 @@ class DLL_EXPORT UMusic : public UObject
   u32 _unknown0; // PackageVerison > 61
   idx ChunkSize;
   u8* ChunkData;
-  
   int MusicType;
+
+  // Runtime Variables
+  void* RawHandle;
 };

@@ -26,6 +26,10 @@
 #pragma once
 
 #include "Core/USystem.h"
+#include "Engine/UMusic.h"
+#include "Engine/USound.h"
+#include "Engine/UViewport.h"
+#include "Actors/AActor.h"
 
 class DLL_EXPORT UAudioSubsystem : public USubsystem
 {
@@ -33,6 +37,7 @@ class DLL_EXPORT UAudioSubsystem : public USubsystem
 
   UAudioSubsystem();
 
+  virtual bool SetOutputDevice( const char* Name ) { return false; }
   virtual void SetViewport( UViewport* Viewport ) {}
   virtual void RegisterSound( USound* Sound ) {}
   virtual void RegisterMusic( UMusic* Music ) {}
