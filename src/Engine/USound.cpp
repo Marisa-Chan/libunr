@@ -99,9 +99,39 @@ void* USound::GetRawPcm()
   return NULL;
 }
 
+// "The Canonical WAVE file format" documentation here
+// http://soundfile.sapp.org/doc/WaveFormat/
 void* USound::GetWavPcm()
 {
+  u8* Data = SoundData;
+
+  // Parse RIFF chunk
+  if ( strncmp( (char*)Data, "RIFF", 4 ) != 0 )
+  {
+    GLogf( LOG_ERR, "USound::GetWavPcm() failed: bad RIFF chunk" );
+    return NULL;
+  }
+
+  Data += 4;
+  int ChunkSize = *(u32*)Data;
   
+  // Expect WAVE format
+  Data += 4;
+  if ( strncmp ( (char*)Data, "WAVE", 4 ) != 0 )
+  {
+    GLogf( LOG_ERR, "USound::GetWavPcm() failed: expected WAVE format" );
+    return NULL;
+  }
+
+  // Read format sub-chunk
+  Data += 4;
+  if ( strncmp( (char*)Data, "fmt ", 4 ) != 0 )
+  {
+    GLogf( LOG_ERR, "USound::GetWavPcm() failed: expected format subchunk" );
+    return NULL;
+  }
+
+
 }
 
 #include "Core/UClass.h"
