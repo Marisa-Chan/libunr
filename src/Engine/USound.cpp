@@ -90,6 +90,20 @@ bool USound::ExportToFile( const char* Dir, const char* Type )
   return true;
 }
 
+void* USound::GetRawPcm()
+{
+  if ( stricmp( SoundFormat.Data(), "wav" ) == 0 )
+    return GetWavPcm();
+
+  GLogf( LOG_WARN, "Unknown sound format '%s' in sound '%s.%s'", SoundFormat.Data(), Pkg->Name.Data(), Name.Data() );
+  return NULL;
+}
+
+void* USound::GetWavPcm()
+{
+  
+}
+
 #include "Core/UClass.h"
 #include "Core/UPackage.h"
 IMPLEMENT_NATIVE_CLASS( USound );

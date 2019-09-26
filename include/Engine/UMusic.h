@@ -46,11 +46,11 @@ class DLL_EXPORT UMusic : public UObject
   virtual void Load();
   virtual bool ExportToFile( const char* Dir, const char* Type );
   
-  u16 ChunkCount; //?
-  u32 _unknown0; // PackageVerison > 61
-  idx ChunkSize;
-  u8* ChunkData;
-  int MusicType;
+  u16   ChunkCount; //?
+  u32   _unknown0; // PackageVerison > 61
+  idx   ChunkSize;
+  u8*   ChunkData;
+  FName MusicType;
 
   // Runtime Variables
   void* RawHandle;

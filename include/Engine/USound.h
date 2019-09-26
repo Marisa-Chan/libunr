@@ -48,11 +48,14 @@ class DLL_EXPORT USound : public UObject
   
   void* GetRawPcm();
   
-  int SoundFormat;
-  u32 OffsetNext;  // PackageVersion >= 63
-  idx SoundSize;
-  u8* SoundData;
+  FName SoundFormat;
+  u32   OffsetNext;  // PackageVersion >= 63
+  idx   SoundSize;
+  u8*   SoundData;
 
   // Runtime Variables
   void* RawHandle;
+
+protected:
+  void* GetWavPcm();
 };
