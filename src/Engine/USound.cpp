@@ -131,6 +131,19 @@ void* USound::GetWavPcm()
     return NULL;
   }
 
+  // TODO: Verify chunk sizes for malformed wav files
+  Data += 4;
+  ChunkSize = *(u32*)Data;
+
+  Data += 4;
+  int AudioFormat = *(u32*)Data;
+
+  if ( AudioFormat != 1 )
+  {
+    GLogf( LOG_ERR, "USound::GetWavPcm() needs handling for compressed PCM" );
+    return NULL;
+  }
+
 
 }
 
