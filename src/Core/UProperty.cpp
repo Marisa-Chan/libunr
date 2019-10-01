@@ -483,6 +483,11 @@ void UStructProperty::Load()
 
 bool UStructProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int RealSize, int Idx )
 {
+  // Is there a better place to handle this? Circular dependencies prevent us
+  // from doing it at the correct time
+  if ( ElementSize == 0 )
+    ElementSize = Struct->StructSize;
+
   void* Data = PtrAdd( ObjMem, Offset + (MAX(Idx,0) * Struct->StructSize) );
   size_t Num = Struct->StructSize;
   if ( Idx < 0 )
@@ -673,6 +678,9 @@ void UArrayProperty::Load()
 
 bool UArrayProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int RealSize, int Idx )
 {
+  if ( Inner->Class == UStructProperty::StaticClass() && Inner->ElementSize == 0 )
+    Inner->ElementSize = ((UStructProperty*)Inner)->Struct->StructSize;
+
   u8 NumElem = 0;
   In >> NumElem;
 
