@@ -86,6 +86,25 @@ DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FString& Str )
       Str += C;
     }
   }
+  else if ( Size < 0 )
+  {
+    // Some packages store in unicode by storing a negative
+    // length. This is an indicator for unicode text.
+    // Will this actually butcher the text if it has non-ascii
+    // representable characters?
+    Size = -Size;
+
+    wchar_t* TextBuf = new wchar_t[Size + 1];
+    In.Read( TextBuf, (Size + 1) * 2 );
+
+    char* MbsText = new char[Size + 1];
+    wcstombs( MbsText, TextBuf, Size );
+
+    Str.Assign( MbsText );
+
+    delete TextBuf;
+    delete MbsText;
+  }
 
   return In;
 }
