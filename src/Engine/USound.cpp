@@ -111,32 +111,33 @@ void* USound::GetWavPcm()
     GLogf( LOG_ERR, "USound::GetWavPcm() failed: bad RIFF chunk" );
     return NULL;
   }
-
   Data += 4;
+
   int ChunkSize = *(u32*)Data;
+  Data += 4;
   
   // Expect WAVE format
-  Data += 4;
   if ( strncmp ( (char*)Data, "WAVE", 4 ) != 0 )
   {
     GLogf( LOG_ERR, "USound::GetWavPcm() failed: expected WAVE format" );
     return NULL;
   }
+  Data += 4;
 
   // Read format sub-chunk
-  Data += 4;
   if ( strncmp( (char*)Data, "fmt ", 4 ) != 0 )
   {
     GLogf( LOG_ERR, "USound::GetWavPcm() failed: expected format subchunk" );
     return NULL;
   }
+  Data += 4;
 
   // TODO: Verify chunk sizes for malformed wav files
-  Data += 4;
   ChunkSize = *(u32*)Data;
-
   Data += 4;
-  int AudioFormat = *(u32*)Data;
+
+  u16 AudioFormat = *(u16*)Data;
+  Data += 2;
 
   if ( AudioFormat != 1 )
   {
@@ -144,7 +145,33 @@ void* USound::GetWavPcm()
     return NULL;
   }
 
+  u16 NumChannels = *(u16*)Data;
+  Data += 2;
 
+  u32 SampleRate = *(u32*)Data;
+  Data += 4;
+
+  u32 ByteRate = *(u32*)Data;
+  Data += 4;
+
+  u16 BlockAlign = *(u16*)Data;
+  Data += 2;
+
+  BitsPerSample = *(u16*)Data;
+  Data += 2;
+
+  // Get actual data
+  if ( strncmp( (char*)Data, "data", 4 ) != 0 )
+  {
+    GLogf( LOG_ERR, "USound::GetWavPcm() failed: expected data subchunk" );
+    return NULL;
+  }
+
+  RawSize = *(u32*)Data;
+  Data += 4;
+
+  RawHandle = Data;
+  return RawHandle;
 }
 
 #include "Core/UClass.h"

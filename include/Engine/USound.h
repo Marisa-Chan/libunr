@@ -55,9 +55,10 @@ class DLL_EXPORT USound : public UObject
 
   // Runtime Variables
   void* RawHandle;
+  int RawSize;
   int NumChannels;
   int SampleRate;
-  int BitsPerSample;
+  u16 BitsPerSample;
 
 protected:
   void* GetWavPcm();
