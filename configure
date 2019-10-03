@@ -34,7 +34,7 @@ print_help()
 # Main
 #################################################
 OPTIND=1
-while getopts "hdsc:vim" opt; do
+while getopts "hdsc:vi:m" opt; do
   case "$opt" in
   h) print_help; exit 0 ;;
   d) BUILD_DEBUG=1 ;;
