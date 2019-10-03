@@ -681,8 +681,8 @@ bool UArrayProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int 
   if ( Inner->Class == UStructProperty::StaticClass() && Inner->ElementSize == 0 )
     Inner->ElementSize = ((UStructProperty*)Inner)->Struct->StructSize;
 
-  u8 NumElem = 0;
-  In >> NumElem;
+  idx NumElem = 0;
+  In >> CINDEX( NumElem );
 
   // Maybe FGenericArray can be modified when the type is not used?
   TArray<u8>** Arr = (TArray<u8>**)PtrAdd( ObjMem, Offset + ( MAX(Idx,0) * ElementSize ) );
