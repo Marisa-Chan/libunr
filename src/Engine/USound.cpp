@@ -32,6 +32,12 @@ USound::USound()
   SoundFormat = 0;
   SoundSize = 0;
   SoundData = NULL;
+  PcmData = NULL;
+  Handle = 0;
+  PcmSize = 0;
+  SampleRate = 0;
+  NumChannels = 0;
+  BitsPerSample = 0;
 }
 
 USound::~USound()
@@ -145,10 +151,10 @@ void* USound::GetWavPcm()
     return NULL;
   }
 
-  u16 NumChannels = *(u16*)Data;
+  NumChannels = *(u16*)Data;
   Data += 2;
 
-  u32 SampleRate = *(u32*)Data;
+  SampleRate = *(u32*)Data;
   Data += 4;
 
   u32 ByteRate = *(u32*)Data;
@@ -167,11 +173,11 @@ void* USound::GetWavPcm()
     return NULL;
   }
 
-  RawSize = *(u32*)Data;
+  PcmSize = *(u32*)Data;
   Data += 4;
 
-  RawHandle = Data;
-  return RawHandle;
+  PcmData = Data;
+  return PcmData;
 }
 
 #include "Core/UClass.h"

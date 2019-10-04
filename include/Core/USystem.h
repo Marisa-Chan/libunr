@@ -55,7 +55,7 @@ class DLL_EXPORT USystem : public USubsystem
   DECLARE_NATIVE_CLASS( USystem, USubsystem, CLASS_NoExport, Core )
   USystem();
 
-  // Per instance method
+  // Per instance methods
   const char* ResolvePath( const char* PkgName );
   void Exit( int ExitCode );
 
