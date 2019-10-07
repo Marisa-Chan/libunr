@@ -41,6 +41,9 @@ class LIBUNR_API USubsystem : public UObject
 
   USubsystem();
 
+  virtual bool Init() { return false; }
+  virtual bool Exit() { return false; }
+
   bool bInitialized;
 };
 

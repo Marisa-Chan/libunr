@@ -55,6 +55,12 @@
     <Filter Include="Header Files\DeusEx">
       <UniqueIdentifier>{af07a262-bff1-4a72-bb54-a8148c72a8c1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Editor">
+      <UniqueIdentifier>{fbc04467-1cc3-456c-8b7b-9cfb945888e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Editor">
+      <UniqueIdentifier>{481c6ec4-4fb5-4621-90bc-25cd3327da7d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\libunr.h">

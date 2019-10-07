@@ -23,6 +23,7 @@
  *========================================================================
 */
 
+#include "Core/UClass.h"
 #include "Engine/UEngine.h"
 
 UClient::UClient()
@@ -37,10 +38,66 @@ UClient::~UClient()
 UEngine::UEngine()
   : USubsystem()
 {
+  GameRenderDevice = NULL;
+  AudioDevice = NULL;
+  Console = NULL;
+  NetworkDevice = NULL;
+  Language = NULL;
 }
 
 UEngine::~UEngine()
 {
+}
+
+bool UEngine::Init()
+{
+  // Init audio device
+  FString Device( GSystem->AudioDevice );
+  size_t Dot = Device.Find( '.' );
+  if ( Dot == string::npos )
+  {
+    GLogf( LOG_ERR, "Incorrectly formatted AudioDevice setting in libunr.ini" );
+    return false;
+  }
+
+  FString FileName = Device.Substr( 0, Dot );
+  FString ClassName = Device.Substr( Dot );
+
+  AudioModule = new UDynamicNativeModule();
+  if ( !AudioModule->Load( FileName.Data() ) )
+  {
+    GLogf( LOG_ERR, "Failed to load audio device '%s', cannot load native module", Device.Data() );
+    return false;
+  }
+
+  AudioDevice = AudioModule->GetNativeClass( ClassName.Data() );
+  if ( AudioDevice == NULL )
+  {
+    GLogf( LOG_ERR, "Failed to load audio device '%s', class does not exist", Device.Data() );
+    return false;
+  }
+
+  Audio = (UAudioSubsystem*)AudioDevice->CreateObject();
+  if ( !Audio->Init() )
+  {
+    GLogf( LOG_ERR, "Audio device initialization failed" );
+    return false;
+  }
+
+  // TODO: Render device init
+
+  return true;
+}
+
+bool UEngine::Exit()
+{
+  // TODO
+  return false;
+}
+
+void UEngine::Tick( float DeltaTime )
+{
+  // TODO
 }
 
 #include "Core/UClass.h"
@@ -65,5 +122,3 @@ BEGIN_PROPERTY_LINK( UEngine, 15 )
   LINK_NATIVE_PROPERTY( UseSound );
   LINK_NATIVE_PROPERTY( CurrentTickRate );
 END_PROPERTY_LINK()
-
-

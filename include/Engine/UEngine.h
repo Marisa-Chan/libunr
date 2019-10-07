@@ -46,7 +46,9 @@ class LIBUNR_API UEngine : public USubsystem
 
   UEngine();
 
-  virtual void Tick( float DeltaTime ) {}
+  virtual bool Init();
+  virtual bool Exit();
+  virtual void Tick( float DeltaTime );
 
   UClass* GameRenderDevice;
   UClass* AudioDevice;
@@ -67,6 +69,10 @@ class LIBUNR_API UEngine : public USubsystem
   bool UseSound;
 
   float CurrentTickRate;
+
+protected:
+  UNativeModule* AudioModule;
+  UNativeModule* RenderModule;
 };
 
 
