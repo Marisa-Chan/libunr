@@ -28,7 +28,7 @@
 #include "Actors/AActor.h"
 #include "Actors/ANavigationPoint.h"
 
-class DLL_EXPORT AInventoryAttachment : public AActor
+class LIBUNR_API AInventoryAttachment : public AActor
 {
   DECLARE_NATIVE_CLASS( AInventoryAttachment, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -36,7 +36,7 @@ class DLL_EXPORT AInventoryAttachment : public AActor
   AInventoryAttachment();
 };
 
-class DLL_EXPORT AInventorySpot : public ANavigationPoint
+class LIBUNR_API AInventorySpot : public ANavigationPoint
 {
   DECLARE_NATIVE_CLASS( AInventorySpot, ANavigationPoint, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -46,7 +46,7 @@ class DLL_EXPORT AInventorySpot : public ANavigationPoint
   AInventory* MarkedItem;
 };
 
-class DLL_EXPORT AInventory : public AActor
+class LIBUNR_API AInventory : public AActor
 {
   DECLARE_NATIVE_CLASS( AInventory, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -145,7 +145,7 @@ class DLL_EXPORT AInventory : public AActor
   USound* DropSound;
 };
 
-class DLL_EXPORT APickup : public AInventory
+class LIBUNR_API APickup : public AInventory
 {
   DECLARE_NATIVE_CLASS( APickup, AInventory, 0, Engine )
   EXPOSE_TO_USCRIPT()

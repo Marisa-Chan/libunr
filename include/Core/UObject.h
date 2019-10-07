@@ -174,7 +174,7 @@ struct FNativePropertyLink
   u32 Offset;
 };
 
-class DLL_EXPORT FNativePropertyList
+class LIBUNR_API FNativePropertyList
 {
 public:
   FNativePropertyList( FHash InHash, size_t InNum );
@@ -307,9 +307,9 @@ public: \
   DECLARE_NATIVE_CLASS_BASE(cls, supcls, flags, pkg) \
 
 #define IMPLEMENT_NATIVE_CLASS(cls) \
-  DLL_EXPORT UClass* cls::ObjectClass = NULL; \
-  DLL_EXPORT size_t  cls::NativeSize  = sizeof( cls ); \
-  DLL_EXPORT FNativePropertyList* cls::StaticNativePropList = NULL; \
+  LIBUNR_API UClass* cls::ObjectClass = NULL; \
+  LIBUNR_API size_t  cls::NativeSize  = sizeof( cls ); \
+  LIBUNR_API FNativePropertyList* cls::StaticNativePropList = NULL; \
   bool cls::StaticLoadNativePackage( const char* NativePkgName ) \
   { \
     ObjectClass->Pkg = UPackage::StaticLoadPackage( NativePkgName ); \
@@ -431,7 +431,7 @@ bool cls::StaticLinkNativeProperties() \
  * UObject
  * The base class of all Unreal objects
 -----------------------------------------------------------------------------*/
-class DLL_EXPORT UObject
+class LIBUNR_API UObject
 {
 public:
   DECLARE_NATIVE_CLASS_BASE( UObject, UObject, CLASS_Abstract, Core )
@@ -525,7 +525,7 @@ template <class T> T* SafeCast( UObject* Obj )
   return (T*)Obj;
 }
 
-class DLL_EXPORT UCommandlet : public UObject
+class LIBUNR_API UCommandlet : public UObject
 {
   DECLARE_NATIVE_CLASS( UCommandlet, UObject, 0, Core )
   EXPOSE_TO_USCRIPT();

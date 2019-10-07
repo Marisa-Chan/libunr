@@ -27,7 +27,7 @@
 #include "Core/UObject.h"
 #include "Core/UMath.h"
 
-class DLL_EXPORT UGesture : public UObject
+class LIBUNR_API UGesture : public UObject
 {
   DECLARE_NATIVE_CLASS( UGesture, UObject, 0, Engine );
   EXPOSE_TO_USCRIPT();

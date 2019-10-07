@@ -30,7 +30,7 @@
 class APlayerPawn;
 class UConsole;
 
-class DLL_EXPORT UPlayer : public UObject
+class LIBUNR_API UPlayer : public UObject
 {
   DECLARE_NATIVE_CLASS( UPlayer, UObject, CLASS_Transient | CLASS_Config, Engine )
   EXPOSE_TO_USCRIPT()

@@ -51,11 +51,12 @@
   // MinGW
   #if defined __MINGW32__ && !defined __MINGW64__
     #define DLL_EXPORT __declspec(dllexport)
+    #define LIBUNR_API __declspec(dllexport)
 	#elif defined __i386__
 		#define ftello ftello64
 		#define fseeko fseeko64
   #else
-    #define DLL_EXPORT
+    #define LIBUNR_API
   #endif
  
 #elif defined _MSC_VER
@@ -63,10 +64,13 @@
   #pragma warning(disable:4251) // Non dll-interface class 'type' used as based for dll-interface class 'type2'
   #pragma warning(disable:4275) // Class 'type' needs to have dll-interface to be used by clients of class 'type2'
 
-#ifdef LIBUNR_EXPORTS
   #define DLL_EXPORT __declspec(dllexport)
+  #define DLL_IMPORT __declspec(dllimport)
+
+#ifdef LIBUNR_EXPORTS
+  #define LIBUNR_API DLL_EXPORT
 #else
-  #define DLL_EXPORT __declspec(dllimport)
+  #define LIBUNR_API DLL_IMPORT
 #endif
 
   #define FORCEINLINE __forceinline

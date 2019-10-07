@@ -26,7 +26,7 @@
 #pragma once
 #include "Actors/AActor.h"
 
-class DLL_EXPORT AInternetInfo : public AInfo
+class LIBUNR_API AInternetInfo : public AInfo
 {
   DECLARE_NATIVE_CLASS( AInternetInfo, AInfo, CLASS_Transient, Engine )
   EXPOSE_TO_USCRIPT()
@@ -34,7 +34,7 @@ class DLL_EXPORT AInternetInfo : public AInfo
   AInternetInfo();
 };
 
-class DLL_EXPORT AInternetLink : public AInternetInfo
+class LIBUNR_API AInternetLink : public AInternetInfo
 {
   DECLARE_NATIVE_CLASS( AInternetLink, AInternetInfo, CLASS_Transient, IpDrv )
   EXPOSE_TO_USCRIPT()
@@ -76,7 +76,7 @@ class DLL_EXPORT AInternetLink : public AInternetInfo
   FString* Validate( FString* ValidationString, FString* GameName );
 };
 
-class DLL_EXPORT ATcpLink : public AInternetLink
+class LIBUNR_API ATcpLink : public AInternetLink
 {
   DECLARE_NATIVE_CLASS( ATcpLink, AInternetLink, CLASS_Transient, IpDrv )
   EXPOSE_TO_USCRIPT()
@@ -113,7 +113,7 @@ class DLL_EXPORT ATcpLink : public AInternetLink
   int ReadBinary( int Count, u8* B );
 };
 
-class DLL_EXPORT AUdpLink : public AInternetLink
+class LIBUNR_API AUdpLink : public AInternetLink
 {
   DECLARE_NATIVE_CLASS( AUdpLink, AInternetLink, CLASS_Transient, IpDrv )
   EXPOSE_TO_USCRIPT()

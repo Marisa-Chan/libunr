@@ -27,7 +27,7 @@
 
 #include "Core/UObject.h"
 
-class DLL_EXPORT ULanguage : public UObject
+class LIBUNR_API ULanguage : public UObject
 {
   DECLARE_NATIVE_CLASS( ULanguage, UObject, CLASS_NoExport, Core )
 

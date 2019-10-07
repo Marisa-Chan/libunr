@@ -28,7 +28,7 @@
 #include "Core/UObject.h"
 #include "Core/UMath.h"
 
-class DLL_EXPORT UPrimitive : public UObject
+class LIBUNR_API UPrimitive : public UObject
 {
   DECLARE_NATIVE_CLASS( UPrimitive, UObject, CLASS_NoExport, Engine )
 

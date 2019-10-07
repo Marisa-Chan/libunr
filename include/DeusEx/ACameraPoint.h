@@ -25,7 +25,7 @@
 
 #include "Actors/AActor.h"
 
-class DLL_EXPORT ACameraPoint : public AKeypoint
+class LIBUNR_API ACameraPoint : public AKeypoint
 {
   DECLARE_NATIVE_CLASS( ACameraPoint, AKeypoint, 0, Engine )
   EXPOSE_TO_USCRIPT()

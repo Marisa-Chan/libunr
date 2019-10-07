@@ -69,7 +69,7 @@ enum EMatterType
   MATTER_LAVA
 };
 
-class DLL_EXPORT FColor
+class LIBUNR_API FColor
 {
 public:
   union 
@@ -93,27 +93,30 @@ public:
   }
 };
 
-class DLL_EXPORT FMipmap
+class LIBUNR_API FMipmap
 {
 public:  
   FMipmap() 
-  {}
+  {
+    USize = 0;
+    VSize = 0;
+  }
   
   FMipmap( int InUSize, int InVSize )
   : USize( InUSize ), VSize( InVSize )
-  , DataArray( (size_t)(InUSize * InVSize), 0 )
+  , DataArray( ((size_t)InUSize * (size_t)InVSize), 0 )
   {}
   
   void Clear()
   {
-    memset( DataArray.data(), 0, USize * VSize );
+    memset( DataArray.data(), 0, (size_t)USize * (size_t)VSize );
   }
   
   int USize, VSize;
   TArray<u8> DataArray;
 };
 
-class DLL_EXPORT UPalette : public UObject
+class LIBUNR_API UPalette : public UObject
 {
   DECLARE_NATIVE_CLASS( UPalette, UObject, CLASS_SafeReplace, Engine )
   EXPOSE_TO_USCRIPT()
@@ -124,7 +127,7 @@ class DLL_EXPORT UPalette : public UObject
   FColor Colors[256];
 };
 
-class DLL_EXPORT UBitmap : public UObject
+class LIBUNR_API UBitmap : public UObject
 {
   DECLARE_NATIVE_CLASS( UBitmap, UObject, CLASS_SafeReplace, Engine )
   EXPOSE_TO_USCRIPT()
@@ -188,7 +191,7 @@ enum EVClampMode
   VClamp,
 };
 
-class DLL_EXPORT UTexture : public UBitmap
+class LIBUNR_API UTexture : public UBitmap
 {
   DECLARE_NATIVE_CLASS( UTexture, UBitmap, CLASS_SafeReplace, Engine )
   EXPOSE_TO_USCRIPT()
@@ -272,7 +275,7 @@ class DLL_EXPORT UTexture : public UBitmap
   virtual bool ExportToFile( const char* Dir, const char* Type );
 };
 
-class DLL_EXPORT UFont : public UObject
+class LIBUNR_API UFont : public UObject
 {
   DECLARE_NATIVE_CLASS( UFont, UObject, CLASS_NoExport, Engine )
   UFont();
@@ -310,7 +313,7 @@ class DLL_EXPORT UFont : public UObject
   virtual void Load();
 };
 
-class DLL_EXPORT UScriptedTexture : public UTexture
+class LIBUNR_API UScriptedTexture : public UTexture
 {
   DECLARE_NATIVE_CLASS( UScriptedTexture, UTexture, CLASS_SafeReplace, Engine )
   EXPOSE_TO_USCRIPT()
@@ -361,7 +364,7 @@ class DLL_EXPORT UScriptedTexture : public UTexture
 // This is deprecated and will never be implemented. Real dynamic shadows will
 // be implemented in the renderer. This class is here simply to allow the export
 // of the ShadowBitMap.uc class in 227
-class DLL_EXPORT UShadowBitMap : public UTexture
+class LIBUNR_API UShadowBitMap : public UTexture
 {
   DECLARE_NATIVE_CLASS( UShadowBitMap, UTexture, 0, Engine )
   EXPOSE_TO_USCRIPT()

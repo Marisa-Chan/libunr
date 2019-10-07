@@ -30,7 +30,7 @@
 #define MAX_MSG_LEN  512
 #define MAX_TYPE_LEN 32
 #define MAX_LINE_LEN (MAX_MSG_LEN + MAX_TYPE_LEN - 1)
-DLL_EXPORT FLogFile* GLogFile = NULL;
+LIBUNR_API FLogFile* GLogFile = NULL;
 
 int FLogFile::Open( const char* Filename )
 {

@@ -28,7 +28,7 @@
 #include "Engine/UPlayer.h"
 #include "Actors/APawn.h"
 
-class DLL_EXPORT APlayerPawn : public APawn
+class LIBUNR_API APlayerPawn : public APawn
 {
   DECLARE_NATIVE_CLASS( APlayerPawn, APawn, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -237,7 +237,7 @@ class DLL_EXPORT APlayerPawn : public APawn
   u8 oldPhysics;
 };
 
-class DLL_EXPORT ACamera : public APlayerPawn
+class LIBUNR_API ACamera : public APlayerPawn
 {
   DECLARE_NATIVE_CLASS( ACamera, APlayerPawn, CLASS_Transient, Engine )
   EXPOSE_TO_USCRIPT()

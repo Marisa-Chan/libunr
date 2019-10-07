@@ -75,12 +75,12 @@ class FPackageFileOut;
  * FCompactIndex
  * https://wiki.beyondunreal.com/Legacy:Package_File_Format/Data_Details
 -----------------------------------------------------------------------------*/
-class DLL_EXPORT FCompactIndex
+class LIBUNR_API FCompactIndex
 {
 public:
   int Value;
-  friend DLL_EXPORT FPackageFileIn&  operator>>( FPackageFileIn& Ar,  FCompactIndex& Index );
-  friend DLL_EXPORT FPackageFileOut& operator<<( FPackageFileOut& Ar, FCompactIndex& Index );
+  friend LIBUNR_API FPackageFileIn&  operator>>( FPackageFileIn& Ar,  FCompactIndex& Index );
+  friend LIBUNR_API FPackageFileOut& operator<<( FPackageFileOut& Ar, FCompactIndex& Index );
 };
 
 #define CINDEX(val) (*(FCompactIndex*)&val)

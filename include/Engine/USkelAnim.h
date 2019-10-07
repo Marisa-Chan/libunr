@@ -51,7 +51,7 @@ struct FChunkHeaderOut
  * FNamedBone
  * Describes a bone within an animation object
 -----------------------------------------------------------------------------*/
-struct DLL_EXPORT FNamedBone
+struct LIBUNR_API FNamedBone
 {
   FName Name;
   u32 Flags;
@@ -64,7 +64,7 @@ struct DLL_EXPORT FNamedBone
  * FAnalogTrack
  * Describes animation for a single bone
 -----------------------------------------------------------------------------*/
-struct DLL_EXPORT FAnalogTrack
+struct LIBUNR_API FAnalogTrack
 {
   u32 Flags;
   TArray<FPlane>  KeyQuats;
@@ -78,7 +78,7 @@ struct DLL_EXPORT FAnalogTrack
  * FMotionChunk
  * A group of analog chunks to describe motion for a single frame (?)
 -----------------------------------------------------------------------------*/
-struct DLL_EXPORT FMotionChunk
+struct LIBUNR_API FMotionChunk
 {
   FVector RootSpeed3D;
   float TrackTime;
@@ -96,7 +96,7 @@ struct DLL_EXPORT FMotionChunk
  * UAnimation
  * An object for skeletal animations
 -----------------------------------------------------------------------------*/
-class DLL_EXPORT UAnimation : public UObject
+class LIBUNR_API UAnimation : public UObject
 {
   DECLARE_NATIVE_CLASS( UAnimation, UObject, CLASS_NoExport, Engine )
 
@@ -116,7 +116,7 @@ class DLL_EXPORT UAnimation : public UObject
   //float CompFactor;
 };
 
-class DLL_EXPORT USkeletalMeshInstance : public UObject
+class LIBUNR_API USkeletalMeshInstance : public UObject
 {
   DECLARE_NATIVE_CLASS( USkeletalMeshInstance, UObject, 0, Engine )
   EXPOSE_TO_USCRIPT()

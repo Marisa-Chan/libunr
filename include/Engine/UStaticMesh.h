@@ -40,7 +40,7 @@ enum EStaticMeshFlags
   SMFL_Unlit       = 0x0100
 };
 
-class DLL_EXPORT UStaticMesh : public UMesh
+class LIBUNR_API UStaticMesh : public UMesh
 {
   DECLARE_NATIVE_CLASS( UStaticMesh, UMesh, CLASS_NoExport, Engine )
   UStaticMesh();

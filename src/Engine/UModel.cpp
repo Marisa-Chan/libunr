@@ -28,7 +28,7 @@
 #include "Actors/ABrush.h"
 #include "Actors/AZoneInfo.h"
 
-DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FPoly& P )
+LIBUNR_API FPackageFileIn& operator>>( FPackageFileIn& In, FPoly& P )
 {
   In >> CINDEX( P.NumVertices );
 
@@ -65,7 +65,7 @@ DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FPoly& P )
 }
 
 // This is probably broken
-DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FBspNode& BN )
+LIBUNR_API FPackageFileIn& operator>>( FPackageFileIn& In, FBspNode& BN )
 {
   In >> BN.Plane;
   In >> BN.ZoneMask;
@@ -85,7 +85,7 @@ DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FBspNode& BN )
   return In;
 }
 
-DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FBspSurf& BS )
+LIBUNR_API FPackageFileIn& operator>>( FPackageFileIn& In, FBspSurf& BS )
 {
   idx ObjRef;
   In >> CINDEX( ObjRef );
@@ -106,7 +106,7 @@ DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FBspSurf& BS )
   return In;
 }
 
-DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FZoneProperties& ZP )
+LIBUNR_API FPackageFileIn& operator>>( FPackageFileIn& In, FZoneProperties& ZP )
 {
   idx ObjRef;
   In >> CINDEX( ObjRef );

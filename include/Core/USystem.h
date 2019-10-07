@@ -34,7 +34,7 @@
 #define GAME_HPSS   0x00010
 #define GAME_All    0xFFFFF
 
-class DLL_EXPORT USubsystem : public UObject
+class LIBUNR_API USubsystem : public UObject
 {
   DECLARE_NATIVE_CLASS( USubsystem, UObject, CLASS_Abstract, Core )
   EXPOSE_TO_USCRIPT()
@@ -50,7 +50,7 @@ typedef int(*GamePromptCallback)( TArray<char*>* );
 // Prompt callback for if audio/render devices have not been picked
 typedef void(*DevicePromptCallback)(char*, char*); // RenderBuf, AudioBuf
 
-class DLL_EXPORT USystem : public USubsystem
+class LIBUNR_API USystem : public USubsystem
 {
   DECLARE_NATIVE_CLASS( USystem, USubsystem, CLASS_NoExport, Core )
   USystem();
@@ -102,6 +102,6 @@ protected:
   static bool bIsEditor;
 };
 
-DLL_EXPORT extern USystem* GSystem;
-DLL_EXPORT bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool bIsEditor, char* GameName = NULL );
+LIBUNR_API extern USystem* GSystem;
+LIBUNR_API bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool bIsEditor, char* GameName = NULL );
 

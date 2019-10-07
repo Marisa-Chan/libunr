@@ -27,7 +27,7 @@
 
 #include "Actors/AActor.h"
 
-class DLL_EXPORT ABrush : public AActor
+class LIBUNR_API ABrush : public AActor
 {
   DECLARE_NATIVE_CLASS( ABrush, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -57,7 +57,7 @@ class DLL_EXPORT ABrush : public AActor
   bool   bColored;
 };
 
-class DLL_EXPORT AMover : public ABrush 
+class LIBUNR_API AMover : public ABrush 
 {
   DECLARE_NATIVE_CLASS( AMover, ABrush, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -158,7 +158,7 @@ class DLL_EXPORT AMover : public ABrush
   FName InterpolateEvent[16];
 };
 
-class DLL_EXPORT APolyObj : public ABrush
+class LIBUNR_API APolyObj : public ABrush
 {
   DECLARE_NATIVE_CLASS( APolyObj, ABrush, 0, Engine )
   EXPOSE_TO_USCRIPT()

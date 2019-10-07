@@ -29,7 +29,7 @@
 #include "Actors/AReplicationInfo.h"
 #include "Actors/AWeapon.h"
 
-class DLL_EXPORT APawn : public AActor
+class LIBUNR_API APawn : public AActor
 {
   DECLARE_NATIVE_CLASS( APawn, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()

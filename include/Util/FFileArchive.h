@@ -30,7 +30,7 @@
  * FFileArchive
  * Provides generic interface for reading and writing to a file
 -----------------------------------------------------------------------------*/
-class DLL_EXPORT FFileArchive : public FArchive
+class LIBUNR_API FFileArchive : public FArchive
 {
 public:
   FFileArchive();
@@ -58,7 +58,7 @@ protected:
  * FFileArchiveIn
  * Provides interface to read from a file
 -----------------------------------------------------------------------------*/
-class DLL_EXPORT FFileArchiveIn : public FFileArchive
+class LIBUNR_API FFileArchiveIn : public FFileArchive
 {
 public:
   virtual int Open( const char* Filename );
@@ -69,7 +69,7 @@ public:
  * FFileArchiveOut
  * Provides interface to write to a file
 -----------------------------------------------------------------------------*/
-class DLL_EXPORT FFileArchiveOut : public FFileArchive
+class LIBUNR_API FFileArchiveOut : public FFileArchive
 {
 public:
   virtual int Open( const char* Filename );
@@ -80,7 +80,7 @@ public:
  * FStringFilePath
  * An FString variant that ensures consistent state for a file path
 -----------------------------------------------------------------------------*/
-class DLL_EXPORT FStringFilePath : public FString
+class LIBUNR_API FStringFilePath : public FString
 {
 public:
   FStringFilePath( const char* Dir, const char* Name, const char* Ext=NULL );

@@ -42,7 +42,7 @@ const char* const LogLevelStrings[] =
   "!"
 };
 
-class DLL_EXPORT FLogFile : public FFileArchiveOut
+class LIBUNR_API FLogFile : public FFileArchiveOut
 {
 public:
   virtual int Open( const char* Filename );
@@ -55,6 +55,6 @@ protected:
   int LogLevel;
 };
 
-extern DLL_EXPORT FLogFile* GLogFile;
+extern LIBUNR_API FLogFile* GLogFile;
 #define GLogf GLogFile->Logf
 

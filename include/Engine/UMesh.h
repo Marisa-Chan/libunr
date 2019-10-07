@@ -30,7 +30,7 @@
 
 class AActor;
 
-struct DLL_EXPORT FMeshVert
+struct LIBUNR_API FMeshVert
 {
   float X;
   float Y;
@@ -40,7 +40,7 @@ struct DLL_EXPORT FMeshVert
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FMeshVert& MV );
 };
 
-struct DLL_EXPORT FMeshTri
+struct LIBUNR_API FMeshTri
 {
   u16 Vertex[3];
   u8  VertexUV[3][2];
@@ -50,7 +50,7 @@ struct DLL_EXPORT FMeshTri
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FMeshTri& MT );
 };
 
-struct DLL_EXPORT FMeshAnimFunc
+struct LIBUNR_API FMeshAnimFunc
 {
   float Time;
   idx FuncIdx;
@@ -59,7 +59,7 @@ struct DLL_EXPORT FMeshAnimFunc
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FMeshAnimFunc& MAF );
 };
 
-struct DLL_EXPORT FMeshAnimSeq
+struct LIBUNR_API FMeshAnimSeq
 {
   FName Name;
   FName Group;
@@ -71,7 +71,7 @@ struct DLL_EXPORT FMeshAnimSeq
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FMeshAnimSeq& MA );
 };
 
-struct DLL_EXPORT FMeshVertConnect
+struct LIBUNR_API FMeshVertConnect
 {
   u32 NumVertTriangles;
   u32 TriangleListOffset;
@@ -79,7 +79,7 @@ struct DLL_EXPORT FMeshVertConnect
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FMeshVertConnect& MVC );
 };
 
-class DLL_EXPORT UMesh : public UPrimitive
+class LIBUNR_API UMesh : public UPrimitive
 {
   DECLARE_NATIVE_CLASS( UMesh, UPrimitive, CLASS_NoExport, Engine )
 
@@ -104,7 +104,7 @@ class DLL_EXPORT UMesh : public UPrimitive
   bool bDeusExMesh;
 };
 
-class DLL_EXPORT UAnimationNotify : public UObject
+class LIBUNR_API UAnimationNotify : public UObject
 {
   DECLARE_NATIVE_CLASS( UAnimationNotify, UObject, 0, Engine )
   EXPOSE_TO_USCRIPT()

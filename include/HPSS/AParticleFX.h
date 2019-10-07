@@ -29,7 +29,7 @@
 #include "Actors/AActor.h"
 #include "HPSS/UParticleList.h"
 
-class DLL_EXPORT AParticleFX : public AActor
+class LIBUNR_API AParticleFX : public AActor
 {
   DECLARE_NATIVE_CLASS( AParticleFX, AActor, 0, Engine );
   EXPOSE_TO_USCRIPT();

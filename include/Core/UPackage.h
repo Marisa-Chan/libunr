@@ -33,7 +33,7 @@
  * FPackageFileIn
  * Keeps track of package specifics when reading a package from a file
 -----------------------------------------------------------------------------*/
-class DLL_EXPORT FPackageFileIn : public FFileArchiveIn
+class LIBUNR_API FPackageFileIn : public FFileArchiveIn
 {
 public:
   int Ver;
@@ -46,7 +46,7 @@ int ReadArrayIndex( FPackageFileIn& PkgFile );
  * FPackageFileOut
  * Keeps track of package specifics when writing a package to a file
 -----------------------------------------------------------------------------*/
-class DLL_EXPORT FPackageFileOut : public FFileArchiveOut
+class LIBUNR_API FPackageFileOut : public FFileArchiveOut
 {
 public:
   int Ver;
@@ -58,7 +58,7 @@ public:
  * A data struct that contains information about a single object
  * that a package will expose to outside sources
 -----------------------------------------------------------------------------*/
-struct DLL_EXPORT FExport
+struct LIBUNR_API FExport
 {
   idx Class;        // Object reference to Class
   idx Super;        // Object reference to Parent
@@ -80,7 +80,7 @@ struct DLL_EXPORT FExport
  * A data struct that contains information about a single object
  * which is required for the complete loading of a package
 -----------------------------------------------------------------------------*/
-struct DLL_EXPORT FImport
+struct LIBUNR_API FImport
 {
   idx ClassPackage; // Name index to Package name of Class
   idx ClassName;    // Name index to Class Name
@@ -95,7 +95,7 @@ struct DLL_EXPORT FImport
  * A data struct which contains information about a single package
  * This information is always located at the top of a package file
 -----------------------------------------------------------------------------*/
-struct DLL_EXPORT UPackageHeader
+struct LIBUNR_API UPackageHeader
 {
   u32 Signature;
   u16 PackageVersion;
@@ -126,7 +126,7 @@ enum EPkgLoadOpts
  * UPackage
  * A container for default object types
 -----------------------------------------------------------------------------*/
-class DLL_EXPORT UPackage : public UObject
+class LIBUNR_API UPackage : public UObject
 {
   DECLARE_NATIVE_CLASS( UPackage, UObject, CLASS_NoExport, Core )
   UPackage();

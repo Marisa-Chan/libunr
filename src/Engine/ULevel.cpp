@@ -31,7 +31,7 @@
 #include "Actors/ANavigationPoint.h"
 #include "Actors/APlayerPawn.h"
 
-DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FReachSpec& RS )
+LIBUNR_API FPackageFileIn& operator>>( FPackageFileIn& In, FReachSpec& RS )
 {
   In >> RS.Distance;
   
@@ -50,7 +50,7 @@ DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FReachSpec& RS )
   return In;
 }
 
-DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FURL& URL )
+LIBUNR_API FPackageFileIn& operator>>( FPackageFileIn& In, FURL& URL )
 {
   In >> URL.Protocol;
   In >> URL.Host;

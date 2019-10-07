@@ -27,7 +27,7 @@
 
 #include "Engine/UPlayer.h"
 
-class DLL_EXPORT UViewport : public UPlayer
+class LIBUNR_API UViewport : public UPlayer
 {
   DECLARE_NATIVE_CLASS( UViewport, UPlayer, CLASS_NoExport, Engine )
   UViewport();

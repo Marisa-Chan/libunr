@@ -30,7 +30,7 @@
 class AHUDOverlay;
 class AMenu;
 
-class DLL_EXPORT AHUD : public AActor
+class LIBUNR_API AHUD : public AActor
 {
   DECLARE_NATIVE_CLASS( AHUD, AActor, CLASS_Abstract, Engine )
   EXPOSE_TO_USCRIPT()
@@ -51,7 +51,7 @@ class DLL_EXPORT AHUD : public AActor
   APlayerPawn* PlayerOwner;
 };
 
-class DLL_EXPORT AHUDOverlay : public AActor
+class LIBUNR_API AHUDOverlay : public AActor
 {
   DECLARE_NATIVE_CLASS( AHUDOverlay, AActor, CLASS_Abstract, Engine )
   EXPOSE_TO_USCRIPT()

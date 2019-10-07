@@ -27,7 +27,7 @@
 
 #include "Actors/AActor.h"
 
-class DLL_EXPORT ANavigationPoint : public AActor
+class LIBUNR_API ANavigationPoint : public AActor
 {
   DECLARE_NATIVE_CLASS( ANavigationPoint, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -84,7 +84,7 @@ class DLL_EXPORT ANavigationPoint : public AActor
   bool bTwoWay;
 };
 
-class DLL_EXPORT AWarpZoneMarker : public ANavigationPoint
+class LIBUNR_API AWarpZoneMarker : public ANavigationPoint
 {
   DECLARE_NATIVE_CLASS( AWarpZoneMarker, ANavigationPoint, CLASS_NoUserCreate, Engine )
   EXPOSE_TO_USCRIPT()
@@ -96,7 +96,7 @@ class DLL_EXPORT AWarpZoneMarker : public ANavigationPoint
   AActor* TriggerActor2;
 };
 
-class DLL_EXPORT ALiftExit : public ANavigationPoint
+class LIBUNR_API ALiftExit : public ANavigationPoint
 {
   DECLARE_NATIVE_CLASS( ALiftExit, ANavigationPoint, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -110,7 +110,7 @@ class DLL_EXPORT ALiftExit : public ANavigationPoint
   float LastTriggerTime;
 };
 
-class DLL_EXPORT ALiftCenter : public ANavigationPoint
+class LIBUNR_API ALiftCenter : public ANavigationPoint
 {
   DECLARE_NATIVE_CLASS( ALiftCenter, ANavigationPoint, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -127,7 +127,7 @@ class DLL_EXPORT ALiftCenter : public ANavigationPoint
   FVector LiftOffset;
 };
 
-class DLL_EXPORT APlayerStart : public ANavigationPoint
+class LIBUNR_API APlayerStart : public ANavigationPoint
 {
   DECLARE_NATIVE_CLASS( APlayerStart, ANavigationPoint, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -144,7 +144,7 @@ class DLL_EXPORT APlayerStart : public ANavigationPoint
   bool bNonTeamOnlyStart;
 };
 
-class DLL_EXPORT ATeleporter : public ANavigationPoint
+class LIBUNR_API ATeleporter : public ANavigationPoint
 {
   DECLARE_NATIVE_CLASS( ATeleporter, ANavigationPoint, 0, Engine )
   EXPOSE_TO_USCRIPT()

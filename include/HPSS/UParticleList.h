@@ -26,7 +26,7 @@
 #pragma once
 #include "Core/UObject.h"
 
-class DLL_EXPORT UParticleList : public UObject
+class LIBUNR_API UParticleList : public UObject
 {
   DECLARE_NATIVE_CLASS( UParticleList, UObject, CLASS_NoExport, Engine );
   UParticleList();

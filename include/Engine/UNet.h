@@ -28,7 +28,7 @@
 #include "Core/USystem.h"
 #include "Engine/UPlayer.h"
 
-class DLL_EXPORT UNetConnection : public UPlayer
+class LIBUNR_API UNetConnection : public UPlayer
 {
   DECLARE_NATIVE_CLASS( UNetConnection, UPlayer, 
       CLASS_NoExport | CLASS_Transient | CLASS_Config, Engine )
@@ -37,7 +37,7 @@ class DLL_EXPORT UNetConnection : public UPlayer
   UNetConnection();
 };
 
-class DLL_EXPORT UNetDriver : public USubsystem
+class LIBUNR_API UNetDriver : public USubsystem
 {
   DECLARE_NATIVE_CLASS( UNetDriver, USubsystem,
       CLASS_NoExport | CLASS_Transient, Engine )
@@ -47,7 +47,7 @@ class DLL_EXPORT UNetDriver : public USubsystem
   // TODO:
 };
 
-class DLL_EXPORT USecurityData : public UObject
+class LIBUNR_API USecurityData : public UObject
 {
   DECLARE_NATIVE_CLASS( USecurityData, UObject, CLASS_Config, Engine )
   EXPOSE_TO_USCRIPT()

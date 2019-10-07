@@ -113,9 +113,9 @@ struct FDecal
   TArray<int> Nodes;
 };
 
-struct DLL_EXPORT FPoly
+struct LIBUNR_API FPoly
 {
-  friend DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& Ar, FPoly& P );
+  friend LIBUNR_API FPackageFileIn& operator>>( FPackageFileIn& Ar, FPoly& P );
   void ExportToLevelText( FFileArchiveOut* Out );
 
   FVector Base;
@@ -133,7 +133,7 @@ struct DLL_EXPORT FPoly
   i16     PanU, PanV;
 };
 
-class DLL_EXPORT UPolys : public UObject
+class LIBUNR_API UPolys : public UObject
 {
   DECLARE_NATIVE_CLASS( UPolys, UObject, CLASS_RuntimeStatic | CLASS_NoExport, Engine )
   UPolys();
@@ -144,9 +144,9 @@ class DLL_EXPORT UPolys : public UObject
   TArray<FPoly> Element;
 };
 
-struct DLL_EXPORT FBspNode
+struct LIBUNR_API FBspNode
 {
-  friend DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FBspNode& BN );
+  friend LIBUNR_API FPackageFileIn& operator>>( FPackageFileIn& In, FBspNode& BN );
 
   FPlane Plane;
   u64    ZoneMask;
@@ -169,9 +169,9 @@ struct DLL_EXPORT FBspNode
   int iLeaf[2];
 };
 
-struct DLL_EXPORT FBspSurf
+struct LIBUNR_API FBspSurf
 {
-  friend DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FBspSurf& BS );
+  friend LIBUNR_API FPackageFileIn& operator>>( FPackageFileIn& In, FBspSurf& BS );
 
   UTexture* Texture;
   u32 PolyFlags;
@@ -189,7 +189,7 @@ struct DLL_EXPORT FBspSurf
   TArray<int> Nodes;
 };
 
-struct DLL_EXPORT FLightMapIndex
+struct LIBUNR_API FLightMapIndex
 {
   int DataOffset;
   int iLightActors;
@@ -212,7 +212,7 @@ struct DLL_EXPORT FLightMapIndex
 
 };
 
-struct DLL_EXPORT FVert
+struct LIBUNR_API FVert
 {
   idx pVertex;
   idx iSide;
@@ -225,7 +225,7 @@ struct DLL_EXPORT FVert
   }
 };
 
-struct DLL_EXPORT FLeaf
+struct LIBUNR_API FLeaf
 {
   idx iZone;
   idx iPermeating;
@@ -242,21 +242,21 @@ struct DLL_EXPORT FLeaf
   }
 };
 
-struct DLL_EXPORT FZoneProperties
+struct LIBUNR_API FZoneProperties
 {
   class AZoneInfo* ZoneInfo;
   float LastRenderTime;
   u64   Connectivity;
   u64   Visibility;
 
-  friend DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FZoneProperties& ZP );
+  friend LIBUNR_API FPackageFileIn& operator>>( FPackageFileIn& In, FZoneProperties& ZP );
 };
 
 /*-----------------------------------------------------------------------------
  * UVectors
  * Old Vectors object
 -----------------------------------------------------------------------------*/
-class DLL_EXPORT UVectors : public UObject
+class LIBUNR_API UVectors : public UObject
 {
   DECLARE_NATIVE_CLASS( UVectors, UObject, CLASS_NoExport, Engine )
   UVectors();
@@ -270,7 +270,7 @@ class DLL_EXPORT UVectors : public UObject
  * UBspNodes
  * Old BspNodes object
 -----------------------------------------------------------------------------*/
-class DLL_EXPORT UBspNodes : public UObject
+class LIBUNR_API UBspNodes : public UObject
 {
   DECLARE_NATIVE_CLASS( UBspNodes, UObject, CLASS_NoExport, Engine )
   UBspNodes();
@@ -284,7 +284,7 @@ class DLL_EXPORT UBspNodes : public UObject
  * UBspSurfs
  * Old BspSurfs object
 -----------------------------------------------------------------------------*/
-class DLL_EXPORT UBspSurfs : public UObject
+class LIBUNR_API UBspSurfs : public UObject
 {
   DECLARE_NATIVE_CLASS( UBspSurfs, UObject, CLASS_NoExport, Engine )
   UBspSurfs();
@@ -298,7 +298,7 @@ class DLL_EXPORT UBspSurfs : public UObject
  * UVerts
  * Old Verts object
 -----------------------------------------------------------------------------*/
-class DLL_EXPORT UVerts : public UObject
+class LIBUNR_API UVerts : public UObject
 {
   DECLARE_NATIVE_CLASS( UVerts, UObject, CLASS_NoExport, Engine )
   UVerts();
@@ -312,7 +312,7 @@ class DLL_EXPORT UVerts : public UObject
  * UModel
  * Holds polygon and BSP information for a level object
 -----------------------------------------------------------------------------*/
-class DLL_EXPORT UModel : public UPrimitive
+class LIBUNR_API UModel : public UPrimitive
 {
   DECLARE_NATIVE_CLASS( UModel, UPrimitive, CLASS_NoExport, Engine )
   UModel();
@@ -344,7 +344,7 @@ class DLL_EXPORT UModel : public UPrimitive
  * USkelModel
  * Skeletal Model object. Only seems to exist in Rune
 -----------------------------------------------------------------------------*/
-class DLL_EXPORT USkelModel : public UPrimitive
+class LIBUNR_API USkelModel : public UPrimitive
 {
   DECLARE_NATIVE_CLASS( USkelModel, UPrimitive, CLASS_NoExport, Engine )
   USkelModel();

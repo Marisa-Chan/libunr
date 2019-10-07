@@ -31,7 +31,7 @@
 #include "Engine/UViewport.h"
 #include "Actors/AActor.h"
 
-class DLL_EXPORT UAudioSubsystem : public USubsystem
+class LIBUNR_API UAudioSubsystem : public USubsystem
 {
   DECLARE_NATIVE_CLASS( UAudioSubsystem, USubsystem, CLASS_NoExport, Engine )
 

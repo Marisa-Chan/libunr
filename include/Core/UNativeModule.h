@@ -32,9 +32,72 @@
 #endif
 
 #define IMPLEMENT_MODULE_CLASS(cls) \
-  extern "C" UClass* cls##StaticClass() { return cls::StaticClass(); }
+  extern "C" UClass* cls##StaticClass() { return cls::StaticClass(); }  \
+  DLL_EXPORT UClass* cls::ObjectClass = NULL; \
+  DLL_EXPORT size_t  cls::NativeSize  = sizeof( cls ); \
+  DLL_EXPORT FNativePropertyList* cls::StaticNativePropList = NULL; \
+  bool cls::StaticLoadNativePackage( const char* NativePkgName ) \
+  { \
+    ObjectClass->Pkg = UPackage::StaticLoadPackage( NativePkgName ); \
+    if ( ObjectClass->Pkg == NULL ) \
+    { \
+      GLogf( LOG_CRIT, "Failed to load package '%s' for class '%s'.", NativePkgName, ObjectClass->Name ); \
+      return false; \
+    } \
+    return true; \
+  } \
+  bool cls::StaticSetPackageProperties() \
+  { \
+    ObjectClass->Pkg = UPackage::StaticLoadPackage( NativePkgName ); \
+    if ( ObjectClass->Pkg == NULL ) \
+    { \
+      GLogf( LOG_CRIT, "Failed to load package '%s' for class '%s'.", NativePkgName, ObjectClass->Name ); \
+      return false; \
+    } \
+    ObjectClass->Export = ObjectClass->Pkg->GetClassExport( ObjectClass->Name.Data() ); \
+    if ( ObjectClass->Export == NULL ) \
+    { \
+      ObjectClass->ObjectFlags = RF_EliminateObject; \
+      return true; \
+    } \
+    ObjectClass->Export->Obj = ObjectClass; \
+    ObjectClass->ObjectFlags = ObjectClass->Export->ObjectFlags; \
+    ObjectClass->Pkg->bIntrinsicPackage = true; \
+    return true; \
+  } \
+  bool cls::StaticCreateClass() \
+  { \
+    if (!ObjectClass) \
+    { \
+      UPackage* ClsPkg = UPackage::StaticLoadPackage( NativePkgName ); \
+      if (!ClsPkg) \
+      { \
+        GLogf( LOG_CRIT, "Package '%s' for class '%s' could not be opened", \
+          NativePkgName, TEXT(cls) ); \
+        return false; \
+      } \
+      const char* ClsNameStr = TEXT(cls); \
+      ClsNameStr++; \
+      size_t PkgNameIdx = ClsPkg->FindName( ClsNameStr ); \
+      FName ClsName = 0; \
+      if ( PkgNameIdx != MAX_SIZE ) \
+        ClsName = ClsPkg->GetGlobalName( PkgNameIdx ); \
+      else \
+        ClsName = FName::CreateName( ClsNameStr, RF_TagExp | RF_LoadContextFlags | RF_Native ); \
+      ObjectClass = UObject::StaticAllocateClass( ClsName, StaticFlags, Super::ObjectClass,\
+        NativeSize, NativeConstructor ); \
+      if ( ObjectClass != NULL ) \
+      { \
+        ClassPool.push_back( ObjectClass ); \
+        ObjectClass->bRegistered = true; \
+        return true; \
+      } \
+      return false; \
+    } \
+    return true; \
+  } \
 
-class DLL_EXPORT UNativeModule : public UObject
+class LIBUNR_API UNativeModule : public UObject
 {
   DECLARE_NATIVE_CLASS( UNativeModule, UObject, CLASS_Abstract | CLASS_NoExport, Core )
 
@@ -43,7 +106,7 @@ class DLL_EXPORT UNativeModule : public UObject
   virtual UClass* GetNativeClass( const char* ClsName );
 };
 
-class DLL_EXPORT UDynamicNativeModule : public UNativeModule
+class LIBUNR_API UDynamicNativeModule : public UNativeModule
 {
   DECLARE_NATIVE_CLASS( UDynamicNativeModule, UNativeModule, CLASS_NoExport, Core )
 

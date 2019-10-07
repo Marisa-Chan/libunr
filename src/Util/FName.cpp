@@ -123,7 +123,7 @@ bool operator!=( FName& A, FName& B )
   return UObject::NameTable[A.Index]->Hash != UObject::NameTable[B.Index]->Hash;
 }
 
-DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FName& Name )
+LIBUNR_API FPackageFileIn& operator>>( FPackageFileIn& In, FName& Name )
 {
   idx NameIdx;
   In >> CINDEX( NameIdx );

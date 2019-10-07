@@ -30,7 +30,7 @@
 #include "Engine/UAudio.h"
 #include "Engine/URender.h"
 
-class DLL_EXPORT UClient : public UObject
+class LIBUNR_API UClient : public UObject
 {
   DECLARE_NATIVE_CLASS( UClient, UObject, CLASS_NoExport, Engine )
 
@@ -39,12 +39,14 @@ class DLL_EXPORT UClient : public UObject
   // TODO:
 };
 
-class DLL_EXPORT UEngine : public USubsystem
+class LIBUNR_API UEngine : public USubsystem
 {
   DECLARE_NATIVE_CLASS( UEngine, USubsystem, CLASS_Transient, Engine )
   EXPOSE_TO_USCRIPT()
 
   UEngine();
+
+  virtual void Tick( float DeltaTime ) {}
 
   UClass* GameRenderDevice;
   UClass* AudioDevice;

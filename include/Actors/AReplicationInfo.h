@@ -28,7 +28,7 @@
 #include "Actors/AActor.h"
 #include "Actors/AZoneInfo.h"
 
-class DLL_EXPORT AReplicationInfo : public AInfo
+class LIBUNR_API AReplicationInfo : public AInfo
 {
   DECLARE_NATIVE_CLASS( AReplicationInfo, AInfo, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -36,7 +36,7 @@ class DLL_EXPORT AReplicationInfo : public AInfo
   AReplicationInfo();
 };
 
-class DLL_EXPORT APlayerReplicationInfo : public AReplicationInfo
+class LIBUNR_API APlayerReplicationInfo : public AReplicationInfo
 {
   DECLARE_NATIVE_CLASS( APlayerReplicationInfo, AReplicationInfo, 0, Engine );
   EXPOSE_TO_USCRIPT()
@@ -80,7 +80,7 @@ class DLL_EXPORT APlayerReplicationInfo : public AReplicationInfo
   int HeadKills;
 };
 
-class DLL_EXPORT AGameReplicationInfo : public AReplicationInfo
+class LIBUNR_API AGameReplicationInfo : public AReplicationInfo
 {
   DECLARE_NATIVE_CLASS( AGameReplicationInfo, AReplicationInfo, 0, Engine )
   EXPOSE_TO_USCRIPT()

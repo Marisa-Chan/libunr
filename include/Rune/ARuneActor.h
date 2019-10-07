@@ -30,7 +30,7 @@
 #include "Actors/AHUD.h"
 #include "Actors/ANavigationPoint.h"
 
-class DLL_EXPORT AAnimationProxy : public AKeypoint
+class LIBUNR_API AAnimationProxy : public AKeypoint
 {
   DECLARE_NATIVE_CLASS( AAnimationProxy, AKeypoint, 0, Engine ) 
   EXPOSE_TO_USCRIPT()
@@ -43,7 +43,7 @@ class DLL_EXPORT AAnimationProxy : public AKeypoint
   class AShield* newShield;
 };
 
-class DLL_EXPORT AAutoLink : public ANavigationPoint
+class LIBUNR_API AAutoLink : public ANavigationPoint
 {
   DECLARE_NATIVE_CLASS( AAutoLink, ANavigationPoint, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -53,7 +53,7 @@ class DLL_EXPORT AAutoLink : public ANavigationPoint
   FName LinkTag;
 };
 
-class DLL_EXPORT ADebugHUD : public AHUD
+class LIBUNR_API ADebugHUD : public AHUD
 {
   DECLARE_NATIVE_CLASS( ADebugHUD, AHUD, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -66,7 +66,7 @@ class DLL_EXPORT ADebugHUD : public AHUD
   int DebugHudMode;
 };
 
-class DLL_EXPORT AParticleSystem : public AActor
+class LIBUNR_API AParticleSystem : public AActor
 {
   DECLARE_NATIVE_CLASS( AParticleSystem, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -159,7 +159,7 @@ class DLL_EXPORT AParticleSystem : public AActor
   bool bTaperEndPoint;
 };
 
-class DLL_EXPORT AScriptDispatcher : public AKeypoint
+class LIBUNR_API AScriptDispatcher : public AKeypoint
 {
   DECLARE_NATIVE_CLASS( AScriptDispatcher, AKeypoint, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -186,7 +186,7 @@ class DLL_EXPORT AScriptDispatcher : public AKeypoint
   APawn* WaitingScripter;
 };
 
-class DLL_EXPORT AScriptAction : public AKeypoint
+class LIBUNR_API AScriptAction : public AKeypoint
 {
   DECLARE_NATIVE_CLASS( AScriptAction, AKeypoint, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -211,7 +211,7 @@ class DLL_EXPORT AScriptAction : public AKeypoint
   APawn* WaitingScripter;
 };
 
-class DLL_EXPORT ASoundPlayer : public AKeypoint
+class LIBUNR_API ASoundPlayer : public AKeypoint
 {
   DECLARE_NATIVE_CLASS( ASoundPlayer, AKeypoint, 0, Engine )
   EXPOSE_TO_USCRIPT()

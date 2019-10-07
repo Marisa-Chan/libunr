@@ -33,7 +33,7 @@
 class UObject;
 class UStruct;
 
-class DLL_EXPORT FConfig
+class LIBUNR_API FConfig
 {
 public:
   FConfig();
@@ -117,11 +117,11 @@ private:
   char* Name;
 };
 
-extern DLL_EXPORT FConfig* GLibunrConfig; // Used only before loading any game
-extern DLL_EXPORT FConfig* GGameConfig;   // Used when a game is picked
-extern DLL_EXPORT FConfig* GUserConfig;   // Used when a game is picked
+extern LIBUNR_API FConfig* GLibunrConfig; // Used only before loading any game
+extern LIBUNR_API FConfig* GGameConfig;   // Used when a game is picked
+extern LIBUNR_API FConfig* GUserConfig;   // Used when a game is picked
 
-class DLL_EXPORT FConfigManager
+class LIBUNR_API FConfigManager
 {
 public:
   FConfigManager();
@@ -137,5 +137,5 @@ private:
   TArray<FConfig*> Configs;
 };
 
-extern DLL_EXPORT FConfigManager* GConfigManager;
+extern LIBUNR_API FConfigManager* GConfigManager;
 

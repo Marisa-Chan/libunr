@@ -25,7 +25,7 @@
 
 #include "Actors/AActor.h"
 
-class DLL_EXPORT ATimeDemo : public AInfo
+class LIBUNR_API ATimeDemo : public AInfo
 {
   DECLARE_NATIVE_CLASS( ATimeDemo, AInfo, 0, Engine )
   EXPOSE_TO_USCRIPT()

@@ -27,7 +27,7 @@
 
 #include "Actors/AActor.h"
 
-class DLL_EXPORT ADecal : public AActor
+class LIBUNR_API ADecal : public AActor
 {
   DECLARE_NATIVE_CLASS( ADecal, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()

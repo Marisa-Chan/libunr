@@ -30,7 +30,7 @@
 #include "Util/FConfig.h"
 #include "Core/UObject.h"
 
-class DLL_EXPORT UTextBuffer : public UObject
+class LIBUNR_API UTextBuffer : public UObject
 {
   DECLARE_NATIVE_CLASS( UTextBuffer, UObject, CLASS_Abstract | CLASS_NoExport, Core )
 
@@ -41,7 +41,7 @@ class DLL_EXPORT UTextBuffer : public UObject
   FString* Text;
 };
 
-class DLL_EXPORT UField : public UObject
+class LIBUNR_API UField : public UObject
 {
   DECLARE_NATIVE_CLASS( UField, UObject, CLASS_Abstract | CLASS_NoExport, Core )
 
@@ -52,7 +52,7 @@ class DLL_EXPORT UField : public UObject
   UField* Next;       // Next object in list
 };
 
-class DLL_EXPORT UConst : public UField
+class LIBUNR_API UConst : public UField
 {
   DECLARE_NATIVE_CLASS( UConst, UField, CLASS_NoExport, Core )
 
@@ -62,7 +62,7 @@ class DLL_EXPORT UConst : public UField
   FString* Value;
 };
 
-class DLL_EXPORT UEnum : public UField
+class LIBUNR_API UEnum : public UField
 {
   DECLARE_NATIVE_CLASS( UEnum, UField, CLASS_NoExport, Core )
 
@@ -78,7 +78,7 @@ struct FScriptLabel
   u32 Offset;
 };
 
-class DLL_EXPORT UStruct : public UField
+class LIBUNR_API UStruct : public UField
 {
   DECLARE_NATIVE_CLASS( UStruct, UField, CLASS_NoExport, Core )
 
@@ -130,7 +130,7 @@ enum EFunctionFlags
   FUNC_NetFuncFlags       = FUNC_Net  | FUNC_NetReliable,
 };
 
-class DLL_EXPORT UFunction : public UStruct
+class LIBUNR_API UFunction : public UStruct
 {
   DECLARE_NATIVE_CLASS( UFunction, UStruct, CLASS_NoExport, Core )
 
@@ -146,7 +146,7 @@ class DLL_EXPORT UFunction : public UStruct
   u16 ReplicationOffset; // will be entirely unused
 };
 
-class DLL_EXPORT UState : public UStruct
+class LIBUNR_API UState : public UStruct
 {
   DECLARE_NATIVE_CLASS( UState, UStruct, CLASS_NoExport, Core )
 
@@ -159,7 +159,7 @@ class DLL_EXPORT UState : public UStruct
   u32 StateFlags;
 };
 
-struct DLL_EXPORT FDependency
+struct LIBUNR_API FDependency
 {
   FDependency();
   
@@ -168,7 +168,7 @@ struct DLL_EXPORT FDependency
   u32 ScriptTextCRC;
 };
 
-class DLL_EXPORT UClass : public UState
+class LIBUNR_API UClass : public UState
 {
   DECLARE_NATIVE_CLASS( UClass, UState, CLASS_NoExport, Core )
   

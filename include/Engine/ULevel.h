@@ -31,9 +31,9 @@
 #include "Engine/UModel.h"
 #include "Engine/UNet.h"
 
-struct DLL_EXPORT FReachSpec
+struct LIBUNR_API FReachSpec
 {
-  friend DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FReachSpec& RS );
+  friend LIBUNR_API FPackageFileIn& operator>>( FPackageFileIn& In, FReachSpec& RS );
 
   int Distance;
   AActor* Start;
@@ -44,9 +44,9 @@ struct DLL_EXPORT FReachSpec
   u8  bPruned;
 };
 
-struct DLL_EXPORT FURL
+struct LIBUNR_API FURL
 {
-  friend DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FURL& URL );
+  friend LIBUNR_API FPackageFileIn& operator>>( FPackageFileIn& In, FURL& URL );
 
   FString Protocol;
   FString Host;
@@ -57,7 +57,7 @@ struct DLL_EXPORT FURL
   bool   bValid;
 };
 
-class DLL_EXPORT ULevelBase : public UObject
+class LIBUNR_API ULevelBase : public UObject
 {
   DECLARE_NATIVE_CLASS( ULevelBase, UObject, CLASS_Abstract | CLASS_NoExport, Engine )
   ULevelBase();
@@ -74,7 +74,7 @@ class DLL_EXPORT ULevelBase : public UObject
   bool bDeletedBrushwork;
 };
 
-class DLL_EXPORT ULevel : public ULevelBase
+class LIBUNR_API ULevel : public ULevelBase
 {
   DECLARE_NATIVE_CLASS( ULevel, ULevelBase, CLASS_NoExport, Engine )
   ULevel();

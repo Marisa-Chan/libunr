@@ -34,7 +34,7 @@ class ASkyZoneInfo;
 class ALocationID;
 class AVisibilityNotify;
 
-class DLL_EXPORT AZoneInfo : public AInfo
+class LIBUNR_API AZoneInfo : public AInfo
 {
   DECLARE_NATIVE_CLASS( AZoneInfo, AInfo, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -262,7 +262,7 @@ class DLL_EXPORT AZoneInfo : public AInfo
   u8 FogSaturation;
 };
 
-class DLL_EXPORT ULevelSummary : public UObject
+class LIBUNR_API ULevelSummary : public UObject
 {
   DECLARE_NATIVE_CLASS( ULevelSummary, UObject, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -277,7 +277,7 @@ class DLL_EXPORT ULevelSummary : public UObject
   FString* LevelEnterText;
 };
 
-class DLL_EXPORT ALevelInfo : public AZoneInfo
+class LIBUNR_API ALevelInfo : public AZoneInfo
 {
   DECLARE_NATIVE_CLASS( ALevelInfo, AZoneInfo, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -404,7 +404,7 @@ class DLL_EXPORT ALevelInfo : public AZoneInfo
   FString* BuildNumber;
 };
 
-class DLL_EXPORT AWarpZoneInfo : public AZoneInfo
+class LIBUNR_API AWarpZoneInfo : public AZoneInfo
 {
   DECLARE_NATIVE_CLASS( AWarpZoneInfo, AZoneInfo, 0, Engine )
   EXPOSE_TO_USCRIPT()

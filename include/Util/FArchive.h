@@ -46,7 +46,7 @@ enum ESeekBase
   End,
 };
 
-class DLL_EXPORT FArchive
+class LIBUNR_API FArchive
 {
 public:
   FArchive() {};

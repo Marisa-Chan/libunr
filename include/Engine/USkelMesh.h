@@ -28,7 +28,7 @@
 #include "Engine/ULodMesh.h"
 #include "Engine/USkelAnim.h"
 
-struct DLL_EXPORT FWedgeChunk
+struct LIBUNR_API FWedgeChunk
 {
   FWedgeChunk( FLodWedge& LodWedge );
 
@@ -41,7 +41,7 @@ struct DLL_EXPORT FWedgeChunk
   friend FFileArchiveOut& operator<<( FFileArchiveOut& Out, FWedgeChunk& Wedge );
 };
 
-struct DLL_EXPORT FFaceChunk
+struct LIBUNR_API FFaceChunk
 {
   FFaceChunk( FLodFace& LodFace );
 
@@ -51,7 +51,7 @@ struct DLL_EXPORT FFaceChunk
   int SmoothingGroups;
 };
 
-struct DLL_EXPORT FMaterialChunk
+struct LIBUNR_API FMaterialChunk
 {
   FMaterialChunk( FLodMaterial& LodMaterial );
 
@@ -64,7 +64,7 @@ struct DLL_EXPORT FMaterialChunk
   int  LodStyle;
 };
 
-struct DLL_EXPORT FSkeletalWedge
+struct LIBUNR_API FSkeletalWedge
 {
   u16 VertexIndex;
   u16 Flags;
@@ -74,7 +74,7 @@ struct DLL_EXPORT FSkeletalWedge
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FSkeletalWedge& SW );
 };
 
-struct DLL_EXPORT FBonePos
+struct LIBUNR_API FBonePos
 {
   FPlane Orientation;
   FVector Position;
@@ -84,7 +84,7 @@ struct DLL_EXPORT FBonePos
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FBonePos& BP );
 };
 
-struct DLL_EXPORT FRefSkeleton
+struct LIBUNR_API FRefSkeleton
 {
   FName Name;
   u32 Flags;
@@ -95,7 +95,7 @@ struct DLL_EXPORT FRefSkeleton
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FRefSkeleton& RS );
 };
 
-struct DLL_EXPORT FBoneWeightIndex
+struct LIBUNR_API FBoneWeightIndex
 {
   u16 WeightIndex;
   u16 Number;
@@ -105,7 +105,7 @@ struct DLL_EXPORT FBoneWeightIndex
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FBoneWeightIndex& BWI );
 };
 
-struct DLL_EXPORT FBoneWeight
+struct LIBUNR_API FBoneWeight
 {
   float Weight;
   u16 PointIndex;
@@ -115,7 +115,7 @@ struct DLL_EXPORT FBoneWeight
   friend FFileArchiveOut& operator<<( FFileArchiveOut& Out, FBoneWeight& BW );
 };
 
-class DLL_EXPORT USkeletalMesh : public ULodMesh
+class LIBUNR_API USkeletalMesh : public ULodMesh
 {
   DECLARE_NATIVE_CLASS( USkeletalMesh, ULodMesh, CLASS_NoExport, Engine )
 

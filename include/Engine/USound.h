@@ -38,7 +38,7 @@ enum ESoundSlot
 	SLOT_Interface,
 };
 
-class DLL_EXPORT USound : public UObject
+class LIBUNR_API USound : public UObject
 {
   DECLARE_NATIVE_CLASS( USound, UObject, CLASS_NoExport | CLASS_SafeReplace, Engine )
   USound();

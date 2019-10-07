@@ -38,7 +38,7 @@ enum EMusicTransition
 	MTRAN_SlowFade,
 };
 
-class DLL_EXPORT UMusic : public UObject
+class LIBUNR_API UMusic : public UObject
 {
   DECLARE_NATIVE_CLASS( UMusic, UObject, CLASS_NoExport | CLASS_SafeReplace, Core )
   UMusic();

@@ -33,7 +33,7 @@ class UViewport;
 class APlayerReplicationInfo;
 class ATimeDemo;
 
-class DLL_EXPORT UConsole : public UObject
+class LIBUNR_API UConsole : public UObject
 {
   DECLARE_NATIVE_CLASS( UConsole, UObject, 0, Engine )
   EXPOSE_TO_USCRIPT()

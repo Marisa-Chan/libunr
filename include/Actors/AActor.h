@@ -45,7 +45,7 @@ class ATrigger;
 //   Unreal 227j_39
 //   UT 436
 //   Deus Ex 1.112
-class DLL_EXPORT AActor : public UObject
+class LIBUNR_API AActor : public UObject
 {
   DECLARE_NATIVE_CLASS( AActor, UObject, CLASS_NativeReplication, Engine )
   EXPOSE_TO_USCRIPT()
@@ -609,7 +609,7 @@ class DLL_EXPORT AActor : public UObject
 
 };
 
-class DLL_EXPORT ABlockingActor : public AActor
+class LIBUNR_API ABlockingActor : public AActor
 {
   DECLARE_NATIVE_CLASS( ABlockingActor, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -622,7 +622,7 @@ class DLL_EXPORT ABlockingActor : public AActor
   TArray<UClass*>* ScriptBlocking;
 };
 
-class DLL_EXPORT ADecoration : public AActor
+class LIBUNR_API ADecoration : public AActor
 {
   DECLARE_NATIVE_CLASS( ADecoration, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -650,7 +650,7 @@ class DLL_EXPORT ADecoration : public AActor
   float BaseEyeHeight;
 };
 
-class DLL_EXPORT ACarcass : public ADecoration
+class LIBUNR_API ACarcass : public ADecoration
 {
   DECLARE_NATIVE_CLASS( ACarcass, ADecoration, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -668,7 +668,7 @@ class DLL_EXPORT ACarcass : public ADecoration
   APawn* Bugs;
 };
 
-class DLL_EXPORT AInfo : public AActor
+class LIBUNR_API AInfo : public AActor
 {
   DECLARE_NATIVE_CLASS( AInfo, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -676,7 +676,7 @@ class DLL_EXPORT AInfo : public AActor
   AInfo();
 };
 
-class DLL_EXPORT ASavedMove : public AInfo
+class LIBUNR_API ASavedMove : public AInfo
 {
   DECLARE_NATIVE_CLASS( ASavedMove, AInfo, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -701,7 +701,7 @@ class DLL_EXPORT ASavedMove : public AInfo
   bool bForceAltFire;
 };
 
-class DLL_EXPORT AKeypoint : public AActor
+class LIBUNR_API AKeypoint : public AActor
 {
   DECLARE_NATIVE_CLASS( AKeypoint, AActor, CLASS_Abstract, Engine )
   EXPOSE_TO_USCRIPT()
@@ -709,7 +709,7 @@ class DLL_EXPORT AKeypoint : public AActor
   AKeypoint();
 };
 
-class DLL_EXPORT ALocationID : public AKeypoint
+class LIBUNR_API ALocationID : public AKeypoint
 {
   DECLARE_NATIVE_CLASS( ALocationID, AKeypoint, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -721,7 +721,7 @@ class DLL_EXPORT ALocationID : public AKeypoint
   ALocationID* NextLocation;
 };
 
-class DLL_EXPORT ACollisionPlane : public AKeypoint
+class LIBUNR_API ACollisionPlane : public AKeypoint
 {
   DECLARE_NATIVE_CLASS( ACollisionPlane, AKeypoint, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -733,7 +733,7 @@ class DLL_EXPORT ACollisionPlane : public AKeypoint
   bool bBlockNonZeroExtent;
 };
 
-class DLL_EXPORT AInterpolationPoint : public AKeypoint
+class LIBUNR_API AInterpolationPoint : public AKeypoint
 {
   DECLARE_NATIVE_CLASS( AInterpolationPoint, AKeypoint, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -757,7 +757,7 @@ class DLL_EXPORT AInterpolationPoint : public AKeypoint
   AInterpolationPoint* Next;
 };
 
-class DLL_EXPORT ALight : public AActor
+class LIBUNR_API ALight : public AActor
 {
   DECLARE_NATIVE_CLASS( ALight, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -774,7 +774,7 @@ class DLL_EXPORT ALight : public AActor
   TArray<ShadowMoverInfo>* MoverShadowSurfs;
 };
 
-class DLL_EXPORT ADynamicCorona : public ALight
+class LIBUNR_API ADynamicCorona : public ALight
 {
   DECLARE_NATIVE_CLASS( ADynamicCorona, ALight, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -799,7 +799,7 @@ class DLL_EXPORT ADynamicCorona : public ALight
   ECoronaAttenuateType CoronaAttenuate;
 };
 
-class DLL_EXPORT ASunlightCorona : public ALight
+class LIBUNR_API ASunlightCorona : public ALight
 {
   DECLARE_NATIVE_CLASS( ASunlightCorona, ALight, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -827,7 +827,7 @@ class DLL_EXPORT ASunlightCorona : public ALight
   bool bUScriptRenderHandler;
 };
 
-class DLL_EXPORT AMutator : public AActor
+class LIBUNR_API AMutator : public AActor
 {
   DECLARE_NATIVE_CLASS( AMutator, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -845,7 +845,7 @@ class DLL_EXPORT AMutator : public AActor
   UClass* DefaultShield;
 };
 
-class DLL_EXPORT AMenu : public AActor
+class LIBUNR_API AMenu : public AActor
 {
   DECLARE_NATIVE_CLASS( AMenu, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -873,7 +873,7 @@ class DLL_EXPORT AMenu : public AActor
   FString* OffString;
 };
 
-class DLL_EXPORT AProjectile : public AActor
+class LIBUNR_API AProjectile : public AActor
 {
   DECLARE_NATIVE_CLASS( AProjectile, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -897,7 +897,7 @@ class DLL_EXPORT AProjectile : public AActor
   AActor* LastHitActor;
 };
 
-class DLL_EXPORT AStaticMeshActor : public AActor
+class LIBUNR_API AStaticMeshActor : public AActor
 {
   DECLARE_NATIVE_CLASS( AStaticMeshActor, AActor, CLASS_NoUserCreate, Engine )
   EXPOSE_TO_USCRIPT()
@@ -909,7 +909,7 @@ class DLL_EXPORT AStaticMeshActor : public AActor
   bool bComputeUnlitColor;
 };
 
-class DLL_EXPORT ASpawnNotify : public AActor
+class LIBUNR_API ASpawnNotify : public AActor
 {
   DECLARE_NATIVE_CLASS( ASpawnNotify, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -920,7 +920,7 @@ class DLL_EXPORT ASpawnNotify : public AActor
   ASpawnNotify* Next;
 };
 
-class DLL_EXPORT ATriggers : public AActor
+class LIBUNR_API ATriggers : public AActor
 {
   DECLARE_NATIVE_CLASS( ATriggers, AActor, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -928,7 +928,7 @@ class DLL_EXPORT ATriggers : public AActor
   ATriggers();
 };
 
-class DLL_EXPORT ADispatcher : public ATriggers
+class LIBUNR_API ADispatcher : public ATriggers
 {
   DECLARE_NATIVE_CLASS( ADispatcher, ATriggers, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -941,7 +941,7 @@ class DLL_EXPORT ADispatcher : public ATriggers
   int i;
 };
 
-class DLL_EXPORT ATrigger : public ATriggers
+class LIBUNR_API ATrigger : public ATriggers
 {
   DECLARE_NATIVE_CLASS( ATrigger, ATriggers, 0, Engine )
   EXPOSE_TO_USCRIPT()
@@ -977,7 +977,7 @@ class DLL_EXPORT ATrigger : public ATriggers
   float SightAngle;
 };
 
-class DLL_EXPORT AVisibilityNotify : public AInfo
+class LIBUNR_API AVisibilityNotify : public AInfo
 {
   DECLARE_NATIVE_CLASS( AVisibilityNotify, AInfo, 0, Engine )
   EXPOSE_TO_USCRIPT()

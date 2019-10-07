@@ -180,8 +180,8 @@ public:
   FString operator+( char c ) const;
   FString& operator+( FName Name );
 
-  friend DLL_EXPORT FPackageFileIn&  operator>>( FPackageFileIn& In, FString& Str );
-  friend DLL_EXPORT FPackageFileOut& operator<<( FPackageFileOut& Out, FString& Str );
+  friend LIBUNR_API FPackageFileIn&  operator>>( FPackageFileIn& In, FString& Str );
+  friend LIBUNR_API FPackageFileOut& operator<<( FPackageFileOut& Out, FString& Str );
 
   friend bool operator==( const FString& lhs, const FString& rhs );
   friend bool operator==( const char* lhs,    const FString& rhs );
@@ -204,11 +204,11 @@ FString operator+( char lhs, const FString& rhs );
 #ifdef LIBUNR_WIN32
 #pragma warning(disable:4273)
 #endif
-DLL_EXPORT int stricmp ( const char* str1, const char* str2 );
-DLL_EXPORT int strnicmp( const char* str1, const char* str2, size_t count );
+LIBUNR_API int stricmp ( const char* str1, const char* str2 );
+LIBUNR_API int strnicmp( const char* str1, const char* str2, size_t count );
 #ifdef LIBUNR_WIN32
 #pragma warning(pop)
 #endif
-DLL_EXPORT char* strupper( const char* str );
-DLL_EXPORT char* GetDateString( const char* Fmt );
+LIBUNR_API char* strupper( const char* str );
+LIBUNR_API char* GetDateString( const char* Fmt );
 

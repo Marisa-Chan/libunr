@@ -130,7 +130,7 @@ FPackageFileIn& operator>>( FPackageFileIn& In, UPackageHeader& Header )
 /*-----------------------------------------------------------------------------
  * FCompactIndex
 -----------------------------------------------------------------------------*/
-DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FCompactIndex& Index )
+LIBUNR_API FPackageFileIn& operator>>( FPackageFileIn& In, FCompactIndex& Index )
 {
   bool negate = false;
  
@@ -181,7 +181,7 @@ DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FCompactIndex& Index 
   return In;
 }
 
-DLL_EXPORT FPackageFileOut& operator<<( FPackageFileOut& Out, FCompactIndex& Index )
+LIBUNR_API FPackageFileOut& operator<<( FPackageFileOut& Out, FCompactIndex& Index )
 {
   // looks bad but it's faster than calling pow() potentially 4 times
   u8 num_bytes = 0;

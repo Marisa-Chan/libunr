@@ -38,13 +38,13 @@
 #define JMT_ModulatedTwoSided 0x4
 #define JMT_WeaponTriangle    0x8
 
-struct DLL_EXPORT FLodFace
+struct LIBUNR_API FLodFace
 {
   u16 WedgeIndex[3];
   u16 MaterialIndex;
 };
 
-struct DLL_EXPORT FLodWedge
+struct LIBUNR_API FLodWedge
 {
   u16 VertexIndex;
 
@@ -53,7 +53,7 @@ struct DLL_EXPORT FLodWedge
   u8  T; // 255 - V
 };
 
-struct DLL_EXPORT FLodMaterial
+struct LIBUNR_API FLodMaterial
 {
   u32 Flags;
   u32 TextureIndex;
@@ -91,7 +91,7 @@ struct FVertexAnivHeader
   u16 FrameSize;
 };
 
-class DLL_EXPORT ULodMesh : public UMesh
+class LIBUNR_API ULodMesh : public UMesh
 {
   DECLARE_NATIVE_CLASS( ULodMesh, UMesh, CLASS_NoExport, Engine )
 

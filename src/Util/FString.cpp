@@ -65,7 +65,7 @@ bool operator!=( const FString& lhs, const FString& rhs )
   return (string&)lhs != (string&)rhs;
 }
 
-DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FString& Str )
+LIBUNR_API FPackageFileIn& operator>>( FPackageFileIn& In, FString& Str )
 {
   idx Size = 0;
   In >> CINDEX( Size );
@@ -109,7 +109,7 @@ DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FString& Str )
   return In;
 }
 
-DLL_EXPORT FPackageFileOut& operator<<( FPackageFileOut& Out, FString& Str )
+LIBUNR_API FPackageFileOut& operator<<( FPackageFileOut& Out, FString& Str )
 {
   size_t Length = Str.length();
   Out << CINDEX( Length );

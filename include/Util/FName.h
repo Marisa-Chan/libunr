@@ -33,7 +33,7 @@ class FPackageFileOut;
  * An entry into a name table
 -----------------------------------------------------------------------------*/
 #define NAME_LEN 64
-class DLL_EXPORT FNameEntry
+class LIBUNR_API FNameEntry
 {
 public:
    FNameEntry();
@@ -52,7 +52,7 @@ public:
  * FName
  * An index into the global name table
 -----------------------------------------------------------------------------*/
-class DLL_EXPORT FName
+class LIBUNR_API FName
 {
 public:
   u32 Index;
@@ -82,7 +82,7 @@ public:
 
   friend bool operator==( FName& A, FName& B );
   friend bool operator!=( FName& A, FName& B );
-  friend DLL_EXPORT FPackageFileIn& operator>>( FPackageFileIn& In, FName& Name );
+  friend LIBUNR_API FPackageFileIn& operator>>( FPackageFileIn& In, FName& Name );
 };
 
 
