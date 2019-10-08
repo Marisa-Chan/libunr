@@ -279,6 +279,9 @@
     <ClInclude Include="include\Rune\ARuneActor.h">
       <Filter>Header Files\Rune</Filter>
     </ClInclude>
+    <ClInclude Include="include\Editor\UEditorEngine.h">
+      <Filter>Header Files\Editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Actors\AActor.cpp">
@@ -454,6 +457,9 @@
     </ClCompile>
     <ClCompile Include="src\Actors\ATimeDemo.cpp">
       <Filter>Source Files\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Editor\UEditorEngine.cpp">
+      <Filter>Source Files\Editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -42,6 +42,7 @@
     <ClInclude Include="include\Core\USystem.h" />
     <ClInclude Include="include\DeusEx\ACameraPoint.h" />
     <ClInclude Include="include\DeusEx\UEventManager.h" />
+    <ClInclude Include="include\Editor\UEditorEngine.h" />
     <ClInclude Include="include\Engine\UAudio.h" />
     <ClInclude Include="include\Engine\UCanvas.h" />
     <ClInclude Include="include\Engine\UConsole.h" />
@@ -114,6 +115,7 @@
     <ClCompile Include="src\Core\USystem.cpp" />
     <ClCompile Include="src\DeusEx\ACameraPoint.cpp" />
     <ClCompile Include="src\DeusEx\UEventManager.cpp" />
+    <ClCompile Include="src\Editor\UEditorEngine.cpp" />
     <ClCompile Include="src\Engine\UAudio.cpp" />
     <ClCompile Include="src\Engine\UCanvas.cpp" />
     <ClCompile Include="src\Engine\UConsole.cpp" />
