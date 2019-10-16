@@ -26,6 +26,8 @@
 #include "Core/UClass.h"
 #include "Engine/UEngine.h"
 
+UEngine* GEngine = NULL;
+
 UClient::UClient()
   : UObject()
 {
@@ -61,7 +63,7 @@ bool UEngine::Init()
   }
 
   FString FileName = Device.Substr( 0, Dot );
-  FString ClassName = Device.Substr( Dot );
+  FString ClassName = Device.Substr( Dot+1 );
 
   AudioModule = new UDynamicNativeModule();
   if ( !AudioModule->Load( FileName.Data() ) )
@@ -92,12 +94,13 @@ bool UEngine::Init()
 bool UEngine::Exit()
 {
   // TODO
-  return false;
+  return true;
 }
 
 void UEngine::Tick( float DeltaTime )
 {
-  // TODO
+  if ( Audio )
+    Audio->Tick( DeltaTime );
 }
 
 #include "Core/UClass.h"

@@ -43,6 +43,7 @@ class LIBUNR_API USubsystem : public UObject
 
   virtual bool Init() { return false; }
   virtual bool Exit() { return false; }
+  virtual void Tick( float DeltaTime ) {}
 
   bool bInitialized;
 };
@@ -96,6 +97,7 @@ class LIBUNR_API USystem : public USubsystem
   TArray<FString*> Paths;
 
   static int LogLevel;
+  static char* LibunrPath;
 
 protected:
   GamePromptCallback DoGamePrompt;

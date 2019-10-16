@@ -271,7 +271,6 @@ public: \
     } \
     return true; \
   } \
-  static bool StaticLoadNativePackage( const char* NativePkgName ); \
   static bool StaticSetPackageProperties(); \
   static bool StaticClassInit() \
   { \
@@ -280,8 +279,6 @@ public: \
       GLogf( LOG_CRIT, "%s::StaticCreateClass() failed!", TEXT(cls) ); \
       return false; \
     } \
-    if ( !StaticLoadNativePackage( NativePkgName ) ) \
-      return false; \
     if ( !( (clsflags) & CLASS_NoExport ) ) \
     { \
       if ( !StaticLinkNativeProperties() ) \
@@ -310,24 +307,8 @@ public: \
   LIBUNR_API UClass* cls::ObjectClass = NULL; \
   LIBUNR_API size_t  cls::NativeSize  = sizeof( cls ); \
   LIBUNR_API FNativePropertyList* cls::StaticNativePropList = NULL; \
-  bool cls::StaticLoadNativePackage( const char* NativePkgName ) \
-  { \
-    ObjectClass->Pkg = UPackage::StaticLoadPackage( NativePkgName ); \
-    if ( ObjectClass->Pkg == NULL ) \
-    { \
-      GLogf( LOG_CRIT, "Failed to load package '%s' for class '%s'.", NativePkgName, ObjectClass->Name ); \
-      return false; \
-    } \
-    return true; \
-  } \
   bool cls::StaticSetPackageProperties() \
   { \
-    ObjectClass->Pkg = UPackage::StaticLoadPackage( NativePkgName ); \
-    if ( ObjectClass->Pkg == NULL ) \
-    { \
-      GLogf( LOG_CRIT, "Failed to load package '%s' for class '%s'.", NativePkgName, ObjectClass->Name ); \
-      return false; \
-    } \
     ObjectClass->Export = ObjectClass->Pkg->GetClassExport( ObjectClass->Name.Data() ); \
     if ( ObjectClass->Export == NULL ) \
     { \
@@ -364,6 +345,7 @@ public: \
       { \
         ClassPool.push_back( ObjectClass ); \
         ObjectClass->bRegistered = true; \
+        ObjectClass->Pkg = ClsPkg; \
         return true; \
       } \
       return false; \

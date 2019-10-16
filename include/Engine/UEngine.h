@@ -64,6 +64,7 @@ class LIBUNR_API UEngine : public USubsystem
   int TickCycles;
   int GameCycles;
   int ClientCycles;
+  int MinDesiredFramerate;
 
   int CacheSizeMegs;
   bool UseSound;
@@ -75,5 +76,4 @@ protected:
   UNativeModule* RenderModule;
 };
 
-
-
+extern LIBUNR_API UEngine* GEngine;
