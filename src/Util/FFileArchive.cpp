@@ -145,10 +145,10 @@ FStringFilePath::FStringFilePath( const char* Dir, const char* Name, const char*
 #if defined LIBUNR_WIN32
   ReplaceChars( '\\', '/' );
 #endif
-  if ( Back() != '/' )
-    Append('/');
+  if ( Length() > 0 && Back() != '/' )
+    Append( 1, '/' );
 
   Append( Name );
-  Append( '.' );
+  Append( 1, '.' );
   Append( Ext );
 }
