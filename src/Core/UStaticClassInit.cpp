@@ -49,6 +49,8 @@
 #include "Engine/UTexture.h"
 #include "Engine/UViewport.h"
 
+#include "Editor/UEditorEngine.h"
+
 #include "Actors/AActor.h"
 #include "Actors/ABrush.h"
 #include "Actors/ADecal.h"
@@ -338,6 +340,12 @@ bool UObject::StaticInit()
     ACameraPoint::StaticClass()->PreLoad();
     ACameraPoint::StaticClass()->Load();
     ACameraPoint::StaticClass()->PostLoad();
+  }
+
+  if ( GSystem->IsEditor() )
+  {
+    Result &= UTransBuffer::StaticClassInit();
+    Result &= UEditorEngine::StaticClassInit();
   }
 
   return Result;

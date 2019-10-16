@@ -46,6 +46,7 @@
 USystem* GSystem = NULL;
 LIBUNR_API int USystem::LogLevel = LOG_INFO;
 LIBUNR_API bool USystem::bIsEditor = false;
+LIBUNR_API char* USystem::LibunrPath = NULL;
 
 #ifdef LIBUNR_POSIX
 // Some niche platforms later supported in the future may not support sigaction
@@ -255,6 +256,9 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool
   bIsEditor = InIsEditor;
 
   // Read libunr ini and get game specific details
+  LibunrPath = new char[4096];
+  getcwd( LibunrPath, 4096 );
+
   GLibunrConfig = new FConfig();
   const char* LibunrIniPath = GetLibunrIniPath();
   int IniStatus = GLibunrConfig->Load( LibunrIniPath );
@@ -460,7 +464,7 @@ const char* USystem::GetNativeModulesPath()
   strcat( DefLibUnrPath, "/share/libunr/modules/" );
   return DefLibUnrPath;
 #elif defined LIBUNR_WIN32
-  return "";
+  return LibunrPath;
 #else
   #error "Unknown operating system! Please add a section to USystem::GetNativeModulesPath()"
   return -1;

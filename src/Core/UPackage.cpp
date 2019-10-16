@@ -613,13 +613,15 @@ UPackage* UPackage::StaticLoadPackage( const char* PkgName, bool bSearch )
 
   if ( Pkg == NULL )
   {
+    const char* Path = (bSearch) ? GSystem->ResolvePath( ActualName ) : PkgName;
+    if ( Path == NULL )
+      return NULL;
+    
     Pkg = new UPackage();
     if ( Pkg == NULL )
       return NULL;
 
-    const char* Path = (bSearch) ? GSystem->ResolvePath( ActualName ) : PkgName;
-
-    if ( Path != NULL && !Pkg->Load( Path ) )
+    if ( !Pkg->Load( Path ) )
     {
       delete Pkg;
       return NULL;

@@ -153,6 +153,7 @@ class LIBUNR_API UPackage : public UObject
   size_t          GetPackageVer();
   void            LoadEditableTypes();
 
+  size_t AddName( const char* Name );
   size_t FindName( const char* Name );
   
   // Name resolution
@@ -167,6 +168,7 @@ class LIBUNR_API UPackage : public UObject
   static bool StaticInit();
   static void StaticExit( bool bCrashExit = false );
   static UPackage* StaticLoadPackage( const char* Filepath, bool bSearch = true );
+  static UPackage* StaticCreatePackage( const char* Name );
   
   static TArray<UPackage*>* GetLoadedPackages();
   

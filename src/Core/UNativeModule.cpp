@@ -27,6 +27,7 @@
 #include "Core/USystem.h"
 #include "Core/UClass.h"
 #include "Core/UPackage.h"
+
 IMPLEMENT_NATIVE_CLASS( UNativeModule );
 IMPLEMENT_NATIVE_CLASS( UDynamicNativeModule );
 
@@ -116,6 +117,7 @@ UClass* UDynamicNativeModule::GetNativeClass( const char* ClsName )
   }
 
   FString StaticClassFuncName;
+  StaticClassFuncName += 'U';
   StaticClassFuncName += ClsName;
   StaticClassFuncName += "StaticClass";
 
