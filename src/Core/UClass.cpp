@@ -1064,12 +1064,18 @@ bool UClass::IsNative()
   return (ObjectFlags & RF_Native) != 0;
 }
 
-UObject* UClass::CreateObject()
+UObject* UClass::CreateObject( FName InName )
 {
+  UObject* Out = NULL;
+
   if ( ClassFlags & CLASS_NoExport )
-    return Constructor( StructSize );
+    Out = Constructor( StructSize );
   else
-    return Default->Clone();
+    Out = Default->Clone();
+
+  if ( InName.Index != 0 )
+    Out->Name = InName;
+  return Out;
 }
 
 UObject* UClass::CreateDefaultObject()

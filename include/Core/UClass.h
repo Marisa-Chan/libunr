@@ -185,7 +185,7 @@ class LIBUNR_API UClass : public UState
 
   bool ClassIsA( UClass* ClassType );
   bool IsNative();
-  UObject* CreateObject();
+  UObject* CreateObject( FName InName = 0 );
   void SetSuperClassProperties();
   void LinkSuperClassChildren();
 
