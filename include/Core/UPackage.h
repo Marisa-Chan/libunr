@@ -111,6 +111,7 @@ struct LIBUNR_API UPackageHeader
   u32 HeritageOffset;
   u8  GUID[16];
   
+  void Initialize();
   friend FPackageFileIn& operator>>( FPackageFileIn& In, UPackageHeader& Header );
 };
 
@@ -168,12 +169,13 @@ class LIBUNR_API UPackage : public UObject
   static bool StaticInit();
   static void StaticExit( bool bCrashExit = false );
   static UPackage* StaticLoadPackage( const char* Filepath, bool bSearch = true );
-  static UPackage* StaticCreatePackage( const char* Name );
+  static UPackage* StaticCreatePackage( const char* Name, UNativeModule* InNativeModule = NULL );
   
   static TArray<UPackage*>* GetLoadedPackages();
   
   FString Path;
   bool bIntrinsicPackage;
+  UNativeModule* NativeModule; // May be NULL if there is no native component (or if package is intrinsic)
   FNameEntry* NoneNameEntry;
 
 protected:    
@@ -183,7 +185,6 @@ protected:
   FFileArchive* Stream;
   UPackageHeader Header;
   u32 NameTableStart; // The index at which this package's name table appears in the global name table
-  UNativeModule* NativeModule; // May be NULL if there is no native component (or if package is intrinsic)
 
   // Global package variables
   static EPkgLoadOpts LoadOpts;

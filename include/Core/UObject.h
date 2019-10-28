@@ -59,6 +59,7 @@ enum EPackageFlags
   PKG_BrokenLinks    = 0x0008, // Loaded from linker with broken import links.
   PKG_Unsecure       = 0x0010, // Not trusted.
   PKG_Need           = 0x8000, // Client needs to download this package.
+  PKG_Default = PKG_AllowDownload | PKG_Unsecure | PKG_Need
 };
 
 // Flags describing a class.

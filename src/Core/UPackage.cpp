@@ -105,6 +105,24 @@ FPackageFileIn& operator>>( FPackageFileIn& In, FImport& Import )
 /*-----------------------------------------------------------------------------
  * UPackageHeader
 -----------------------------------------------------------------------------*/
+void UPackageHeader::Initialize()
+{
+  Signature = UE1_PKG_SIG;
+  PackageVersion = GSystem->MaxPackageVersion;
+  LicenseMode = 0;
+  PackageFlags = PKG_Default;
+  NameCount = 0;
+  NameOffset = 0;
+  ExportCount = 0;
+  ExportOffset = 0;
+  ImportCount = 0;
+  ImportOffset = 0;
+  HeritageCount = 0;
+  HeritageOffset = 0;
+
+
+}
+
 FPackageFileIn& operator>>( FPackageFileIn& In, UPackageHeader& Header )
 {
   In >> Header.Signature;
@@ -611,9 +629,9 @@ UPackage* UPackage::StaticLoadPackage( const char* PkgName, bool bSearch )
     }
   }
 
+  const char* Path = (bSearch) ? GSystem->ResolvePath( ActualName ) : PkgName;
   if ( Pkg == NULL )
   {
-    const char* Path = (bSearch) ? GSystem->ResolvePath( ActualName ) : PkgName;
     if ( Path == NULL )
       return NULL;
     
@@ -628,13 +646,38 @@ UPackage* UPackage::StaticLoadPackage( const char* PkgName, bool bSearch )
     }
 
     size_t PkgNameIdx = Pkg->FindName( ActualName );
-    Pkg->Name = (PkgNameIdx != MAX_SIZE) 
+    Pkg->Name = (PkgNameIdx != MAX_SIZE)
       ? FName( Pkg->GetGlobalName( PkgNameIdx ) )
       : FName::CreateName( ActualName, RF_LoadContextFlags );
+
     Packages->PushBack( Pkg );
+  }
+  else if ( Pkg->Stream == NULL )
+  {
+    // Native-only package needs to have it's scripted counter-part loaded
+    if ( !Pkg->Load( Path ) )
+    {
+      // FIXME: Package needs to be removed from the array here
+      delete Pkg;
+      return NULL;
+    }
+
+    size_t PkgNameIdx = Pkg->FindName( ActualName );
+    Pkg->Name = (PkgNameIdx != MAX_SIZE)
+      ? FName( Pkg->GetGlobalName( PkgNameIdx ) )
+      : FName::CreateName( ActualName, RF_LoadContextFlags );
   }
 
   return Pkg;
+}
+
+UPackage* UPackage::StaticCreatePackage( const char* Name, UNativeModule* InNativeModule )
+{
+  UPackage* Pkg = new UPackage();
+  Pkg->Name = FName::CreateName( Name, RF_LoadContextFlags );
+  Pkg->NativeModule = InNativeModule;
+
+  Pkg->Header.Initialize();
 }
 
 TArray<UPackage*>* UPackage::GetLoadedPackages()

@@ -88,6 +88,8 @@ class LIBUNR_API USystem : public USubsystem
   const char* GamePath;
   const char* GameName;
   u32 GameFlags; // Flags for the games that are currently supported by this instance
+  int EngineVersion;
+  int MaxPackageVersion;
 
   // Per game
   int PurgeCacheDays;

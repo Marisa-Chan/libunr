@@ -63,6 +63,7 @@
       UPackage* ClsPkg = UPackage::StaticLoadPackage( NativePkgName ); \
       if ( ClsPkg == NULL ) { \
         if ( StaticFlags & CLASS_NoExport ) { \
+          ClsPkg = UPackage::StaticCreatePackage( NativePkgName, false ); \
           ClsName = FName::CreateName( ClsNameStr, RF_LoadContextFlags | RF_Native ); \
         } else { \
           GLogf( LOG_CRIT, "Failed to load package '%s' for class '%s'.", NativePkgName, ClsNameStr ); \
