@@ -119,8 +119,7 @@ void UPackageHeader::Initialize()
   ImportOffset = 0;
   HeritageCount = 0;
   HeritageOffset = 0;
-
-
+  GUID.Generate();
 }
 
 FPackageFileIn& operator>>( FPackageFileIn& In, UPackageHeader& Header )
@@ -136,7 +135,7 @@ FPackageFileIn& operator>>( FPackageFileIn& In, UPackageHeader& Header )
   In >> Header.ExportOffset;
   In >> Header.ImportCount;
   In >> Header.ImportOffset;
-  if (Header.PackageVersion < PKG_VER_UT_400)
+  if ( Header.PackageVersion < PKG_VER_UT_400 )
   {
     In >> Header.HeritageCount;
     In >> Header.HeritageOffset;
@@ -257,12 +256,28 @@ LIBUNR_API FPackageFileOut& operator<<( FPackageFileOut& Out, FCompactIndex& Ind
 TArray<UPackage*>* UPackage::Packages = NULL;
 
 UPackage::UPackage()
+  : UObject()
 {
-  memset( &Header, 0, sizeof ( UPackageHeader ) );
   Names = TArray<FNameEntry>();
   Exports = TArray<FExport>();
   Imports = TArray<FImport>();
   bIntrinsicPackage = false;
+
+  memset( &Header, 0, sizeof( UPackageHeader ) );
+}
+
+UPackage::UPackage( const char* InName, UNativeModule* InNativeModule )
+  : UObject()
+{
+  Names = TArray<FNameEntry>();
+  Exports = TArray<FExport>();
+  Imports = TArray<FImport>();
+  bIntrinsicPackage = false;
+  Stream = NULL;
+
+  Name = FName::CreateName( InName, RF_LoadContextFlags );
+  NativeModule = InNativeModule;
+  Header.Initialize();
 }
 
 UPackage::~UPackage()
@@ -671,13 +686,11 @@ UPackage* UPackage::StaticLoadPackage( const char* PkgName, bool bSearch )
   return Pkg;
 }
 
-UPackage* UPackage::StaticCreatePackage( const char* Name, UNativeModule* InNativeModule )
+UPackage* UPackage::StaticCreatePackage( const char* InName, UNativeModule* InNativeModule )
 {
-  UPackage* Pkg = new UPackage();
-  Pkg->Name = FName::CreateName( Name, RF_LoadContextFlags );
-  Pkg->NativeModule = InNativeModule;
-
-  Pkg->Header.Initialize();
+  UPackage* Pkg = new UPackage( InName, InNativeModule );
+  Packages->PushBack( Pkg );
+  return Pkg;
 }
 
 TArray<UPackage*>* UPackage::GetLoadedPackages()

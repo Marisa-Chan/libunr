@@ -24,6 +24,7 @@
 */
 
 #pragma once
+#include "Util/FGuid.h"
 #include "Core/UObject.h"
 #include "Core/UNativeModule.h"
 
@@ -109,7 +110,7 @@ struct LIBUNR_API UPackageHeader
   u32 ImportOffset;
   u32 HeritageCount;
   u32 HeritageOffset;
-  u8  GUID[16];
+  FGuid GUID;
   
   void Initialize();
   friend FPackageFileIn& operator>>( FPackageFileIn& In, UPackageHeader& Header );
@@ -131,6 +132,7 @@ class LIBUNR_API UPackage : public UObject
 {
   DECLARE_NATIVE_CLASS( UPackage, UObject, CLASS_NoExport, Core )
   UPackage();
+  UPackage( const char* Name, UNativeModule* InNativeModule );
   
   virtual bool Load( const char* File );
   virtual bool Save( const char* File = NULL );

@@ -31,7 +31,6 @@
   #include <dlfcn.h>
 #endif
 
-
 #define IMPLEMENT_MODULE_CLASS(cls) \
   extern "C" DLL_EXPORT UClass* cls##StaticClass() \
   { \
