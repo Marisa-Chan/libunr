@@ -63,6 +63,7 @@
 	
   #pragma warning(disable:4251) // Non dll-interface class 'type' used as based for dll-interface class 'type2'
   #pragma warning(disable:4275) // Class 'type' needs to have dll-interface to be used by clients of class 'type2'
+  #pragma warning(disable:4005) // Macro redefinition (super annoying because TEXT is not properly defined on MBCS)
 
   #define DLL_EXPORT __declspec(dllexport)
   #define DLL_IMPORT __declspec(dllimport)
@@ -125,6 +126,8 @@
 #define BLOCK_COPY_CTOR(cls) \
 private: \
   cls (const cls & copy); \
+
+#define TEXT(s) #s
 
 // Timers
 #include <time.h>

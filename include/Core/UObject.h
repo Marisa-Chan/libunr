@@ -214,8 +214,6 @@ class UPackage;
 struct FPropertyRecord;
 struct FExport;
 
-#define TEXT(s) #s
-
 #define DECLARE_NATIVE_CLASS_BASE(cls, supcls, clsflags, pkg) \
 protected: \
   static UClass* ConstructNativeClass( u32 Flags ); \
