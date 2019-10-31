@@ -265,7 +265,7 @@ public: \
         NumProperties ); \
       if ( StaticNativePropList != NULL ) \
       { \
-        NativePropertyLists.push_back( StaticNativePropList ); \
+        GetGlobalNativePropertyLists()->PushBack( StaticNativePropList ); \
         return true; \
       } \
       return false; \
@@ -344,7 +344,7 @@ public: \
         NativeSize, NativeConstructor ); \
       if ( ObjectClass != NULL ) \
       { \
-        ClassPool.push_back( ObjectClass ); \
+        GetGlobalClassPool()->PushBack( ObjectClass ); \
         ObjectClass->bRegistered = true; \
         ObjectClass->Pkg = ClsPkg; \
         return true; \
@@ -405,7 +405,7 @@ bool cls::StaticLinkNativeProperties() \
     ExpProp->RefCnt = 1; \
     ExpProp->Class = ptype::StaticClass(); \
     ExpProp->PropertyType = enumptype; \
-      ObjectPool.PushBack( ExpProp ); \
+      GetGlobalObjectPool()->PushBack( ExpProp ); \
     ExpCls->Children = ExpProp; \
     ExpCls->Default->Field = ExpCls->Children; \
   }
@@ -459,11 +459,11 @@ public:
     size_t InStructSize, UObject *(*NativeCtor)(size_t) );
   static UObject* StaticFindObject( UPackage* Pkg, FName ObjName );
 
-  static TArray<UObject*> ObjectPool;
-  static TArray<UClass*>  ClassPool;
-  static TArray<FNativePropertyList*> NativePropertyLists;
-  static TArray<UFunction*> NativeFunctions;
-  static TArray<FNameEntry*> NameTable;
+  static TArray<UObject*>* GetGlobalObjectPool();
+  static TArray<UClass*>* GetGlobalClassPool();
+  static TArray<FNativePropertyList*>* GetGlobalNativePropertyLists();
+  static TArray<UFunction*>* GetGlobalNativeFunctions();
+  static TArray<FNameEntry*>* GetGlobalNameTable();
 
   FName     Name;     // Name of the object stored in the global name table 
   int       Index;    // Index of the object in object pool
@@ -498,6 +498,16 @@ protected:
   TStack<size_t>* OldPkgFileOffsets;
 
   static bool bStaticBootstrapped;
+
+private:
+  // Module DLLs seem to keep track of their own version of this while
+  // interacting with these arrays at the same time, causing weird corruption
+  // Get these through accessors to mitigate that problem
+  static TArray<UObject*> ObjectPool;
+  static TArray<UClass*>  ClassPool;
+  static TArray<FNativePropertyList*> NativePropertyLists;
+  static TArray<UFunction*> NativeFunctions;
+  static TArray<FNameEntry*> NameTable;
 };
 
 template <class T> T* SafeCast( UObject* Obj )

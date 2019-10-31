@@ -735,7 +735,7 @@ void UFunction::Load()
   *PkgFile >> FunctionFlags;
 
   if ( FunctionFlags & FUNC_Native )
-    UObject::NativeFunctions.PushBack( this );
+    UObject::GetGlobalNativeFunctions()->PushBack( this );
 
   if ( FunctionFlags & FUNC_Net )
     *PkgFile >> ReplicationOffset;
@@ -780,7 +780,7 @@ void UClass::BootstrapStage1()
       sizeof(UClass), UClass::NativeConstructor );
   ObjectClass->Class = ObjectClass;
   ObjectClass->bRegistered = true;
-  ClassPool.PushBack( ObjectClass );
+  GetGlobalClassPool()->PushBack( ObjectClass );
 }
 
 void UClass::BootstrapStage2()
@@ -971,7 +971,7 @@ void UClass::Load()
   if ( !bRegistered )
   {
     bRegistered = true;
-    ClassPool.PushBack( this );
+    GetGlobalClassPool()->PushBack( this );
   }
 }
 

@@ -321,14 +321,15 @@ bool UPackage::Load( const char* File )
   }
 
   // read in the name table
-  NameTableStart = NameTable.Size();
+  TArray<FNameEntry*>* GNameTable = GetGlobalNameTable();
+  NameTableStart = GNameTable->Size();
   Names.Resize( Header.NameCount );
   PackageFile->Seek( Header.NameOffset, ESeekBase::Begin );
   for ( int i = 0; i < Header.NameCount; i++ )
   {
     FNameEntry* NameEntry = &Names[i];
     *PackageFile >> *NameEntry;
-    NameTable.PushBack( NameEntry );
+    GNameTable->PushBack( NameEntry );
   }
   NoneNameEntry = &Names[FindName("None")];
   

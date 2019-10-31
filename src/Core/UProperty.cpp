@@ -110,10 +110,11 @@ u32 UProperty::GetNativeOffset( FName ClassName, FName PropName )
   FNativePropertyList* NativePropList = NULL;
   u32 Offset = MAX_UINT32;
 
-  for ( int i = 0; i < NativePropertyLists.Size(); i++ )
+  TArray<FNativePropertyList*>* PropLists = GetGlobalNativePropertyLists();
+  for ( int i = 0; i < PropLists->Size(); i++ )
   {
     // Can you take the address of an overloaded operator[] ?
-    NativePropList = NativePropertyLists.Data()[i];    
+    NativePropList = PropLists->Data()[i];
     if ( ClassName.Hash() == NativePropList->Hash )
       break;
   }

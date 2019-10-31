@@ -97,30 +97,31 @@ FPackageFileOut& operator<<( FPackageFileOut& Out, FNameEntry& Name )
 -----------------------------------------------------------------------------*/
 FName FName::CreateName( const char* InName, int InFlags )
 {
+  TArray<FNameEntry*>* GNameTable = UObject::GetGlobalNameTable();
   FNameEntry* NewEntry = new FNameEntry( InName, InFlags );
-  FName Out = UObject::NameTable.size();
-  UObject::NameTable.push_back( NewEntry );
+  FName Out = GNameTable->Size();
+  GNameTable->PushBack( NewEntry );
   return Out;
 }
 
 const char* FName::Data() const
 {
-  return UObject::NameTable[Index]->Data;
+  return (*UObject::GetGlobalNameTable())[Index]->Data;
 }
 
 const FHash& FName::Hash() const
 {
-  return UObject::NameTable[Index]->Hash;
+  return (*UObject::GetGlobalNameTable())[Index]->Hash;
 }
 
 bool operator==( FName& A, FName& B )
 {
-  return UObject::NameTable[A.Index]->Hash == UObject::NameTable[B.Index]->Hash;
+  return (*UObject::GetGlobalNameTable())[A.Index]->Hash == (*UObject::GetGlobalNameTable())[B.Index]->Hash;
 }
 
 bool operator!=( FName& A, FName& B )
 {
-  return UObject::NameTable[A.Index]->Hash != UObject::NameTable[B.Index]->Hash;
+  return (*UObject::GetGlobalNameTable())[A.Index]->Hash != (*UObject::GetGlobalNameTable())[B.Index]->Hash;
 }
 
 LIBUNR_API FPackageFileIn& operator>>( FPackageFileIn& In, FName& Name )

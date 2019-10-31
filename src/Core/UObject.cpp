@@ -772,6 +772,31 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
   return Obj;
 }
 
+TArray<UObject*>* UObject::GetGlobalObjectPool()
+{
+  return &ObjectPool;
+}
+
+TArray<UClass*>* UObject::GetGlobalClassPool()
+{
+  return &ClassPool;
+}
+
+TArray<FNativePropertyList*>* UObject::GetGlobalNativePropertyLists()
+{
+  return &NativePropertyLists;
+}
+
+TArray<UFunction*>* UObject::GetGlobalNativeFunctions()
+{
+  return &NativeFunctions;
+}
+
+TArray<FNameEntry*>* UObject::GetGlobalNameTable()
+{
+  return &NameTable;
+}
+
 UCommandlet::UCommandlet()
   : UObject()
 {

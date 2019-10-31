@@ -79,7 +79,8 @@
         NativeSize, NativeConstructor ); \
       if ( ObjectClass != NULL ) \
       { \
-        ClassPool.push_back( ObjectClass ); \
+        GLogf( LOG_INFO, "ClassPool size = %i", GetGlobalClassPool()->Size() ); \
+        GetGlobalClassPool()->PushBack( ObjectClass ); \
         ObjectClass->bRegistered = true; \
         ObjectClass->Pkg = ClsPkg; \
         return true; \
