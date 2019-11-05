@@ -60,6 +60,11 @@ FString& FString::operator+=( FName Name )
   return *this;
 }
 
+bool operator==( const FString& lhs, const FString& rhs )
+{
+  return (string&)lhs == (string&)rhs;
+}
+
 bool operator!=( const FString& lhs, const FString& rhs )
 {
   return (string&)lhs != (string&)rhs;
