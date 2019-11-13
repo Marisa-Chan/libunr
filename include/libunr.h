@@ -63,6 +63,7 @@
 #include "Engine/USound.h"
 #include "Engine/UTexture.h"
 #include "Engine/UViewport.h"
+#include "Engine/UStaticMesh.h"
 
 #include "Actors/AActor.h"
 #include "Actors/ABrush.h"
