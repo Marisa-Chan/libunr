@@ -50,7 +50,7 @@ void USound::Load()
 {
   ReadDefaultProperties();
 
-  *PkgFile >> CINDEX( SoundFormat );
+  *PkgFile >> SoundFormat;
   if ( PkgFile->Ver >= PKG_VER_UN_220 )
     *PkgFile >> OffsetNext;
   
@@ -172,6 +172,7 @@ void* USound::GetWavPcm()
     GLogf( LOG_ERR, "USound::GetWavPcm() failed: expected data subchunk" );
     return NULL;
   }
+  Data += 4;
 
   PcmSize = *(u32*)Data;
   Data += 4;
