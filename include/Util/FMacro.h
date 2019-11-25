@@ -57,6 +57,7 @@
 		#define fseeko fseeko64
   #else
     #define LIBUNR_API
+    #define DLL_EXPORT
   #endif
  
 #elif defined _MSC_VER

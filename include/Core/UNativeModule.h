@@ -30,7 +30,7 @@
 #if defined __linux__ || defined __unix__
   #include <dlfcn.h>
 #endif
-
+//TODO: LIne 65, fix that shit
 #define IMPLEMENT_MODULE_CLASS(cls) \
   extern "C" DLL_EXPORT UClass* cls##StaticClass() \
   { \
@@ -62,7 +62,7 @@
       UPackage* ClsPkg = UPackage::StaticLoadPackage( NativePkgName ); \
       if ( ClsPkg == NULL ) { \
         if ( StaticFlags & CLASS_NoExport ) { \
-          ClsPkg = UPackage::StaticCreatePackage( NativePkgName, false ); \
+          ClsPkg = UPackage::StaticCreatePackage( NativePkgName, NULL ); \
           ClsName = FName::CreateName( ClsNameStr, RF_LoadContextFlags | RF_Native ); \
         } else { \
           GLogf( LOG_CRIT, "Failed to load package '%s' for class '%s'.", NativePkgName, ClsNameStr ); \
