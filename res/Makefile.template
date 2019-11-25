@@ -4,7 +4,9 @@
 
 install: $(OUTPUT)
 	-@mkdir $(INSTALL_PREFIX)/share/libunr
+	-@mkdir $(INSTALL_PREFIX)/share/libunr/modules
 	-@mkdir $(INSTALL_PREFIX)/include/libunr
+	-@mkdir $(INSTALL_PREFIX)/include/libunr/modules
 	@cp -v $< $(INSTALL_PREFIX)/lib/$<
 	@cp -v res/DefaultLibunr.ini $(INSTALL_PREFIX)/share/libunr/DefaultLibunr.ini
 	@cp -rv include/* $(INSTALL_PREFIX)/include/libunr/
