@@ -42,12 +42,12 @@ public:
   TArray<T>( size_t n, const T& Value ) : vector<T>( n, Value ) 
   { ElementSize = sizeof(T); }
 
-  FORCEINLINE size_t Size()                           { return vector<T>::size(); }
-  FORCEINLINE size_t MaxSize()                        { return vector<T>::max_size(); }
+  FORCEINLINE size_t Size() const                     { return vector<T>::size(); }
+  FORCEINLINE size_t MaxSize() const                  { return vector<T>::max_size(); }
   FORCEINLINE void Resize( size_t n )                 { vector<T>::resize(n); }
   FORCEINLINE void Resize( size_t n, const T& Value ) { vector<T>::resize(n,Value); }
   FORCEINLINE size_t Capacity()                       { return vector<T>::capacity(); }
-  FORCEINLINE bool IsEmpty()                          { return vector<T>::empty(); }
+  FORCEINLINE bool IsEmpty() const                    { return vector<T>::empty(); }
   FORCEINLINE void Reserve( size_t n )                { vector<T>::reserve(n); }
   FORCEINLINE void Reclaim ()                         { vector<T>::shrink_to_fit(); }
   FORCEINLINE T& At ( size_t n )                      { return vector<T>::at(n); }
