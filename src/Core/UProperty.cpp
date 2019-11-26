@@ -51,7 +51,7 @@ void UProperty::Load()
   *PkgFile >> ArrayDim;
   *PkgFile >> ElementSize;
   *PkgFile >> PropertyFlags;
-  *PkgFile >> CINDEX( Category );
+  *PkgFile >> Category;
   
   if ( PropertyFlags & CPF_Net )
     *PkgFile >> ReplicationOffset;

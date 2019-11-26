@@ -124,6 +124,7 @@ bool UTexture::ExportToFile( const char* Dir, const char* Type )
   Filename += ".";
   if ( Type == NULL )
     Type = "bmp";
+
   else if ( strnicmp( Type, "bmp", 3 ) != 0 )
   {
     GLogf( LOG_WARN, "Can't export texture to file type '%s'", Type );
@@ -201,6 +202,10 @@ bool UTexture::ExportToFile( const char* Dir, const char* Type )
     
     Out->Close();  
     return true;
+  }
+  else if ( Format == TEXF_DXT5 )
+  {
+
   }
 
   return false;

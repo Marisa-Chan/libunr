@@ -197,6 +197,12 @@ class LIBUNR_API UTexture : public UBitmap
   EXPOSE_TO_USCRIPT()
   UTexture();
 
+  virtual void Load();
+  virtual bool ExportToFile( const char* Dir, const char* Type );
+  //virtual bool ExportToBmp( const char* Dir );
+  //virtual bool ExportToPcx( const char* Dir );
+  //virtual bool ExportToPng( const char* Dir );
+
   UTexture* BumpMap;
   UTexture* DetailTexture;
   UTexture* MacroTexture;
@@ -270,9 +276,6 @@ class LIBUNR_API UTexture : public UBitmap
   FColor PaletteTransform;
   void*  TextureHandle; // ???
   u8     TextureMaterial;
-  
-  virtual void Load();
-  virtual bool ExportToFile( const char* Dir, const char* Type );
 };
 
 class LIBUNR_API UFont : public UObject

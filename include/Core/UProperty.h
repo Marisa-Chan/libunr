@@ -77,7 +77,7 @@ class LIBUNR_API UProperty : public UField
   u16 ArrayDim;
   u16 ElementSize;
   u32 PropertyFlags;
-  const char* Category;
+  FName Category;
   u16 ReplicationOffset; // only exists since objects may store this variable
   
   // Instance variables
