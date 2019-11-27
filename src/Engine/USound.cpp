@@ -63,7 +63,7 @@ void USound::Load()
 // TODO: Support exporting to a number of different formats
 bool USound::ExportToFile( const char* Dir, const char* Type )
 {
-  const char* Ext = Pkg->ResolveNameFromIdx( SoundFormat );
+  const char* Ext = SoundFormat.Data();
 
   // Set up filename
   FString Filename( Dir );

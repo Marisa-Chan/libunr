@@ -532,19 +532,13 @@ bool UStructProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In,
   }
 
   // Verify struct name
-  idx StructName = 0;
-  In >> CINDEX( StructName );
-  if ( StructName < 0 )
-  {
-    GLogf( LOG_CRIT, "Bad struct name index for StructProperty '%s'", Name );
-    return false;
-  }
+  FName StructName = 0;
+  In >> StructName;
 
-  FHash StructHash = In.Pkg->GetNameEntry( StructName )->Hash;
-  if ( Struct->Name.Hash() != StructHash )
+  if ( Struct->Name.Hash() != StructName.Hash() )
   {
     GLogf( LOG_CRIT, "Default property expected struct type '%s' but got '%s'", 
-      In.Pkg->ResolveNameFromIdx( StructName ), Struct->Name );
+      StructName.Data(), Struct->Name );
     return false;
   }
 

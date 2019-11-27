@@ -162,9 +162,8 @@ void UEnum::Load()
 
   for( int i = 0; i < ArraySize; i++ )
   {
-    idx ElementIdx;
-    *PkgFile >> CINDEX( ElementIdx );
-    Names.PushBack( Pkg->ResolveNameFromIdx( ElementIdx ) );
+    FName Element;
+    Names.PushBack( Element );
   }
 }
 
@@ -600,7 +599,7 @@ void UStruct::Load()
   
   *PkgFile >> CINDEX( ScriptTextIdx );
   *PkgFile >> CINDEX( ChildIdx );
-  *PkgFile >> CINDEX( FriendlyNameIdx );
+  *PkgFile >> FriendlyName;
  
   if ( ScriptTextIdx )
     ScriptText = (UTextBuffer*)LoadObject( ScriptTextIdx, UTextBuffer::StaticClass(), this );
@@ -608,7 +607,6 @@ void UStruct::Load()
   if ( ChildIdx )
     Children = (UField*)LoadObject( ChildIdx, NULL, this );
 
-  FriendlyName = Pkg->ResolveNameFromIdx( FriendlyNameIdx );
   *PkgFile >> Line;
   *PkgFile >> TextPos;
   *PkgFile >> ScriptSize;
@@ -838,7 +836,7 @@ bool UClass::ExportToFile( const char* Dir, const char* Type )
   if ( Filename.Back() != '/' )
     Filename += '/';
 
-  Filename += Pkg->ResolveNameFromIdx( Export->ObjectName );
+  Filename += Name.Data();
   Filename += ".uc"; // Scripts won't get exported to any other type
 
   GLogf( LOG_INFO, "Exporting %s.uc", Name.Data() ); 
@@ -949,18 +947,16 @@ void UClass::Load()
   if ( PkgFile->Ver >= PKG_VER_UN_220 - 1 ) // package version 62 ??
   {
     idx ClassWithinIdx = 0;
-    idx ClassConfigNameIdx = 0;
     
     *PkgFile >> CINDEX( ClassWithinIdx );
-    *PkgFile >> CINDEX( ClassConfigNameIdx );
+    *PkgFile >> ClassConfigName;
    
     ClassWithin = (UClass*)LoadObject( ClassWithinIdx, UClass::StaticClass(), NULL );
-    ClassConfigName = Pkg->ResolveNameFromIdx( ClassConfigNameIdx );
 
-    if ( stricmp( ClassConfigName, "System" ) == 0 )
+    if ( stricmp( ClassConfigName.Data(), "System" ) == 0 )
       ClassConfig = GGameConfig;
     else
-      ClassConfig = GConfigManager->GetConfig( ClassConfigName );
+      ClassConfig = GConfigManager->GetConfig( ClassConfigName.Data() );
   }
   else
     ClassConfig = GGameConfig; 

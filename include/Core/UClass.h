@@ -69,7 +69,7 @@ class LIBUNR_API UEnum : public UField
   UEnum();
   virtual void Load();
 
-  TArray<const char*> Names;
+  TArray<FName> Names;
 };
 
 struct FScriptLabel
@@ -90,7 +90,7 @@ class LIBUNR_API UStruct : public UField
 
   UTextBuffer* ScriptText;
   UField* Children;
-  const char* FriendlyName;
+  FName FriendlyName;
   u32 Line;
   u32 TextPos;
   u32 ScriptSize;
@@ -195,7 +195,7 @@ class LIBUNR_API UClass : public UState
   TArray<FDependency> Dependencies;
   TArray<int> PackageImports;
   UClass* ClassWithin;
-  const char* ClassConfigName;
+  FName ClassConfigName;
   
   // Runtime variables
   UObject* Default;

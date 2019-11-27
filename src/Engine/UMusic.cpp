@@ -55,7 +55,7 @@ void UMusic::Load()
 
 bool UMusic::ExportToFile( const char* Dir, const char* Type )
 {
-  const char* Ext = Pkg->ResolveNameFromIdx( MusicType );
+  const char* Ext = MusicType.Data();
 
   // Set up filename
   FString Filename( Dir );
