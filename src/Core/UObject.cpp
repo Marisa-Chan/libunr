@@ -290,7 +290,6 @@ UObject* UObject::StaticFindObject( UPackage* Pkg, FName ObjName )
 void UObject::ReadDefaultProperties()
 {
   FName PropName = 0;
-  idx PropNameIdx = 0;
   u8  InfoByte = 0;
   u8  PropType = 0;
   u8  SizeByte = 0;
@@ -300,8 +299,7 @@ void UObject::ReadDefaultProperties()
 
   while( 1 )
   {
-    *PkgFile >> CINDEX( PropNameIdx );
-    PropName = FName( Pkg->GetGlobalName( PropNameIdx ) );
+    *PkgFile >> PropName;
     if ( UNLIKELY( strncmp( PropName.Data(), "None", 4 ) == 0 ) )
       break;
 

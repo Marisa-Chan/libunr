@@ -163,6 +163,7 @@ void UEnum::Load()
   for( int i = 0; i < ArraySize; i++ )
   {
     FName Element;
+    *PkgFile >> Element;
     Names.PushBack( Element );
   }
 }
