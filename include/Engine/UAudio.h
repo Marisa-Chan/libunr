@@ -51,5 +51,9 @@ class LIBUNR_API UAudioSubsystem : public USubsystem
   {
     return false;
   }
+
+  u8 SoundVolume;
+  u8 MusicVolume;
+  u32 OutputRate;
 };
 
