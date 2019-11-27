@@ -451,7 +451,7 @@ MakeEntry:
 
   CatIter->Entries->PushBack( Entry );
 
-  return NULL;
+  return (char*)Default;
 }
 
 bool FConfig::ReadBool( const char* Category, const char* Variable, size_t Index, bool Default )
