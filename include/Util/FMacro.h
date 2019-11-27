@@ -92,6 +92,7 @@
   #endif
 
   #define S_ISDIR(mode) (mode & _S_IFDIR)
+  #define getcwd _getcwd
 
 #else
   #error "Unsupported compiler type, read more here"

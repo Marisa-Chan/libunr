@@ -23,6 +23,10 @@
  *========================================================================
 */
 
+#if defined _WIN32
+  #include <direct.h>
+#endif
+
 #include "Util/FConfig.h"
 #include "Util/FFileArchive.h"
 #include "Util/FLogFile.h"
@@ -134,6 +138,7 @@ int FConfig::Load( const char* Filename )
     return ERR_FILE_NOT_EXIST;
   }
 
+
   // Read until the end of the file
   FConfigCategory* Category = NULL;
   FConfigEntry* Entry = NULL;
@@ -203,7 +208,7 @@ int FConfig::Load( const char* Filename )
       Category = new FConfigCategory();
       Category->Name = strdup( CategoryBuf );
       Category->Hash = FnvHashString( Category->Name );
-      Categories.push_back( Category );
+      Categories.PushBack( Category );
 
       ReadNewLine( IniFile, Filename );
     }
@@ -257,7 +262,7 @@ int FConfig::Load( const char* Filename )
       if ( LIKELY( VarHash != PreviousHash ) )
       {
         Entry = new FConfigEntry();
-        Category->Entries->push_back( Entry );
+        Category->Entries->PushBack( Entry );
         Entry->Name = strdup( VariableBuf );
         Entry->Hash = VarHash;
       }
@@ -313,7 +318,7 @@ int FConfig::Load( const char* Filename )
       }
 
       if ( !bIndexed )
-        Entry->Values->push_back( strdup( ValueBuf ) );
+        Entry->Values->PushBack( strdup( ValueBuf ) );
       else
         (*Entry->Values)[Index] = strdup( ValueBuf );
 
@@ -329,6 +334,19 @@ int FConfig::Load( const char* Filename )
   if ( Dot )
     *Dot = '\0';
 
+  Path = strdup( Filename );
+  char* Slash = strrchr( Name, DIRECTORY_SEPARATOR );
+  if ( Slash )
+  {
+    *Slash = '\0';
+  }
+  else
+  {
+    free( Path );
+    Path = new char[296];
+    getcwd( Path, 296 );
+  }
+
   IniFile.Close();
   return 0;
 }
@@ -336,8 +354,10 @@ int FConfig::Load( const char* Filename )
 int FConfig::Save()
 {
   FFileArchiveOut IniFile;
-  FString Filename( Name );
+  FString Filename( Path );
 
+  Filename += DIRECTORY_SEPARATOR;
+  Filename += Name;
   Filename += ".ini";
 
   int Status = IniFile.Open( Filename );
@@ -386,18 +406,23 @@ int FConfig::Save()
   return 0;
 }
 
-char* FConfig::ReadString( const char* Category, const char* Variable, size_t Index )
+char* FConfig::ReadString( const char* Category, const char* Variable, size_t Index, const char* Default )
 {
+  FConfigCategory* CatIter = NULL;
+  FConfigEntry* Entry = NULL;
   FHash CatHash = FnvHashString( Category ); // meow
+  FHash VarHash = FnvHashString( Variable );
+
   for ( size_t i = 0; i < Categories.size(); i++ )
   {
-    FConfigCategory* CatIter = Categories[i];
+    // Get Variable
+    CatIter = Categories[i];
     if ( CatIter->Hash == CatHash )
     {
-      FHash VarHash = FnvHashString( Variable );
+      // Found Category, get Entry
       for ( size_t j = 0; j < CatIter->Entries->size(); j++ )
       {
-        FConfigEntry* Entry = (*CatIter->Entries)[j];
+        Entry = (*CatIter->Entries)[j];
         if ( Entry->Hash == VarHash )
         {
           if ( UNLIKELY( Index >= Entry->Values->size() ) )
@@ -407,15 +432,32 @@ char* FConfig::ReadString( const char* Category, const char* Variable, size_t In
           return strdup( Value );
         }
       }
+      Entry = NULL;
+      goto MakeEntry;
     }
   }
+
+  // Did not find entry, make one
+  CatIter = new FConfigCategory();
+  CatIter->Name = strdup( Category );
+  CatIter->Hash = CatHash;
+  Categories.PushBack( CatIter );
+
+MakeEntry:
+  Entry = new FConfigEntry();
+  Entry->Name = strdup( Variable );
+  Entry->Hash = VarHash;
+  Entry->Values->PushBack( strdup( Default ) );
+
+  CatIter->Entries->PushBack( Entry );
+
   return NULL;
 }
 
-bool FConfig::ReadBool( const char* Category, const char* Variable, size_t Index )
+bool FConfig::ReadBool( const char* Category, const char* Variable, size_t Index, bool Default )
 {
   bool Value = false;
-  char* StrVar = ReadString( Category, Variable, Index );
+  char* StrVar = ReadString( Category, Variable, Index, (Default) ? "true" : "false" );
   if ( LIKELY( StrVar ) )
   {
     if ( strncmp( StrVar, "true", 4 ) == 0 )
@@ -426,10 +468,13 @@ bool FConfig::ReadBool( const char* Category, const char* Variable, size_t Index
   return Value;
 }
 
-static inline u64 ReadUInt( FConfig* Config, const char* Category, const char* Variable, size_t Index )
+static inline u64 ReadUInt( FConfig* Config, const char* Category, const char* Variable, size_t Index, u64 Default )
 {
   u64 Value = 0;
-  char* StrVar = Config->ReadString( Category, Variable, Index );
+  char StrDef[24];
+  sprintf( StrDef, "%lu", Default );
+
+  char* StrVar = Config->ReadString( Category, Variable, Index, StrDef );
   if ( LIKELY( StrVar ) )
   {
     Value = strtoull( StrVar, NULL, 10 );
@@ -441,30 +486,33 @@ static inline u64 ReadUInt( FConfig* Config, const char* Category, const char* V
   return Value;
 }
 
-u64 FConfig::ReadUInt64( const char* Category, const char* Variable, size_t Index )
+u64 FConfig::ReadUInt64( const char* Category, const char* Variable, size_t Index, u64 Default )
 {
-  return ReadUInt( this, Category, Variable, Index );
+  return ReadUInt( this, Category, Variable, Index, Default );
 }
 
-u32 FConfig::ReadUInt32( const char* Category, const char* Variable, size_t Index )
+u32 FConfig::ReadUInt32( const char* Category, const char* Variable, size_t Index, u32 Default )
 {
-  return ReadUInt( this, Category, Variable, Index ) & MAX_UINT32;
+  return ReadUInt( this, Category, Variable, Index, Default ) & MAX_UINT32;
 }
 
-u16 FConfig::ReadUInt16( const char* Category, const char* Variable, size_t Index )
+u16 FConfig::ReadUInt16( const char* Category, const char* Variable, size_t Index, u16 Default )
 {
-  return ReadUInt( this, Category, Variable, Index ) & MAX_UINT16;
+  return ReadUInt( this, Category, Variable, Index, Default ) & MAX_UINT16;
 }
 
-u8 FConfig::ReadUInt8( const char* Category, const char* Variable, size_t Index )
+u8 FConfig::ReadUInt8( const char* Category, const char* Variable, size_t Index, u8 Default )
 {
-  return ReadUInt( this, Category, Variable, Index ) & MAX_UINT8;
+  return ReadUInt( this, Category, Variable, Index, Default ) & MAX_UINT8;
 }
 
-static inline i64 ReadInt( FConfig* Config, const char* Category, const char* Variable, size_t Index )
+static inline i64 ReadInt( FConfig* Config, const char* Category, const char* Variable, size_t Index, i64 Default )
 {
   i64 Value = 0;
-  char* StrVar = Config->ReadString( Category, Variable, Index );
+  char StrDef[24];
+  sprintf( StrDef, "%ld", Default );
+
+  char* StrVar = Config->ReadString( Category, Variable, Index, StrDef );
   if ( LIKELY( StrVar ) )
   {
     Value = strtoll( StrVar, NULL, 10 );
@@ -476,30 +524,33 @@ static inline i64 ReadInt( FConfig* Config, const char* Category, const char* Va
   return Value;
 }
 
-i64 FConfig::ReadInt64( const char* Category, const char* Variable, size_t Index )
+i64 FConfig::ReadInt64( const char* Category, const char* Variable, size_t Index, i64 Default )
 {
-  return ReadInt( this, Category, Variable, Index );
+  return ReadInt( this, Category, Variable, Index, Default );
 }
 
-i32 FConfig::ReadInt32( const char* Category, const char* Variable, size_t Index )
+i32 FConfig::ReadInt32( const char* Category, const char* Variable, size_t Index, i32 Default )
 {
-  return ReadInt( this, Category, Variable, Index ) & MAX_UINT32;
+  return ReadInt( this, Category, Variable, Index, Default ) & MAX_UINT32;
 }
 
-i16 FConfig::ReadInt16( const char* Category, const char* Variable, size_t Index )
+i16 FConfig::ReadInt16( const char* Category, const char* Variable, size_t Index, i16 Default )
 {
-  return ReadInt( this, Category, Variable, Index ) & MAX_UINT16;
+  return ReadInt( this, Category, Variable, Index, Default ) & MAX_UINT16;
 }
 
-i8 FConfig::ReadInt8( const char* Category, const char* Variable, size_t Index )
+i8 FConfig::ReadInt8( const char* Category, const char* Variable, size_t Index, i8 Default )
 {
-  return ReadInt( this, Category, Variable, Index ) & MAX_UINT8;
+  return ReadInt( this, Category, Variable, Index, Default ) & MAX_UINT8;
 }
 
-float FConfig::ReadFloat( const char* Category, const char* Variable, size_t Index )
+float FConfig::ReadFloat( const char* Category, const char* Variable, size_t Index, float Default )
 {
   float Value = 0.f;
-  char* StrVar = ReadString( Category, Variable, Index );
+  char StrDef[16];
+  sprintf( StrDef, "%f", Default );
+
+  char* StrVar = ReadString( Category, Variable, Index, StrDef );
   if ( LIKELY( StrVar ) )
   {
     Value = strtof( StrVar, NULL );
@@ -508,10 +559,13 @@ float FConfig::ReadFloat( const char* Category, const char* Variable, size_t Ind
   return Value;
 }
 
-double FConfig::ReadDouble( const char* Category, const char* Variable, size_t Index )
+double FConfig::ReadDouble( const char* Category, const char* Variable, size_t Index, double Default )
 {
   double Value = 0.0;
-  char* StrVar = ReadString( Category, Variable, Index );
+  char StrDef[32];
+  sprintf( StrDef, "%lf", Default );
+
+  char* StrVar = ReadString( Category, Variable, Index, StrDef );
   if ( LIKELY( StrVar ) )
   {
     Value = strtod( StrVar, NULL );
@@ -603,13 +657,13 @@ TArray<char*>* FConfig::CreateEntry( const char* Category, const char* Variable 
   CatIter = new FConfigCategory();
   CatIter->Name = strdup( Category );
   CatIter->Hash = FnvHashString( CatIter->Name );
-  Categories.push_back( CatIter );
+  Categories.PushBack( CatIter );
 
 makeEntry:
   Entry = new FConfigEntry();
   Entry->Name = strdup( Variable );
   Entry->Hash = FnvHashString( Entry->Name );
-  CatIter->Entries->push_back( Entry );
+  CatIter->Entries->PushBack( Entry );
   return Entry->Values;
 }
 
@@ -670,7 +724,7 @@ FConfigManager::~FConfigManager()
 
 void FConfigManager::AddConfig( FConfig* Cfg )
 {
-  Configs.push_back( Cfg );
+  Configs.PushBack( Cfg );
 }
 
 FConfig* FConfigManager::GetConfig( const char* Name )

@@ -47,20 +47,20 @@ public:
   // These functions will try to read the requested variable
   // If the Variable does not exist, a default value will be created and added to the config
   // If the SubVariable does not exist, a default value will be returned but not added to config
-  char* ReadString( const char* Category, const char* Variable, size_t Index = 0 );
-  bool  ReadBool  ( const char* Category, const char* Variable, size_t Index = 0 );
-  u64 ReadUInt64( const char* Category, const char* Variable, size_t Index = 0 ); 
-  u32 ReadUInt32( const char* Category, const char* Variable, size_t Index = 0 );
-  u16 ReadUInt16( const char* Category, const char* Variable, size_t Index = 0 );
-  u8  ReadUInt8 ( const char* Category, const char* Variable, size_t Index = 0 );
+  char* ReadString( const char* Category, const char* Variable, size_t Index = 0, const char* Default = "" );
+  bool  ReadBool  ( const char* Category, const char* Variable, size_t Index = 0, bool Default = false );
+  u64 ReadUInt64( const char* Category, const char* Variable, size_t Index = 0, u64 Default = 0 );
+  u32 ReadUInt32( const char* Category, const char* Variable, size_t Index = 0, u32 Default = 0 );
+  u16 ReadUInt16( const char* Category, const char* Variable, size_t Index = 0, u16 Default = 0 );
+  u8  ReadUInt8 ( const char* Category, const char* Variable, size_t Index = 0, u8 Default = 0 );
 
-  i64 ReadInt64( const char* Category, const char* Variable, size_t Index = 0 );
-  i32 ReadInt32( const char* Category, const char* Variable, size_t Index = 0 );
-  i16 ReadInt16( const char* Category, const char* Variable, size_t Index = 0 );
-  i8  ReadInt8 ( const char* Category, const char* Variable, size_t Index = 0 );
+  i64 ReadInt64( const char* Category, const char* Variable, size_t Index = 0, i64 Default = 0 );
+  i32 ReadInt32( const char* Category, const char* Variable, size_t Index = 0, i32 Default = 0 );
+  i16 ReadInt16( const char* Category, const char* Variable, size_t Index = 0, i16 Default = 0 );
+  i8  ReadInt8 ( const char* Category, const char* Variable, size_t Index = 0, i8 Default = 0 );
 
-  float  ReadFloat ( const char* Category, const char* Variable, size_t Index = 0 );
-  double ReadDouble( const char* Category, const char* Variable, size_t Index = 0 );
+  float  ReadFloat ( const char* Category, const char* Variable, size_t Index = 0, float Default = 0 );
+  double ReadDouble( const char* Category, const char* Variable, size_t Index = 0, double Default = 0 );
 
   void ReadStruct( const char* Category, const char* Variable, UStruct* Struct, void* StructLoc, size_t Index = 0 );
   void ReadObject( const char* Category, const char* Variable, UObject* Obj, size_t Index = 0 );
@@ -115,6 +115,7 @@ private:
 
   TArray<FConfigCategory*> Categories;
   char* Name;
+  char* Path;
 };
 
 extern LIBUNR_API FConfig* GLibunrConfig; // Used only before loading any game
