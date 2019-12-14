@@ -27,6 +27,10 @@
   #include <direct.h>
 #endif
 
+#if defined __linux__ || defined __unix__
+  #include <unistd.h>
+#endif
+
 #include "Util/FConfig.h"
 #include "Util/FFileArchive.h"
 #include "Util/FLogFile.h"
