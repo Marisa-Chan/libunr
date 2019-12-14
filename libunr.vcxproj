@@ -80,6 +80,7 @@
     <ClInclude Include="include\Util\FMacro.h" />
     <ClInclude Include="include\Util\FName.h" />
     <ClInclude Include="include\Util\FString.h" />
+    <ClInclude Include="include\Util\FThread.h" />
     <ClInclude Include="include\Util\FTypes.h" />
     <ClInclude Include="include\Util\TArray.h" />
     <ClInclude Include="include\Util\TMap.h" />
@@ -147,6 +148,7 @@
     <ClCompile Include="src\Util\FLogFile.cpp" />
     <ClCompile Include="src\Util\FName.cpp" />
     <ClCompile Include="src\Util\FString.cpp" />
+    <ClCompile Include="src\Util\FThread.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />

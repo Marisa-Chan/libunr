@@ -426,7 +426,10 @@ char* FConfig::ReadString( const char* Category, const char* Variable, size_t In
         if ( Entry->Hash == VarHash )
         {
           if ( UNLIKELY( Index >= Entry->Values->size() ) )
+          {
+            GLogf( LOG_ERR, "Config variable '%s.%s' index out of bounds in '%s.ini'", Category, Variable, Name );
             return NULL;
+          }
 
           char* Value = (*Entry->Values)[Index];
           return strdup( Value );
@@ -451,7 +454,7 @@ MakeEntry:
 
   CatIter->Entries->PushBack( Entry );
 
-  return (char*)Default;
+  return strdup( Default );
 }
 
 bool FConfig::ReadBool( const char* Category, const char* Variable, size_t Index, bool Default )

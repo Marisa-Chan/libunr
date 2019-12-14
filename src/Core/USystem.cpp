@@ -209,6 +209,12 @@ bool USystem::PromptForGameInfo( char* InGameName )
     i = DoGamePrompt( Names );
   }
 
+  if ( i < 0 )
+  {
+    GLogf( LOG_INFO, "User cancelled game selection, Exiting..." );
+    return false;
+  }
+
   // Get name and set
   NameBuf = GLibunrConfig->ReadString( "Game", "Name", i );
   ExecBuf = GLibunrConfig->ReadString( "Game", "Exec", i );
