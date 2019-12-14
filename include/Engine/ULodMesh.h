@@ -29,15 +29,6 @@
 
 #include "Engine/UMesh.h"
 
-// "James Mesh Types"
-// See http://paulbourke.net/dataformats/unreal/ for more info
-#define JMT_Normal            0x0
-#define JMT_TwoSided          0x1
-#define JMT_Translucent       0x2
-#define JMT_MaskedTwoSided    0x3
-#define JMT_ModulatedTwoSided 0x4
-#define JMT_WeaponTriangle    0x8
-
 struct LIBUNR_API FLodFace
 {
   u16 WedgeIndex[3];
@@ -59,46 +50,12 @@ struct LIBUNR_API FLodMaterial
   u32 TextureIndex;
 };
 
-// Vertex mesh file format can be found here
-// http://paulbourke.net/dataformats/unreal/
-struct FVertexDataHeader
-{
-  u16 NumPolygons;
-  u16 NumVertices;
-  u16 BogusRot;
-  u16 BogusFrame;
-  u32 BogusNormX;
-  u32 BogusNormY;
-  u32 BogusNormZ;
-  u32 FixScale;
-  u32 Unused[3];
-  u8  Unknown[12];
-};
-
-struct FVertexDataTri
-{
-  u16 Vertex[3];
-  i8  Type;
-  i8  Color;
-  u8  VertexUV[3][2];
-  i8  TexNum;
-  i8  Flags; // unused
-};
-
-struct FVertexAnivHeader
-{
-  u16 NumFrames;
-  u16 FrameSize;
-};
-
 class LIBUNR_API ULodMesh : public UMesh
 {
   DECLARE_NATIVE_CLASS( ULodMesh, UMesh, CLASS_NoExport, Engine )
 
   ULodMesh();
   virtual void Load();
-  virtual bool ExportToFile( const char* Dir, const char* Type );
-  virtual bool ExportToFile( const char* Dir, const char* Type, int Frame = -1 );
 
   TArray<u16> CollapsePoints;
   TArray<u16> FaceLevels;
@@ -118,8 +75,8 @@ class LIBUNR_API ULodMesh : public UMesh
   float LODZDisplace;
   u32 OldFrameVerts;
 
-private:
-  bool ExportUnreal3DMesh( const char* Dir, int Frame );
-  bool ExportObjMesh( const char* Dir, int Frame );
+protected:
+  virtual bool ExportUnreal3DMesh( const char* Dir, int Frame );
+  virtual bool ExportObjMesh( const char* Dir, int Frame );
 };
 

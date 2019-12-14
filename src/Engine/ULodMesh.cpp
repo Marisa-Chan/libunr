@@ -82,10 +82,11 @@ void ULodMesh::Load()
  
   // 227 seems to change the material type to 0x81, I guess
   // for clearly identifying weapon triangles. Can't rely on this
-  // behavior as it isn't seen anywhere else
+  // behavior as it isn't seen anywhere else. Check also for an
+  // extremely large MaterialIndex, which seems to occur in the UTBeta 
   for ( int i = 0; i < SpecialFaceCount; i++ )
   {
-    if ( SpecialFaces[i].MaterialIndex == 0x81 )
+    if ( SpecialFaces[i].MaterialIndex == 0x81 || SpecialFaces[i].MaterialIndex > Materials.Size() )
       SpecialFaces[i].MaterialIndex = 0;
 
     // Separate weapon triangle wedges
@@ -423,43 +424,6 @@ bool ULodMesh::ExportObjMesh( const char* Dir, int Frame )
 
   Out.Close();
   return true;
-}
-
-bool ULodMesh::ExportToFile( const char* Dir, const char* Type )
-{
-  return ULodMesh::ExportToFile( Dir, Type, -1 );
-}
-
-bool ULodMesh::ExportToFile( const char* Dir, const char* Type, int Frame )
-{
-  if ( Type == NULL )
-    Type = "U3D";
-
-  GLogf( LOG_INFO, "Exporting %s.3d", Name.Data() );
-
-  if ( stricmp( Type, "U3D" ) == 0 )
-  {
-    return ExportUnreal3DMesh( Dir, Frame );
-  }
-  else if ( stricmp( Type, "OBJ" ) == 0 )
-  {
-    if ( Frame < 0 )
-    {
-      for ( int i = 0; i < AnimFrames; i++ )
-      {
-        if ( !ExportObjMesh( Dir, i ) )
-          return false;
-      }
-      return true;
-    }
-    return ExportObjMesh( Dir, Frame );
-  }
-  else
-  {
-    GLogf( LOG_WARN, "Unknown LODMesh export extension '%s'", Type );
-  }
-
-  return false;
 }
 
 IMPLEMENT_NATIVE_CLASS( ULodMesh );
