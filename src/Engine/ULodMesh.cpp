@@ -89,16 +89,18 @@ void ULodMesh::Load()
       SpecialFaces[i].MaterialIndex = 0;
 
     // Separate weapon triangle wedges
-    SpecialFaces[0].WedgeIndex[0]++;
-    SpecialFaces[0].WedgeIndex[1]++;
-    SpecialFaces[0].WedgeIndex[2]++;
+    FLodWedge SpecialWedge;
+    
+    SpecialWedge.VertexIndex = 0;
+    Wedges.PushBack( SpecialWedge );
+    SpecialFaces[i].WedgeIndex[0] = Wedges.Size() - 1;
 
-    Wedges.PushBack( Wedges[SpecialFaces[i].WedgeIndex[0]] );
-    Wedges.PushBack( Wedges[SpecialFaces[i].WedgeIndex[1]] );
-    Wedges.PushBack( Wedges[SpecialFaces[i].WedgeIndex[2]] );
+    SpecialWedge.VertexIndex = 1;
+    Wedges.PushBack( SpecialWedge );
+    SpecialFaces[i].WedgeIndex[1] = Wedges.Size() - 1;
 
-    SpecialFaces[i].WedgeIndex[0] = Wedges.Size() - 3;
-    SpecialFaces[i].WedgeIndex[1] = Wedges.Size() - 2;
+    SpecialWedge.VertexIndex = 2;
+    Wedges.PushBack( SpecialWedge );
     SpecialFaces[i].WedgeIndex[2] = Wedges.Size() - 1;
   }
 
