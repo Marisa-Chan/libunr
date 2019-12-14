@@ -87,6 +87,19 @@ void ULodMesh::Load()
   {
     if ( SpecialFaces[i].MaterialIndex == 0x81 )
       SpecialFaces[i].MaterialIndex = 0;
+
+    // Separate weapon triangle wedges
+    SpecialFaces[0].WedgeIndex[0]++;
+    SpecialFaces[0].WedgeIndex[1]++;
+    SpecialFaces[0].WedgeIndex[2]++;
+
+    Wedges.PushBack( Wedges[SpecialFaces[i].WedgeIndex[0]] );
+    Wedges.PushBack( Wedges[SpecialFaces[i].WedgeIndex[1]] );
+    Wedges.PushBack( Wedges[SpecialFaces[i].WedgeIndex[2]] );
+
+    SpecialFaces[i].WedgeIndex[0] = Wedges.Size() - 3;
+    SpecialFaces[i].WedgeIndex[1] = Wedges.Size() - 2;
+    SpecialFaces[i].WedgeIndex[2] = Wedges.Size() - 1;
   }
 
   Faces.Append( SpecialFaces );
@@ -102,12 +115,15 @@ void ULodMesh::Load()
   In.Read( ReMapAnimVerts.Data(), ReMapAnimVertCount * sizeof(u16) );
 
   In >> OldFrameVerts;
-
+  
   if ( SpecialFaces.Size() > 0 )
   {
+    if ( SpecialFaces.Size() > 1 )
+      GLogf( LOG_WARN, "SpecialFaces.Size() > 1 for LodMesh '%s', export may be incorrect!", Name.Data() );
+
     // Ugh, need to remap all of the wedges for special vertices
     // Behavior observed in UModel source
-    for ( int i = 0; i < Wedges.Size(); i++ )
+    for ( int i = 0; i < Wedges.Size() - (SpecialFaces.Size()*3); i++ )
       Wedges[i].VertexIndex += SpecialVerts;
   }
 };
