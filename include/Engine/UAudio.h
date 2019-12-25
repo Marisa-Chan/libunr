@@ -28,8 +28,14 @@
 #include "Core/USystem.h"
 #include "Engine/UMusic.h"
 #include "Engine/USound.h"
+#include "Engine/UMusic.h"
 #include "Engine/UViewport.h"
 #include "Actors/AActor.h"
+
+/*-----------------------------------------------------------------------------
+ * UAudioSubsystem
+ * Defines the base interface for audio devices to play sounds and music
+-----------------------------------------------------------------------------*/
 
 class LIBUNR_API UAudioSubsystem : public USubsystem
 {
@@ -37,23 +43,23 @@ class LIBUNR_API UAudioSubsystem : public USubsystem
 
   UAudioSubsystem();
 
+  virtual bool Init();
   virtual bool SetOutputDevice( const char* Name ) { return false; }
   virtual void SetViewport( UViewport* Viewport ) {}
   virtual void RegisterSound( USound* Sound ) {}
-  virtual void RegisterMusic( UMusic* Music ) {}
   virtual void UnregisterSound( USound* Sound ) {}
-  virtual void UnregisterMusic( UMusic* Music ) {}
-  virtual bool PlaySound( AActor* Actor, USound* Sound, FVector Location, float Volume, float Radius, float Pitch ) 
-  {
-    return false;
-  }
-  virtual bool DoMusicTransition( UMusic* Music, EMusicTransition MusicTrans ) 
-  {
-    return false;
-  }
-
+  virtual bool PlaySound( AActor* Actor, USound* Sound, FVector Location, float Volume, float Radius, float Pitch )  { return false; }
+  virtual void PlayMusicBuffer( int* MusicBuffer, int NumSamples ) {}
+  
+  // Music playback logic should be consistent across all audio devices
+  void PlayMusic( UMusic* Music, int SongSection, EMusicTransition MusicTrans );
+  void StopMusic( EMusicTransition MusicTrans );
+    
   u8 SoundVolume;
   u8 MusicVolume;
   u32 OutputRate;
+
+private:
+  FMusicPlayer* MusicPlayer;
 };
 

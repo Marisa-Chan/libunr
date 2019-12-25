@@ -33,7 +33,7 @@
 /*-----------------------------------------------------------------------------
  * FNativePropertyList
 -----------------------------------------------------------------------------*/
-FNativePropertyList::FNativePropertyList( FHash InHash, size_t InNum )
+FNativePropertyList::FNativePropertyList( u32 InHash, size_t InNum )
 {
   Hash = InHash;
   Num = InNum;
@@ -52,7 +52,7 @@ void FNativePropertyList::AddProperty( const char* Name, u32 Offset )
   if ( LIKELY( Added < Num ) )
   {
     char* UpperName = strupper( Name );
-    Properties[Added].Hash = FnvHashString( UpperName );
+    Properties[Added].Hash = SuperFastHashString( UpperName );
     Properties[Added].Offset = Offset;
     Added++;
     free( UpperName );
@@ -79,7 +79,6 @@ TArray<UObject*> UObject::ObjectPool;
 TArray<UClass*>  UObject::ClassPool;
 TArray<FNativePropertyList*> UObject::NativePropertyLists;
 TArray<UFunction*> UObject::NativeFunctions;
-TArray<FNameEntry*> UObject::NameTable;
 bool UObject::bStaticBootstrapped = false;
 
 UObject* UObject::StaticConstructObject( FName InName, UClass* InClass, UObject* InOuter, 
@@ -237,7 +236,7 @@ bool UObject::IsA( UClass* ClassType )
 bool UObject::IsA( FName ClassName )
 {
   if ( *(int*)ClassName.Data() == NONE_STR )
-    ClassName = Pkg->GetGlobalName( Pkg->FindName( "Class" ) );
+    ClassName = NAME_Class;
 
   UClass* Cls = FindClass( ClassName );
   if ( Cls != NULL )
@@ -461,7 +460,7 @@ UObject* UObject::LoadObject( idx ObjRef, UClass* ObjClass, UObject* InOuter, bo
 UObject* UObject::StaticLoadObject( UPackage* Pkg, const char* ObjName, UClass* ObjClass,
   UObject* InOuter, bool bLoadClassNow )
 {
-  FExport* Export = Pkg->GetExportByName( Pkg->FindName( ObjName ) );
+  FExport* Export = Pkg->GetExportByName( Pkg->FindLocalName( ObjName ) );
   if ( UNLIKELY( Export == NULL ) )
   {
     GLogf( LOG_WARN, "Can't load object '%s.%s', object does not exist", Pkg->Name, ObjName );
@@ -492,9 +491,9 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
     const char* ClsName = Pkg->ResolveNameFromIdx( Import->ClassName );
     const char* GroupName = Pkg->ResolveNameFromObjRef( Import->Package );
 
-    FHash ObjNameHash = FnvHashString( ObjName );
-    FHash ClsNameHash = FnvHashString( ClsName );
-    FHash GroupHash   = FnvHashString( GroupName );
+    u32 ObjNameHash = SuperFastHashString( ObjName );
+    u32 ClsNameHash = SuperFastHashString( ClsName );
+    u32 GroupHash   = SuperFastHashString( GroupName );
 
     // Check to see if we're trying to load some intrinsic class
     if ( ObjClass == UClass::StaticClass() && ObjClass->ClassFlags & CLASS_NoExport )
@@ -593,23 +592,23 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
       // much faster to do everything here even if it is slightly on the not-so-great
       // side from a design perspective.
       // Get object name entry
-      FNameEntry* ExpObjName = &Names[ExpIter->ObjectName];
-      FNameEntry* ExpGrpName;
+      const FNameEntry* ExpObjName = &Names[ExpIter->ObjectName];
+      const FNameEntry* ExpGrpName;
       if ( ExpIter->Group == 0 )
-        ExpGrpName = ObjPkg->NoneNameEntry;
+        ExpGrpName = FName( NAME_None ).Entry();
       else
         ExpGrpName = &Names[Exports[ExpIter->Group-1].ObjectName];
 
       // Optimization: stricmp eats a large chunk of execution time here, so we
       // elect to treat this comparison as a single int
       if ( *(int*)&ExpGrpName->Data[0] == NONE_STR )
-        ExpGrpName = NameTable[ObjPkg->Name.Index];
+        ExpGrpName = ObjPkg->Name.Entry();
 
       // Get class name entry
       FNameEntry* ExpClsName = NULL;
       if ( ExpIter->Class < 0 )
       {
-        Import = &Imports[(-ExpIter->Class)-1];
+        Import = &Imports[(size_t)(-ExpIter->Class)-1];
         ExpClsName = &Names[Import->ObjectName];
       }
       else
@@ -618,7 +617,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
         if ( ExpIter->Class == 0 )
           ExpClsName = &ClassNameEntry;
         else
-          ExpClsName = &Names[Exports[ExpIter->Class - 1].ObjectName];
+          ExpClsName = &Names[Exports[(size_t)ExpIter->Class - 1].ObjectName];
       }
 
       if ( ExpObjName->Hash == ObjNameHash && ExpClsName->Hash == ClsNameHash && ExpGrpName->Hash == GroupHash )
@@ -631,7 +630,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
   else
   {
     ObjPkg = Pkg;
-    ObjExport = ObjPkg->GetExport( ObjRef - 1 );
+    ObjExport = ObjPkg->GetExport( (size_t)ObjRef - 1 );
   }
 
   if ( UNLIKELY( ObjExport == NULL ) )
@@ -665,7 +664,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
 UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass* ObjClass, 
   UObject* InOuter, bool bLoadClassNow )
 {
-  FName ObjName = ObjPkg->GetGlobalName( ObjExport->ObjectName );
+  FName ObjName( ObjPkg->GetNameEntry( ObjExport->ObjectName ) );
   bool bNeedsFullLoad = true;
 
   // 'None' object means NULL, don't load anything
@@ -706,7 +705,7 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
   }
 
   // Type checking
-  FName ClassName = ObjPkg->ResolveGlobalNameObjRef( ObjExport->Class );
+  FName ClassName( ObjPkg->ResolveNameFromObjRef( ObjExport->Class ) );
   UClass* ClassType = FindClass( ClassName );
   if ( UNLIKELY( ClassType == NULL ) )
   {
@@ -788,11 +787,6 @@ TArray<FNativePropertyList*>* UObject::GetGlobalNativePropertyLists()
 TArray<UFunction*>* UObject::GetGlobalNativeFunctions()
 {
   return &NativeFunctions;
-}
-
-TArray<FNameEntry*>* UObject::GetGlobalNameTable()
-{
-  return &NameTable;
 }
 
 UCommandlet::UCommandlet()

@@ -199,14 +199,14 @@ class LIBUNR_API AActor : public UObject
   // Major actor properties
   ALevelInfo* Level;
   class ULevel* XLevel;
-  idx         Tag;
-  idx         Event;
+  FName       Tag;
+  FName       Event;
   AActor*     Target;
   APawn*      Instigator;
   AInventory* Inventory;
   AActor*     Base;
   PointRegion Region;
-  idx         AttachTag;
+  FName       AttachTag;
 
   // Internal
   u8      StandingCount;

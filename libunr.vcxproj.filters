@@ -285,7 +285,7 @@
     <ClInclude Include="include\Util\FGuid.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
-    <ClInclude Include="include\Util\FThread.h">
+    <ClInclude Include="include\Util\FRegisteredNames.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
   </ItemGroup>
@@ -470,7 +470,7 @@
     <ClCompile Include="src\Util\FGuid.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
-    <ClCompile Include="src\Util\FThread.cpp">
+    <ClCompile Include="src\Util\FHash.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
   </ItemGroup>

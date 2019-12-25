@@ -24,14 +24,49 @@
 */
 
 #include "Engine/UAudio.h"
+#include "Engine/UEngine.h"
 
 UAudioSubsystem::UAudioSubsystem()
   : USubsystem()
 {
+  MusicVolume = 0;
+  OutputRate = 0;
+  SoundVolume = 0;
 }
 
 UAudioSubsystem::~UAudioSubsystem()
 {
+}
+
+bool UAudioSubsystem::Init()
+{
+  if ( MusicPlayer == NULL )
+  {
+    MusicPlayer = new FMusicPlayer();
+    if ( MusicPlayer == NULL )
+    {
+      GLogf( LOG_CRIT, "Failed to initialize music player" );
+      return false;
+    }
+  }
+
+  return true;
+}
+
+void UAudioSubsystem::PlayMusic( UMusic* Music, int SongSection, EMusicTransition MusicTrans )
+{
+  MusicPlayer->Play( Music, SongSection, MusicTrans );
+}
+
+void UAudioSubsystem::StopMusic( EMusicTransition MusicTrans )
+{
+  MusicPlayer->Stop( MusicTrans );
+  /*
+  QueuedTrack = NULL;
+  QueuedSection = 255;
+  CurrentTransition = MusicTrans;
+  bTransitioning = true;
+  */
 }
 
 #include "Core/UClass.h"

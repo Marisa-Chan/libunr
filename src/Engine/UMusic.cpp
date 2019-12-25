@@ -25,8 +25,204 @@
 */
 
 #include "Core/UPackage.h"
+#include "Core/USystem.h"
+#include "Engine/UEngine.h"
 #include "Engine/UMusic.h"
 
+/*-----------------------------------------------------------------------------
+ * FMusicPlayer
+-----------------------------------------------------------------------------*/
+FMusicPlayer::FMusicPlayer()
+{
+  CurrentTrack = NULL;
+  QueuedTrack = NULL;
+  CurrentSection = 255;
+  QueuedSection = 255;
+  float CurrentVolume = 0.0f;
+  float TargetVolume = 0.0f;
+  CurrentTransition = MTRAN_None;
+  bTransitioning = false;
+  RequestExit = 0;
+  ThreadErr = 0;
+
+  MusicThread = GSystem->RunThread( StaticThreadFunc, this );
+  if ( MusicThread == NULL )
+    GLogf( LOG_CRIT, "Failed to initialize music player thread" );
+}
+
+FMusicPlayer::~FMusicPlayer()
+{
+  RequestExit = 1;
+ // while ( GSystem->IsThreadActive( MusicThread ) );
+}
+
+int FMusicPlayer::GetStatus()
+{
+  return ThreadErr;
+}
+
+void FMusicPlayer::ClearStatus()
+{
+  ThreadErr = 0;
+}
+
+void FMusicPlayer::Play( UMusic* Music, int SongSection, EMusicTransition Transition )
+{
+  QueuedTrack = Music;
+  QueuedSection = SongSection;
+  CurrentTransition = Transition;
+  bTransitioning = true;
+}
+
+void FMusicPlayer::Stop( EMusicTransition Transition )
+{
+  QueuedTrack = NULL;
+  QueuedSection = 255;
+  CurrentTransition = Transition;
+  bTransitioning = true;
+}
+
+float FMusicPlayer::GetCurrentVolume()
+{
+  return CurrentVolume;
+}
+
+ThreadReturnType FMusicPlayer::StaticThreadFunc( void* Args )
+{
+  return ((FMusicPlayer*)Args)->PlayerThread();
+}
+
+#define FRAME_COUNT 32
+ThreadReturnType FMusicPlayer::PlayerThread()
+{
+  bool bSongChanged = false;
+  double LastTime = USystem::GetSeconds();
+  double CurrentTime = 0.0;
+  int* RenderBuffer = new int[FRAME_COUNT];
+
+  UAudioSubsystem* Audio = GEngine->Audio;
+  if ( Audio == NULL )
+  {
+    ThreadErr = ERR_NO_AUDIO_DEVICE;
+    return -1;
+  }
+
+  // Don't exit until RequestExit has been set
+  while ( !RequestExit )
+  {
+    if ( ThreadErr < 0 )
+      continue;
+
+    LastTime = CurrentTime;
+    CurrentTime = USystem::GetSeconds();
+    float DeltaTime = CurrentTime - LastTime;
+    bool bSetFadeTime = false;
+
+    // Handle currently playing track
+    if ( CurrentTrack != NULL )
+    {
+      // Render music frames and play back
+      RenderMusic( RenderBuffer, FRAME_COUNT );
+      GEngine->Audio->PlayMusicBuffer( RenderBuffer, FRAME_COUNT );
+
+      // Handle music transition if needed
+      if ( bTransitioning )
+      {
+        // TODO: Settle on values that sound similar to UE1
+        float FadeRate = 0.0f;
+        if ( !bSetFadeTime )
+        {
+          switch ( CurrentTransition )
+          {
+          case MTRAN_None:
+          case MTRAN_Instant:
+          case MTRAN_Segue:
+            FadeRate = 1000.0f;
+            break;
+          case MTRAN_Fade:
+            FadeRate = 0.5f;
+            break;
+          case MTRAN_SlowFade:
+            FadeRate = 0.25f;
+            break;
+          case MTRAN_FastFade:
+            FadeRate = 0.75f;
+            break;
+          }
+          bSetFadeTime = true;
+        }
+
+        // Adjust volume
+        if ( CurrentTrack != QueuedTrack || CurrentSection != QueuedSection )
+          CurrentVolume -= FadeRate * DeltaTime;
+        else
+          CurrentVolume += FadeRate * DeltaTime;
+
+        // Adjust music state if fade in or out is completed
+        if ( CurrentVolume <= FLT_EPSILON )
+        {
+          if ( CurrentTrack != QueuedTrack )
+          {
+            // Unload current track and set up new track
+            UnregisterMusic( CurrentTrack );
+
+            // Handle music stop if needed
+            if ( QueuedTrack == NULL )
+            {
+              CurrentSection = 255;
+              continue;
+            }
+
+            CurrentTrack = QueuedTrack;
+            RegisterMusic( CurrentTrack );
+          }
+          else if ( CurrentSection != QueuedSection )
+          {
+            // !!! Handle section change
+          }
+          CurrentVolume = 0.0f;
+        }
+        else if ( fabsf( CurrentVolume - TargetVolume ) <= FLT_EPSILON )
+        {
+          // Fade in ended, thus ending fade sequence
+          CurrentTransition = MTRAN_None;
+          CurrentVolume = 1.0f;
+          bSetFadeTime = false;
+          bTransitioning = false;
+        }
+      }
+    }
+
+    // Handle queued track when no other track is playing
+    else if ( QueuedTrack != NULL )
+    {
+      RegisterMusic( QueuedTrack );
+      CurrentTrack = QueuedTrack;
+      CurrentSection = QueuedSection;
+      bTransitioning = true;
+    }
+  }
+
+  // TODO: Exit thread
+  delete[] RenderBuffer;
+  return 0;
+}
+
+void FMusicPlayer::RegisterMusic( UMusic* Music )
+{
+}
+
+void FMusicPlayer::UnregisterMusic( UMusic* Music )
+{
+}
+
+void FMusicPlayer::RenderMusic( int* Buf, size_t Size )
+{
+}
+
+/*-----------------------------------------------------------------------------
+ * UMusic
+-----------------------------------------------------------------------------*/
 UMusic::UMusic()
 {
   MusicType = 0; // Index 0 in a package's name table always points to music type

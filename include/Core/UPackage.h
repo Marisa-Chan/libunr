@@ -149,7 +149,6 @@ class LIBUNR_API UPackage : public UObject
   TArray<FNameEntry>& GetNameTable();
   TArray<FExport>& GetExportTable();
   TArray<FImport>& GetImportTable();
-  u32             GetGlobalName( u32 PkgNameIdx );
   const char*     GetFilePath();
   const char*     GetFileName();
   FString*        GetFullObjName( FExport* ObjExp );
@@ -157,13 +156,11 @@ class LIBUNR_API UPackage : public UObject
   void            LoadEditableTypes();
 
   size_t AddName( const char* Name );
-  size_t FindName( const char* Name );
+  size_t FindLocalName( const char* Name );
   
   // Name resolution
   const char* ResolveNameFromIdx( idx Index );
   const char* ResolveNameFromObjRef( int ObjRef );
-  FName ResolveGlobalNameIdx( idx Index );
-  FName ResolveGlobalNameObjRef( int ObjRef );
 
   // Accessors 
   FPackageFileIn* GetStream();
@@ -178,7 +175,6 @@ class LIBUNR_API UPackage : public UObject
   FString Path;
   bool bIntrinsicPackage;
   UNativeModule* NativeModule; // May be NULL if there is no native component (or if package is intrinsic)
-  FNameEntry* NoneNameEntry;
 
 protected:    
   TArray<FNameEntry> Names;
@@ -186,7 +182,6 @@ protected:
   TArray<FImport>    Imports;
   FFileArchive* Stream;
   UPackageHeader Header;
-  u32 NameTableStart; // The index at which this package's name table appears in the global name table
 
   // Global package variables
   static EPkgLoadOpts LoadOpts;

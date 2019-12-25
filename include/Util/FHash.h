@@ -17,9 +17,12 @@
 \*===========================================================================*/
 
 /*========================================================================
- * FHash.h - FNV1 hash functionality
+ * FHash.h - SuperFastHash implementation
  * 
- * written by Adam 'Xaleros' Smith
+ * Original implementation by Paul Hsieh
+ * http://www.azillionmonkeys.com/qed/hash.html
+ *
+ * adapted to libunr by Adam 'Xaleros' Smith
  *========================================================================
 */
 
@@ -28,80 +31,5 @@
 #include <string.h>
 #include <ctype.h>
 
-#define FNV1A_HASH 0
-#define FNV1_HASH  1
-
-#if defined LIBUNR_64BIT
-  #define FNV_PRIME 1099511628211ULL
-  #define FNV_BASIS 14695981039346656037ULL
-
-  struct FHash
-  {
-    union
-    {
-      u64  FnvHash[2]; 
-    };
-  };
-
-#elif defined LIBUNR_32BIT
-  #define FNV_PRIME 16777619
-  #define FNV_BASIS 2166136261
-
-  struct FHash
-  {
-    union
-    {
-      u32 FnvHash[2];
-    };
-  };
-
-#endif
-
-static bool operator==( FHash A, FHash B )
-{
-  return ( A.FnvHash[0] == B.FnvHash[0] &&
-           A.FnvHash[1] == B.FnvHash[1] );
-}
-
-static bool operator!=( FHash A, FHash B )
-{
-  return ( A.FnvHash[0] != B.FnvHash[0] || 
-           A.FnvHash[1] != B.FnvHash[1] );
-}
-
-static inline FHash FnvHash( const void* Data, size_t Len )
-{
-  FHash Hash;
-  Hash.FnvHash[FNV1A_HASH] = Hash.FnvHash[FNV1_HASH] = FNV_BASIS;
-
-  for (int i = 0; i < Len; i++) 
-  {
-    Hash.FnvHash[FNV1A_HASH] ^= ((u8*)Data)[i];
-    Hash.FnvHash[FNV1A_HASH] *= FNV_PRIME;
-
-    Hash.FnvHash[FNV1_HASH] *= FNV_PRIME;
-    Hash.FnvHash[FNV1_HASH] ^= ((u8*)Data)[i];
-  }
-  return Hash;
-}
-
-static inline FHash FnvHashString( const char* Data )
-{
-  FHash Hash;
-  Hash.FnvHash[FNV1A_HASH] = Hash.FnvHash[FNV1_HASH] = FNV_BASIS;
-
-  size_t Len = strlen( Data );
-  for (int i = 0; i < Len; i++) 
-  {
-    u8 ConvData = isalpha( Data[i] ) ? toupper( Data[i] ) : Data[i];
-    Hash.FnvHash[FNV1A_HASH] ^= ConvData;
-    Hash.FnvHash[FNV1A_HASH] *= FNV_PRIME;
-
-    Hash.FnvHash[FNV1_HASH] *= FNV_PRIME;
-    Hash.FnvHash[FNV1_HASH] ^= ConvData;
-  }
-  return Hash;
-}
-
-#define ZERO_HASH {0, 0}
-
+LIBUNR_API u32 SuperFastHash( const char* Data, size_t Len );
+LIBUNR_API u32 SuperFastHashString( const char* Text, size_t Len = 0 );

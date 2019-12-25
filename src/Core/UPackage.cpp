@@ -275,7 +275,7 @@ UPackage::UPackage( const char* InName, UNativeModule* InNativeModule )
   bIntrinsicPackage = false;
   Stream = NULL;
 
-  Name = FName::CreateName( InName, RF_LoadContextFlags );
+  Name = FName( InName, RF_LoadContextFlags );
   NativeModule = InNativeModule;
   Header.Initialize();
 }
@@ -321,17 +321,13 @@ bool UPackage::Load( const char* File )
   }
 
   // read in the name table
-  TArray<FNameEntry*>* GNameTable = GetGlobalNameTable();
-  NameTableStart = GNameTable->Size();
   Names.Resize( Header.NameCount );
   PackageFile->Seek( Header.NameOffset, ESeekBase::Begin );
   for ( int i = 0; i < Header.NameCount; i++ )
   {
     FNameEntry* NameEntry = &Names[i];
     *PackageFile >> *NameEntry;
-    GNameTable->PushBack( NameEntry );
   }
-  NoneNameEntry = &Names[FindName("None")];
   
   // read in imports
   Imports.Resize( Header.ImportCount );
@@ -378,13 +374,13 @@ FNameEntry* UPackage::GetNameEntry( size_t Index )
 FNameEntry* UPackage::GetNameEntryByObjRef( int ObjRef )
 {
   if ( ObjRef == 0 )
-    return NoneNameEntry;
+    return (FNameEntry*)FName( NAME_None ).Entry();
 
   int Index;
   if ( ObjRef < 0 )
-    Index = Imports[(-ObjRef)-1].ObjectName;
+    Index = Imports[(size_t)(-ObjRef)-1].ObjectName;
   else if ( ObjRef > 0 )
-    Index = Exports[ObjRef-1].ObjectName;
+    Index = Exports[(size_t)ObjRef-1].ObjectName;
   
   return &Names[Index];
 }
@@ -426,7 +422,7 @@ FExport* UPackage::GetClassExport( const char* ExportName )
 {
   // Find the name in this package's name table
   int NameIndex = -1;
-  FHash NameHash = FnvHashString( ExportName );
+  u32 NameHash = SuperFastHashString( ExportName );
   for ( int i = 0; i < Names.Size(); i++ )
   {
     if ( NameHash == Names[i].Hash )
@@ -456,11 +452,6 @@ FExport* UPackage::GetClassExport( const char* ExportName )
 TArray<FExport>& UPackage::GetExportTable()
 {
   return Exports;
-}
-
-u32 UPackage::GetGlobalName( u32 PkgNameIdx )
-{
-  return NameTableStart + PkgNameIdx;
 }
 
 TArray<FImport>& UPackage::GetImportTable()
@@ -509,14 +500,14 @@ FString* UPackage::GetFullObjName( FExport* ObjExp )
   return ObjName;
 }
 
-size_t UPackage::FindName( const char* Name )
+size_t UPackage::FindLocalName( const char* Name )
 {
   for ( int i = 0; i < Names.Size(); i++ )
   {
     if ( stricmp( Names[i].Data, Name ) == 0 )
       return i;
   }
-  
+
   return MAX_SIZE;
 }
 
@@ -535,16 +526,6 @@ const char* UPackage::ResolveNameFromObjRef( int ObjRef )
     return GetNameEntry( GetExport( CalcObjRefValue( ObjRef ) )->ObjectName )->Data;
 }
 
-FName UPackage::ResolveGlobalNameObjRef( int ObjRef )
-{
-  if (ObjRef == 0)
-    return 0;
-  else if (ObjRef < 0)
-    return GetGlobalName( GetImport( CalcObjRefValue( ObjRef ) )->ObjectName );
-  else
-    return GetGlobalName( GetExport( CalcObjRefValue( ObjRef ) )->ObjectName ); 
-}
-
 FPackageFileIn* UPackage::GetStream()
 {
   return (FPackageFileIn*)Stream;
@@ -555,7 +536,7 @@ void UPackage::LoadEditableTypes()
   bool bDoGroupPathExport = false;
   const char* ClassName;
   const char* ObjName;
-  FHash ClassHash;
+  u32 ClassHash;
   const char* Types[] =
   {
     "None",
@@ -661,11 +642,7 @@ UPackage* UPackage::StaticLoadPackage( const char* PkgName, bool bSearch )
       return NULL;
     }
 
-    size_t PkgNameIdx = Pkg->FindName( ActualName );
-    Pkg->Name = (PkgNameIdx != MAX_SIZE)
-      ? FName( Pkg->GetGlobalName( PkgNameIdx ) )
-      : FName::CreateName( ActualName, RF_LoadContextFlags );
-
+    Pkg->Name = FName( ActualName, RF_LoadContextFlags );
     Packages->PushBack( Pkg );
   }
   else if ( Pkg->Stream == NULL )
@@ -678,10 +655,7 @@ UPackage* UPackage::StaticLoadPackage( const char* PkgName, bool bSearch )
       return NULL;
     }
 
-    size_t PkgNameIdx = Pkg->FindName( ActualName );
-    Pkg->Name = (PkgNameIdx != MAX_SIZE)
-      ? FName( Pkg->GetGlobalName( PkgNameIdx ) )
-      : FName::CreateName( ActualName, RF_LoadContextFlags );
+    Pkg->Name = FName( ActualName, RF_LoadContextFlags );
   }
 
   return Pkg;

@@ -774,8 +774,7 @@ FDependency::FDependency()
 // UClass
 void UClass::BootstrapStage1()
 {
-  int NameFlags = RF_TagExp | RF_HighlightedName | RF_LoadContextFlags | RF_Native;
-  ObjectClass = new UClass( FName::CreateName( "Class", NameFlags ), CLASS_NoExport, NULL, 
+  ObjectClass = new UClass( FName( NAME_Class ), CLASS_NoExport, NULL, 
       sizeof(UClass), UClass::NativeConstructor );
   ObjectClass->Class = ObjectClass;
   ObjectClass->bRegistered = true;
@@ -1070,7 +1069,7 @@ UObject* UClass::CreateObject( FName InName )
   else
     Out = Default->Clone();
 
-  if ( InName.Index != 0 )
+  if ( InName != NAME_None )
     Out->Name = InName;
   return Out;
 }

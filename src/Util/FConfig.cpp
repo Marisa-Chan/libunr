@@ -131,7 +131,7 @@ int FConfig::Load( const char* Filename )
   char ValueBuf[512];
   bool bIndexed = false;
   u32  Index = 0;
-  FHash PreviousHash = {0, 0};
+  u32  PreviousHash = 0;
   NumLines = 0;
 
   FFileArchiveIn IniFile;
@@ -211,7 +211,7 @@ int FConfig::Load( const char* Filename )
 
       Category = new FConfigCategory();
       Category->Name = strdup( CategoryBuf );
-      Category->Hash = FnvHashString( Category->Name );
+      Category->Hash = SuperFastHashString( Category->Name );
       Categories.PushBack( Category );
 
       ReadNewLine( IniFile, Filename );
@@ -262,7 +262,7 @@ int FConfig::Load( const char* Filename )
         return ERR_BAD_DATA;
       }
 
-      FHash VarHash = FnvHashString( VariableBuf );
+      u32 VarHash = SuperFastHashString( VariableBuf );
       if ( LIKELY( VarHash != PreviousHash ) )
       {
         Entry = new FConfigEntry();
@@ -414,8 +414,8 @@ char* FConfig::ReadString( const char* Category, const char* Variable, size_t In
 {
   FConfigCategory* CatIter = NULL;
   FConfigEntry* Entry = NULL;
-  FHash CatHash = FnvHashString( Category ); // meow
-  FHash VarHash = FnvHashString( Variable );
+  u32 CatHash = SuperFastHashString( Category ); // meow
+  u32 VarHash = SuperFastHashString( Variable );
 
   for ( size_t i = 0; i < Categories.size(); i++ )
   {
@@ -593,7 +593,7 @@ void FConfig::WriteString( const char* Category, const char* Variable, const cha
 {
   FConfigCategory* Cat = NULL; // meow
   FConfigEntry* Entry = NULL;
-  FHash CatHash = FnvHashString( Category );
+  u32 CatHash = SuperFastHashString( Category );
   for ( size_t i = 0; i < Categories.size(); i++ )
   {
     FConfigCategory* CatIter = Categories[i];
@@ -611,7 +611,7 @@ void FConfig::WriteString( const char* Category, const char* Variable, const cha
     Cat->Hash = CatHash;
   }
 
-  FHash VarHash = FnvHashString( Variable );
+  u32 VarHash = SuperFastHashString( Variable );
   for ( size_t j = 0; j < Cat->Entries->size(); j++ )
   {
     FConfigEntry* EntryIter = (*Cat->Entries)[j];
@@ -644,13 +644,13 @@ TArray<char*>* FConfig::CreateEntry( const char* Category, const char* Variable 
 {
   FConfigCategory* CatIter;
   FConfigEntry* Entry;
-  FHash CatHash = FnvHashString( Category ); // meow
+  u32 CatHash = SuperFastHashString( Category ); // meow
   for ( size_t i = 0; i < Categories.size(); i++ )
   {
     CatIter = Categories[i];
     if ( CatIter->Hash == CatHash )
     {
-      FHash VarHash = FnvHashString( Variable );
+      u32 VarHash = SuperFastHashString( Variable );
       for ( size_t j = 0; j < CatIter->Entries->size(); j++ )
       {
         Entry = (*CatIter->Entries)[j];
@@ -663,13 +663,13 @@ TArray<char*>* FConfig::CreateEntry( const char* Category, const char* Variable 
 
   CatIter = new FConfigCategory();
   CatIter->Name = strdup( Category );
-  CatIter->Hash = FnvHashString( CatIter->Name );
+  CatIter->Hash = SuperFastHashString( CatIter->Name );
   Categories.PushBack( CatIter );
 
 makeEntry:
   Entry = new FConfigEntry();
   Entry->Name = strdup( Variable );
-  Entry->Hash = FnvHashString( Entry->Name );
+  Entry->Hash = SuperFastHashString( Entry->Name );
   CatIter->Entries->PushBack( Entry );
   return Entry->Values;
 }
@@ -682,7 +682,7 @@ const char* FConfig::GetName()
 FConfig::FConfigEntry::FConfigEntry()
 {
   Name = NULL;
-  Hash = ZERO_HASH;
+  Hash = 0;
   Values = new TArray<char*>();
   StructVars = NULL;
   bWriteIndices = false; // TODO: Make libunr.ini option
@@ -706,7 +706,7 @@ FConfig::FConfigEntry::~FConfigEntry()
 FConfig::FConfigCategory::FConfigCategory()
 {
   Name = NULL;
-  Hash = ZERO_HASH;
+  Hash = 0;
   Entries = new TArray<FConfigEntry*>();
   //Entries->Reserve( 4 );
 }

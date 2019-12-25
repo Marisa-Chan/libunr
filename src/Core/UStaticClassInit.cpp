@@ -87,16 +87,14 @@ bool UObject::StaticInit()
   ClassPool  = TArray<UClass*> ();
   NativePropertyLists = TArray<FNativePropertyList*>();
   NativeFunctions = TArray<UFunction*>();
-  NameTable = TArray<FNameEntry*>();
 
   ObjectPool.Reserve( 64 );
   ClassPool.Reserve( 128 );
   NativePropertyLists.Reserve( 64 );
   NativeFunctions.Reserve( 4096 );
-  NameTable.Reserve( 16384 );
 
-  // Index 0 must always have "None"
-  FName::CreateName( "None", RF_TagExp | RF_LoadContextFlags | RF_Native );
+  // Initialize name table system
+  FName::StaticInit();
 
   // Create the "class" class first, everything else depends on it
   UClass::BootstrapStage1();

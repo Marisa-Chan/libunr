@@ -131,6 +131,8 @@ private: \
 
 #define TEXT(s) #s
 
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof(*a))
+
 // Timers
 #include <time.h>
 #if defined __linux__

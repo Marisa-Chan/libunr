@@ -27,6 +27,7 @@
 #pragma once
 
 #include "Core/UObject.h"
+#include "Core/USystem.h"
 
 enum EMusicTransition
 {
@@ -37,6 +38,16 @@ enum EMusicTransition
 	MTRAN_FastFade,
 	MTRAN_SlowFade,
 };
+
+#define ERR_LIBXMP_LOAD_FAILED -1
+#define ERR_LIBXMP_START_PLAY_FAILED -2
+#define ERR_LIBXMP_PLAY_BUF_FAILED -3
+#define ERR_NO_AUDIO_DEVICE -4
+
+/*-----------------------------------------------------------------------------
+ * UMusic
+ * Contains data about a music file
+-----------------------------------------------------------------------------*/
 
 class LIBUNR_API UMusic : public UObject
 {
@@ -51,7 +62,45 @@ class LIBUNR_API UMusic : public UObject
   idx   ChunkSize;
   u8*   ChunkData;
   FName MusicType;
+};
 
-  // Runtime Variables
-  void* RawHandle;
+/*-----------------------------------------------------------------------------
+ * FMusicPlayer
+ * Handles rendering of music on a separate thread
+ * Rendered music goes to the audio device
+-----------------------------------------------------------------------------*/
+class LIBUNR_API FMusicPlayer
+{
+public:
+
+  FMusicPlayer();
+  ~FMusicPlayer();
+
+  int GetStatus();
+  void ClearStatus();
+
+  void Play( UMusic* Music, int SongSection, EMusicTransition Transition );
+  void Stop( EMusicTransition Transition );
+  float GetCurrentVolume();
+
+protected:
+
+  static ThreadReturnType StaticThreadFunc( void* Args );
+
+  ThreadReturnType PlayerThread();
+  void RegisterMusic( UMusic* Music );
+  void UnregisterMusic( UMusic* Music );
+  void RenderMusic( int* Buf, size_t Size );
+
+  void* MusicThread;
+  UMusic* CurrentTrack;
+  UMusic* QueuedTrack;
+  int CurrentSection;
+  int QueuedSection;
+  float CurrentVolume;
+  float TargetVolume;
+  EMusicTransition CurrentTransition;
+  bool bTransitioning;
+  int RequestExit;
+  int ThreadErr;
 };

@@ -87,7 +87,7 @@ bool UEngine::Init()
       return false;
     }
 
-    Audio = (UAudioSubsystem*)AudioDevice->CreateObject( FName::CreateName( "Audio", RF_Native ) );
+    Audio = (UAudioSubsystem*)AudioDevice->CreateObject( FName( "Audio", RF_Native ) );
     if ( !Audio->Init() )
     {
       GLogf( LOG_ERR, "Audio device initialization failed" );

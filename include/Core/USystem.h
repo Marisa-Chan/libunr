@@ -54,6 +54,17 @@ typedef int(*GamePromptCallback)( TArray<char*>* );
 // Prompt callback for if audio/render devices have not been picked
 typedef void(*DevicePromptCallback)(char*, char*); // RenderBuf, AudioBuf
 
+// Function typedef for starting new threads
+#if defined LIBUNR_WIN32
+  typedef unsigned long ThreadReturnType;
+#elif defined LIBUNR_POSIX
+  typedef void* ThreadReturnType;
+#else
+  #error "Unknown operating system! Please add a section for ThreadReturnType in USystem.h"
+#endif
+
+typedef ThreadReturnType( *ThreadFunc )(void*);
+
 class LIBUNR_API USystem : public USubsystem
 {
   DECLARE_NATIVE_CLASS( USystem, USubsystem, CLASS_NoExport, Core )
@@ -65,6 +76,8 @@ class LIBUNR_API USystem : public USubsystem
 
   bool PromptForGameInfo( char* InGameName = NULL );
   bool PromptForDeviceInfo();
+  void* RunThread( ThreadFunc Func, void* Args );
+  bool IsThreadActive( void* Thread );
   
   // Global methods
   static bool StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool InIsEditor, char* InGameName = NULL );
@@ -76,6 +89,7 @@ class LIBUNR_API USystem : public USubsystem
   static void RealPath( const char* Path, char* FullPath, size_t FullPathSize );
   static bool MakeDir( const char* Path );
   static bool IsEditor();
+  static double GetSeconds();
 #if defined LIBUNR_POSIX
   static const char* GetHomeDir();
 #endif
@@ -104,6 +118,7 @@ class LIBUNR_API USystem : public USubsystem
 protected:
   GamePromptCallback DoGamePrompt;
   DevicePromptCallback DoDevicePrompt;
+  TArray<void*> Threads;
 
   // Runtime
   static bool bIsEditor;

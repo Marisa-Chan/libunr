@@ -237,9 +237,7 @@ bool UNameProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int R
 
   while ( Num )
   {
-    idx PkgNameIdx;
-    In >> CINDEX( PkgNameIdx );
-    *(FName*)Data = In.Pkg->GetGlobalName( PkgNameIdx );
+    In >>  *(FName*)Data;
 
     Data = PtrAdd( Data, ElementSize );
     Num -= ElementSize;

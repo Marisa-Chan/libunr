@@ -54,17 +54,26 @@ typedef signed long long i64;
 #define MIN_INT64 0x8000000000000000
 
 #if defined LIBUNR_64BIT
+
   #define MAX_SIZE MAX_UINT64
   #if defined __MINGW32__ || _MSC_VER
     typedef i64 ssize_t;
   #endif
+  typedef double real_t;
+
 #elif defined LIBUNR_32BIT
+
   #define MAX_SIZE MAX_UINT32
   #if defined __MINGW32__ || _MSC_VER
     typedef i32 ssize_t;
   #endif
-#endif
 
+  #if (_MSC_VER == 1200)
+    typedef float real_t;
+  #else
+    typedef double real_t;
+  #endif
+#endif
 
 // TODO: make type 'idx' cast automatically to FCompactIndex
 typedef i32 idx;

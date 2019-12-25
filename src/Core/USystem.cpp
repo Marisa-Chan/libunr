@@ -30,6 +30,7 @@
 #include "Util/FConfig.h"
 #include "Core/USystem.h"
 #include "Core/UPackage.h"
+#include "Engine/UMusic.h"
 
 #ifdef LIBUNR_WIN32
   #include <Windows.h>
@@ -244,6 +245,52 @@ bool USystem::PromptForGameInfo( char* InGameName )
   }
 
   return true;
+}
+
+void* USystem::RunThread( ThreadFunc Func, void* Args )
+{
+#if defined LIBUNR_WIN32
+
+  HANDLE Thread = CreateThread( NULL, 0, Func, Args, CREATE_SUSPENDED, NULL );
+  if ( Thread == NULL )
+  {
+    GLogf( LOG_ERR, "Failed to create thread (%i)", GetLastError() );
+    return false;
+  }
+
+  Threads.PushBack( Thread );
+
+  GLogf( LOG_ERR, "Starting thread at address %p", Func );
+  ResumeThread( Thread );
+
+  return Thread;
+
+#elif defined LIBUNR_POSIX
+
+  pthread_attr_t ThreadAttr;
+  pthread_t Thread;
+
+  if ( pthread_attr_init( &ThreadAttr ) < 0 )
+  {
+    GLogf( LOG_ERR, "Failed to initialize thread attributes (%i)", errno );
+    return false;
+  }
+
+  pthread_attr_setdetachstate( &ThreadAttr, PTRHEAD_CREATE_DETACHED );
+
+  if ( pthread_create( &Thread, &ThreadAttr, Func, Args ) < 0 )
+  {
+    GLogf( LOG_ERR, "Failed to create thread (%i)", GetLastError() );
+    return false;
+  }
+
+  // Will we get some racy behavior if the thread is added after it starts?
+  Threads.PushBack( Thread );
+  return Thread;
+
+#else
+  #error "Unknown operating system!Please add a section to USystem::RunThread()"
+#endif
 }
 
 bool USystem::IsEditor()
@@ -521,7 +568,6 @@ bool USystem::FileExists( const char* Filename )
 }
 
 // FIXME: Verify that a directory traversal backwards is actually possible
-// This code looks *VERY* exploitable at the moment...
 void USystem::RealPath( const char* Path, char* FullPath, size_t FullPathSize )
 {
   char CurrentFolder[128] = { 0 };
@@ -693,6 +739,30 @@ bool USystem::MakeDir( const char* Path )
   return true;
 }
 
+// TODO: Need to implement mechanisms for handling wraparound
+double USystem::GetSeconds()
+{
+#if defined LIBUNR_WIN32
+  #if (_WIN32_WINNT >= 0x0601)
+    u64 Time;
+    if ( !QueryUnbiasedInterruptTime( &Time ) )
+    {
+      GLogf( LOG_CRIT, "QueryUnbiasedInterruptTime failed! Aborting program" );
+      GSystem->Exit( -1 );
+    }
+    return (double)Time / 1000000000.0;
+  #else
+    u32 Time = timeGetTime();
+    return (double)Time / 1000.0;
+  #endif
+#elif defined LIBUNR_POSIX
+  timespec ts;
+  clock_gettime( CLOCK_REALTIME, &ts );
+  double Time = (double)ts.tv_sec + ((double)ts.tv_nsec / 1000000000.0);
+  return Time;
+#endif
+}
+
 #if defined LIBUNR_POSIX
 const char* USystem::GetHomeDir()
 {
@@ -736,7 +806,7 @@ bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool bIsEdito
   {
     GLogf( LOG_CRIT, "UObject::StaticInit() failed!" );
     return false;
-  } 
+  }
 
   return true;
 }

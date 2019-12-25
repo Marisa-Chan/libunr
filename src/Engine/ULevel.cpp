@@ -222,7 +222,7 @@ bool ULevel::ExportToFile( const char* Dir, const char* Type )
 
   // Temporarily change package name to MyLevel
   FName PkgName = Pkg->Name;
-  Pkg->Name = Pkg->GetGlobalName( Pkg->FindName( "MyLevel" ) );
+  Pkg->Name = FName( "MyLevel" );
 
   // Write beginning map
   Out->Printf( "Begin Map\r\n" );

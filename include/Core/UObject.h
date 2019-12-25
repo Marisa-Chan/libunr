@@ -124,6 +124,7 @@ enum EPropertyFlags
 // Flags describing an object instance.
 enum EObjectFlags
 {
+  RF_None           = 0,          // No flags
   RF_Transactional  = 0x00000001, // Object is transactional.
   RF_Unreachable    = 0x00000002, // Object is not reachable on the object graph.
   RF_Public         = 0x00000004, // Object is visible outside its package.
@@ -171,20 +172,20 @@ enum EObjectFlags
 
 struct FNativePropertyLink
 {
-  FHash Hash;
+  u32 Hash;
   u32 Offset;
 };
 
 class LIBUNR_API FNativePropertyList
 {
 public:
-  FNativePropertyList( FHash InHash, size_t InNum );
+  FNativePropertyList( u32 InHash, size_t InNum );
   ~FNativePropertyList();
   void AddProperty( const char* Name, u32 InOffset );
   void AppendList( FNativePropertyList* List );
 
   bool bInitialized;
-  FHash Hash;
+  u32 Hash;
   size_t Added;
   size_t Num;
   FNativePropertyLink* Properties;
@@ -259,7 +260,7 @@ public: \
     if (!StaticNativePropList) \
     { \
       const char* ClsName = TEXT(cls); \
-      StaticNativePropList = new FNativePropertyList( FnvHashString( ClsName + 1 ),\
+      StaticNativePropList = new FNativePropertyList( SuperFastHashString( ClsName + 1 ),\
         NumProperties ); \
       if ( StaticNativePropList != NULL ) \
       { \
@@ -332,12 +333,7 @@ public: \
       } \
       const char* ClsNameStr = TEXT(cls); \
       ClsNameStr++; \
-      size_t PkgNameIdx = ClsPkg->FindName( ClsNameStr ); \
-      FName ClsName = 0; \
-      if ( PkgNameIdx != MAX_SIZE ) \
-        ClsName = ClsPkg->GetGlobalName( PkgNameIdx ); \
-      else \
-        ClsName = FName::CreateName( ClsNameStr, RF_TagExp | RF_LoadContextFlags | RF_Native ); \
+      FName ClsName = FName( ClsNameStr, RF_TagExp | RF_LoadContextFlags | RF_Native, true ); \
       ObjectClass = UObject::StaticAllocateClass( ClsName, StaticFlags, Super::ObjectClass,\
         NativeSize, NativeConstructor ); \
       if ( ObjectClass != NULL ) \
@@ -398,7 +394,7 @@ bool cls::StaticLinkNativeProperties() \
     ExpProp->Outer = ExpCls; \
     ExpProp->Offset = OFFSET_OF( cls, prop ); \
     ExpProp->Next = ExpCls->Children; \
-    ExpProp->Name = FName::CreateName( TEXT(prop), RF_TagExp | RF_LoadContextFlags ); \
+    ExpProp->Name = FName( TEXT(prop), RF_TagExp | RF_LoadContextFlags ); \
     ExpProp->ObjectFlags = RF_Native; \
     ExpProp->RefCnt = 1; \
     ExpProp->Class = ptype::StaticClass(); \
@@ -461,7 +457,7 @@ public:
   static TArray<UClass*>* GetGlobalClassPool();
   static TArray<FNativePropertyList*>* GetGlobalNativePropertyLists();
   static TArray<UFunction*>* GetGlobalNativeFunctions();
-  static TArray<FNameEntry*>* GetGlobalNameTable();
+  //static TArray<FNameEntry*>* GetGlobalNameTable();
 
   FName     Name;     // Name of the object stored in the global name table 
   int       Index;    // Index of the object in object pool
@@ -505,7 +501,7 @@ private:
   static TArray<UClass*>  ClassPool;
   static TArray<FNativePropertyList*> NativePropertyLists;
   static TArray<UFunction*> NativeFunctions;
-  static TArray<FNameEntry*> NameTable;
+  //static TArray<FNameEntry*> NameTable;
 };
 
 template <class T> T* SafeCast( UObject* Obj )

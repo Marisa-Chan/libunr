@@ -97,7 +97,7 @@ private:
     ~FConfigEntry();
 
     char*  Name;
-    FHash  Hash;
+    u32  Hash;
     TArray<char*>* Values;
     TArray<FConfigEntry*>* StructVars;
     bool bWriteIndices;
@@ -108,8 +108,8 @@ private:
     FConfigCategory();
     ~FConfigCategory();
 
-    char*  Name;
-    FHash  Hash;
+    char* Name;
+    u32   Hash;
     TArray<FConfigEntry*>* Entries;
   };
 

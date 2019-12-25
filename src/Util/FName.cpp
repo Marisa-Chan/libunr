@@ -24,10 +24,20 @@
 */
 
 #include <stdarg.h>
+#include "Core/UObject.h"
 #include "Util/FName.h"
 #include "Util/FHash.h"
 #include "Core/USystem.h"
 #include "Core/UPackage.h"
+
+static const char* PredefinedNames[] =
+{
+  #define xx(n) #n,
+  #include "Util/FRegisteredNames.h"
+  #undef xx
+};
+
+FName::FNameTableManager FName::NameTableManager;
 
 /*-----------------------------------------------------------------------------
  * FNameEntry
@@ -35,16 +45,16 @@
 FNameEntry::FNameEntry()
 {
   memset( Data, 0, NAME_LEN );
-  Hash = ZERO_HASH;
+  Hash = 0;
   Flags = 0;
 }
 
-FNameEntry::FNameEntry( const char* InStr, int InFlags )
+FNameEntry::FNameEntry( const char* InStr, u32 Hash, int InFlags )
 {
   strncpy( Data, InStr, NAME_LEN );
   Data[NAME_LEN-1] = '\0';
   Flags = InFlags;
-  Hash = FnvHashString( Data );
+  Hash = (Hash) ? Hash : SuperFastHashString( InStr );
 }
 
 FNameEntry::~FNameEntry()
@@ -73,7 +83,7 @@ FPackageFileIn& operator>>( FPackageFileIn& In, FNameEntry& Name )
       In.Read( Name.Data, len );
   }
   In >> Name.Flags;
-  Name.Hash = FnvHashString( Name.Data );
+  Name.Hash = SuperFastHashString( Name.Data );
   return In;
 }
 
@@ -92,44 +102,163 @@ FPackageFileOut& operator<<( FPackageFileOut& Out, FNameEntry& Name )
   return Out;
 }
 
+bool operator==( FNameEntry& A, FNameEntry& B )
+{
+  return (A.Hash == B.Hash) && (stricmp( A.Data, B.Data ) == 0);
+}
+
+bool operator!=( FNameEntry& A, FNameEntry& B )
+{
+  return (A.Hash != B.Hash) || (stricmp( A.Data, B.Data ) != 0);
+}
+
 /*-----------------------------------------------------------------------------
  * FName
 -----------------------------------------------------------------------------*/
-FName FName::CreateName( const char* InName, int InFlags )
-{
-  TArray<FNameEntry*>* GNameTable = UObject::GetGlobalNameTable();
-  FNameEntry* NewEntry = new FNameEntry( InName, InFlags );
-  FName Out = GNameTable->Size();
-  GNameTable->PushBack( NewEntry );
-  return Out;
-}
 
 const char* FName::Data() const
 {
-  return (*UObject::GetGlobalNameTable())[Index]->Data;
+  return NameTableManager.Entries[Index].Data;
 }
 
-const FHash& FName::Hash() const
+const u32 FName::Hash() const
 {
-  return (*UObject::GetGlobalNameTable())[Index]->Hash;
+  return NameTableManager.Entries[Index].Hash;
+}
+
+const FNameEntry* FName::Entry() const
+{
+  return &NameTableManager.Entries[Index];
 }
 
 bool operator==( FName& A, FName& B )
 {
-  return (*UObject::GetGlobalNameTable())[A.Index]->Hash == (*UObject::GetGlobalNameTable())[B.Index]->Hash;
+  return A.Index == B.Index;
 }
 
 bool operator!=( FName& A, FName& B )
 {
-  return (*UObject::GetGlobalNameTable())[A.Index]->Hash != (*UObject::GetGlobalNameTable())[B.Index]->Hash;
+  return A.Index != B.Index;
 }
 
 LIBUNR_API FPackageFileIn& operator>>( FPackageFileIn& In, FName& Name )
 {
   idx NameIdx;
   In >> CINDEX( NameIdx );
-  Name = In.Pkg->GetGlobalName( NameIdx );
+
+  FNameEntry& NameEntry = (In.Pkg->GetNameTable())[NameIdx];
+  Name = FName::NameTableManager.FindName( NameEntry, true );
   return In;
 }
 
+/*-----------------------------------------------------------------------------
+ * FNameTableManager
+-----------------------------------------------------------------------------*/
+u32 FName::FNameTableManager::FindName( FNameEntry& Entry, bool Create )
+{
+  u32 Bucket;
+  int Scanner;
+
+  Bucket = Entry.Hash % HASH_SIZE;
+  Scanner = Buckets[Bucket];
+
+  while ( Scanner >= 0 )
+  {
+    if ( Entries[Scanner] == Entry )
+      return Scanner;
+
+    Scanner = Entries[Scanner].NextHash;
+  }
+
+  if ( !Create )
+    return NAME_None;
+
+  return AddName( Entry, Bucket );
+}
+
+u32 FName::FNameTableManager::FindName( const char* Text, int Flags, bool Create )
+{
+  if ( Text == NULL )
+    return NAME_None;
+
+  size_t Len = strlen( Text );
+  if ( Len == 0 )
+    return NAME_None;
+
+  u32 Hash = SuperFastHashString( Text, Len );
+  u32 Bucket = Hash % HASH_SIZE;
+  int Scanner = Buckets[Bucket];
+
+  while ( Scanner >= 0 )
+  {
+    if ( Entries[Scanner].Hash == Hash && stricmp( Entries[Scanner].Data, Text ) == 0 )
+      return Scanner;
+
+    Scanner = Entries[Scanner].NextHash;
+  }
+
+  if ( !Create )
+    return NAME_None;
+
+  return AddName( Text, Len, Hash, Flags, Bucket );
+}
+
+u32 FName::FNameTableManager::FindName( const char* Text, size_t Len, int Flags, bool Create )
+{
+  if ( Text == NULL )
+    return NAME_None;
+
+  if ( Len == 0 )
+    return NAME_None;
+
+  u32 Hash = SuperFastHashString( Text, Len );
+  u32 Bucket = Hash % HASH_SIZE;
+  int Scanner = Buckets[Bucket];
+
+  while ( Scanner >= 0 )
+  {
+    if ( Entries[Scanner].Hash == Hash && stricmp( Entries[Scanner].Data, Text ) == 0 )
+      return Scanner;
+
+    Scanner = Entries[Scanner].NextHash;
+  }
+
+  if ( !Create )
+    return NAME_None;
+
+  return AddName( Text, Len, Hash, Flags, Bucket );
+}
+
+u32 FName::FNameTableManager::AddName( FNameEntry& Entry, u32 Bucket )
+{
+  Entries.PushBack( Entry );
+  Buckets[Bucket] = Entries.Size() - 1;
+  return Entries.Size() - 1;
+}
+
+u32 FName::FNameTableManager::AddName( const char* Text, size_t Len, u32 Hash, int Flags, u32 Bucket )
+{
+  FNameEntry TmpEntry( Text, Hash, Flags );
+  return AddName( TmpEntry, Bucket );
+}
+
+void FName::FNameTableManager::SetNameFlags( FName Name, int NewFlags )
+{
+  FNameEntry& NameEntry = Entries[Name];
+  NameEntry.Flags = NewFlags;
+}
+
+void FName::FNameTableManager::Init()
+{
+  memset( Buckets, -1, sizeof( Buckets ) );
+
+  // Add hardcoded names to table
+  for ( size_t i = 0; i < ARRAY_SIZE( PredefinedNames ); i++ )
+    FindName( PredefinedNames[i], (int)RF_Keep, true );
+}
+
+void FName::FNameTableManager::Exit()
+{
+  Entries.Clear();
+}
 
