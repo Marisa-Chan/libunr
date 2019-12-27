@@ -39,6 +39,7 @@
   #undef TEXT
   #define TEXT(s) #s
 #elif defined LIBUNR_POSIX
+  #include <pthread.h>
   #include <dirent.h>
   #include <pwd.h>
   #include <unistd.h>
@@ -276,17 +277,17 @@ void* USystem::RunThread( ThreadFunc Func, void* Args )
     return NULL;
   }
 
-  pthread_attr_setdetachstate( &ThreadAttr, PTRHEAD_CREATE_DETACHED );
+  pthread_attr_setdetachstate( &ThreadAttr, PTHREAD_CREATE_DETACHED );
 
   if ( pthread_create( &Thread, &ThreadAttr, Func, Args ) < 0 )
   {
-    GLogf( LOG_ERR, "Failed to create thread (%i)", GetLastError() );
+    GLogf( LOG_ERR, "Failed to create thread (%i)", errno );
     return NULL;
   }
 
   // Will we get some racy behavior if the thread is added after it starts?
-  Threads.PushBack( Thread );
-  return Thread;
+  Threads.PushBack( (void*)Thread );
+  return (void*)Thread;
 
 #else
   #error "Unknown operating system!Please add a section to USystem::RunThread()"
