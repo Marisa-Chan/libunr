@@ -54,6 +54,7 @@ class LIBUNR_API UAudioSubsystem : public USubsystem
   // Music playback logic should be consistent across all audio devices
   void PlayMusic( UMusic* Music, int SongSection, EMusicTransition MusicTrans );
   void StopMusic( EMusicTransition MusicTrans );
+  float GetCurrentMusicVolume();
     
   u8 SoundVolume;
   u8 MusicVolume;

@@ -61,12 +61,11 @@ void UAudioSubsystem::PlayMusic( UMusic* Music, int SongSection, EMusicTransitio
 void UAudioSubsystem::StopMusic( EMusicTransition MusicTrans )
 {
   MusicPlayer->Stop( MusicTrans );
-  /*
-  QueuedTrack = NULL;
-  QueuedSection = 255;
-  CurrentTransition = MusicTrans;
-  bTransitioning = true;
-  */
+}
+
+float UAudioSubsystem::GetCurrentMusicVolume()
+{
+  return MusicPlayer->GetCurrentVolume();
 }
 
 #include "Core/UClass.h"
