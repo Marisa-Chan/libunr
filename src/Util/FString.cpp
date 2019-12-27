@@ -99,10 +99,10 @@ LIBUNR_API FPackageFileIn& operator>>( FPackageFileIn& In, FString& Str )
     // representable characters?
     Size = -Size;
 
-    wchar_t* TextBuf = new wchar_t[Size + 1];
-    In.Read( TextBuf, (Size + 1) * 2 );
+    wchar_t* TextBuf = new wchar_t[Size];
+    In.Read( TextBuf, (Size) * 2 );
 
-    char* MbsText = new char[Size + 1];
+    char* MbsText = new char[Size];
     wcstombs( MbsText, TextBuf, Size );
 
     Str.Assign( MbsText );
