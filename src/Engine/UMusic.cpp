@@ -152,10 +152,7 @@ ThreadReturnType FMusicPlayer::PlayerThread()
 
   UAudioSubsystem* Audio = GEngine->Audio;
   if ( Audio == NULL )
-  {
     ThreadErr = ERR_NO_AUDIO_DEVICE;
-    return -1;
-  }
 
   // Don't exit until RequestExit has been set
   while ( !RequestExit )
@@ -255,7 +252,7 @@ ThreadReturnType FMusicPlayer::PlayerThread()
 
   // TODO: Exit thread
   delete[] RenderBuffer;
-  return 0;
+  return THREAD_SUCCESS;
 }
 
 void FMusicPlayer::RegisterMusic( UMusic* Music )

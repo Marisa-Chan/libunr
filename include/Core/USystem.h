@@ -57,8 +57,10 @@ typedef void(*DevicePromptCallback)(char*, char*); // RenderBuf, AudioBuf
 // Function typedef for starting new threads
 #if defined LIBUNR_WIN32
   typedef unsigned long ThreadReturnType;
+  #define THREAD_SUCCESS 0
 #elif defined LIBUNR_POSIX
   typedef void* ThreadReturnType;
+  #define THREAD_SUCCESS NULL
 #else
   #error "Unknown operating system! Please add a section for ThreadReturnType in USystem.h"
 #endif
