@@ -255,7 +255,7 @@ void* USystem::RunThread( ThreadFunc Func, void* Args )
   if ( Thread == NULL )
   {
     GLogf( LOG_ERR, "Failed to create thread (%i)", GetLastError() );
-    return false;
+    return NULL;
   }
 
   Threads.PushBack( Thread );
@@ -273,7 +273,7 @@ void* USystem::RunThread( ThreadFunc Func, void* Args )
   if ( pthread_attr_init( &ThreadAttr ) < 0 )
   {
     GLogf( LOG_ERR, "Failed to initialize thread attributes (%i)", errno );
-    return false;
+    return NULL;
   }
 
   pthread_attr_setdetachstate( &ThreadAttr, PTRHEAD_CREATE_DETACHED );
@@ -281,7 +281,7 @@ void* USystem::RunThread( ThreadFunc Func, void* Args )
   if ( pthread_create( &Thread, &ThreadAttr, Func, Args ) < 0 )
   {
     GLogf( LOG_ERR, "Failed to create thread (%i)", GetLastError() );
-    return false;
+    return NULL;
   }
 
   // Will we get some racy behavior if the thread is added after it starts?
