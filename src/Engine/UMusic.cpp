@@ -28,6 +28,56 @@
 #include "Core/USystem.h"
 #include "Engine/UEngine.h"
 #include "Engine/UMusic.h"
+#include <dumb.h>
+
+class FDumbMusic
+{
+public:
+  static DUMBFILE* DumbFile;
+  static DUH* Duh;
+  static DUH_SIGRENDERER* DuhRenderer;
+  static sample_t** Samples;
+  static long NumSamples;
+
+  static void RegisterMusic( UMusic* Music )
+  {
+    DumbFile = dumbfile_open_memory( (const char*)Music->ChunkData, Music->ChunkSize );
+    
+    switch ( Music->MusicType )
+    {
+    case NAME_It:
+      Duh = dumb_read_it_quick( DumbFile );
+      break;
+    case NAME_Xm:
+      Duh = dumb_read_xm_quick( DumbFile );
+      break;
+    case NAME_S3M:
+      Duh = dumb_read_s3m_quick( DumbFile );
+      break;
+    case NAME_Mod:
+      Duh = dumb_read_mod_quick( DumbFile, 0 );
+      break;
+    }
+
+    DuhRenderer = duh_start_sigrenderer( Duh, 0, 2, 0 );
+  }
+
+  static void UnregisterMusic( UMusic* Music )
+  {
+    duh_end_sigrenderer( DuhRenderer );
+    unload_duh( Duh );
+    dumbfile_close( DumbFile );
+
+    Duh = NULL;
+    DumbFile = NULL;
+    DuhRenderer = NULL;
+  }
+
+  static void RenderMusic( float* Buf, size_t Size )
+  {
+    duh_render_float( DuhRenderer, &Samples, &NumSamples, 16, 1.0, 65536.0f / GEngine->Audio->OutputRate, Size, Buf );
+  }
+};
 
 /*-----------------------------------------------------------------------------
  * FMusicPlayer
@@ -98,7 +148,7 @@ ThreadReturnType FMusicPlayer::PlayerThread()
   bool bSongChanged = false;
   double LastTime = USystem::GetSeconds();
   double CurrentTime = 0.0;
-  int* RenderBuffer = new int[FRAME_COUNT];
+  float* RenderBuffer = new float[FRAME_COUNT];
 
   UAudioSubsystem* Audio = GEngine->Audio;
   if ( Audio == NULL )
@@ -210,14 +260,41 @@ ThreadReturnType FMusicPlayer::PlayerThread()
 
 void FMusicPlayer::RegisterMusic( UMusic* Music )
 {
+  switch ( Music->MusicType )
+  {
+    case NAME_It:
+    case NAME_Xm:
+    case NAME_S3M:
+    case NAME_Mod:
+      FDumbMusic::RegisterMusic( Music );
+      break;
+  }
 }
 
 void FMusicPlayer::UnregisterMusic( UMusic* Music )
 {
+  switch ( Music->MusicType )
+  {
+    case NAME_It:
+    case NAME_Xm:
+    case NAME_S3M:
+    case NAME_Mod:
+      FDumbMusic::UnregisterMusic( Music );
+      break;
+  }
 }
 
-void FMusicPlayer::RenderMusic( int* Buf, size_t Size )
+void FMusicPlayer::RenderMusic( float* Buf, size_t Size )
 {
+  switch ( CurrentTrack->MusicType )
+  {
+  case NAME_It:
+  case NAME_Xm:
+  case NAME_S3M:
+  case NAME_Mod:
+    FDumbMusic::RenderMusic( Buf, Size );
+    break;
+  }
 }
 
 /*-----------------------------------------------------------------------------

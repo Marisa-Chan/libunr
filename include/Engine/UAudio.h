@@ -49,7 +49,7 @@ class LIBUNR_API UAudioSubsystem : public USubsystem
   virtual void RegisterSound( USound* Sound ) {}
   virtual void UnregisterSound( USound* Sound ) {}
   virtual bool PlaySound( AActor* Actor, USound* Sound, FVector Location, float Volume, float Radius, float Pitch )  { return false; }
-  virtual void PlayMusicBuffer( int* MusicBuffer, int NumSamples ) {}
+  virtual void PlayMusicBuffer( float* MusicBuffer, int NumSamples ) {}
   
   // Music playback logic should be consistent across all audio devices
   void PlayMusic( UMusic* Music, int SongSection, EMusicTransition MusicTrans );

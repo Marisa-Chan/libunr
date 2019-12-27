@@ -235,3 +235,13 @@
   xx( Progress )
   xx( UserPrompt )
   xx( ServerLog )
+
+  xx( It )
+  xx( Xm )
+  xx( S3M )
+  xx( Mod )
+  xx( Mp3 )
+  xx( Flac )
+  xx( Ogg )
+
+   

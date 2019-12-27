@@ -90,9 +90,10 @@ protected:
   ThreadReturnType PlayerThread();
   void RegisterMusic( UMusic* Music );
   void UnregisterMusic( UMusic* Music );
-  void RenderMusic( int* Buf, size_t Size );
+  void RenderMusic( float* Buf, size_t Size );
 
   void* MusicThread;
+  void* MusicHandle;
   UMusic* CurrentTrack;
   UMusic* QueuedTrack;
   int CurrentSection;
