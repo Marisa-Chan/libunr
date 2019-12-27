@@ -49,12 +49,13 @@ FNameEntry::FNameEntry()
   Flags = 0;
 }
 
-FNameEntry::FNameEntry( const char* InStr, u32 Hash, int InFlags )
+FNameEntry::FNameEntry( const char* InStr, u32 InHash, int InFlags )
 {
   strncpy( Data, InStr, NAME_LEN );
   Data[NAME_LEN-1] = '\0';
   Flags = InFlags;
-  Hash = (Hash) ? Hash : SuperFastHashString( InStr );
+  Hash = (InHash) ? InHash : SuperFastHashString( InStr );
+  NextHash = 0;
 }
 
 FNameEntry::~FNameEntry()
@@ -147,7 +148,7 @@ LIBUNR_API FPackageFileIn& operator>>( FPackageFileIn& In, FName& Name )
   In >> CINDEX( NameIdx );
 
   FNameEntry& NameEntry = (In.Pkg->GetNameTable())[NameIdx];
-  Name = FName::NameTableManager.FindName( NameEntry, true );
+  Name = FName( NameEntry, true );
   return In;
 }
 
@@ -231,8 +232,10 @@ u32 FName::FNameTableManager::FindName( const char* Text, size_t Len, int Flags,
 
 u32 FName::FNameTableManager::AddName( FNameEntry& Entry, u32 Bucket )
 {
+  Entry.NextHash = Buckets[Bucket];
+  Buckets[Bucket] = Entries.Size();
+
   Entries.PushBack( Entry );
-  Buckets[Bucket] = Entries.Size() - 1;
   return Entries.Size() - 1;
 }
 

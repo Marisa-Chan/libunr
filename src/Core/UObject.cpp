@@ -51,11 +51,9 @@ void FNativePropertyList::AddProperty( const char* Name, u32 Offset )
 {
   if ( LIKELY( Added < Num ) )
   {
-    char* UpperName = strupper( Name );
-    Properties[Added].Hash = SuperFastHashString( UpperName );
+    Properties[Added].Hash = SuperFastHashString( Name );
     Properties[Added].Offset = Offset;
     Added++;
-    free( UpperName );
   }
 }
 

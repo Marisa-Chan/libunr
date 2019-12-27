@@ -47,7 +47,7 @@ class LIBUNR_API FNameEntry
 {
 public:
    FNameEntry();
-   FNameEntry( const char* InStr, u32 Hash = 0, int InFlags = 0 );
+   FNameEntry( const char* InStr, u32 InHash = 0, int InFlags = 0 );
   ~FNameEntry();
   
   friend FPackageFileIn&  operator>>( FPackageFileIn& In,  FNameEntry& Name );
