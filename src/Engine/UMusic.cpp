@@ -79,6 +79,12 @@ public:
   }
 };
 
+DUMBFILE* FDumbMusic::DumbFile;
+DUH* FDumbMusic::Duh;
+DUH_SIGRENDERER* FDumbMusic::DuhRenderer;
+sample_t** FDumbMusic::Samples;
+long FDumbMusic::NumSamples;
+
 /*-----------------------------------------------------------------------------
  * FMusicPlayer
 -----------------------------------------------------------------------------*/

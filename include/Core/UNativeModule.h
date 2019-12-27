@@ -63,13 +63,13 @@
       if ( ClsPkg == NULL ) { \
         if ( StaticFlags & CLASS_NoExport ) { \
           ClsPkg = UPackage::StaticCreatePackage( NativePkgName, NULL ); \
-          ClsName = FName::CreateName( ClsNameStr, RF_LoadContextFlags | RF_Native ); \
+          ClsName = FName( ClsNameStr, RF_LoadContextFlags | RF_Native ); \
         } else { \
           GLogf( LOG_CRIT, "Failed to load package '%s' for class '%s'.", NativePkgName, ClsNameStr ); \
           return false; \
         } \
       } else { \
-        ClsName = ClsPkg->FindName( ClsNameStr ); \
+        ClsName = ClsPkg->FindLocalName( ClsNameStr ); \
         if ( ClsName == MAX_SIZE ) { \
           GLogf( LOG_CRIT, "Failed to find class '%s' in package '%s'", ClsNameStr, NativePkgName ); \
           return false; \
