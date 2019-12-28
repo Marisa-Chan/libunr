@@ -52,6 +52,7 @@
   #if defined __MINGW32__ && !defined __MINGW64__
     #define DLL_EXPORT __declspec(dllexport)
     #define LIBUNR_API __declspec(dllexport)
+    #define ALIGN(n) __declspec(align(n))
 	#elif defined __i386__
 		#define ftello ftello64
 		#define fseeko fseeko64
@@ -68,6 +69,8 @@
 
   #define DLL_EXPORT __declspec(dllexport)
   #define DLL_IMPORT __declspec(dllimport)
+
+  #define ALIGN(n) __declspec(align(n))
 
 #ifdef LIBUNR_EXPORTS
   #define LIBUNR_API DLL_EXPORT

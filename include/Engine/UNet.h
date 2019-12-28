@@ -63,6 +63,7 @@ class LIBUNR_API USecurityData : public UObject
     int IPEnd;
   };
 
+#pragma pack(push, 4)
   struct TempBanEntry
   {
     FString* ClientName;
@@ -79,6 +80,7 @@ class LIBUNR_API USecurityData : public UObject
     FString* ClientIdentNr;
     int IPAddress;
   };
+#pragma pack(pop)
 
   TArray<BanEntry>* BanList;
   TArray<TempBanEntry>* TempBanList;
