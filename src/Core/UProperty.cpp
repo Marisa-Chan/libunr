@@ -492,6 +492,10 @@ bool UStructProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int
   if ( Idx < 0 )
     Num *= ArrayDim;
 
+  bool bConfigOnly = false;
+  if ( Outer->Class == UArrayProperty::StaticClass() && ((UProperty*)Outer)->PropertyFlags & CPF_Config )
+    bConfigOnly = true;
+
   UField* Child = Struct->Children;
   while ( Num )
   {
@@ -504,7 +508,8 @@ bool UStructProperty::LoadDefaultProperty( void* ObjMem, FPackageFileIn& In, int
     if ( Child->IsA( UProperty::StaticClass() ) )
     {
       UProperty* ChildProp = (UProperty*)Child;
-      ChildProp->LoadDefaultProperty( Data, In, -1 );
+      if ( !bConfigOnly || (bConfigOnly && ChildProp->PropertyFlags & CPF_Config) )
+        ChildProp->LoadDefaultProperty( Data, In, -1 );
 
       Num -= ChildProp->ElementSize * ChildProp->ArrayDim;
     }
