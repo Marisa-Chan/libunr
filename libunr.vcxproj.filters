@@ -288,6 +288,9 @@
     <ClInclude Include="include\Util\FRegisteredNames.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="include\Util\TRingQueue.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Actors\AActor.cpp">

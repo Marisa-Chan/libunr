@@ -32,6 +32,15 @@ UAudioSubsystem::UAudioSubsystem()
   MusicVolume = 0;
   OutputRate = 0;
   SoundVolume = 0;
+
+  CurrentTrack = NULL;
+  QueuedTrack = NULL;
+  CurrentSection = 255;
+  QueuedSection = 255;
+  float CurrentVolume = 0.0f;
+  float TargetVolume = 0.0f;
+  CurrentTransition = MTRAN_None;
+  bTransitioning = false;
 }
 
 UAudioSubsystem::~UAudioSubsystem()
@@ -40,32 +49,126 @@ UAudioSubsystem::~UAudioSubsystem()
 
 bool UAudioSubsystem::Init()
 {
-  if ( MusicPlayer == NULL )
+  // Initialize music buffer and ring queue
+  MusicBuffer = new i16[MUSIC_BUFFER_COUNT * MUSIC_BUFFER_SIZE];
+  memset( MusicBuffer, 0, MUSIC_BUFFER_COUNT * MUSIC_BUFFER_SIZE * sizeof( i16 ) );
+
+  MusicQueue = new TRingQueue<i16*>( MUSIC_BUFFER_COUNT );
+
+  // Fill out each buffer slot in the queue
+  for ( int i = 0; i < MUSIC_BUFFER_COUNT; i++ )
   {
-    MusicPlayer = new FMusicPlayer();
-    if ( MusicPlayer == NULL )
+    MusicQueue->Push( &MusicBuffer[MUSIC_BUFFER_SIZE * i] );
+    MusicQueue->Pop();
+  }
+  return true;
+}
+
+void UAudioSubsystem::Tick( float DeltaTime )
+{
+  // Handle currently playing track
+  if ( CurrentTrack != NULL )
+  {
+    while ( MusicQueue->Size() < MUSIC_BUFFER_COUNT )
     {
-      GLogf( LOG_CRIT, "Failed to initialize music player" );
-      return false;
+      // Render a chunk of music
+      CurrentTrack->Stream->GetPCM( MusicQueue->GetNextFree(), MUSIC_BUFFER_SIZE );
+
+      // It's kind of an abuse of how a ring queue should work, 
+      // but it works fine for circular record keeping
+      MusicQueue->Push( MusicQueue->GetNextFree() );
+    }
+    PlayMusicBuffer();
+
+    // Handle music transition if needed
+    if ( bTransitioning )
+    {
+      // TODO: Settle on values that sound similar to UE1
+      if ( FadeRate == 0.0f )
+      {
+        switch ( CurrentTransition )
+        {
+        case MTRAN_None:
+        case MTRAN_Instant:
+        case MTRAN_Segue:
+          FadeRate = 10000000.0f;
+          break;
+        case MTRAN_Fade:
+          FadeRate = 0.5f;
+          break;
+        case MTRAN_SlowFade:
+          FadeRate = 0.25f;
+          break;
+        case MTRAN_FastFade:
+          FadeRate = 0.75f;
+          break;
+        }
+      }
+
+      // Adjust volume
+      if ( CurrentTrack != QueuedTrack || CurrentSection != QueuedSection )
+        CurrentVolume -= FadeRate * DeltaTime;
+      else
+        CurrentVolume += FadeRate * DeltaTime;
+
+      // Adjust music state if fade in or out is completed
+      if ( CurrentVolume <= FLT_EPSILON )
+      {
+        if ( CurrentTrack != QueuedTrack )
+        {
+          // Unload current track and set up new track
+          CurrentTrack->Stream->Exit();
+
+          // Handle music stop if needed
+          if ( QueuedTrack == NULL )
+          {
+            CurrentSection = 255;
+            return;
+          }
+
+          CurrentTrack = QueuedTrack;
+          CurrentTrack->Stream->Init( CurrentTrack );
+        }
+        else if ( CurrentSection != QueuedSection )
+        {
+          // !!! Handle section change
+        }
+        CurrentVolume = 0.0f;
+      }
+      else if ( fabsf( CurrentVolume - TargetVolume ) <= FLT_EPSILON )
+      {
+        // Fade in ended, thus ending fade sequence
+        CurrentTransition = MTRAN_None;
+        CurrentVolume = 1.0f;
+        FadeRate = 0.0f;
+        bTransitioning = false;
+      }
     }
   }
 
-  return true;
+  // Handle queued track when no other track is playing
+  else if ( QueuedTrack != NULL )
+  {
+    QueuedTrack->Stream->Init( QueuedTrack );
+    CurrentTrack = QueuedTrack;
+    CurrentSection = QueuedSection;
+  }
 }
 
 void UAudioSubsystem::PlayMusic( UMusic* Music, int SongSection, EMusicTransition MusicTrans )
 {
-  MusicPlayer->Play( Music, SongSection, MusicTrans );
+  QueuedTrack = Music;
+  QueuedSection = SongSection;
+  CurrentTransition = MusicTrans;
+  bTransitioning = true;
 }
 
 void UAudioSubsystem::StopMusic( EMusicTransition MusicTrans )
 {
-  MusicPlayer->Stop( MusicTrans );
-}
-
-float UAudioSubsystem::GetCurrentMusicVolume()
-{
-  return MusicPlayer->GetCurrentVolume();
+  QueuedTrack = NULL;
+  QueuedSection = 255;
+  CurrentTransition = MusicTrans;
+  bTransitioning = true;
 }
 
 #include "Core/UClass.h"

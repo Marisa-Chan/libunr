@@ -87,6 +87,7 @@ u32 SuperFastHash( const char* Data, size_t Len )
  * Case insensitive SuperFastHash for strings
  -----------------------------------------------------------------------------*/
 
+// TODO: Big endian version
 #define GET_16_BITS_I(d) ((((u32)tolower(((const u8 *)(d))[1])) << 8)\
                        +(u32)tolower(((const u8 *)(d))[0]) )
 

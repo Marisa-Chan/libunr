@@ -109,6 +109,9 @@ bool UEngine::Exit()
 
 void UEngine::Tick( float DeltaTime )
 {
+  if ( DeltaTime <= FLT_EPSILON )
+    DeltaTime = FLT_EPSILON;
+
   if ( Audio )
     Audio->Tick( DeltaTime );
 }

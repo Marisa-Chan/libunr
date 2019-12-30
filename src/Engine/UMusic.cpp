@@ -30,39 +30,40 @@
 #include "Engine/UMusic.h"
 #include <dumb.h>
 
-class FDumbMusic
+class FDumbMusicStream : public FMusicStream
 {
 public:
-  static DUMBFILE* DumbFile;
-  static DUH* Duh;
-  static DUH_SIGRENDERER* DuhRenderer;
-  static sample_t** Samples;
-  static long NumSamples;
+  DUMBFILE* DumbFile;
+  DUH* Duh;
+  DUH_SIGRENDERER* DuhRenderer;
 
-  static void RegisterMusic( UMusic* Music )
+  bool Init( UMusic* Music )
   {
     DumbFile = dumbfile_open_memory( (const char*)Music->ChunkData, Music->ChunkSize );
     
-    switch ( Music->MusicType )
-    {
-    case NAME_It:
+    // We can't rely on the music type because some tracks decided
+    // to have an incorrect name while the actual music is ImpulseTracker
+
+    // Check for ImpulseTracker, most likely scenario
+    if ( strnicmp( (const char*)Music->ChunkData, "IMPM", 4 ) == 0 )
       Duh = dumb_read_it_quick( DumbFile );
-      break;
-    case NAME_Xm:
+
+    // Check for XM, second most likely
+    else if ( strnicmp( (const char*)Music->ChunkData, "Extended module:", 16 ) == 0 )
       Duh = dumb_read_xm_quick( DumbFile );
-      break;
-    case NAME_S3M:
+
+    // At this point, we have to just hope that the type matches the actual format
+    else if ( Music->MusicType == NAME_S3M )
       Duh = dumb_read_s3m_quick( DumbFile );
-      break;
-    case NAME_Mod:
+
+    else if ( Music->MusicType == NAME_Mod )
       Duh = dumb_read_mod_quick( DumbFile, 0 );
-      break;
-    }
 
     DuhRenderer = duh_start_sigrenderer( Duh, 0, 2, 0 );
+    return true;
   }
 
-  static void UnregisterMusic( UMusic* Music )
+  void Exit()
   {
     duh_end_sigrenderer( DuhRenderer );
     unload_duh( Duh );
@@ -73,232 +74,16 @@ public:
     DuhRenderer = NULL;
   }
 
-  static void RenderMusic( float* Buf, size_t Size )
+  void GetPCM( void* Buffer, size_t Num )
   {
-    duh_render_float( DuhRenderer, &Samples, &NumSamples, 16, 1.0, 65536.0f / GEngine->Audio->OutputRate, Size, Buf );
+    duh_sigrenderer_generate_samples( DuhRenderer, 1.0, 65536.0 / GEngine->Audio->OutputRate, Num, (sample_t**)&Buffer );
+  }
+
+  void GoToSection( int Section )
+  {
+
   }
 };
-
-DUMBFILE* FDumbMusic::DumbFile;
-DUH* FDumbMusic::Duh;
-DUH_SIGRENDERER* FDumbMusic::DuhRenderer;
-sample_t** FDumbMusic::Samples;
-long FDumbMusic::NumSamples;
-
-/*-----------------------------------------------------------------------------
- * FMusicPlayer
------------------------------------------------------------------------------*/
-FMusicPlayer::FMusicPlayer()
-{
-  CurrentTrack = NULL;
-  QueuedTrack = NULL;
-  CurrentSection = 255;
-  QueuedSection = 255;
-  float CurrentVolume = 0.0f;
-  float TargetVolume = 0.0f;
-  CurrentTransition = MTRAN_None;
-  bTransitioning = false;
-  RequestExit = 0;
-  ThreadErr = 0;
-
-  MusicThread = GSystem->RunThread( StaticThreadFunc, this );
-  if ( MusicThread == NULL )
-    GLogf( LOG_CRIT, "Failed to initialize music player thread" );
-}
-
-FMusicPlayer::~FMusicPlayer()
-{
-  RequestExit = 1;
- // while ( GSystem->IsThreadActive( MusicThread ) );
-}
-
-int FMusicPlayer::GetStatus()
-{
-  return ThreadErr;
-}
-
-void FMusicPlayer::ClearStatus()
-{
-  ThreadErr = 0;
-}
-
-void FMusicPlayer::Play( UMusic* Music, int SongSection, EMusicTransition Transition )
-{
-  QueuedTrack = Music;
-  QueuedSection = SongSection;
-  CurrentTransition = Transition;
-  bTransitioning = true;
-}
-
-void FMusicPlayer::Stop( EMusicTransition Transition )
-{
-  QueuedTrack = NULL;
-  QueuedSection = 255;
-  CurrentTransition = Transition;
-  bTransitioning = true;
-}
-
-float FMusicPlayer::GetCurrentVolume()
-{
-  return CurrentVolume;
-}
-
-ThreadReturnType FMusicPlayer::StaticThreadFunc( void* Args )
-{
-  return ((FMusicPlayer*)Args)->PlayerThread();
-}
-
-#define FRAME_COUNT 32
-ThreadReturnType FMusicPlayer::PlayerThread()
-{
-  bool bSongChanged = false;
-  double LastTime = USystem::GetSeconds();
-  double CurrentTime = 0.0;
-  float* RenderBuffer = new float[FRAME_COUNT];
-
-  UAudioSubsystem* Audio = GEngine->Audio;
-  if ( Audio == NULL )
-    ThreadErr = ERR_NO_AUDIO_DEVICE;
-
-  // Don't exit until RequestExit has been set
-  while ( !RequestExit )
-  {
-    if ( ThreadErr < 0 )
-      continue;
-
-    LastTime = CurrentTime;
-    CurrentTime = USystem::GetSeconds();
-    float DeltaTime = CurrentTime - LastTime;
-    bool bSetFadeTime = false;
-
-    // Handle currently playing track
-    if ( CurrentTrack != NULL )
-    {
-      // Render music frames and play back
-      RenderMusic( RenderBuffer, FRAME_COUNT );
-      GEngine->Audio->PlayMusicBuffer( RenderBuffer, FRAME_COUNT );
-
-      // Handle music transition if needed
-      if ( bTransitioning )
-      {
-        // TODO: Settle on values that sound similar to UE1
-        float FadeRate = 0.0f;
-        if ( !bSetFadeTime )
-        {
-          switch ( CurrentTransition )
-          {
-          case MTRAN_None:
-          case MTRAN_Instant:
-          case MTRAN_Segue:
-            FadeRate = 1000.0f;
-            break;
-          case MTRAN_Fade:
-            FadeRate = 0.5f;
-            break;
-          case MTRAN_SlowFade:
-            FadeRate = 0.25f;
-            break;
-          case MTRAN_FastFade:
-            FadeRate = 0.75f;
-            break;
-          }
-          bSetFadeTime = true;
-        }
-
-        // Adjust volume
-        if ( CurrentTrack != QueuedTrack || CurrentSection != QueuedSection )
-          CurrentVolume -= FadeRate * DeltaTime;
-        else
-          CurrentVolume += FadeRate * DeltaTime;
-
-        // Adjust music state if fade in or out is completed
-        if ( CurrentVolume <= FLT_EPSILON )
-        {
-          if ( CurrentTrack != QueuedTrack )
-          {
-            // Unload current track and set up new track
-            UnregisterMusic( CurrentTrack );
-
-            // Handle music stop if needed
-            if ( QueuedTrack == NULL )
-            {
-              CurrentSection = 255;
-              continue;
-            }
-
-            CurrentTrack = QueuedTrack;
-            RegisterMusic( CurrentTrack );
-          }
-          else if ( CurrentSection != QueuedSection )
-          {
-            // !!! Handle section change
-          }
-          CurrentVolume = 0.0f;
-        }
-        else if ( fabsf( CurrentVolume - TargetVolume ) <= FLT_EPSILON )
-        {
-          // Fade in ended, thus ending fade sequence
-          CurrentTransition = MTRAN_None;
-          CurrentVolume = 1.0f;
-          bSetFadeTime = false;
-          bTransitioning = false;
-        }
-      }
-    }
-
-    // Handle queued track when no other track is playing
-    else if ( QueuedTrack != NULL )
-    {
-      RegisterMusic( QueuedTrack );
-      CurrentTrack = QueuedTrack;
-      CurrentSection = QueuedSection;
-      bTransitioning = true;
-    }
-  }
-
-  // TODO: Exit thread
-  delete[] RenderBuffer;
-  return THREAD_SUCCESS;
-}
-
-void FMusicPlayer::RegisterMusic( UMusic* Music )
-{
-  switch ( Music->MusicType )
-  {
-    case NAME_It:
-    case NAME_Xm:
-    case NAME_S3M:
-    case NAME_Mod:
-      FDumbMusic::RegisterMusic( Music );
-      break;
-  }
-}
-
-void FMusicPlayer::UnregisterMusic( UMusic* Music )
-{
-  switch ( Music->MusicType )
-  {
-    case NAME_It:
-    case NAME_Xm:
-    case NAME_S3M:
-    case NAME_Mod:
-      FDumbMusic::UnregisterMusic( Music );
-      break;
-  }
-}
-
-void FMusicPlayer::RenderMusic( float* Buf, size_t Size )
-{
-  switch ( CurrentTrack->MusicType )
-  {
-  case NAME_It:
-  case NAME_Xm:
-  case NAME_S3M:
-  case NAME_Mod:
-    FDumbMusic::RenderMusic( Buf, Size );
-    break;
-  }
-}
 
 /*-----------------------------------------------------------------------------
  * UMusic
@@ -327,6 +112,33 @@ void UMusic::Load()
   
   ChunkData = new u8[ChunkSize];
   PkgFile->Read( ChunkData, ChunkSize );
+
+  // For some reason, "s3m" and "S3M" don't hash to the same thing
+  // with a case insensitive SuperFastHash. Force upper case
+  FNameEntry& MusicTypeEntry = Pkg->GetNameTable()[0];
+  for ( int i = 0; i < 64; i++ )
+  {
+    if ( MusicTypeEntry.Data[i] == '\0' )
+      break;
+
+    MusicTypeEntry.Data[i] = toupper( MusicTypeEntry.Data[i] );
+  }
+  MusicTypeEntry.Hash = SuperFastHashString( MusicTypeEntry.Data );
+  MusicType = FName( Pkg->GetNameTable()[0] );
+
+  // Set up stream
+  switch ( MusicType )
+  {
+    case NAME_It:
+    case NAME_Xm:
+    case NAME_S3M:
+    case NAME_Mod:
+      Stream = new FDumbMusicStream();
+      break;
+    default:
+      GLogf( LOG_WARN, "Unsupported music type '%s' loaded", MusicType.Data() );
+      break;
+  }
 }
 
 bool UMusic::ExportToFile( const char* Dir, const char* Type )

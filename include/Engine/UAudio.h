@@ -25,12 +25,21 @@
 
 #pragma once
 
+#include "Util/TRingQueue.h"
 #include "Core/USystem.h"
 #include "Engine/UMusic.h"
 #include "Engine/USound.h"
 #include "Engine/UMusic.h"
 #include "Engine/UViewport.h"
 #include "Actors/AActor.h"
+
+#ifndef MUSIC_BUFFER_COUNT
+  #define MUSIC_BUFFER_COUNT 32
+#endif
+
+#ifndef MUSIC_BUFFER_SIZE
+  #define MUSIC_BUFFER_SIZE 64
+#endif
 
 /*-----------------------------------------------------------------------------
  * UAudioSubsystem
@@ -44,23 +53,38 @@ class LIBUNR_API UAudioSubsystem : public USubsystem
   UAudioSubsystem();
 
   virtual bool Init();
+  virtual void Tick( float DeltaTime );
   virtual bool SetOutputDevice( const char* Name ) { return false; }
   virtual void SetViewport( UViewport* Viewport ) {}
   virtual void RegisterSound( USound* Sound ) {}
   virtual void UnregisterSound( USound* Sound ) {}
   virtual bool PlaySound( AActor* Actor, USound* Sound, FVector Location, float Volume, float Radius, float Pitch )  { return false; }
-  virtual void PlayMusicBuffer( float* MusicBuffer, int NumSamples ) {}
+  virtual void PlayMusicBuffer() {}
   
   // Music playback logic should be consistent across all audio devices
   void PlayMusic( UMusic* Music, int SongSection, EMusicTransition MusicTrans );
   void StopMusic( EMusicTransition MusicTrans );
-  float GetCurrentMusicVolume();
     
   u8 SoundVolume;
   u8 MusicVolume;
   u32 OutputRate;
 
+protected:
+  float CurrentVolume;
+
+  // For streaming music. Audio devices will get their buffers from here
+  // and handle it internally based on how the underlying audio system works
+  TRingQueue<i16*>* MusicQueue;
+
 private:
-  FMusicPlayer* MusicPlayer;
+  i16* MusicBuffer;
+  UMusic* CurrentTrack;
+  UMusic* QueuedTrack;
+  int CurrentSection;
+  int QueuedSection;
+  float TargetVolume;
+  float FadeRate;
+  EMusicTransition CurrentTransition;
+  bool bTransitioning;
 };
 

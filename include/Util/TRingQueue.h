@@ -17,70 +17,116 @@
 \*===========================================================================*/
 
 /*========================================================================
- * UMusic.h - Native music object type
- * See the 'Class Music' in UT-Package-File-Format.pdf
- * 
+ * TRingQueue.h - Template queue that operates in a circular manner
+ *
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
 #pragma once
+#include "Util/TArray.h"
 
-#include "Core/UObject.h"
-#include "Core/USystem.h"
-
-enum EMusicTransition
-{
-	MTRAN_None,
-	MTRAN_Instant,
-	MTRAN_Segue,
-	MTRAN_Fade,
-	MTRAN_FastFade,
-	MTRAN_SlowFade,
-};
-
-#define ERR_LIBXMP_LOAD_FAILED -1
-#define ERR_LIBXMP_START_PLAY_FAILED -2
-#define ERR_LIBXMP_PLAY_BUF_FAILED -3
-#define ERR_NO_AUDIO_DEVICE -4
-
-class FMusicStream;
-
-/*-----------------------------------------------------------------------------
- * UMusic
- * Contains data about a music file
------------------------------------------------------------------------------*/
-class LIBUNR_API UMusic : public UObject
-{
-  DECLARE_NATIVE_CLASS( UMusic, UObject, CLASS_NoExport | CLASS_SafeReplace, Core )
-  UMusic();
-
-  virtual void Load();
-  virtual bool ExportToFile( const char* Dir, const char* Type );
-  
-  u16   ChunkCount; //?
-  u32   _unknown0; // PackageVerison > 61
-  idx   ChunkSize;
-  u8*   ChunkData;
-  FName MusicType;
-
-  // Runtime variables
-  FMusicStream* Stream;
-};
-
-/*-----------------------------------------------------------------------------
- * FMusicStream
- * Assists in playback of the underlying music format
------------------------------------------------------------------------------*/
-class LIBUNR_API FMusicStream
+template<class T> class TRingQueue
 {
 public:
-  FMusicStream() {}
-  ~FMusicStream() {}
+  TRingQueue<T>( size_t n )
+  {
+    Data = (T*)malloc( sizeof( T ) * n );
+    Len = n;
+    Num = 0;
+    Current = 0;
+  }
 
-  virtual bool Init( UMusic* Music ) = 0;
-  virtual void Exit() = 0;
-  virtual void GetPCM( void* Buffer, size_t Num ) = 0;
-  virtual void GoToSection( int Section ) = 0;
+  TRingQueue<T>( size_t n, const T& Value )
+  { 
+    Data = (T*)malloc( sizeof( T ) * n );
+    for ( int i = 0; i < n; i++ )
+      Data[i] = Value;
+
+    Len = n;
+    Num = 0;
+    Current = 0;
+  }
+
+  ~TRingQueue<T>()
+  {
+    free( Data );
+  }
+
+  bool Empty()
+  {
+    return (Num == 0);
+  }
+
+  size_t Size()
+  {
+    return Num;
+  }
+
+  T& Front()
+  {
+    return Data[Current];
+  }
+
+  T& GetNextFree()
+  {
+    size_t Index = Current + Num;
+    if ( Index >= Len )
+      Index -= Len;
+
+    return Data[Index];
+  }
+
+  bool Push( const T& Val )
+  {
+    if ( Num == Len )
+      return false;
+
+    GetNextFree() = Val;
+    Num++;
+
+    return true;
+  }
+
+  bool Push( T& Val )
+  {
+    if ( Num == Len )
+      return false;
+
+    GetNextFree() = Val;
+    Num++;
+
+    return true;
+  }
+
+  T& Pop()
+  {
+    T& Out = Data[Current];
+    if ( Num > 0 )
+    {
+      Current++;
+      if ( Current >= Len )
+        Current = 0;
+
+      Num--;
+    }
+    return Out;
+  }
+
+  bool Resize( size_t NewSize )
+  {
+    T* NewData = (T*)realloc( Data, sizeof(T) * NewSize );
+    if ( NewData == NULL )
+      return false;
+
+    Data = NewData;
+    Len = NewSize;
+    return true;
+  }
+
+private:
+  T* Data;
+  size_t Len;
+  size_t Current;
+  size_t Num;
 };
-

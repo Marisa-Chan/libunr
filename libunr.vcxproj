@@ -85,6 +85,7 @@
     <ClInclude Include="include\Util\TArray.h" />
     <ClInclude Include="include\Util\TMap.h" />
     <ClInclude Include="include\Util\TQueue.h" />
+    <ClInclude Include="include\Util\TRingQueue.h" />
     <ClInclude Include="include\Util\TStack.h" />
   </ItemGroup>
   <ItemGroup>
