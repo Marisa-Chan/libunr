@@ -126,7 +126,7 @@ u32 SuperFastHashString( const char* Text, size_t Len )
   case 3:
     Hash += GET_16_BITS_I( Text );
     Hash ^= Hash << 16;
-    Hash ^= Text[sizeof( u16 )] << 18;
+    Hash ^= tolower( Text[sizeof( u16 )] ) << 18;
     Hash += Hash >> 11;
     break;
   case 2:

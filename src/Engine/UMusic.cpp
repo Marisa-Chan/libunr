@@ -28,15 +28,23 @@
 #include "Core/USystem.h"
 #include "Engine/UEngine.h"
 #include "Engine/UMusic.h"
-#include <dumb.h>
 
+#include <dumb.h>
+#include <vorbis/vorbisfile.h>
+
+/*-----------------------------------------------------------------------------
+ * FDumbMusicStream
+ * Plays back module tracker music
+-----------------------------------------------------------------------------*/
 class FDumbMusicStream : public FMusicStream
 {
-public:
   DUMBFILE* DumbFile;
   DUH* Duh;
   DUH_SIGRENDERER* DuhRenderer;
+  sample_t** Samples;
+  long NumSamples;
 
+public:
   bool Init( UMusic* Music )
   {
     DumbFile = dumbfile_open_memory( (const char*)Music->ChunkData, Music->ChunkSize );
@@ -60,6 +68,12 @@ public:
       Duh = dumb_read_mod_quick( DumbFile, 0 );
 
     DuhRenderer = duh_start_sigrenderer( Duh, 0, 2, 0 );
+
+    Samples = allocate_sample_buffer( 2, GEngine->Audio->MusicBufferSize );
+
+    StreamFormat = STREAM_Stereo16;
+    StreamRate = GEngine->Audio->OutputRate;
+
     return true;
   }
 
@@ -69,6 +83,9 @@ public:
     unload_duh( Duh );
     dumbfile_close( DumbFile );
 
+    if ( Samples )
+      destroy_sample_buffer( Samples );
+
     Duh = NULL;
     DumbFile = NULL;
     DuhRenderer = NULL;
@@ -76,7 +93,7 @@ public:
 
   void GetPCM( void* Buffer, size_t Num )
   {
-    duh_sigrenderer_generate_samples( DuhRenderer, 1.0, 65536.0 / GEngine->Audio->OutputRate, Num, (sample_t**)&Buffer );
+    duh_render_int( DuhRenderer, &Samples, &NumSamples, 16, 0, 1.0f, 65536.0f / (float)StreamRate, Num, Buffer );
   }
 
   void GoToSection( int Section )
@@ -84,6 +101,153 @@ public:
 
   }
 };
+
+/*-----------------------------------------------------------------------------
+ * FOggMusicStream
+ * Plays back music from Ogg Vorbis files
+-----------------------------------------------------------------------------*/
+class FOggMusicStream : public FMusicStream
+{
+  static FOggMusicStream* StaticStream;
+  OggVorbis_File VorbisFile;
+  vorbis_info* VorbisInfo;
+  ov_callbacks Callbacks;
+
+  size_t Pos;
+  size_t Len;
+
+  size_t VorbisRead( void* Dest, size_t Size, size_t Num, void* Src )
+  {
+    size_t Ret = 0;
+
+    if ( Pos < Len )
+    {
+      // Figure out which is larger, size or num. Ideally, we want to memcpy more at a time
+      // We don't want to memcpy 1 byte 2048 times, but instead memcpy 2048 bytes 1 time
+      Src = PtrAdd( Src, Pos );
+
+      size_t RealSize = MAX( Size, Num );
+      size_t RealNum  = MIN( Size, Num );
+
+      for ( size_t i = 0; i < RealNum; i++ )
+      {
+        if ( Pos + RealSize > Len )
+        {
+          RealSize = Len - Pos;
+          Num = 0;
+        }
+
+        memcpy( Dest, Src, RealSize );
+        Dest = PtrAdd( Dest, RealSize );
+        Src = PtrAdd( Src, RealSize );
+
+        Pos += RealSize;
+        Ret += RealSize;
+      }
+    }
+
+    return Ret;
+  }
+
+  int VorbisSeek( void* Src, i64 Offset, int Whence )
+  {
+    switch ( Whence )
+    {
+    case SEEK_SET:
+      if ( Offset > Len )
+        Pos = Len;
+      else
+        Pos = Offset;
+      break;
+    case SEEK_CUR:
+      if ( Offset > 0 && Pos + Offset > Len )
+        Pos = Len;
+      else if ( Offset < 0 && Pos - Offset < 0 )
+        Pos = 0;
+      else
+        Pos += Offset;
+      break;
+    case SEEK_END:
+      if ( Offset > Len )
+        Pos = 0;
+      else
+        Pos = Len - Offset;
+      break;
+    default:
+      return -1;
+    }
+
+    return 0;
+  }
+
+  long VorbisTell( void* Src )
+  {
+    return Pos;
+  }
+
+  static size_t StaticVorbisRead( void* Dest, size_t Size, size_t Num, void* Src )
+  {
+    return StaticStream->VorbisRead( Dest, Size, Num, Src );
+  }
+
+  static int StaticVorbisSeek( void* Src, ogg_int64_t Offset, int Whence )
+  {
+    return StaticStream->VorbisSeek( Src, Offset, Whence );
+  }
+
+  static long StaticVorbisTell( void* Src )
+  {
+    return StaticStream->VorbisTell( Src );
+  }
+
+public:
+  bool Init( UMusic* Music )
+  {
+    StaticStream = this;
+    Callbacks.read_func  = StaticVorbisRead;
+    Callbacks.seek_func  = StaticVorbisSeek;
+    Callbacks.close_func = NULL;
+    Callbacks.tell_func  = StaticVorbisTell;
+
+    Pos = 0;
+    Len = Music->ChunkSize;
+
+    if ( ov_open_callbacks( Music->ChunkData, &VorbisFile, NULL, 0, Callbacks ) < 0 )
+    {
+      GLogf( LOG_ERR, "Tried to init ogg vorbis stream for non-ogg music '%s'", Music->Name.Data() );
+      return false;
+    }
+
+    VorbisInfo = ov_info( &VorbisFile, -1 );
+    StreamFormat = VorbisInfo->channels == 1 ? STREAM_Mono16 : STREAM_Stereo16;
+    StreamRate = VorbisInfo->rate;
+
+    return true;
+  }
+
+  void Exit()
+  {
+    ov_clear( &VorbisFile );
+  }
+
+  void GetPCM( void* Buffer, size_t Num )
+  {
+    long IsBigEndian = 0;
+    #if defined LIBUNR_BIG_ENDIAN
+      IsBigEndian = 1;
+    #endif
+
+    long Ret = ov_read( &VorbisFile, (char*)Buffer, Num, IsBigEndian, 2, 1, NULL );
+    if ( Ret < 0 )
+      GLogf( LOG_ERR, "Failed to get PCM from ogg stream" );
+  }
+
+  void GoToSection( int SongSection )
+  {
+  }
+};
+
+FOggMusicStream* FOggMusicStream::StaticStream = NULL;
 
 /*-----------------------------------------------------------------------------
  * UMusic
@@ -113,17 +277,9 @@ void UMusic::Load()
   ChunkData = new u8[ChunkSize];
   PkgFile->Read( ChunkData, ChunkSize );
 
+  // Get music type from first name in the package
   // For some reason, "s3m" and "S3M" don't hash to the same thing
   // with a case insensitive SuperFastHash. Force upper case
-  FNameEntry& MusicTypeEntry = Pkg->GetNameTable()[0];
-  for ( int i = 0; i < 64; i++ )
-  {
-    if ( MusicTypeEntry.Data[i] == '\0' )
-      break;
-
-    MusicTypeEntry.Data[i] = toupper( MusicTypeEntry.Data[i] );
-  }
-  MusicTypeEntry.Hash = SuperFastHashString( MusicTypeEntry.Data );
   MusicType = FName( Pkg->GetNameTable()[0] );
 
   // Set up stream
@@ -134,6 +290,9 @@ void UMusic::Load()
     case NAME_S3M:
     case NAME_Mod:
       Stream = new FDumbMusicStream();
+      break;
+    case NAME_Ogg:
+      Stream = new FOggMusicStream();
       break;
     default:
       GLogf( LOG_WARN, "Unsupported music type '%s' loaded", MusicType.Data() );

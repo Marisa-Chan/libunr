@@ -50,15 +50,15 @@ UAudioSubsystem::~UAudioSubsystem()
 bool UAudioSubsystem::Init()
 {
   // Initialize music buffer and ring queue
-  MusicBuffer = new i16[MUSIC_BUFFER_COUNT * MUSIC_BUFFER_SIZE];
-  memset( MusicBuffer, 0, MUSIC_BUFFER_COUNT * MUSIC_BUFFER_SIZE * sizeof( i16 ) );
+  MusicBuffer = new i16[MusicBufferCount * MusicBufferSize];
+  memset( MusicBuffer, 0, MusicBufferCount * MusicBufferSize * sizeof( i16 ) );
 
-  MusicQueue = new TRingQueue<i16*>( MUSIC_BUFFER_COUNT );
+  MusicQueue = new TRingQueue<i16*>( MusicBufferCount );
 
   // Fill out each buffer slot in the queue
-  for ( int i = 0; i < MUSIC_BUFFER_COUNT; i++ )
+  for ( int i = 0; i < MusicBufferCount; i++ )
   {
-    MusicQueue->Push( &MusicBuffer[MUSIC_BUFFER_SIZE * i] );
+    MusicQueue->Push( &MusicBuffer[MusicBufferSize * i] );
     MusicQueue->Pop();
   }
   return true;
@@ -69,16 +69,23 @@ void UAudioSubsystem::Tick( float DeltaTime )
   // Handle currently playing track
   if ( CurrentTrack != NULL )
   {
-    while ( MusicQueue->Size() < MUSIC_BUFFER_COUNT )
+    while ( MusicQueue->Size() < MusicBufferCount )
     {
       // Render a chunk of music
-      CurrentTrack->Stream->GetPCM( MusicQueue->GetNextFree(), MUSIC_BUFFER_SIZE );
+      CurrentTrack->Stream->GetPCM( MusicQueue->GetNextFree(), MusicBufferSize );
 
-      // It's kind of an abuse of how a ring queue should work, 
-      // but it works fine for circular record keeping
+      // Push buffer into the circular queue
       MusicQueue->Push( MusicQueue->GetNextFree() );
     }
-    PlayMusicBuffer();
+
+    // Play a rendered buffer (or start playback)
+    if ( !bPlaying )
+    {
+      StartMusicPlayback();
+      bPlaying = true;
+    }
+    else if ( MusicQueue->Size() > 0 )
+      PlayMusicBuffer();
 
     // Handle music transition if needed
     if ( bTransitioning )
@@ -107,12 +114,12 @@ void UAudioSubsystem::Tick( float DeltaTime )
 
       // Adjust volume
       if ( CurrentTrack != QueuedTrack || CurrentSection != QueuedSection )
-        CurrentVolume -= FadeRate * DeltaTime;
+        CurrentMusicVolume -= FadeRate * DeltaTime;
       else
-        CurrentVolume += FadeRate * DeltaTime;
+        CurrentMusicVolume += FadeRate * DeltaTime;
 
       // Adjust music state if fade in or out is completed
-      if ( CurrentVolume <= FLT_EPSILON )
+      if ( CurrentMusicVolume <= FLT_EPSILON )
       {
         if ( CurrentTrack != QueuedTrack )
         {
@@ -123,23 +130,38 @@ void UAudioSubsystem::Tick( float DeltaTime )
           if ( QueuedTrack == NULL )
           {
             CurrentSection = 255;
+            bPlaying = false;
             return;
           }
 
           CurrentTrack = QueuedTrack;
-          CurrentTrack->Stream->Init( CurrentTrack );
+          CurrentSection = QueuedSection;
+
+          if ( !CurrentTrack->Stream->Init( CurrentTrack ) )
+          {
+            GLogf( LOG_ERR, "Failed to initialize music stream for '%s'", CurrentTrack->Name.Data() );
+            CurrentTrack = NULL;
+            QueuedTrack = NULL;
+            return;
+          }
+
+          CurrentTrack->Stream->GoToSection( CurrentSection );
+
+          CurrentStreamFormat = CurrentTrack->Stream->GetStreamFormat();
+          CurrentStreamRate = CurrentTrack->Stream->GetStreamRate();
         }
         else if ( CurrentSection != QueuedSection )
         {
-          // !!! Handle section change
+          CurrentTrack->Stream->GoToSection( QueuedSection );
+          CurrentSection = QueuedSection;
         }
-        CurrentVolume = 0.0f;
+        CurrentMusicVolume = 0.0f;
       }
-      else if ( fabsf( CurrentVolume - TargetVolume ) <= FLT_EPSILON )
+      else if ( fabsf( CurrentMusicVolume - TargetVolume ) <= FLT_EPSILON )
       {
         // Fade in ended, thus ending fade sequence
         CurrentTransition = MTRAN_None;
-        CurrentVolume = 1.0f;
+        CurrentMusicVolume = 1.0f;
         FadeRate = 0.0f;
         bTransitioning = false;
       }
@@ -149,8 +171,17 @@ void UAudioSubsystem::Tick( float DeltaTime )
   // Handle queued track when no other track is playing
   else if ( QueuedTrack != NULL )
   {
-    QueuedTrack->Stream->Init( QueuedTrack );
     CurrentTrack = QueuedTrack;
+    if ( !CurrentTrack->Stream->Init( CurrentTrack ) )
+    {
+      GLogf( LOG_ERR, "Failed to initialize music stream for '%s'", CurrentTrack->Name.Data() );
+      CurrentTrack = NULL;
+      QueuedTrack = NULL;
+      return;
+    }
+    CurrentStreamFormat = CurrentTrack->Stream->GetStreamFormat();
+    CurrentStreamRate = CurrentTrack->Stream->GetStreamRate();
+
     CurrentSection = QueuedSection;
   }
 }

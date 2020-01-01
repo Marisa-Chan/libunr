@@ -72,6 +72,14 @@ class LIBUNR_API UMusic : public UObject
  * FMusicStream
  * Assists in playback of the underlying music format
 -----------------------------------------------------------------------------*/
+enum EStreamFormat
+{
+  STREAM_Mono8,
+  STREAM_Mono16,
+  STREAM_Stereo8,
+  STREAM_Stereo16,
+};
+
 class LIBUNR_API FMusicStream
 {
 public:
@@ -82,5 +90,19 @@ public:
   virtual void Exit() = 0;
   virtual void GetPCM( void* Buffer, size_t Num ) = 0;
   virtual void GoToSection( int Section ) = 0;
+  
+  EStreamFormat GetStreamFormat()
+  {
+    return StreamFormat;
+  }
+
+  int GetStreamRate()
+  {
+    return StreamRate;
+  }
+
+protected:
+  EStreamFormat StreamFormat;
+  int StreamRate;
 };
 

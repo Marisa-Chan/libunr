@@ -33,14 +33,6 @@
 #include "Engine/UViewport.h"
 #include "Actors/AActor.h"
 
-#ifndef MUSIC_BUFFER_COUNT
-  #define MUSIC_BUFFER_COUNT 32
-#endif
-
-#ifndef MUSIC_BUFFER_SIZE
-  #define MUSIC_BUFFER_SIZE 64
-#endif
-
 /*-----------------------------------------------------------------------------
  * UAudioSubsystem
  * Defines the base interface for audio devices to play sounds and music
@@ -59,7 +51,6 @@ class LIBUNR_API UAudioSubsystem : public USubsystem
   virtual void RegisterSound( USound* Sound ) {}
   virtual void UnregisterSound( USound* Sound ) {}
   virtual bool PlaySound( AActor* Actor, USound* Sound, FVector Location, float Volume, float Radius, float Pitch )  { return false; }
-  virtual void PlayMusicBuffer() {}
   
   // Music playback logic should be consistent across all audio devices
   void PlayMusic( UMusic* Music, int SongSection, EMusicTransition MusicTrans );
@@ -69,8 +60,17 @@ class LIBUNR_API UAudioSubsystem : public USubsystem
   u8 MusicVolume;
   u32 OutputRate;
 
+  u32 MusicBufferSize;
+  u32 MusicBufferCount;
+
 protected:
-  float CurrentVolume;
+  virtual bool StartMusicPlayback() { return false; }
+  virtual bool PlayMusicBuffer() { return false; }
+
+  // Convenient music variables for audio devices
+  float CurrentMusicVolume; // Let the audio device handle music fading
+  EStreamFormat CurrentStreamFormat;
+  int CurrentStreamRate;
 
   // For streaming music. Audio devices will get their buffers from here
   // and handle it internally based on how the underlying audio system works
@@ -86,5 +86,8 @@ private:
   float FadeRate;
   EMusicTransition CurrentTransition;
   bool bTransitioning;
+  bool bPlaying;
+
+  float DeltaTimeAcc;
 };
 
