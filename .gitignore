@@ -10,6 +10,13 @@ CMakeCache.txt
 *.so
 *.dll
 *.a
+*.lib
+*.obj
+*.tlog
+*.pdb
+*.idb
+*.def
+*.log
 Makefile
 *.sh
 *.cmake
@@ -17,5 +24,3 @@ tags
 libunr-test
 .gdb_history
 install_manifest.txt
-libxmp/
-deps/
