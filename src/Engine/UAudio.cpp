@@ -101,27 +101,32 @@ void UAudioSubsystem::Tick( float DeltaTime )
           FadeRate = 10000000.0f;
           break;
         case MTRAN_Fade:
-          FadeRate = 0.5f;
+          FadeRate = 50.0f;
           break;
         case MTRAN_SlowFade:
-          FadeRate = 0.25f;
+          FadeRate = 25.0f;
           break;
         case MTRAN_FastFade:
-          FadeRate = 0.75f;
+          FadeRate = 75.0f;
           break;
         }
+
+        if ( CurrentTrack != QueuedTrack || CurrentSection != QueuedSection )
+          TargetVolume = 0.0f;
+        else
+          TargetVolume = 1.0f;
       }
 
       // Adjust volume
       if ( CurrentTrack != QueuedTrack || CurrentSection != QueuedSection )
-        CurrentMusicVolume -= FadeRate * DeltaTime;
+        CurrentMusicVolume = MAX( (CurrentMusicVolume)-FadeRate * DeltaTime, 0.0f );
       else
-        CurrentMusicVolume += FadeRate * DeltaTime;
+        CurrentMusicVolume = MIN( (CurrentMusicVolume)+FadeRate * DeltaTime, 1.0f );
 
       // Adjust music state if fade in or out is completed
       if ( CurrentMusicVolume <= FLT_EPSILON )
       {
-        if ( CurrentTrack != QueuedTrack )
+        if ( CurrentTrack != QueuedTrack || CurrentSection != QueuedSection )
         {
           // Unload current track and set up new track
           CurrentTrack->Stream->Exit();
@@ -129,6 +134,7 @@ void UAudioSubsystem::Tick( float DeltaTime )
           // Handle music stop if needed
           if ( QueuedTrack == NULL )
           {
+            CurrentTrack = NULL;
             CurrentSection = 255;
             bPlaying = false;
             return;
@@ -137,7 +143,7 @@ void UAudioSubsystem::Tick( float DeltaTime )
           CurrentTrack = QueuedTrack;
           CurrentSection = QueuedSection;
 
-          if ( !CurrentTrack->Stream->Init( CurrentTrack ) )
+          if ( !CurrentTrack->Stream->Init( CurrentTrack, CurrentSection ) )
           {
             GLogf( LOG_ERR, "Failed to initialize music stream for '%s'", CurrentTrack->Name.Data() );
             CurrentTrack = NULL;
@@ -145,15 +151,8 @@ void UAudioSubsystem::Tick( float DeltaTime )
             return;
           }
 
-          CurrentTrack->Stream->GoToSection( CurrentSection );
-
           CurrentStreamFormat = CurrentTrack->Stream->GetStreamFormat();
           CurrentStreamRate = CurrentTrack->Stream->GetStreamRate();
-        }
-        else if ( CurrentSection != QueuedSection )
-        {
-          CurrentTrack->Stream->GoToSection( QueuedSection );
-          CurrentSection = QueuedSection;
         }
         CurrentMusicVolume = 0.0f;
       }
@@ -172,7 +171,8 @@ void UAudioSubsystem::Tick( float DeltaTime )
   else if ( QueuedTrack != NULL )
   {
     CurrentTrack = QueuedTrack;
-    if ( !CurrentTrack->Stream->Init( CurrentTrack ) )
+    CurrentSection = QueuedSection;
+    if ( !CurrentTrack->Stream->Init( CurrentTrack, CurrentSection ) )
     {
       GLogf( LOG_ERR, "Failed to initialize music stream for '%s'", CurrentTrack->Name.Data() );
       CurrentTrack = NULL;

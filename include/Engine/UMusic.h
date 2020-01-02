@@ -86,10 +86,9 @@ public:
   FMusicStream() {}
   ~FMusicStream() {}
 
-  virtual bool Init( UMusic* Music ) = 0;
+  virtual bool Init( UMusic* Music, int Section = 0 ) = 0;
   virtual void Exit() = 0;
   virtual void GetPCM( void* Buffer, size_t Num ) = 0;
-  virtual void GoToSection( int Section ) = 0;
   
   EStreamFormat GetStreamFormat()
   {

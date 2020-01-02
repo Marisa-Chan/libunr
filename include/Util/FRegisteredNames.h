@@ -236,12 +236,21 @@
   xx( UserPrompt )
   xx( ServerLog )
 
+  // Supported music format strings
   xx( It )
   xx( Xm )
   xx( S3M )
+  xx( Stm )
   xx( Mod )
+  xx( Ptm )
+  xx( 669 )
+  xx( Psm )
+  xx( Mtm )
+  xx( Riff )
+  xx( Asy )
+  xx( Amf )
+  xx( Okt )
   xx( Mp3 )
   xx( Flac )
   xx( Ogg )
-
    

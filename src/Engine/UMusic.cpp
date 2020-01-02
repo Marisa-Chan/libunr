@@ -45,29 +45,80 @@ class FDumbMusicStream : public FMusicStream
   long NumSamples;
 
 public:
-  bool Init( UMusic* Music )
+  bool Init( UMusic* Music, int Section )
   {
+    bool bModuleSupportsSkipping = false;
     DumbFile = dumbfile_open_memory( (const char*)Music->ChunkData, Music->ChunkSize );
-    
+    if ( DumbFile == NULL )
+    {
+
+    }
+
     // We can't rely on the music type because some tracks decided
     // to have an incorrect name while the actual music is ImpulseTracker
 
     // Check for ImpulseTracker, most likely scenario
     if ( strnicmp( (const char*)Music->ChunkData, "IMPM", 4 ) == 0 )
+    {
       Duh = dumb_read_it_quick( DumbFile );
+      bModuleSupportsSkipping = true;
+    }
 
     // Check for XM, second most likely
     else if ( strnicmp( (const char*)Music->ChunkData, "Extended module:", 16 ) == 0 )
+    {
       Duh = dumb_read_xm_quick( DumbFile );
+      bModuleSupportsSkipping = true;
+    }
 
     // At this point, we have to just hope that the type matches the actual format
-    else if ( Music->MusicType == NAME_S3M )
-      Duh = dumb_read_s3m_quick( DumbFile );
+    else
+    {
+      switch ( Music->MusicType )
+      {
+        case NAME_S3M:
+          Duh = dumb_read_s3m_quick( DumbFile );
+          bModuleSupportsSkipping = true;
+          break;
+        case NAME_Mod:
+          Duh = dumb_read_mod_quick( DumbFile, 0 );
+          bModuleSupportsSkipping = true;
+          break;
+        case NAME_Stm:
+          Duh = dumb_read_stm_quick( DumbFile );
+        case NAME_669:
+          Duh = dumb_read_669_quick( DumbFile );
+          break;
+        case NAME_Ptm:
+          Duh = dumb_read_ptm_quick( DumbFile );
+          break;
+        case NAME_Psm:
+          Duh = dumb_read_psm_quick( DumbFile, 0 );
+          if ( Duh == NULL )
+            Duh = dumb_read_old_psm_quick( DumbFile );
+          break;
+        case NAME_Mtm:
+          Duh = dumb_read_mtm_quick( DumbFile );
+          break;
+        case NAME_Riff:
+          Duh = dumb_read_riff_quick( DumbFile );
+          break;
+        case NAME_Asy:
+          Duh = dumb_read_asy_quick( DumbFile );
+          break;
+        case NAME_Amf:
+          Duh = dumb_read_amf_quick( DumbFile );
+          break;
+        case NAME_Okt:
+          Duh = dumb_read_okt_quick( DumbFile );
+          break;
+      }
+    }
 
-    else if ( Music->MusicType == NAME_Mod )
-      Duh = dumb_read_mod_quick( DumbFile, 0 );
-
-    DuhRenderer = duh_start_sigrenderer( Duh, 0, 2, 0 );
+    if ( bModuleSupportsSkipping )
+      DuhRenderer = dumb_it_start_at_order( Duh, 2, Section );
+    else
+      DuhRenderer = duh_start_sigrenderer( Duh, 0, 2, 0 );
 
     Samples = allocate_sample_buffer( 2, GEngine->Audio->MusicBufferSize );
 
@@ -95,11 +146,6 @@ public:
   {
     // 4 comes from (Bits / 8) * NumChannels, which is (16 / 8) * 2 = 2 * 2 = 4;
     duh_render_int( DuhRenderer, &Samples, &NumSamples, 16, 0, 1.0f, 65536.0f / (float)StreamRate, Num / 4, Buffer );
-  }
-
-  void GoToSection( int Section )
-  {
-
   }
 };
 
@@ -202,7 +248,7 @@ class FOggMusicStream : public FMusicStream
   }
 
 public:
-  bool Init( UMusic* Music )
+  bool Init( UMusic* Music, int Section )
   {
     StaticStream = this;
     Callbacks.read_func  = StaticVorbisRead;
@@ -289,7 +335,16 @@ void UMusic::Load()
     case NAME_It:
     case NAME_Xm:
     case NAME_S3M:
+    case NAME_Stm:
     case NAME_Mod:
+    case NAME_Ptm:
+    case NAME_669:
+    case NAME_Psm:
+    case NAME_Mtm:
+    case NAME_Riff:
+    case NAME_Asy:
+    case NAME_Amf:
+    case NAME_Okt:
       Stream = new FDumbMusicStream();
       break;
     case NAME_Ogg:
