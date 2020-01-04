@@ -112,3 +112,70 @@ class FOggMusicStream : public FMusicStream
 
     return 0;
   }
+
+  /*-----------------------------------------------------------------------------
+   * Static Methods
+  -----------------------------------------------------------------------------*/
+
+  static size_t StaticVorbisRead( void* Dest, size_t Size, size_t Num, void* Data )
+  {
+    PrivateData* PrivDataPtr = (PrivateData*)Data;
+    return PrivDataPtr->Stream->VorbisRead( Dest, Size, Num, PrivDataPtr->Music->ChunkData );
+  }
+
+  static int StaticVorbisSeek( void* Data, ogg_int64_t Offset, int Whence )
+  {
+    PrivateData* PrivDataPtr = (PrivateData*)Data;
+    return PrivDataPtr->Stream->VorbisSeek( Offset, Whence );
+  }
+
+  static long StaticVorbisTell( void* Data )
+  {
+    PrivateData* PrivDataPtr = (PrivateData*)Data;
+    return PrivDataPtr->Stream->Pos;
+  }
+
+public:
+  bool Init( UMusic* Music, int Section )
+  {
+    PrivData.Stream = this;
+    PrivData.Music = Music;
+
+    Callbacks.read_func = StaticVorbisRead;
+    Callbacks.seek_func = StaticVorbisSeek;
+    Callbacks.close_func = NULL;
+    Callbacks.tell_func = StaticVorbisTell;
+
+    Pos = 0;
+    Len = Music->ChunkSize;
+
+    if ( ov_open_callbacks( &PrivData, &VorbisFile, NULL, 0, Callbacks ) < 0 )
+    {
+      GLogf( LOG_ERR, "Tried to init ogg vorbis stream for non-ogg music '%s'", Music->Name.Data() );
+      return false;
+    }
+
+    VorbisInfo = ov_info( &VorbisFile, -1 );
+    StreamFormat = VorbisInfo->channels == 1 ? STREAM_Mono16 : STREAM_Stereo16;
+    StreamRate = VorbisInfo->rate;
+
+    return true;
+  }
+
+  void Exit()
+  {
+    ov_clear( &VorbisFile );
+  }
+
+  void GetPCM( void* Buffer, size_t Num )
+  {
+    long IsBigEndian = 0;
+#if defined LIBUNR_BIG_ENDIAN
+    IsBigEndian = 1;
+#endif
+
+    long Ret = ov_read( &VorbisFile, (char*)Buffer, Num, IsBigEndian, 2, 1, NULL );
+    if ( Ret < 0 )
+      GLogf( LOG_ERR, "Failed to get PCM from ogg stream for music '%s'", PrivData.Music->Name.Data() );
+  }
+};
