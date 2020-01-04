@@ -1,0 +1,387 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{48513647-4E37-32CF-A4DC-5E3AC294F319}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>gme</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)$(Platform)\$(Configuration)</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectName)</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)$(Platform)\$(Configuration)</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectName)</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">$(ProjectDir)$(Platform)\$(Configuration)</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">$(Platform)\$(Configuration)</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">$(ProjectName)</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(ProjectDir)$(Platform)\$(Configuration)</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(Platform)\$(Configuration)</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(ProjectName)</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\build\gme;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;BLARGG_BUILD_DLL;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\build\gme;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\build\gme;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\build\gme;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;BLARGG_BUILD_DLL;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\build\gme;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\build\gme;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\build\gme;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;BLARGG_BUILD_DLL;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\build\gme;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\build\gme;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\build\gme;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="RelWithDebInfo";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;BLARGG_BUILD_DLL;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\build\gme;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\build\gme;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule F:/data/dev/openue/libunr/deps/game-music-emu-0.6.2/gme/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SF:/data/dev/openue/libunr/deps/game-music-emu-0.6.2 -BF:/data/dev/openue/libunr/deps/game-music-emu-0.6.2/build --check-stamp-file F:/data/dev/openue/libunr/deps/game-music-emu-0.6.2/build/gme/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\gme_types.h.in;F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\libgme.pc.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\build\gme\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule F:/data/dev/openue/libunr/deps/game-music-emu-0.6.2/gme/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SF:/data/dev/openue/libunr/deps/game-music-emu-0.6.2 -BF:/data/dev/openue/libunr/deps/game-music-emu-0.6.2/build --check-stamp-file F:/data/dev/openue/libunr/deps/game-music-emu-0.6.2/build/gme/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\gme_types.h.in;F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\libgme.pc.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\build\gme\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule F:/data/dev/openue/libunr/deps/game-music-emu-0.6.2/gme/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SF:/data/dev/openue/libunr/deps/game-music-emu-0.6.2 -BF:/data/dev/openue/libunr/deps/game-music-emu-0.6.2/build --check-stamp-file F:/data/dev/openue/libunr/deps/game-music-emu-0.6.2/build/gme/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\gme_types.h.in;F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\libgme.pc.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\build\gme\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule F:/data/dev/openue/libunr/deps/game-music-emu-0.6.2/gme/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SF:/data/dev/openue/libunr/deps/game-music-emu-0.6.2 -BF:/data/dev/openue/libunr/deps/game-music-emu-0.6.2/build --check-stamp-file F:/data/dev/openue/libunr/deps/game-music-emu-0.6.2/build/gme/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\gme_types.h.in;F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\libgme.pc.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\build\gme\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Blip_Buffer.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Classic_Emu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Data_Reader.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Dual_Resampler.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Effects_Buffer.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Fir_Resampler.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\gme.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Gme_File.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\M3u_Playlist.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Multi_Buffer.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Music_Emu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Ay_Apu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Ym2612_Emu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Sms_Apu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Ay_Cpu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Ay_Emu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Gb_Apu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Gb_Cpu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Gb_Oscs.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Gbs_Emu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Gym_Emu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Hes_Apu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Hes_Cpu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Hes_Emu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Kss_Cpu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Kss_Emu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Kss_Scc_Apu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Nes_Apu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Nes_Cpu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Nes_Fme7_Apu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Nes_Namco_Apu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Nes_Oscs.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Nes_Vrc6_Apu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Nsf_Emu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Nsfe_Emu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Sap_Apu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Sap_Cpu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Sap_Emu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Snes_Spc.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Spc_Cpu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Spc_Dsp.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Spc_Emu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Spc_Filter.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Vgm_Emu.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Vgm_Emu_Impl.cpp" />
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Ym2413_Emu.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\build\ZERO_CHECK.vcxproj">
+      <Project>{38DDC9FF-7DE8-316C-BE0B-79E75E027A5C}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\gme\Ay_Apu.h" />
+    <ClInclude Include="..\..\gme\Ay_Cpu.h" />
+    <ClInclude Include="..\..\gme\Ay_Emu.h" />
+    <ClInclude Include="..\..\gme\blargg_common.h" />
+    <ClInclude Include="..\..\gme\blargg_config.h" />
+    <ClInclude Include="..\..\gme\blargg_endian.h" />
+    <ClInclude Include="..\..\gme\blargg_source.h" />
+    <ClInclude Include="..\..\gme\Blip_Buffer.h" />
+    <ClInclude Include="..\..\gme\Classic_Emu.h" />
+    <ClInclude Include="..\..\gme\Data_Reader.h" />
+    <ClInclude Include="..\..\gme\Dual_Resampler.h" />
+    <ClInclude Include="..\..\gme\Effects_Buffer.h" />
+    <ClInclude Include="..\..\gme\Fir_Resampler.h" />
+    <ClInclude Include="..\..\gme\Gbs_Emu.h" />
+    <ClInclude Include="..\..\gme\Gb_Apu.h" />
+    <ClInclude Include="..\..\gme\Gb_Cpu.h" />
+    <ClInclude Include="..\..\gme\gb_cpu_io.h" />
+    <ClInclude Include="..\..\gme\Gb_Oscs.h" />
+    <ClInclude Include="..\..\gme\gme.h" />
+    <ClInclude Include="..\..\gme\Gme_File.h" />
+    <ClInclude Include="..\..\gme\gme_types.h" />
+    <ClInclude Include="..\..\gme\Gym_Emu.h" />
+    <ClInclude Include="..\..\gme\Hes_Apu.h" />
+    <ClInclude Include="..\..\gme\Hes_Cpu.h" />
+    <ClInclude Include="..\..\gme\hes_cpu_io.h" />
+    <ClInclude Include="..\..\gme\Hes_Emu.h" />
+    <ClInclude Include="..\..\gme\Kss_Cpu.h" />
+    <ClInclude Include="..\..\gme\Kss_Emu.h" />
+    <ClInclude Include="..\..\gme\Kss_Scc_Apu.h" />
+    <ClInclude Include="..\..\gme\M3u_Playlist.h" />
+    <ClInclude Include="..\..\gme\Multi_Buffer.h" />
+    <ClInclude Include="..\..\gme\Music_Emu.h" />
+    <ClInclude Include="..\..\gme\Nes_Apu.h" />
+    <ClInclude Include="..\..\gme\Nes_Cpu.h" />
+    <ClInclude Include="..\..\gme\nes_cpu_io.h" />
+    <ClInclude Include="..\..\gme\Nes_Fme7_Apu.h" />
+    <ClInclude Include="..\..\gme\Nes_Namco_Apu.h" />
+    <ClInclude Include="..\..\gme\Nes_Oscs.h" />
+    <ClInclude Include="..\..\gme\Nes_Vrc6_Apu.h" />
+    <ClInclude Include="..\..\gme\Nsfe_Emu.h" />
+    <ClInclude Include="..\..\gme\Nsf_Emu.h" />
+    <ClInclude Include="..\..\gme\Sap_Apu.h" />
+    <ClInclude Include="..\..\gme\Sap_Cpu.h" />
+    <ClInclude Include="..\..\gme\sap_cpu_io.h" />
+    <ClInclude Include="..\..\gme\Sap_Emu.h" />
+    <ClInclude Include="..\..\gme\Sms_Apu.h" />
+    <ClInclude Include="..\..\gme\Sms_Oscs.h" />
+    <ClInclude Include="..\..\gme\Snes_Spc.h" />
+    <ClInclude Include="..\..\gme\Spc_Cpu.h" />
+    <ClInclude Include="..\..\gme\Spc_Dsp.h" />
+    <ClInclude Include="..\..\gme\Spc_Emu.h" />
+    <ClInclude Include="..\..\gme\Spc_Filter.h" />
+    <ClInclude Include="..\..\gme\Vgm_Emu.h" />
+    <ClInclude Include="..\..\gme\Vgm_Emu_Impl.h" />
+    <ClInclude Include="..\..\gme\Ym2413_Emu.h" />
+    <ClInclude Include="..\..\gme\Ym2612_Emu.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

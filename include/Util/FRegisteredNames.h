@@ -252,4 +252,15 @@
   xx( Okt )
   xx( Mp3 )
   xx( Ogg )
-   
+
+  // Game Music Emu formats
+  xx( Ay )   // ZX Spectrum
+  xx( Gbs )  // Game Boy
+  xx( Gym )  // Sega Genesis
+  xx( Hes )  // NEC PC Engine / TurboGrafx-16
+  xx( Kss )  // MSX / Other Z80
+  xx( Nsf )  // NES
+  xx( Nsfe ) // NES Extended
+  xx( Sap )  // Atari SAP
+  xx( Spc )  // SNES
+  xx( Vgm )  // Sega VGM/VGZ

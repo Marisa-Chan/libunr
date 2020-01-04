@@ -29,9 +29,11 @@
 #include "Engine/UEngine.h"
 #include "Engine/UMusic.h"
 
+// Dependency headers
 #include <dumb.h>
 #include <vorbis/vorbisfile.h>
 #include <mpg123.h>
+#include <gme.h>
 
 /*-----------------------------------------------------------------------------
  * FDumbMusicStream
@@ -448,6 +450,55 @@ public:
   }
 };
 
+/*-----------------------------------------------------------------------------
+ * FGmeMusicStream
+ * Plays back music files from various retro game systems
+-----------------------------------------------------------------------------*/
+class FGmeMusicStream : public FMusicStream
+{
+  UMusic* Music;
+  Music_Emu* MusicEmu;
+
+public:
+  bool Init( UMusic* InMusic, int Section )
+  {
+    MusicEmu = NULL;
+    Music = InMusic;
+    StreamFormat = STREAM_Stereo16;
+    StreamRate = GEngine->Audio->OutputRate;
+
+    // Open music data
+    const char* Err = gme_open_data( Music->ChunkData, Music->ChunkSize, &MusicEmu, StreamRate );
+    if ( Err )
+    {
+      GLogf( LOG_ERR, "Failed to initialize game-music-emu, cannot play music '%s' (%s)", Music->Name.Data(), Err );
+      return false;
+    }
+
+    // Start playback
+    Err = gme_start_track( MusicEmu, Section );
+    if ( Err )
+    {
+      GLogf( LOG_ERR, "Failed to start music '%s' (%s)", Music->Name.Data(), Err );
+      return false;
+    }
+
+    return true;
+  }
+
+  void Exit()
+  {
+    gme_delete( MusicEmu );
+  }
+
+  void GetPCM( void* Buffer, size_t Num )
+  {
+    // Samples are always in stereo at 16-bit, divide Num by 2
+    const char* Err = gme_play( MusicEmu, Num / 2, (i16*)Buffer );
+    if ( Err )
+      GLogf( LOG_ERR, "Failed to play gme sample from music '%s' (%s)", Music->Name.Data(), Err );
+  }
+};
 
 /*-----------------------------------------------------------------------------
  * UMusic
@@ -505,6 +556,18 @@ void UMusic::Load()
       break;
     case NAME_Mp3:
       Stream = new FMp3MusicStream();
+      break;
+    case NAME_Ay:
+    case NAME_Gbs:
+    case NAME_Gym:
+    case NAME_Hes:
+    case NAME_Kss:
+    case NAME_Nsf:
+    case NAME_Nsfe:
+    case NAME_Sap:
+    case NAME_Spc:
+    case NAME_Vgm:
+      Stream = new FGmeMusicStream();
       break;
     default:
       GLogf( LOG_WARN, "Unsupported music type '%s' loaded", MusicType.Data() );

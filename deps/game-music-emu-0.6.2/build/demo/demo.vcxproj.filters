@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\demo\Wave_Writer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\demo\basics.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\demo\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{095A74E5-05C0-3F79-9A4A-FBBA8DFD3323}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

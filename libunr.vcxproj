@@ -209,15 +209,15 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)deps\dumb-2.0.3\include;$(ProjectDir)deps\libogg-1.3.4\include;$(ProjectDir)deps\libvorbis-1.3.6\include;$(ProjectDir)deps\mpg123-1.25.13\ports\MSVC++;$(ProjectDir)deps\mpg123-1.25.13\src;$(ProjectDir)deps\mpg123-1.25.13\src\libmpg123;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)deps\dumb-2.0.3\include;$(ProjectDir)deps\libogg-1.3.4\include;$(ProjectDir)deps\libvorbis-1.3.6\include;$(ProjectDir)deps\mpg123-1.25.13\ports\MSVC++;$(ProjectDir)deps\mpg123-1.25.13\src;$(ProjectDir)deps\mpg123-1.25.13\src\libmpg123;$(ProjectDir)deps\game-music-emu-0.6.2\gme;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <StackReserveSize>4194304</StackReserveSize>
-      <AdditionalDependencies>ole32.lib;dumb.lib;libvorbis_static.lib;libvorbisfile_static.lib;libogg.lib;libmpg123.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)deps\dumb-2.0.3\vc6\dumb\$(Platform)\$(Configuration);$(ProjectDir)deps\libvorbis-1.3.6\win32\VS2010\libvorbisfile\$(Platform)\$(Configuration);$(ProjectDir)deps\libvorbis-1.3.6\win32\VS2010\libvorbis\$(Platform)\$(Configuration);$(ProjectDir)deps\libogg-1.3.4\win32\VS2015\$(Platform)\$(Configuration);$(ProjectDir)deps\mpg123-1.25.13\ports\MSVC++\2015\win32\libmpg123\$(Platform)\$(Configuration)_Generic;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ole32.lib;dumb.lib;libvorbis_static.lib;libvorbisfile_static.lib;libogg.lib;libmpg123.lib;gme.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)deps\dumb-2.0.3\vc6\dumb\$(Platform)\$(Configuration);$(ProjectDir)deps\libvorbis-1.3.6\win32\VS2010\libvorbisfile\$(Platform)\$(Configuration);$(ProjectDir)deps\libvorbis-1.3.6\win32\VS2010\libvorbis\$(Platform)\$(Configuration);$(ProjectDir)deps\libogg-1.3.4\win32\VS2015\$(Platform)\$(Configuration);$(ProjectDir)deps\mpg123-1.25.13\ports\MSVC++\2015\win32\libmpg123\$(Platform)\$(Configuration)_Generic;$(ProjectDir)deps\game-music-emu-0.6.2\build\gme\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
