@@ -31,6 +31,7 @@
 
 #include <dumb.h>
 #include <vorbis/vorbisfile.h>
+#include <mpg123.h>
 
 /*-----------------------------------------------------------------------------
  * FDumbMusicStream
@@ -155,13 +156,23 @@ public:
 -----------------------------------------------------------------------------*/
 class FOggMusicStream : public FMusicStream
 {
-  static FOggMusicStream* StaticStream;
+  struct PrivateData
+  {
+    FOggMusicStream* Stream;
+    UMusic* Music;
+  };
+  PrivateData PrivData;
+
   OggVorbis_File VorbisFile;
   vorbis_info* VorbisInfo;
   ov_callbacks Callbacks;
 
   size_t Pos;
   size_t Len;
+
+  /*-----------------------------------------------------------------------------
+   * Class Methods
+  -----------------------------------------------------------------------------*/
 
   size_t VorbisRead( void* Dest, size_t Size, size_t Num, void* Src )
   {
@@ -196,7 +207,7 @@ class FOggMusicStream : public FMusicStream
     return Ret;
   }
 
-  int VorbisSeek( void* Src, i64 Offset, int Whence )
+  int VorbisSeek( i64 Offset, int Whence )
   {
     switch ( Whence )
     {
@@ -227,30 +238,34 @@ class FOggMusicStream : public FMusicStream
     return 0;
   }
 
-  long VorbisTell( void* Src )
+  /*-----------------------------------------------------------------------------
+   * Static Methods
+  -----------------------------------------------------------------------------*/
+
+  static size_t StaticVorbisRead( void* Dest, size_t Size, size_t Num, void* Data )
   {
-    return Pos;
+    PrivateData* PrivDataPtr = (PrivateData*)Data;
+    return PrivDataPtr->Stream->VorbisRead( Dest, Size, Num, PrivDataPtr->Music->ChunkData );
   }
 
-  static size_t StaticVorbisRead( void* Dest, size_t Size, size_t Num, void* Src )
+  static int StaticVorbisSeek( void* Data, ogg_int64_t Offset, int Whence )
   {
-    return StaticStream->VorbisRead( Dest, Size, Num, Src );
+    PrivateData* PrivDataPtr = (PrivateData*)Data;
+    return PrivDataPtr->Stream->VorbisSeek( Offset, Whence );
   }
 
-  static int StaticVorbisSeek( void* Src, ogg_int64_t Offset, int Whence )
+  static long StaticVorbisTell( void* Data )
   {
-    return StaticStream->VorbisSeek( Src, Offset, Whence );
-  }
-
-  static long StaticVorbisTell( void* Src )
-  {
-    return StaticStream->VorbisTell( Src );
+    PrivateData* PrivDataPtr = (PrivateData*)Data;
+    return PrivDataPtr->Stream->Pos;
   }
 
 public:
   bool Init( UMusic* Music, int Section )
   {
-    StaticStream = this;
+    PrivData.Stream = this;
+    PrivData.Music = Music;
+
     Callbacks.read_func  = StaticVorbisRead;
     Callbacks.seek_func  = StaticVorbisSeek;
     Callbacks.close_func = NULL;
@@ -259,7 +274,7 @@ public:
     Pos = 0;
     Len = Music->ChunkSize;
 
-    if ( ov_open_callbacks( Music->ChunkData, &VorbisFile, NULL, 0, Callbacks ) < 0 )
+    if ( ov_open_callbacks( &PrivData, &VorbisFile, NULL, 0, Callbacks ) < 0 )
     {
       GLogf( LOG_ERR, "Tried to init ogg vorbis stream for non-ogg music '%s'", Music->Name.Data() );
       return false;
@@ -286,15 +301,153 @@ public:
 
     long Ret = ov_read( &VorbisFile, (char*)Buffer, Num, IsBigEndian, 2, 1, NULL );
     if ( Ret < 0 )
-      GLogf( LOG_ERR, "Failed to get PCM from ogg stream" );
-  }
-
-  void GoToSection( int SongSection )
-  {
+      GLogf( LOG_ERR, "Failed to get PCM from ogg stream for music '%s'", PrivData.Music->Name.Data() );
   }
 };
 
-FOggMusicStream* FOggMusicStream::StaticStream = NULL;
+/*-----------------------------------------------------------------------------
+ * FMp3MusicStream
+ * Plays back MP3 music
+-----------------------------------------------------------------------------*/
+class FMp3MusicStream : public FMusicStream
+{
+  struct PrivateData
+  {
+    FMp3MusicStream* Stream;
+    UMusic* Music;
+  };
+  PrivateData PrivData;
+
+  mpg123_handle* Handle;
+  size_t Pos;
+  size_t Len;
+
+  static ssize_t MpgRead( void* Data, void* Dest, size_t Num )
+  {
+    PrivateData* PrivData = (PrivateData*)Data;
+    FMp3MusicStream* Stream = PrivData->Stream;
+
+    ssize_t Ret = 0;
+
+    if ( Stream->Pos < Stream->Len )
+    {
+      size_t RealSize = MIN( Num, Stream->Len - Stream->Pos );
+      void* Src = PrivData->Music->ChunkData;
+
+      memcpy( Dest, PtrAdd( Src, Stream->Pos ), RealSize );
+      Stream->Pos += Num;
+      Ret += Num;
+    }
+
+    return Ret;
+  }
+
+  static off_t MpgSeek( void* Data, off_t Offset, int Whence )
+  {
+    PrivateData* PrivData = (PrivateData*)Data;
+    FMp3MusicStream* Stream = PrivData->Stream;
+
+    switch ( Whence )
+    {
+    case SEEK_SET:
+      if ( Offset > Stream->Len )
+        Stream->Pos = Stream->Len;
+      else
+        Stream->Pos = Offset;
+      break;
+    case SEEK_CUR:
+      if ( Offset > 0 && Stream->Pos + Offset > Stream->Len )
+        Stream->Pos = Stream->Len;
+      else if ( Offset < 0 && Stream->Pos - Offset < 0 )
+        Stream->Pos = 0;
+      else
+        Stream->Pos += Offset;
+      break;
+    case SEEK_END:
+      if ( Offset > Stream->Len )
+        Stream->Pos = 0;
+      else
+        Stream->Pos = Stream->Len - Offset;
+      break;
+    }
+
+    return -1;
+  }
+
+  static void MpgClose( void* Data )
+  {
+    // No cleanup needed
+  }
+
+public:
+  bool Init( UMusic* Music, int Section )
+  {
+    // Init mpg123
+    if ( mpg123_init() != MPG123_OK )
+    {
+      GLogf( LOG_ERR, "Failed to initialize mpg123 library, cannot play mp3 music '%s'", Music->Name.Data() );
+      return false;
+    }
+
+    PrivData.Stream = this;
+    PrivData.Music = Music;
+    
+    Pos = 0;
+    Len = Music->ChunkSize;
+    
+    // Create mp3 handle
+    int Error = 0;
+    Handle = mpg123_new( "generic", &Error );
+    if ( Handle == NULL )
+    {
+      GLogf( LOG_ERR, "Failed to initialize mpg123 decoder, cannot play mp3 music '%s'", Music->Name.Data() );
+      return false;
+    }
+
+    // Replace reader handles
+    if ( mpg123_replace_reader_handle( Handle, MpgRead, MpgSeek, MpgClose ) != MPG123_OK )
+    {
+      GLogf( LOG_ERR, "Failed to replace reader functions for mp3 file '%s'", Music->Name.Data() );
+      return false;
+    }
+
+    // Open the buffer
+    if ( mpg123_open_handle( Handle, &PrivData ) != MPG123_OK )
+    {
+      GLogf( LOG_ERR, "Failed to register MP3 with mpg123, cannot play mp3 music '%s'", Music->Name.Data() );
+      return false;
+    }
+
+    mpg123_seek( Handle, 0, SEEK_SET );
+    Pos = 0;
+
+    // Set stream properties
+    StreamFormat = STREAM_Stereo16;
+    mpg123_format( Handle, 0, 2, MPG123_ENC_SIGNED_16 );
+
+    mpg123_frameinfo FrameInfo;
+    mpg123_info( Handle, &FrameInfo );
+
+    StreamRate = FrameInfo.rate;
+
+    return true;
+  }
+
+  void Exit()
+  {
+    mpg123_close( Handle );
+    mpg123_delete( Handle );
+    mpg123_exit();
+  }
+
+  void GetPCM( void* Buffer, size_t Num )
+  {
+    size_t Bytes = 0;
+    if ( mpg123_read( Handle, (u8*)Buffer, Num, &Bytes ) != MPG123_OK )
+      GLogf( LOG_ERR, "Failed to read mp3 bytes for music '%s'", PrivData.Music->Name.Data() );
+  }
+};
+
 
 /*-----------------------------------------------------------------------------
  * UMusic
@@ -349,6 +502,9 @@ void UMusic::Load()
       break;
     case NAME_Ogg:
       Stream = new FOggMusicStream();
+      break;
+    case NAME_Mp3:
+      Stream = new FMp3MusicStream();
       break;
     default:
       GLogf( LOG_WARN, "Unsupported music type '%s' loaded", MusicType.Data() );
