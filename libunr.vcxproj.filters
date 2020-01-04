@@ -291,6 +291,18 @@
     <ClInclude Include="include\Util\TRingQueue.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="include\Engine\FDumbMusicStream.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\FGmeMusicStream.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\FMp3MusicStream.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\FOggMusicStream.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Actors\AActor.cpp">
