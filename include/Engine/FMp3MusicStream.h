@@ -17,7 +17,7 @@
 \*===========================================================================*/
 
 /*========================================================================
- * FMp3MusicStream.h - Plays back music from Ogg Vorbis files
+ * FMp3MusicStream.h - Plays back music from MP3 files
  *
  * written by Adam 'Xaleros' Smith
  *========================================================================
@@ -25,10 +25,6 @@
 
 #include <mpg123.h>
 
-/*-----------------------------------------------------------------------------
- * FMp3MusicStream
- * Plays back MP3 music
------------------------------------------------------------------------------*/
 class FMp3MusicStream : public FMusicStream
 {
   struct PrivateData

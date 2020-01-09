@@ -23,19 +23,43 @@
  *========================================================================
 */
 
+#include "Util/FConfig.h"
 #include "Engine/UViewport.h"
 
 UViewport::UViewport()
   : UPlayer()
 {
-  Width = 0;
-  Height = 0;
-  BitsPerPixel = 32;
-  MaxDesiredFramerate = 60;
+  Width = -1;
+  Height = -1;
+  BitsPerPixel = 0;
 }
 
 UViewport::~UViewport()
 {
+}
+
+bool UViewport::Init()
+{
+  // Read config settings
+  Width = GLibunrConfig->ReadInt32( "Engine.Viewport", "Width", 0, 1024 ); // TODO: Default to native res
+  Height = GLibunrConfig->ReadInt32( "Engine.Viewport", "Height", 0, 768 );
+  BitsPerPixel = GLibunrConfig->ReadUInt8( "Engine.Viewport", "BitsPerPixel", 0, 24 ); // Usually ignored
+  return true;
+}
+
+bool UViewport::Exit()
+{
+  return false;
+}
+
+void UViewport::Show()
+{
+
+}
+
+void UViewport::Hide()
+{
+
 }
 
 #include "Core/UClass.h"

@@ -17,56 +17,75 @@
 \*===========================================================================*/
 
 /*========================================================================
- * FGmeMusicStream.h - Plays back music files from various retro game systems
+ * UWindowsViewport.cpp - A viewport implemented in WinAPI
  *
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#include <gme.h>
+#include "Engine/UWindowsViewport.h"
 
-class FGmeMusicStream : public FMusicStream
+UWindowsViewport::UWindowsViewport()
+  : UViewport()
 {
-  UMusic* Music;
-  Music_Emu* MusicEmu;
+}
 
-public:
-  bool Init( UMusic* InMusic, int Section )
+UWindowsViewport::~UWindowsViewport()
+{
+}
+
+bool UWindowsViewport::Init()
+{
+  Super::Init();
+
+  // Get hInstance handle
+  Handle = GetModuleHandle( NULL );
+
+  // Set up window class
+  WndClass.style = CS_HREDRAW | CS_VREDRAW;
+  WndClass.lpfnWndProc = StaticWndProc;
+  WndClass.cbClsExtra = 0;
+  WndClass.cbWndExtra = 0;
+  WndClass.hInstance = Handle;
+  WndClass.hIcon = NULL; // TODO: Put OpenUE icon here
+  WndClass.hCursor = LoadCursor( NULL, IDC_ARROW );
+  WndClass.hbrBackground = NULL;
+  WndClass.lpszMenuName = NULL;
+  WndClass.lpszClassName = "UWindowsViewport";
+
+  WndClassAtom = RegisterClassEx( &WndClass );
+  if ( !WndClassAtom )
   {
-    MusicEmu = NULL;
-    Music = InMusic;
-    StreamFormat = STREAM_Stereo16;
-    StreamRate = GEngine->Audio->OutputRate;
-
-    // Open music data
-    const char* Err = gme_open_data( Music->ChunkData, Music->ChunkSize, &MusicEmu, StreamRate );
-    if ( Err )
-    {
-      GLogf( LOG_ERR, "Failed to initialize game-music-emu, cannot play music '%s' (%s)", Music->Name.Data(), Err );
-      return false;
-    }
-
-    // Start playback
-    Err = gme_start_track( MusicEmu, Section );
-    if ( Err )
-    {
-      GLogf( LOG_ERR, "Failed to start music '%s' (%s)", Music->Name.Data(), Err );
-      return false;
-    }
-
-    return true;
+    GLogf( LOG_CRIT, "Failed to create windows viewport, RegisterClassEx() failed (%d)", GetLastError() );
+    return false;
   }
 
-  void Exit()
+  Window = 
+  CreateWindowEx
+  (
+    0,
+    "UWindowsViewport",
+    "OpenUE",
+    WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX,
+    CW_USEDEFAULT,
+    CW_USEDEFAULT,
+    Width,
+    Height,
+    NULL,
+    NULL,
+    Handle,
+    this
+  );
+
+  if ( !Window )
   {
-    gme_delete( MusicEmu );
+    GLogf( LOG_CRIT, "Failed to create windows viewport, CreateWindowEx() failed (%d)", GetLastError() );
+    return false;
   }
 
-  void GetPCM( void* Buffer, size_t Num )
-  {
-    // Samples are always in stereo at 16-bit, divide Num by 2
-    const char* Err = gme_play( MusicEmu, Num / 2, (i16*)Buffer );
-    if ( Err )
-      GLogf( LOG_ERR, "Failed to play gme sample from music '%s' (%s)", Music->Name.Data(), Err );
-  }
-};
+  return true;
+}
+
+#include "Core/UClass.h"
+#include "Core/UPackage.h"
+IMPLEMENT_NATIVE_CLASS( UWindowsViewport );

@@ -25,10 +25,20 @@
 
 #pragma once
 
+#include "Core/UMath.h"
 #include "Core/USystem.h"
+#include "Engine/UTexture.h"
 
+class AActor;
 class APlayerPawn;
+class ULevel;
+class UMesh;
+class UViewport;
 
+/*-----------------------------------------------------------------------------
+ * URenderIterator
+ * Defines an object which can render many things at one time
+-----------------------------------------------------------------------------*/
 class LIBUNR_API URenderIterator : public UObject
 {
   DECLARE_NATIVE_CLASS( URenderIterator, UObject, 0, Engine )
@@ -54,31 +64,78 @@ class LIBUNR_API URenderIterator : public UObject
   void* Frame;
 };
 
+/*-----------------------------------------------------------------------------
+ * FPostRenderNode
+ * Defines a set of geometry to draw after the scene has been rendered
+-----------------------------------------------------------------------------*/
+struct FPostRenderNode
+{
+  FBox Dim;
+  FRotator Rot;
+};
+
+/*-----------------------------------------------------------------------------
+ * URenderDevice
+ * Defines the base interface for render devices to display the world
+-----------------------------------------------------------------------------*/
 class LIBUNR_API URenderDevice : public USubsystem
 {
   DECLARE_NATIVE_CLASS( URenderDevice, USubsystem, CLASS_NoExport, Engine )
 
   URenderDevice();
 
-  // TODO:
+  virtual bool Init() { return false; }
+  virtual bool Exit() { return false; }
+
+  /*-----------------------------------------------------------------------------
+   * Complex drawing functions
+   * Used for drawing the world, including occlusion and lighting
+-  ----------------------------------------------------------------------------*/
+
+  // Draws the current world from the perspective of a viewport
+  virtual void DrawWorld( ULevel* Level, UViewport* Viewport ) {}
+
+  // Draws an actor in the world
+  virtual void DrawActor( AActor* Actor ) {}
+
+  /*-----------------------------------------------------------------------------
+   * Simple drawing functions
+   * Can be used for things like Canvas, texture and mesh browser, etc
+  -----------------------------------------------------------------------------*/
+
+  // Draws a flat tile with a single texture
+  virtual void DrawTile( UTexture* Tex, FBox& Dim, FRotator& Rot, float U, float V, float UL, float VL, int PolyFlags = 0 ) {}
+
+  // Draws a mesh on the screen
+  virtual void DrawMesh( UMesh* Mesh, FName AnimSeq, float AnimRate, FVector& Loc, FVector& Scale, FRotator& Rot, int PolyFlags = 0 ) {}
+
+  /*-----------------------------------------------------------------------------
+   * Utility functions
+   * These generally have some specific, one-time purpose
+  -----------------------------------------------------------------------------*/
+
+  // Draws a grid in 3D space
+  virtual void DrawGrid( FBox& Dim, FColor& Color ) {}
 };
 
+/*-----------------------------------------------------------------------------
+ * URenderBase
+ * Deprecated, holds a reference to render device, which does all rendering
+-----------------------------------------------------------------------------*/
 class LIBUNR_API URenderBase : public USubsystem
 {
   DECLARE_NATIVE_CLASS( URenderBase, USubsystem, CLASS_NoExport, Engine )
 
   URenderBase();
-
   URenderDevice* RenderDevice;
-  // TODO:
 };
 
+/*-----------------------------------------------------------------------------
+ * UStaticLightData
+ * TODO
+-----------------------------------------------------------------------------*/
 class LIBUNR_API UStaticLightData : public UObject
 {
   DECLARE_NATIVE_CLASS( UStaticLightData, UObject, CLASS_NoExport, Engine )
   UStaticLightData();
-
-  // TODO:
 };
-
-

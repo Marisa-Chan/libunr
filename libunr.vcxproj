@@ -67,9 +67,9 @@
     <ClInclude Include="include\Engine\UStaticMesh.h" />
     <ClInclude Include="include\Engine\UTexture.h" />
     <ClInclude Include="include\Engine\UViewport.h" />
-    <ClInclude Include="include\Engine\UViewportWayland.h" />
-    <ClInclude Include="include\Engine\UViewportWin.h" />
-    <ClInclude Include="include\Engine\UViewportX11.h" />
+    <ClInclude Include="include\Engine\UWindowsClient.h" />
+    <ClInclude Include="include\Engine\UWindowsViewport.h" />
+    <ClInclude Include="include\Engine\UX11Viewport.h" />
     <ClInclude Include="include\HPSS\AParticleFX.h" />
     <ClInclude Include="include\HPSS\UParticleList.h" />
     <ClInclude Include="include\libunr.h" />
@@ -143,6 +143,7 @@
     <ClCompile Include="src\Engine\UStaticMesh.cpp" />
     <ClCompile Include="src\Engine\UTexture.cpp" />
     <ClCompile Include="src\Engine\UViewport.cpp" />
+    <ClCompile Include="src\Engine\UWindowsViewport.cpp" />
     <ClCompile Include="src\HPSS\AParticleFX.cpp" />
     <ClCompile Include="src\HPSS\UParticleList.cpp" />
     <ClCompile Include="src\Rune\ARuneActor.cpp" />

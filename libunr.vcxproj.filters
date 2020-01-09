@@ -219,15 +219,6 @@
     <ClInclude Include="include\Engine\UViewport.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\UViewportWayland.h">
-      <Filter>Header Files\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\UViewportWin.h">
-      <Filter>Header Files\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Engine\UViewportX11.h">
-      <Filter>Header Files\Engine</Filter>
-    </ClInclude>
     <ClInclude Include="include\HPSS\AParticleFX.h">
       <Filter>Header Files\HPSS</Filter>
     </ClInclude>
@@ -301,6 +292,15 @@
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
     <ClInclude Include="include\Engine\FOggMusicStream.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\UX11Viewport.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\UWindowsViewport.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\UWindowsClient.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
   </ItemGroup>
@@ -487,6 +487,9 @@
     </ClCompile>
     <ClCompile Include="src\Util\FHash.cpp">
       <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\UWindowsViewport.cpp">
+      <Filter>Source Files\Engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

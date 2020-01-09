@@ -17,56 +17,26 @@
 \*===========================================================================*/
 
 /*========================================================================
- * FGmeMusicStream.h - Plays back music files from various retro game systems
+ * UWindowsClient.h - A windows client to interact with the engine
  *
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#include <gme.h>
+#pragma once
 
-class FGmeMusicStream : public FMusicStream
+#include "Engine/UEngine.h"
+
+class UWindowsClient : public UClient
 {
-  UMusic* Music;
-  Music_Emu* MusicEmu;
+  DECLARE_NATIVE_CLASS( UWindowsClient, UClient, CLASS_NoExport | CLASS_Config, WinDrv );
 
-public:
-  bool Init( UMusic* InMusic, int Section )
-  {
-    MusicEmu = NULL;
-    Music = InMusic;
-    StreamFormat = STREAM_Stereo16;
-    StreamRate = GEngine->Audio->OutputRate;
+  UWindowsClient();
 
-    // Open music data
-    const char* Err = gme_open_data( Music->ChunkData, Music->ChunkSize, &MusicEmu, StreamRate );
-    if ( Err )
-    {
-      GLogf( LOG_ERR, "Failed to initialize game-music-emu, cannot play music '%s' (%s)", Music->Name.Data(), Err );
-      return false;
-    }
+  virtual bool Init();
+  virtual bool Exit();
 
-    // Start playback
-    Err = gme_start_track( MusicEmu, Section );
-    if ( Err )
-    {
-      GLogf( LOG_ERR, "Failed to start music '%s' (%s)", Music->Name.Data(), Err );
-      return false;
-    }
-
-    return true;
-  }
-
-  void Exit()
-  {
-    gme_delete( MusicEmu );
-  }
-
-  void GetPCM( void* Buffer, size_t Num )
-  {
-    // Samples are always in stereo at 16-bit, divide Num by 2
-    const char* Err = gme_play( MusicEmu, Num / 2, (i16*)Buffer );
-    if ( Err )
-      GLogf( LOG_ERR, "Failed to play gme sample from music '%s' (%s)", Music->Name.Data(), Err );
-  }
+  virtual UViewport* OpenViewport( int Width, int Height );
+  virtual bool CloseViewport( UViewport* Viewport );
+  virtual void Tick( float DeltaTime );
 };

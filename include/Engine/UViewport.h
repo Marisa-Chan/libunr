@@ -26,18 +26,29 @@
 #pragma once
 
 #include "Engine/UPlayer.h"
+#include "Engine/URender.h"
+
+class UTexture;
 
 class LIBUNR_API UViewport : public UPlayer
 {
   DECLARE_NATIVE_CLASS( UViewport, UPlayer, CLASS_NoExport, Engine )
   UViewport();
 
-  // Viewport properties
+  virtual bool Init();
+  virtual bool Exit();
+  virtual void Show();
+  virtual void Hide();
+  virtual bool Resize( int NewWidth, int NewHeight ) { return false; }
+  virtual bool SetCursor( UTexture* Cursor ) { return false; }
+  virtual void SetViewportTitle( const char* NewTitle ) {}
+
+protected:
   int Width;
   int Height;
   int BitsPerPixel;
-  int MaxDesiredFramerate;
+  const char* Title;
 
-  //URenderDevice* RenderDevice;
+  URenderDevice* RenderDevice;
 };
 

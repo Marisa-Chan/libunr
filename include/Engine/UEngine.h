@@ -30,15 +30,35 @@
 #include "Engine/UAudio.h"
 #include "Engine/URender.h"
 
+class UEngine;
+
+/*-----------------------------------------------------------------------------
+ * UClient
+ * An object representing a client which interacts with the engine
+-----------------------------------------------------------------------------*/
 class LIBUNR_API UClient : public UObject
 {
   DECLARE_NATIVE_CLASS( UClient, UObject, CLASS_NoExport, Engine )
 
   UClient();
 
-  // TODO:
+  virtual bool Init();
+  virtual bool Exit();
+
+  virtual UViewport* OpenViewport( int Width, int Height ) { return NULL; }
+  virtual bool CloseViewport( UViewport* Viewport ) { return false; }
+  virtual void Tick( float DeltaTime ) {}
+
+  UClass* ViewportClass;
+
+  UEngine* Engine;
+  TArray<UViewport*> Viewports;
 };
 
+/*-----------------------------------------------------------------------------
+ * UEngine
+ * The base engine class which enables basic elements of game and editor logic
+-----------------------------------------------------------------------------*/
 class LIBUNR_API UEngine : public USubsystem
 {
   DECLARE_NATIVE_CLASS( UEngine, USubsystem, CLASS_Transient, Engine )
@@ -50,6 +70,7 @@ class LIBUNR_API UEngine : public USubsystem
   virtual bool Exit();
   virtual void Tick( float DeltaTime );
 
+  UClass* ClientClass;
   UClass* GameRenderDevice;
   UClass* AudioDevice;
   UClass* Console;
@@ -58,7 +79,7 @@ class LIBUNR_API UEngine : public USubsystem
 
   UPrimitive*      Cylinder; // but why?
   UClient*         Client;
-  URenderBase*     Render;
+  URenderDevice*   Render;
   UAudioSubsystem* Audio;
 
   int TickCycles;

@@ -26,7 +26,9 @@
 #include "Core/UClass.h"
 #include "Engine/UEngine.h"
 
-UEngine* GEngine = NULL;
+/*-----------------------------------------------------------------------------
+ * UClient
+-----------------------------------------------------------------------------*/
 
 UClient::UClient()
   : UObject()
@@ -36,6 +38,23 @@ UClient::UClient()
 UClient::~UClient()
 {
 }
+
+bool UClient::Init()
+{
+  GLogf( LOG_CRIT, "Tried to initialize null client type" );
+  return false;
+}
+
+bool UClient::Exit()
+{
+  return false;
+}
+
+/*-----------------------------------------------------------------------------
+ * UEngine
+-----------------------------------------------------------------------------*/
+
+UEngine* GEngine = NULL;
 
 UEngine::UEngine()
   : USubsystem()
@@ -49,10 +68,28 @@ UEngine::UEngine()
 
 UEngine::~UEngine()
 {
+
 }
 
 bool UEngine::Init()
 {
+  /*
+  // Initialize our client
+  FString ClientClassStr = GLibunrConfig->ReadString( "Engine.Engine", "Client", 0, "UClient" );
+  ClientClass = UObject::FindClass( FName( ClientClassStr.Data() ) );
+  if ( ClientClass == NULL )
+  {
+    GLogf( LOG_CRIT, "Invalid client type '%s' specified", ClientClassStr.Data() );
+    return false;
+  }
+
+  Client = (UClient*)ClientClass->CreateObject( FName( "LocalClient" ) );
+  if ( !Client->Init() )
+  {
+    GLogf( LOG_CRIT, "Failed to initialize local client" );
+    return false;
+  }
+  */
   // Init audio device
   FString Device( GSystem->AudioDevice );
   
@@ -95,8 +132,48 @@ bool UEngine::Init()
     }
   
   }
+  /*
+  // Init Render Device
+  Device = FString( GSystem->RenderDevice );
+  if ( Device == FString( "None" ) || Device.IsEmpty() )
+  {
+    GLogf( LOG_WARN, "Null RenderDevice selected." );
+  }
+  else
+  {
+    size_t Dot = Device.Find( '.' );
+    if ( Dot == string::npos )
+    {
+      GLogf( LOG_ERR, "Incorrectly formatted RenderDevice setting in libunr.ini" );
+      return false;
+    }
 
-  // TODO: Render device init
+    FString FileName = Device.Substr( 0, Dot );
+    FString ClassName = Device.Substr( Dot + 1 );
+
+    RenderModule = new UDynamicNativeModule();
+    if ( !RenderModule->Load( FileName.Data() ) )
+    {
+      GLogf( LOG_ERR, "Failed to load render device '%s', cannot load native module", Device.Data() );
+      return false;
+    }
+
+    GameRenderDevice = RenderModule->GetNativeClass( ClassName.Data() );
+    if ( GameRenderDevice == NULL )
+    {
+      GLogf( LOG_ERR, "Failed to load render device '%s', class does not exist", Device.Data() );
+      return false;
+    }
+
+    Render = (URenderDevice*)GameRenderDevice->CreateObject( FName( "Render", RF_Native ) );
+    if ( !Render->Init() )
+    {
+      GLogf( LOG_ERR, "Render device initialization failed" );
+      return false;
+    }
+
+  }
+  */
 
   return true;
 }
@@ -112,8 +189,15 @@ void UEngine::Tick( float DeltaTime )
   if ( DeltaTime <= FLT_EPSILON )
     DeltaTime = FLT_EPSILON;
 
+  // Process audio
   if ( Audio )
     Audio->Tick( DeltaTime );
+
+  // Process rendering
+  if ( Render )
+    Render->Tick( DeltaTime );
+
+  TickCycles++;
 }
 
 #include "Core/UClass.h"

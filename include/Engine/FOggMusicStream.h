@@ -25,10 +25,6 @@
 
 #include <vorbis/vorbisfile.h>
 
-/*-----------------------------------------------------------------------------
- * FOggMusicStream
- * Plays back music from Ogg Vorbis files
------------------------------------------------------------------------------*/
 class FOggMusicStream : public FMusicStream
 {
   struct PrivateData
