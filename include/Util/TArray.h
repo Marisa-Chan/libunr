@@ -64,6 +64,13 @@ public:
   {
     vector<T>::insert( vector<T>::end(), x.begin(), x.end() );
   }
+  FORCEINLINE T* Erase( T* Element )
+  {
+    // Get iterator by doing some math on the array
+    size_t Index = (PtrSubtract( Element, vector<T>::data() ) / sizeof( T ));
+    typename vector<T>::iterator Out = vector<T>::erase( vector<T>::begin() + Index );
+    return *Out;
+  }
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, TArray<T>& Array )
   {
