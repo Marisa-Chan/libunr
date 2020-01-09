@@ -212,62 +212,6 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\CMakeLists.txt">
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule F:/data/dev/openue/libunr/deps/game-music-emu-0.6.2/gme/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SF:/data/dev/openue/libunr/deps/game-music-emu-0.6.2 -BF:/data/dev/openue/libunr/deps/game-music-emu-0.6.2/build --check-stamp-file F:/data/dev/openue/libunr/deps/game-music-emu-0.6.2/build/gme/CMakeFiles/generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\gme_types.h.in;F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\libgme.pc.in;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\build\gme\CMakeFiles\generate.stamp</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule F:/data/dev/openue/libunr/deps/game-music-emu-0.6.2/gme/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SF:/data/dev/openue/libunr/deps/game-music-emu-0.6.2 -BF:/data/dev/openue/libunr/deps/game-music-emu-0.6.2/build --check-stamp-file F:/data/dev/openue/libunr/deps/game-music-emu-0.6.2/build/gme/CMakeFiles/generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\gme_types.h.in;F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\libgme.pc.in;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\build\gme\CMakeFiles\generate.stamp</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule F:/data/dev/openue/libunr/deps/game-music-emu-0.6.2/gme/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SF:/data/dev/openue/libunr/deps/game-music-emu-0.6.2 -BF:/data/dev/openue/libunr/deps/game-music-emu-0.6.2/build --check-stamp-file F:/data/dev/openue/libunr/deps/game-music-emu-0.6.2/build/gme/CMakeFiles/generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\gme_types.h.in;F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\libgme.pc.in;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\build\gme\CMakeFiles\generate.stamp</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule F:/data/dev/openue/libunr/deps/game-music-emu-0.6.2/gme/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SF:/data/dev/openue/libunr/deps/game-music-emu-0.6.2 -BF:/data/dev/openue/libunr/deps/game-music-emu-0.6.2/build --check-stamp-file F:/data/dev/openue/libunr/deps/game-music-emu-0.6.2/build/gme/CMakeFiles/generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\gme_types.h.in;F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\libgme.pc.in;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\build\gme\CMakeFiles\generate.stamp</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
-    </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Blip_Buffer.cpp" />
     <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Classic_Emu.cpp" />
     <ClCompile Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\Data_Reader.cpp" />

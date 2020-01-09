@@ -141,9 +141,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="F:\data\dev\openue\libunr\deps\game-music-emu-0.6.2\gme\CMakeLists.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <Filter Include="Source Files">
       <UniqueIdentifier>{095A74E5-05C0-3F79-9A4A-FBBA8DFD3323}</UniqueIdentifier>
     </Filter>
