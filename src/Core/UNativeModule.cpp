@@ -75,13 +75,13 @@ bool UDynamicNativeModule::Load( const char* Filename )
   FString SystemDir = FString( GSystem->GamePath );
   SystemDir += "/System";
 
-  FStringFilePath SystemPath = FStringFilePath( SystemDir.Data(), Filename, NATIVE_MODULE_EXT );
-  FStringFilePath LibunrPath = FStringFilePath( USystem::GetNativeModulesPath(), Filename, NATIVE_MODULE_EXT );
+  FStringFilePath* SystemPath = new FStringFilePath( SystemDir.Data(), Filename, NATIVE_MODULE_EXT );
+  FStringFilePath* LibunrPath = new FStringFilePath( USystem::GetNativeModulesPath(), Filename, NATIVE_MODULE_EXT );
 
-  FStringFilePath Path = LibunrPath;
-  if ( !USystem::FileExists( LibunrPath.Data() ) ) 
+  FStringFilePath* Path = LibunrPath;
+  if ( !USystem::FileExists( LibunrPath->Data() ) ) 
   {
-    if ( !USystem::FileExists( SystemPath.Data() ) )
+    if ( !USystem::FileExists( SystemPath->Data() ) )
     {
       GLogf( LOG_ERR, "Cannot find native module '%s'", Filename );
       return false;
@@ -91,20 +91,23 @@ bool UDynamicNativeModule::Load( const char* Filename )
   }
 
 #if defined LIBUNR_POSIX
-  ModulePtr = dlopen( Path.Data(), RTLD_LAZY );
+  ModulePtr = dlopen( Path->Data(), RTLD_LAZY );
   if ( ModulePtr == NULL )
   {
     GLogf( LOG_ERR, "Failed to open native module '%s': %s", Filename, dlerror() );
     return false;
   }
 #elif defined LIBUNR_WIN32
-  ModulePtr = LoadLibrary( Path.Data() );
+  ModulePtr = LoadLibrary( Path->Data() );
   if ( ModulePtr == NULL )
   {
     GLogf( LOG_ERR, "Failed to open native module '%s': %d", Filename, GetLastError() );
     return false;
   }
 #endif
+
+  delete LibunrPath;
+  delete SystemPath;
   return true;
 }
 

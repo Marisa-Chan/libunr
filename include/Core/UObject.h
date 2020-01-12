@@ -221,14 +221,16 @@ protected: \
   static UClass* ObjectClass; \
   static FNativePropertyList* StaticNativePropList; \
 private: \
-  static constexpr const char* NativePkgName = TEXT(pkg); \
+  static constexpr const char* NativePkgName = TXT(pkg); \
   static const u32 StaticFlags = clsflags; \
   static size_t NativeSize; \
 public: \
   typedef supcls Super; \
   void* operator new( size_t sz ) \
   { \
-    return malloc( sz ); \
+    void* Mem = malloc( sz ); \
+    ((UObject*)Mem)->Class = ObjectClass; \
+    return Mem; \
   } \
   void* operator new( size_t sz, size_t ObjSize ) \
   { \
@@ -259,7 +261,7 @@ public: \
   { \
     if (!StaticNativePropList) \
     { \
-      const char* ClsName = TEXT(cls); \
+      const char* ClsName = TXT(cls); \
       StaticNativePropList = new FNativePropertyList( SuperFastHashString( ClsName + 1 ),\
         NumProperties ); \
       if ( StaticNativePropList != NULL ) \
@@ -276,19 +278,19 @@ public: \
   { \
     if ( !StaticCreateClass() ) \
     { \
-      GLogf( LOG_CRIT, "%s::StaticCreateClass() failed!", TEXT(cls) ); \
+      GLogf( LOG_CRIT, "%s::StaticCreateClass() failed!", TXT(cls) ); \
       return false; \
     } \
     if ( !( (clsflags) & CLASS_NoExport ) ) \
     { \
       if ( !StaticLinkNativeProperties() ) \
       { \
-        GLogf( LOG_CRIT, "%s::StaticLinkNativeProperties() failed!", TEXT(cls) ); \
+        GLogf( LOG_CRIT, "%s::StaticLinkNativeProperties() failed!", TXT(cls) ); \
         return false; \
       } \
       if ( !StaticSetPackageProperties() ) \
       { \
-        GLogf( LOG_CRIT, "%s::StaticSetPackageProperties() failed!", TEXT(cls) ); \
+        GLogf( LOG_CRIT, "%s::StaticSetPackageProperties() failed!", TXT(cls) ); \
         return false; \
       } \
     } \
@@ -325,13 +327,13 @@ public: \
     if (!ObjectClass) \
     { \
       UPackage* ClsPkg = UPackage::StaticLoadPackage( NativePkgName ); \
-      if (!ClsPkg) \
+      if (!ClsPkg && !(StaticFlags & CLASS_NoExport)) \
       { \
         GLogf( LOG_CRIT, "Package '%s' for class '%s' could not be opened", \
-          NativePkgName, TEXT(cls) ); \
+          NativePkgName, TXT(cls) ); \
         return false; \
       } \
-      const char* ClsNameStr = TEXT(cls); \
+      const char* ClsNameStr = TXT(cls); \
       ClsNameStr++; \
       FName ClsName = FName( ClsNameStr, RF_TagExp | RF_LoadContextFlags | RF_Native, true ); \
       ObjectClass = UObject::StaticAllocateClass( ClsName, StaticFlags, Super::ObjectClass,\
@@ -394,7 +396,7 @@ bool cls::StaticLinkNativeProperties() \
     ExpProp->Outer = ExpCls; \
     ExpProp->Offset = OFFSET_OF( cls, prop ); \
     ExpProp->Next = ExpCls->Children; \
-    ExpProp->Name = FName( TEXT(prop), RF_TagExp | RF_LoadContextFlags ); \
+    ExpProp->Name = FName( TXT(prop), RF_TagExp | RF_LoadContextFlags ); \
     ExpProp->ObjectFlags = RF_Native; \
     ExpProp->RefCnt = 1; \
     ExpProp->Class = ptype::StaticClass(); \

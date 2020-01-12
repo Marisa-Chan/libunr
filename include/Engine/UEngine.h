@@ -45,13 +45,14 @@ class LIBUNR_API UClient : public UObject
   virtual bool Init();
   virtual bool Exit();
 
-  virtual UViewport* OpenViewport( int Width, int Height ) { return NULL; }
-  virtual bool CloseViewport( UViewport* Viewport ) { return false; }
   virtual void Tick( float DeltaTime ) {}
+  virtual UViewport* OpenViewport( int InWidth = 0, int InHeight = 0 ) { return NULL; }
+  virtual bool CloseViewport( UViewport* Viewport ) { return false; }
+  virtual void HandleInput( int Key, bool bDown ) {}
 
   UClass* ViewportClass;
-
   UEngine* Engine;
+  UViewport* CurrentViewport;
   TArray<UViewport*> Viewports;
 };
 

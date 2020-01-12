@@ -209,7 +209,8 @@ UStruct::~UStruct()
 
 // Script loading
 #define LOAD_CODE( strct, var, type ) \
-  *(strct->ScriptCode)++ = var
+  *((type*)strct->ScriptCode) = var; \
+  strct->ScriptCode += sizeof(type)
 
 static inline void LoadScriptByte( UStruct* Struct, FPackageFileIn* PkgFile, u32* ParsedSize )
 {

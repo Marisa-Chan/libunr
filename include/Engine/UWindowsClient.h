@@ -25,18 +25,22 @@
 
 #pragma once
 
+#include <Windows.h>
 #include "Engine/UEngine.h"
 
-class UWindowsClient : public UClient
+class LIBUNR_API UWindowsClient : public UClient
 {
-  DECLARE_NATIVE_CLASS( UWindowsClient, UClient, CLASS_NoExport | CLASS_Config, WinDrv );
+  DECLARE_NATIVE_CLASS( UWindowsClient, UClient, CLASS_NoExport | CLASS_Config, WinDrv )
 
   UWindowsClient();
 
   virtual bool Init();
   virtual bool Exit();
 
-  virtual UViewport* OpenViewport( int Width, int Height );
+  virtual UViewport* OpenViewport( int InWidth = 0, int InHeight = 0 );
   virtual bool CloseViewport( UViewport* Viewport );
+  virtual void HandleInput( int Key, bool bDown );
   virtual void Tick( float DeltaTime );
+
+  HINSTANCE hInstance;
 };

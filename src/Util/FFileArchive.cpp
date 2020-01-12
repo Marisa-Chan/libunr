@@ -17,14 +17,19 @@
 \*===========================================================================*/
 
 /*========================================================================
- * FFileArchiveOut.cpp - FFileArchiveOut implementation
+ * FFileArchive.cpp - FFileArchive implementation
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
-#include <stdarg.h>
 #include "Util/FFileArchive.h"
+
+#include <stdarg.h>
+
+#if defined LIBUNR_WIN32
+  #include <direct.h>
+#endif
 
 /*-----------------------------------------------------------------------------
   FFileArchive
@@ -138,9 +143,13 @@ int FFileArchiveOut::Open( const FString& Filename )
 /*-----------------------------------------------------------------------------
   FStringFilePath
 -----------------------------------------------------------------------------*/
-FStringFilePath::FStringFilePath( const char* Dir, const char* Name, const char* Ext )
+FStringFilePath::FStringFilePath( const char* InDir, const char* InName, const char* InExt )
   : FString()
 {
+  Dir = strdup( InDir );
+  Name = strdup( InName );
+  Ext = strdup( InExt );
+
   Append( Dir );
 #if defined LIBUNR_WIN32
   ReplaceChars( '\\', '/' );
@@ -151,4 +160,54 @@ FStringFilePath::FStringFilePath( const char* Dir, const char* Name, const char*
   Append( Name );
   Append( 1, '.' );
   Append( Ext );
+}
+
+FStringFilePath::FStringFilePath( const char* Path )
+  : FString( Path )
+{
+  Dir = strdup( Path );
+  Ext = NULL;
+
+  char* Marker = strrchr( Dir, DIRECTORY_SEPARATOR );
+  if ( Marker == NULL )
+  {
+    // No directory, just a single file name in the path
+    Name = Dir;
+    Dir = getcwd( NULL, 0 );
+  }
+  else if ( (size_t)PtrSubtract( Marker, Dir ) == Size() )
+  {
+    *Marker = '\0';
+    Marker = strrchr( Marker, DIRECTORY_SEPARATOR );
+
+    *Marker = '\0';
+    Name = strdup( ++Marker );
+  }
+  else
+  {
+    *Marker = '\0';
+    Name = strdup( ++Marker );
+  }
+
+  Marker = strchr( Name, '.' );
+  if ( Marker )
+  {
+    *Marker = '\0';
+    Ext = strdup( ++Marker );
+  }
+}
+
+const char* FStringFilePath::GetDir()
+{
+  return Dir;
+}
+
+const char* FStringFilePath::GetName()
+{
+  return Name;
+}
+
+const char* FStringFilePath::GetExt()
+{
+  return Ext;
 }

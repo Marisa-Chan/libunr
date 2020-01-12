@@ -24,6 +24,7 @@
 */
 
 #include "Util/FConfig.h"
+#include "Engine/UEngine.h"
 #include "Engine/UViewport.h"
 
 UViewport::UViewport()
@@ -38,12 +39,15 @@ UViewport::~UViewport()
 {
 }
 
-bool UViewport::Init()
+bool UViewport::Init( int InWidth, int InHeight )
 {
   // Read config settings
-  Width = GLibunrConfig->ReadInt32( "Engine.Viewport", "Width", 0, 1024 ); // TODO: Default to native res
-  Height = GLibunrConfig->ReadInt32( "Engine.Viewport", "Height", 0, 768 );
-  BitsPerPixel = GLibunrConfig->ReadUInt8( "Engine.Viewport", "BitsPerPixel", 0, 24 ); // Usually ignored
+  // TODO: Default to native res
+  Width = (InWidth) ? InWidth : GLibunrConfig->ReadInt32( "libunr", "RenderWidth", 0, 1024 );
+  Height = (InHeight) ? InHeight : GLibunrConfig->ReadInt32( "libunr", "RenderHeight", 0, 768 );
+  BitsPerPixel = GLibunrConfig->ReadUInt8( "libunr", "RenderBpp", 0, 24 ); // Usually ignored
+
+  Client = GEngine->Client;
   return true;
 }
 

@@ -33,11 +33,11 @@ class LIBUNR_API UWindowsViewport : public UViewport
   DECLARE_NATIVE_CLASS( UWindowsViewport, UViewport, CLASS_NoExport, WinDrv )
   UWindowsViewport();
 
-  virtual bool Init();
-  virtual bool Exit() { return true; }
-  virtual void Show() {}
-  virtual void Hide() {}
-  virtual bool Resize( int NewWidth, int NewHeight ) { return true; }
+  virtual bool Init( int InWidth = 0, int InHeight = 0 );
+  virtual bool Exit();
+  virtual void Show();
+  virtual void Hide();
+  virtual bool Resize( int NewWidth, int NewHeight );
 
   // Viewport properties
   HINSTANCE Handle;
@@ -47,5 +47,5 @@ class LIBUNR_API UWindowsViewport : public UViewport
   ATOM WndClassAtom;
 
 protected:
-  static LRESULT StaticWndProc( HWND Hwnd, UINT Msg, WPARAM WParam, LPARAM LParam ) { return 0; }
+  static LRESULT StaticWndProc( HWND Hwnd, UINT Msg, WPARAM WParam, LPARAM LParam );
 };

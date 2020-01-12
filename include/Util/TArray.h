@@ -64,7 +64,7 @@ public:
   {
     vector<T>::insert( vector<T>::end(), x.begin(), x.end() );
   }
-  FORCEINLINE T* Erase( size_t Index )
+  FORCEINLINE T& Erase( size_t Index )
   {
     // Get iterator by doing some math on the array
     typename vector<T>::iterator Out = vector<T>::erase( vector<T>::begin() + Index );

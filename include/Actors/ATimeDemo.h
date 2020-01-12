@@ -32,8 +32,6 @@ class LIBUNR_API ATimeDemo : public AInfo
 
   ATimeDemo();
 
-  int FileAr; // Unused now
-
   float TimePassed;
   float TimeDilation;
 

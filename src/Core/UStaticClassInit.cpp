@@ -79,6 +79,21 @@
 #include "HPSS/UParticleList.h"
 #include "HPSS/AParticleFX.h"
 
+// Platform specific headers
+#if defined LIBUNR_WIN32
+  #include "Engine/UWindowsClient.h"
+  #include "Engine/UWindowsViewport.h"
+#elif defined LIBUNR_POSIX
+  #if defined BUILD_X11
+    #include "Engine/UX11Client.h"
+    #include "Engine/UX11Viewport.h"
+  #endif
+  #if defined BUILD_WAYLAND
+    #include "Engine/UWaylandClient.h"
+    #include "Engine/UWaylandViewport.h"
+  #endif
+#endif
+
 bool UObject::StaticInit()
 {
   bool Result = true;
@@ -217,6 +232,7 @@ bool UObject::StaticInit()
       Result &= UStaticMesh::StaticClassInit();
     Result &= UModel::StaticClassInit();
     Result &= USkelModel::StaticClassInit();
+
   Result &= UPlayer::StaticClassInit();
     Result &= UViewport::StaticClassInit();
   Result &= URenderBase::StaticClassInit();
@@ -226,6 +242,21 @@ bool UObject::StaticInit()
   Result &= USkeletalMeshInstance::StaticClassInit();
   Result &= UVectors::StaticClassInit();
   Result &= UVerts::StaticClassInit();
+
+  // Init platform specific classes
+#if defined LIBUNR_WIN32
+  Result &= UWindowsClient::StaticClassInit();
+  Result &= UWindowsViewport::StaticClassInit();
+#else if defined LIBUNR_POSIX
+  #if defined BUILD_X11
+    Result &= UX11Client::StaticClassInit();
+    Result &= UX11Viewport::StaticClassInit();
+  #endif
+  #if defined BUILD_WAYLAND
+    Result &= UWaylandClient::StaticClassInit();
+    Result &= UWaylandViewport::StaticClassInit();
+  #endif
+#endif
       
   // Init actor classes
   Result &= AActor::StaticClassInit();

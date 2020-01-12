@@ -86,6 +86,7 @@ class LIBUNR_API URenderDevice : public USubsystem
 
   virtual bool Init() { return false; }
   virtual bool Exit() { return false; }
+  virtual void Tick( float DeltaTime ) {}
 
   /*-----------------------------------------------------------------------------
    * Complex drawing functions
@@ -116,6 +117,12 @@ class LIBUNR_API URenderDevice : public USubsystem
 
   // Draws a grid in 3D space
   virtual void DrawGrid( FBox& Dim, FColor& Color ) {}
+
+  // Initializes a viewport for use with the renderer
+  virtual bool InitViewport( UViewport* Viewport ) { return false; }
+
+  // Sets the current viewport to render to
+  virtual bool SetActiveViewport( UViewport* Viewport ) { return false; }
 };
 
 /*-----------------------------------------------------------------------------

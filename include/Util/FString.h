@@ -53,6 +53,7 @@ public:
   FString( float F ) : string( std::to_string( (float)F )) {}
   FString( double D ) : string( std::to_string( (double)D )) {}
   FString( bool B ) : string( std::to_string( (bool)B )) {}
+  ~FString() {}
 
   FORCEINLINE size_t Size() const             { return string::size(); }
   FORCEINLINE size_t Length() const           { return string::length(); }
@@ -202,13 +203,16 @@ FString operator+( char lhs, const string& rhs );
 FString operator+( char lhs, const FString& rhs );
 
 #ifdef LIBUNR_WIN32
-#pragma warning(disable:4273)
+  #pragma warning(disable:4273)
 #endif
+
 LIBUNR_API int stricmp ( const char* str1, const char* str2 );
 LIBUNR_API int strnicmp( const char* str1, const char* str2, size_t count );
+
 #ifdef LIBUNR_WIN32
-#pragma warning(pop)
+  #pragma warning(pop)
 #endif
+
 LIBUNR_API char* strupper( const char* str );
 LIBUNR_API char* GetDateString( const char* Fmt );
 

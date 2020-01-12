@@ -143,6 +143,7 @@
     <ClCompile Include="src\Engine\UStaticMesh.cpp" />
     <ClCompile Include="src\Engine\UTexture.cpp" />
     <ClCompile Include="src\Engine\UViewport.cpp" />
+    <ClCompile Include="src\Engine\UWindowsClient.cpp" />
     <ClCompile Include="src\Engine\UWindowsViewport.cpp" />
     <ClCompile Include="src\HPSS\AParticleFX.cpp" />
     <ClCompile Include="src\HPSS\UParticleList.cpp" />

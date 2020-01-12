@@ -36,8 +36,6 @@
   #include <Windows.h>
   #include <direct.h>
   #undef CopyFile
-  #undef TEXT
-  #define TEXT(s) #s
 #elif defined LIBUNR_POSIX
   #include <pthread.h>
   #include <dirent.h>
@@ -154,8 +152,6 @@ const char* USystem::ResolvePath( const char* PkgName )
       }
     }
 #endif
-    perror("ResolvePath");
-    GLogf( LOG_WARN, "Error resolving path '%s'", PkgName );
   }
 
   return GoodPath;

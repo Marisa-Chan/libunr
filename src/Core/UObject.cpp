@@ -128,7 +128,6 @@ UObject::UObject()
   Export = NULL;
   ObjectFlags = 0;
   Outer = NULL;
-  Class = NULL;
   Pkg = NULL;
   RefCnt = 1;
   OldPkgFileOffsets = new TStack<size_t>();
@@ -138,8 +137,12 @@ UObject::UObject()
 UObject::~UObject()
 {
   // TODO: Cleanly remove self from object pool or, at least, queue up a removal to be done later
-  Export->Obj = NULL;
-  Export->bNeedsFullLoad = true;
+  if ( Export )
+  {
+    Export->Obj = NULL;
+    Export->bNeedsFullLoad = true;
+  }
+
   delete OldPkgFileOffsets;
 }
 

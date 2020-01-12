@@ -71,11 +71,19 @@ UEngine::~UEngine()
 
 }
 
+#if defined LIBUNR_WIN32
+  #define DEFAULT_CLIENT "WindowsClient"
+#elif defined LIBUNR_POSX
+  #define DEFAULT_CLIENT "X11Client"
+#else
+  #define DEFAULT_CLIENT "Client"
+#endif
+
 bool UEngine::Init()
 {
-  /*
   // Initialize our client
-  FString ClientClassStr = GLibunrConfig->ReadString( "Engine.Engine", "Client", 0, "UClient" );
+  FString ClientClassStr = GLibunrConfig->ReadString( "Engine.Engine", "Client", 0, DEFAULT_CLIENT );
+  
   ClientClass = UObject::FindClass( FName( ClientClassStr.Data() ) );
   if ( ClientClass == NULL )
   {
@@ -89,7 +97,7 @@ bool UEngine::Init()
     GLogf( LOG_CRIT, "Failed to initialize local client" );
     return false;
   }
-  */
+  
   // Init audio device
   FString Device( GSystem->AudioDevice );
   
@@ -132,7 +140,7 @@ bool UEngine::Init()
     }
   
   }
-  /*
+  
   // Init Render Device
   Device = FString( GSystem->RenderDevice );
   if ( Device == FString( "None" ) || Device.IsEmpty() )
@@ -173,7 +181,6 @@ bool UEngine::Init()
     }
 
   }
-  */
 
   return true;
 }
@@ -196,6 +203,9 @@ void UEngine::Tick( float DeltaTime )
   // Process rendering
   if ( Render )
     Render->Tick( DeltaTime );
+
+  // Process client events
+  Client->Tick( DeltaTime );
 
   TickCycles++;
 }

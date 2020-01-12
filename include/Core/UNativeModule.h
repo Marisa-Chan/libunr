@@ -55,7 +55,7 @@
   } \
   bool cls::StaticCreateClass() \
   { \
-    const char* ClsNameStr = TEXT(cls); \
+    const char* ClsNameStr = TXT(cls); \
     ClsNameStr++; \
     if (!ObjectClass) { \
       FName ClsName; \
@@ -79,7 +79,6 @@
         NativeSize, NativeConstructor ); \
       if ( ObjectClass != NULL ) \
       { \
-        GLogf( LOG_INFO, "ClassPool size = %i", GetGlobalClassPool()->Size() ); \
         GetGlobalClassPool()->PushBack( ObjectClass ); \
         ObjectClass->bRegistered = true; \
         ObjectClass->Pkg = ClsPkg; \

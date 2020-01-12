@@ -491,6 +491,9 @@
     <ClCompile Include="src\Engine\UWindowsViewport.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\UWindowsClient.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\DefaultLibunr.ini">

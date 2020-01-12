@@ -28,6 +28,7 @@
 #include "Engine/UPlayer.h"
 #include "Engine/URender.h"
 
+class UClient;
 class UTexture;
 
 class LIBUNR_API UViewport : public UPlayer
@@ -35,7 +36,7 @@ class LIBUNR_API UViewport : public UPlayer
   DECLARE_NATIVE_CLASS( UViewport, UPlayer, CLASS_NoExport, Engine )
   UViewport();
 
-  virtual bool Init();
+  virtual bool Init( int InWidth = 0, int InHeight = 0 );
   virtual bool Exit();
   virtual void Show();
   virtual void Hide();
@@ -43,12 +44,12 @@ class LIBUNR_API UViewport : public UPlayer
   virtual bool SetCursor( UTexture* Cursor ) { return false; }
   virtual void SetViewportTitle( const char* NewTitle ) {}
 
-protected:
   int Width;
   int Height;
   int BitsPerPixel;
   const char* Title;
 
+  UClient* Client;
   URenderDevice* RenderDevice;
 };
 

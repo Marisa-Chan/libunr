@@ -23,6 +23,9 @@
  *========================================================================
 */
 
+#ifndef _FFILEARCHIVE_H_
+#define _FFILEARCHIVE_H_
+
 #pragma once
 #include "Util/FArchive.h"
 
@@ -83,6 +86,28 @@ public:
 class LIBUNR_API FStringFilePath : public FString
 {
 public:
-  FStringFilePath( const char* Dir, const char* Name, const char* Ext=NULL );
+  FStringFilePath( const char* InDir, const char* InName, const char* InExt=NULL );
+  FStringFilePath( const char* Path );
+  ~FStringFilePath()
+  {
+    if ( Dir )
+      free( Dir );
+
+    if ( Name )
+      free( Name );
+
+    if ( Ext )
+      free( Ext );
+  }
+
+  const char* GetDir();
+  const char* GetName();
+  const char* GetExt();
+
+protected:
+  char* Dir;
+  char* Name;
+  char* Ext;
 };
 
+#endif

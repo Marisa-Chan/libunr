@@ -23,6 +23,7 @@
  *========================================================================
 */
 
+#include "Engine/UWindowsClient.h"
 #include "Engine/UWindowsViewport.h"
 
 UWindowsViewport::UWindowsViewport()
@@ -34,18 +35,17 @@ UWindowsViewport::~UWindowsViewport()
 {
 }
 
-bool UWindowsViewport::Init()
+bool UWindowsViewport::Init( int InWidth, int InHeight )
 {
-  Super::Init();
+  Super::Init( InWidth, InHeight );
 
-  // Get hInstance handle
   Handle = GetModuleHandle( NULL );
 
   // Set up window class
-  WndClass.style = CS_HREDRAW | CS_VREDRAW;
+  memset( &WndClass, 0, sizeof( WndClass ));
+  WndClass.cbSize = sizeof( WndClass );
+  WndClass.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
   WndClass.lpfnWndProc = StaticWndProc;
-  WndClass.cbClsExtra = 0;
-  WndClass.cbWndExtra = 0;
   WndClass.hInstance = Handle;
   WndClass.hIcon = NULL; // TODO: Put OpenUE icon here
   WndClass.hCursor = LoadCursor( NULL, IDC_ARROW );
@@ -83,7 +83,63 @@ bool UWindowsViewport::Init()
     return false;
   }
 
+  DrawContext = GetDC( Window );
+
+  if ( !GEngine->Render->InitViewport( this ) )
+  {
+    GLogf( LOG_ERR, "Failed to initialize windows viewport with renderer" );
+    DestroyWindow( Window );
+    return false;
+  }
+
   return true;
+}
+
+bool UWindowsViewport::Exit()
+{
+  return DestroyWindow( Window );
+}
+
+void UWindowsViewport::Show()
+{
+  ShowWindow( Window, SW_SHOW );
+}
+
+void UWindowsViewport::Hide()
+{
+  ShowWindow( Window, SW_HIDE );
+}
+
+bool UWindowsViewport::Resize( int NewWidth, int NewHeight )
+{
+  // TODO
+  return false;
+}
+
+LRESULT UWindowsViewport::StaticWndProc( HWND Hwnd, UINT Msg, WPARAM WParam, LPARAM LParam )
+{
+  static UWindowsViewport* This = NULL;
+  switch ( Msg )
+  {
+  case WM_CREATE:
+    This = (UWindowsViewport*)LParam;
+    break;
+  case WM_KEYDOWN:
+    This->Client->HandleInput( WParam, true );
+    break;
+  case WM_KEYUP:
+    This->Client->HandleInput( WParam, false );
+  case WM_DESTROY:
+    DestroyWindow( Hwnd );
+    break;
+  case WM_PAINT:
+    ValidateRect( Hwnd, NULL );
+    break;
+  default:
+    return DefWindowProc( Hwnd, Msg, WParam, LParam );
+    break;
+  }
+  return 0;
 }
 
 #include "Core/UClass.h"

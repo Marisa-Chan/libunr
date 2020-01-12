@@ -132,7 +132,7 @@
 private: \
   cls (const cls & copy); \
 
-#define TEXT(s) #s
+#define TXT(s) #s
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(*a))
 
