@@ -62,5 +62,7 @@ class LIBUNR_API USound : public UObject
   u16   BitsPerSample;
 
 protected:
+  // WAV functions
   void* GetWavPcm();
+  
 };

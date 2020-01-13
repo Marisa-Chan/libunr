@@ -166,6 +166,14 @@ void* USound::GetWavPcm()
   BitsPerSample = *(u16*)Data;
   Data += 2;
 
+  // Check for optional LIST chunk
+  if ( strncmp( (char*)Data, "LIST", 4 ) == 0 )
+  {
+    Data += 4;
+    u32 Size = *(u32*)Data;
+    Data += Size + 4;
+  }
+
   // Get actual data
   if ( strncmp( (char*)Data, "data", 4 ) != 0 )
   {
