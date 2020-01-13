@@ -64,6 +64,11 @@ public:
   {
     vector<T>::insert( vector<T>::end(), x.begin(), x.end() );
   }
+  FORCEINLINE void Append( T* x, size_t n )
+  {
+    for ( size_t i = 0; i < n; i++ )
+      vector<T>::push_back( x[i] );
+  }
   FORCEINLINE T& Erase( size_t Index )
   {
     // Get iterator by doing some math on the array

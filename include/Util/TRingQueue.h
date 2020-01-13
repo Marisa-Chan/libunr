@@ -124,6 +124,12 @@ public:
     return true;
   }
 
+  void Clear()
+  {
+    Current = 0;
+    Num = 0;
+  }
+
 private:
   T* Data;
   size_t Len;

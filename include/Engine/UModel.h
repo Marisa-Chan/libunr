@@ -71,6 +71,7 @@ enum EPolyFlags
   PF_NoBoundRejection = 0x00200000,  // Disable bound rejection in OccludeBSP (reuse Gourard flag)
   PF_Unlit            = 0x00400000,  // Unlit.
   PF_HighShadowDetail = 0x00800000,  // High detail shadows.
+  PF_CustomShader     = 0x01000000,  // Use a custom shader specified in the texture
   PF_Portal           = 0x04000000,  // Portal between iZones.
   PF_Mirrored         = 0x08000000,  // Reflective surface.
 
@@ -85,7 +86,7 @@ enum EPolyFlags
   PF_EdCut        = 0x80000000,  // FPoly has been split by SplitPolyWithPlane.
   PF_RenderFog    = 0x40000000,  // Render with fogmapping.
   PF_Occlude      = 0x80000000,  // Occludes even if PF_NoOcclude.
-  PF_RenderHint   = 0x01000000,   // Rendering optimization hint.
+  PF_RenderHint   = 0x01000000,  // Rendering optimization hint.
 
   // Combinations of flags.
   PF_NoOcclude  = PF_Masked | PF_Translucent | PF_Invisible | PF_Modulated | PF_AlphaBlend,

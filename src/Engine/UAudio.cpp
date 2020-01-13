@@ -137,6 +137,7 @@ void UAudioSubsystem::Tick( float DeltaTime )
             CurrentTrack = NULL;
             CurrentSection = 255;
             bPlaying = false;
+            MusicQueue->Clear();
             return;
           }
 

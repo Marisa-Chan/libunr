@@ -137,6 +137,12 @@ struct LIBUNR_API FBox
   FVector Max;
   u8      IsValid;
 
+  bool IsZero()
+  {
+    FVector Sub = Max - Min;
+    return (Sub.X == 0 && Sub.Y == 0 && Sub.Z == 0);
+  }
+
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FBox& Box )
   {
     In >> Box.Min;

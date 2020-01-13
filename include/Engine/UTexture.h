@@ -274,7 +274,7 @@ class LIBUNR_API UTexture : public UBitmap
   EVClampMode  VClampMode;
 
   FColor PaletteTransform;
-  void*  TextureHandle; // ???
+  void*  TextureHandle;
   u8     TextureMaterial;
 };
 
