@@ -327,11 +327,16 @@ public: \
     if (!ObjectClass) \
     { \
       UPackage* ClsPkg = UPackage::StaticLoadPackage( NativePkgName ); \
-      if (!ClsPkg && !(StaticFlags & CLASS_NoExport)) \
+      if (!ClsPkg) \
       { \
-        GLogf( LOG_CRIT, "Package '%s' for class '%s' could not be opened", \
-          NativePkgName, TXT(cls) ); \
-        return false; \
+        if ( StaticFlags && CLASS_NoExport ) \
+          ClsPkg = UPackage::StaticCreatePackage( NativePkgName, NULL ); \
+        else \
+        { \
+          GLogf( LOG_CRIT, "Package '%s' for class '%s' could not be opened", \
+            NativePkgName, TXT(cls) ); \
+          return false; \
+        }\
       } \
       const char* ClsNameStr = TXT(cls); \
       ClsNameStr++; \
