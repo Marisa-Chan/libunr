@@ -52,6 +52,48 @@ URenderDevice::~URenderDevice()
 {
 }
 
+// TODO: Platform specific optimizations
+void URenderDevice::GetOrthoMatrix( FMatrix4x4& Mat, float Left, float Right, float Top, float Bottom, float zNear, float zFar )
+{
+#ifndef ARCH_OPTIMIZATIONS
+  // Validate parameters
+  if ( fabsf( Left - Right ) <= FLT_EPSILON || fabsf( Top - Bottom ) <= FLT_EPSILON || fabsf( zNear - zFar ) <= FLT_EPSILON )
+  {
+    GLogf( LOG_WARN, "Invalid ortho matrix parameters" );
+    return;
+  }
+
+  memset( &Mat, 0, sizeof( Mat ) );
+  Mat.Data[0][0] = 2.0f / Right - Left;
+  Mat.Data[1][1] = 2.0f / Top - Bottom;
+  Mat.Data[2][2] = -2.0f / (zFar - zNear);
+  Mat.Data[3][0] = -(Right + Left) / (Right - Left);
+  Mat.Data[3][1] = -(Top + Bottom) / (Top - Bottom);
+  Mat.Data[3][2] = -(zFar + zNear) / (zFar - zNear);
+  Mat.Data[3][3] = 1.0f;
+#endif
+}
+
+// TODO: Platform specific optimizations
+void URenderDevice::GetPerspectiveMatrix( FMatrix4x4& Mat, float Left, float Right, float Top, float Bottom, float zNear, float zFar )
+{
+  // Validate parameters
+  if ( fabsf( Left - Right ) <= FLT_EPSILON || fabsf( Top - Bottom ) <= FLT_EPSILON || fabsf( zNear - zFar ) <= FLT_EPSILON )
+  {
+    GLogf( LOG_WARN, "Invalid ortho matrix parameters" );
+    return;
+  }
+
+  memset( &Mat, 0, sizeof( Mat ) );
+  Mat.Data[0][0] = (2.0f * zNear) / (Right - Left);
+  Mat.Data[1][0] = (2.0f * zNear) / (Top - Bottom);
+  Mat.Data[2][0] = (Right + Left) / (Right - Left);
+  Mat.Data[2][1] = (Top + Bottom) / (Top - Bottom);
+  Mat.Data[2][2] = (zFar + zNear) / (zFar - zNear);
+  Mat.Data[2][3] = -1.0f;
+  Mat.Data[3][2] = (-2.0f * zFar * zNear) / (zFar - zNear);
+}
+
 URenderBase::URenderBase()
   : USubsystem()
 {

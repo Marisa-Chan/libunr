@@ -36,6 +36,10 @@ inline bool FltEqual( float A, float B )
   return fabsf( A - B ) <= FLT_MIN;
 }
 
+/*-----------------------------------------------------------------------------
+ * FVector
+ * A 3D floating point coordinate
+-----------------------------------------------------------------------------*/
 struct LIBUNR_API FVector
 {
   float X;
@@ -63,6 +67,10 @@ struct LIBUNR_API FVector
   friend FVector operator-( FVector& A, FVector& B );
 };
 
+/*-----------------------------------------------------------------------------
+ * FVector
+ * A 4D floating point coordinate
+-----------------------------------------------------------------------------*/
 struct LIBUNR_API FPlane : public FVector
 {
   float W;
@@ -82,6 +90,10 @@ struct LIBUNR_API FPlane : public FVector
   }
 };
 
+/*-----------------------------------------------------------------------------
+ * FQuat
+ * A floating point quaternion
+-----------------------------------------------------------------------------*/
 struct LIBUNR_API FQuat
 {
   float X;
@@ -108,11 +120,29 @@ struct LIBUNR_API FQuat
   }
 };
 
+/*-----------------------------------------------------------------------------
+ * FRotator
+ * A 3D rotation descriptor
+-----------------------------------------------------------------------------*/
 struct LIBUNR_API FRotator
 {
   int Pitch;
   int Yaw;
   int Roll;
+
+  FRotator()
+  {
+    Pitch = 0;
+    Yaw = 0;
+    Roll = 0;
+  }
+
+  FRotator( int InPitch, int InYaw, int InRoll )
+  {
+    Pitch = InPitch;
+    Yaw = InYaw;
+    Roll = InRoll;
+  }
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FRotator& Rotator )
   {
@@ -131,6 +161,10 @@ struct LIBUNR_API FRotator
   }
 };
 
+/*-----------------------------------------------------------------------------
+ * FBox
+ * A 3D rectangular volume
+-----------------------------------------------------------------------------*/
 struct LIBUNR_API FBox
 {
   FVector Min;
@@ -160,6 +194,89 @@ struct LIBUNR_API FBox
   }
 };
 
+/*-----------------------------------------------------------------------------
+ * FBox2D
+ * A 2D rectangular area
+-----------------------------------------------------------------------------*/
+struct LIBUNR_API FBox2D
+{
+  float X, Y;
+  float Width, Height;
+
+  bool IsZero()
+  {
+    return (Width == 0 && Height == 0);
+  }
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FBox2D& Box )
+  {
+    In >> Box.X;
+    In >> Box.Y;
+    In >> Box.Width;
+    In >> Box.Height;
+    return In;
+  }
+
+  friend FPackageFileOut& operator<<( FPackageFileOut& Out, FBox2D& Box )
+  {
+    Out << Box.X;
+    Out << Box.Y;
+    Out << Box.Width;
+    Out << Box.Height;
+    return Out;
+  }
+};
+
+/*-----------------------------------------------------------------------------
+ * FBoxInt2D
+ * An integer based 2D rectangular area
+-----------------------------------------------------------------------------*/
+struct LIBUNR_API FBoxInt2D
+{
+  int X, Y;
+  int Width, Height;
+
+  FBoxInt2D()
+  {
+    memset( this, 0, sizeof( FBoxInt2D ) );
+  }
+
+  FBoxInt2D( int InX, int InY, int InWidth, int InHeight )
+  {
+    X = InX;
+    Y = InY;
+    Width = InWidth;
+    Height = InHeight;
+  }
+
+  bool IsZero()
+  {
+    return (Width == 0 && Height == 0);
+  }
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FBoxInt2D& Box )
+  {
+    In >> Box.X;
+    In >> Box.Y;
+    In >> Box.Width;
+    In >> Box.Height;
+    return In;
+  }
+
+  friend FPackageFileOut& operator<<( FPackageFileOut& Out, FBoxInt2D& Box )
+  {
+    Out << Box.X;
+    Out << Box.Y;
+    Out << Box.Width;
+    Out << Box.Height;
+    return Out;
+  }
+};
+
+/*-----------------------------------------------------------------------------
+ * FSphere
+ * A floating point 3D sphere
+-----------------------------------------------------------------------------*/
 struct LIBUNR_API FSphere : public FPlane
 {
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FSphere& Sphere )
@@ -179,6 +296,10 @@ struct LIBUNR_API FSphere : public FPlane
   }
 };
 
+/*-----------------------------------------------------------------------------
+ * FCoords
+ * A 3D floating point coordinate space
+-----------------------------------------------------------------------------*/
 struct LIBUNR_API FCoords
 {
   FVector Origin;
@@ -197,6 +318,10 @@ struct LIBUNR_API FCoords
   }
 };
 
+/*-----------------------------------------------------------------------------
+ * FScale
+ * A 3D floating point scaling vector
+-----------------------------------------------------------------------------*/
 struct LIBUNR_API FScale
 {
   FVector Scale;
@@ -227,6 +352,48 @@ struct LIBUNR_API FScale
     Out << Scale.Scale;
     Out << Scale.SheerRate;
     Out << (u8&)Scale.SheerAxis;
+    return Out;
+  }
+};
+
+/*-----------------------------------------------------------------------------
+ * FMatrix4x4
+ * A 4x4 floating point matrix
+-----------------------------------------------------------------------------*/
+struct LIBUNR_API FMatrix4x4
+{
+  float Data[4][4];
+
+  FMatrix4x4()
+  {
+    memset( Data, 0, sizeof( Data ) );
+  }
+  FMatrix4x4( float* InData )
+  {
+    memcpy( Data, InData, sizeof( Data ) );
+  }
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FMatrix4x4& Mat )
+  {
+    for ( int i = 0; i < 4; i++ )
+    {
+      In >> Mat.Data[i][0];
+      In >> Mat.Data[i][1];
+      In >> Mat.Data[i][2];
+      In >> Mat.Data[i][3];
+    }
+    return In;
+  }
+
+  friend FPackageFileOut& operator<<( FPackageFileOut& Out, FMatrix4x4& Mat )
+  {
+    for ( int i = 0; i < 4; i++ )
+    {
+      Out << Mat.Data[i][0];
+      Out << Mat.Data[i][1];
+      Out << Mat.Data[i][2];
+      Out << Mat.Data[i][3];
+    }
     return Out;
   }
 };

@@ -105,7 +105,7 @@ class LIBUNR_API URenderDevice : public USubsystem
   -----------------------------------------------------------------------------*/
 
   // Draws a flat tile with a single texture
-  virtual void DrawTile( UTexture* Tex, FBox& Dim, FRotator& Rot, float U, float V, float UL, float VL, int PolyFlags = 0 ) {}
+  virtual void DrawTile( UTexture* Tex, FBoxInt2D& Dim, FRotator& Rot, float U, float V, float UL, float VL, int PolyFlags = 0 ) {}
 
   // Draws a mesh on the screen
   virtual void DrawMesh( UMesh* Mesh, FName AnimSeq, float AnimRate, FVector& Loc, FVector& Scale, FRotator& Rot, int PolyFlags = 0 ) {}
@@ -123,6 +123,12 @@ class LIBUNR_API URenderDevice : public USubsystem
 
   // Sets the current viewport to render to
   virtual bool SetActiveViewport( UViewport* Viewport ) { return false; }
+
+  // Generates an orthographic matrix for 2D drawing
+  virtual void GetOrthoMatrix( FMatrix4x4& Mat, float Left, float Right, float Top, float Bottom, float zNear, float zFar );
+
+  // Generates a perspective matrix for 3D drawing
+  virtual void GetPerspectiveMatrix( FMatrix4x4& Mat, float Left, float Right, float Top, float Bottom, float zNear, float zFar );
 };
 
 /*-----------------------------------------------------------------------------

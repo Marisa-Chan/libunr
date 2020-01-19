@@ -37,6 +37,9 @@ UWindowsViewport::~UWindowsViewport()
 
 bool UWindowsViewport::Init( int InWidth, int InHeight )
 {
+  if ( !GEngine->Render )
+    return true;
+
   Super::Init( InWidth, InHeight );
 
   Handle = GetModuleHandle( NULL );
