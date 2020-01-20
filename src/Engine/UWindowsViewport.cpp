@@ -63,17 +63,29 @@ bool UWindowsViewport::Init( int InWidth, int InHeight )
     return false;
   }
 
+  u32 ExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
+  u32 Style = WS_OVERLAPPEDWINDOW;
+
+  // Ensure our window is sized for desired resolution
+  RECT ClientSize;
+  ClientSize.left = 0;
+  ClientSize.right = Width;
+  ClientSize.top = 0;
+  ClientSize.bottom = Height;
+  AdjustWindowRectEx( &ClientSize, Style, FALSE, ExStyle );
+
+  // Create window
   Window = 
   CreateWindowEx
   (
-    0,
+    ExStyle,
     "UWindowsViewport",
     "OpenUE",
-    WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX,
+    Style,
     CW_USEDEFAULT,
     CW_USEDEFAULT,
-    Width,
-    Height,
+    ClientSize.right-ClientSize.left,
+    ClientSize.bottom-ClientSize.top,
     NULL,
     NULL,
     Handle,
@@ -137,6 +149,7 @@ LRESULT UWindowsViewport::StaticWndProc( HWND Hwnd, UINT Msg, WPARAM WParam, LPA
     break;
   case WM_DESTROY:
     DestroyWindow( Hwnd );
+    GSystem->Exit( 0 );
     break;
   case WM_PAINT:
     ValidateRect( Hwnd, NULL );
