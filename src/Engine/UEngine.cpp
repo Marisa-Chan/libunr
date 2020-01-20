@@ -187,7 +187,9 @@ bool UEngine::Init()
 
 bool UEngine::Exit()
 {
-  // TODO
+  Client->Exit();
+  Audio->Exit();
+  Render->Exit();
   return true;
 }
 

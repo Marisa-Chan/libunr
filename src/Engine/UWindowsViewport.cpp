@@ -148,8 +148,9 @@ LRESULT UWindowsViewport::StaticWndProc( HWND Hwnd, UINT Msg, WPARAM WParam, LPA
     This->Client->HandleInput( WParam, false );
     break;
   case WM_DESTROY:
-    DestroyWindow( Hwnd );
-    GSystem->Exit( 0 );
+    This->Client->CloseViewport( This );
+    if ( This->Client->Viewports.Size() == 0 )
+      GSystem->Exit( 0 );
     break;
   case WM_PAINT:
     ValidateRect( Hwnd, NULL );

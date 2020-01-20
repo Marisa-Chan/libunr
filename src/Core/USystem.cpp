@@ -30,6 +30,7 @@
 #include "Util/FConfig.h"
 #include "Core/USystem.h"
 #include "Core/UPackage.h"
+#include "Engine/UEngine.h"
 #include "Engine/UMusic.h"
 
 #ifdef LIBUNR_WIN32
@@ -162,7 +163,10 @@ void USystem::Exit( int ExitCode )
   // We do not want to save any bad info to any configs, just close them
   GConfigManager->CloseConfigs();
 
-  // TODO: Kill viewports and free resources they use
+  // Shut down engine
+  if ( GEngine )
+    GEngine->Exit();
+
   // TODO: We should reeeeally free object memory too
 
   // Close down all subsystems

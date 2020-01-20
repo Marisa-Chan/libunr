@@ -69,11 +69,10 @@ public:
     for ( size_t i = 0; i < n; i++ )
       vector<T>::push_back( x[i] );
   }
-  FORCEINLINE T& Erase( size_t Index )
+  FORCEINLINE void Erase( size_t Index )
   {
     // Get iterator by doing some math on the array
-    typename vector<T>::iterator Out = vector<T>::erase( vector<T>::begin() + Index );
-    return *Out;
+    vector<T>::erase( vector<T>::begin() + Index );
   }
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, TArray<T>& Array )

@@ -80,7 +80,11 @@ bool UWindowsClient::CloseViewport( UViewport* Viewport )
     if ( Viewports[i] == Viewport )
     {
       Result = Viewport->Exit();
-      CurrentViewport = Viewports.Erase( i );
+      Viewports.Erase( i );
+      if ( Viewports.Size() == 0 )
+        CurrentViewport = NULL;
+      else
+        CurrentViewport = Viewports[0];
     }
   }
 
