@@ -64,8 +64,8 @@ void URenderDevice::GetOrthoMatrix( FMatrix4x4& Mat, float Left, float Right, fl
   }
 
   memset( &Mat, 0, sizeof( Mat ) );
-  Mat.Data[0][0] = 2.0f / Right - Left;
-  Mat.Data[1][1] = 2.0f / Top - Bottom;
+  Mat.Data[0][0] = 2.0f / (Right - Left);
+  Mat.Data[1][1] = 2.0f / (Top - Bottom);
   Mat.Data[2][2] = -2.0f / (zFar - zNear);
   Mat.Data[3][0] = -(Right + Left) / (Right - Left);
   Mat.Data[3][1] = -(Top + Bottom) / (Top - Bottom);

@@ -121,17 +121,20 @@ bool UWindowsViewport::Resize( int NewWidth, int NewHeight )
 
 LRESULT UWindowsViewport::StaticWndProc( HWND Hwnd, UINT Msg, WPARAM WParam, LPARAM LParam )
 {
-  static UWindowsViewport* This = NULL;
+  UWindowsViewport* This = NULL;
+  if ( Msg == WM_NCCREATE )
+    SetWindowLongPtr( Hwnd, GWLP_USERDATA, (LONG_PTR)((CREATESTRUCT*)LParam)->lpCreateParams );
+  else
+    This = (UWindowsViewport*)GetWindowLongPtr( Hwnd, GWLP_USERDATA );
+
   switch ( Msg )
   {
-  case WM_CREATE:
-    This = (UWindowsViewport*)LParam;
-    break;
   case WM_KEYDOWN:
     This->Client->HandleInput( WParam, true );
     break;
   case WM_KEYUP:
     This->Client->HandleInput( WParam, false );
+    break;
   case WM_DESTROY:
     DestroyWindow( Hwnd );
     break;
