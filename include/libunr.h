@@ -74,6 +74,7 @@
 #include "Actors/AInventory.h"
 #include "Actors/ANavigationPoint.h"
 #include "Actors/APawn.h"
+#include "Actors/APlayerPawn.h"
 #include "Actors/AProjector.h"
 #include "Actors/AReplicationInfo.h"
 #include "Actors/ASkyZoneInfo.h"

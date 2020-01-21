@@ -50,6 +50,7 @@ class LIBUNR_API UFireTexture : public UFractalTexture
   EXPOSE_TO_USCRIPT();
 
   UFireTexture();
+  virtual void Tick( float DeltaTime );
 
   enum ESpark
   {

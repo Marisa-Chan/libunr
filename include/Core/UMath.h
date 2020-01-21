@@ -36,6 +36,16 @@ inline bool FltEqual( float A, float B )
   return fabsf( A - B ) <= FLT_MIN;
 }
 
+inline float FClamp( float A, float Min, float Max )
+{
+  if ( A < Min )
+    return Min;
+  else if ( A > Max )
+    return Max;
+  else
+    return A;
+}
+
 /*-----------------------------------------------------------------------------
  * FVector
  * A 3D floating point coordinate

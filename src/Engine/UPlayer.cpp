@@ -36,6 +36,12 @@ UPlayer::~UPlayer()
 {
 }
 
+void UPlayer::Possess( APlayerPawn* PlayerPawn )
+{
+  Actor = PlayerPawn;
+  // PlayerPawn->EventPossess();
+}
+
 IMPLEMENT_NATIVE_CLASS( UPlayer );
 
 BEGIN_PROPERTY_LINK( UPlayer, 15 )

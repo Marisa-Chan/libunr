@@ -25,6 +25,7 @@
 
 #include "Engine/UWindowsViewport.h"
 #include "Engine/UWindowsClient.h"
+#include "Actors/APlayerPawn.h"
 
 UWindowsClient::UWindowsClient()
   : UClient()
@@ -93,23 +94,17 @@ bool UWindowsClient::CloseViewport( UViewport* Viewport )
 
 void UWindowsClient::HandleInput( int Key, bool bDown )
 {
-  // TODO
-  // Convert windows input to universal input enum
 }
 
 void UWindowsClient::Tick( float DeltaTime )
 {
   MSG Msg;
 
-  // Dispatch one incoming message for each viewport
-  for ( int i = 0; i < Viewports.Size(); i++ )
+  // Dispatch all incoming messages for each viewport
+  while ( PeekMessage( &Msg, NULL, 0, 0, PM_REMOVE ) )
   {
-    UWindowsViewport* Viewport = (UWindowsViewport*)Viewports[i];
-    if ( GetMessage( &Msg, Viewport->Window, 0, 0 ) )
-    {
-      TranslateMessage( &Msg );
-      DispatchMessage( &Msg );
-    }
+    TranslateMessage( &Msg );
+    DispatchMessage( &Msg );
   }
 }
 

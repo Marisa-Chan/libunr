@@ -70,10 +70,41 @@ void UBitmap::Load()
 UTexture::UTexture()
   : UBitmap()
 {
+  Accumulator = 0.0f;
 }
 
 UTexture::~UTexture()
 {
+}
+
+void UTexture::Tick( float DeltaTime )
+{
+  // Handle texture animation if necessary
+  if ( AnimCurrent->AnimNext != NULL )
+  {
+    // Prevent divide by zero
+    float MaxAccumulator = (1.0f) / FClamp(MaxFrameRate, 0.001f, 1000.f);
+    Accumulator += DeltaTime;
+
+    // Enforce that we don't change any more than needed
+    if ( Accumulator >= MaxAccumulator )
+    {
+      Accumulator = 0.0f;
+      AnimCurrent = AnimCurrent->AnimNext;
+    }
+  }
+  else
+  {
+    AnimCurrent = this;
+  }
+}
+
+FMipmap& UTexture::GetMips( size_t MipLevel )
+{
+  if ( MipLevel < AnimCurrent->Mips.Size() )
+    return AnimCurrent->Mips[MipLevel];
+  else
+    return AnimCurrent->Mips[0];
 }
 
 void UTexture::Load()
@@ -107,6 +138,8 @@ void UTexture::Load()
     *PkgFile >> Unused[0];
     *PkgFile >> Unused[1];
   }
+
+  AnimCurrent = this;
 }
 
 // TODO: Export textures besides TEXF_P8 (S3TC, etc etc)

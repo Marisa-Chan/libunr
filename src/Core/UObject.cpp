@@ -461,10 +461,10 @@ UObject* UObject::LoadObject( idx ObjRef, UClass* ObjClass, UObject* InOuter, bo
 UObject* UObject::StaticLoadObject( UPackage* Pkg, const char* ObjName, UClass* ObjClass,
   UObject* InOuter, bool bLoadClassNow )
 {
-  FExport* Export = Pkg->GetExportByName( Pkg->FindLocalName( ObjName ) );
+  FExport* Export = Pkg->GetExportByNameAndType( Pkg->FindLocalName( ObjName ), ObjClass );
   if ( UNLIKELY( Export == NULL ) )
   {
-    GLogf( LOG_WARN, "Can't load object '%s.%s', object does not exist", Pkg->Name, ObjName );
+    GLogf( LOG_WARN, "Can't load %s '%s.%s', object does not exist", ObjClass->Name.Data(), Pkg->Name.Data(), ObjName );
     return NULL;
   }
 

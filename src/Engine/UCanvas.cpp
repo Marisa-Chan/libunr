@@ -24,6 +24,7 @@
 */
 
 #include "Engine/UCanvas.h"
+#include "Engine/UEngine.h"
 
 UCanvas::UCanvas()
   : UObject()
@@ -72,6 +73,48 @@ UCanvas::~UCanvas()
 
   if ( LargeFont )
     LargeFont->DelRef();
+}
+
+bool UCanvas::Init()
+{
+  // TODO: Check that these loaded
+  // Load each font
+  SmallFont = (UFont*)StaticLoadObject( Pkg, "SmallFont", UFont::StaticClass(), NULL );
+  MedFont   = (UFont*)StaticLoadObject( Pkg, "MedFont",   UFont::StaticClass(), NULL );
+  BigFont   = (UFont*)StaticLoadObject( Pkg, "BigFont",   UFont::StaticClass(), NULL );
+  LargeFont = (UFont*)StaticLoadObject( Pkg, "LargeFont", UFont::StaticClass(), NULL );
+  Viewport = (UViewport*)Outer;
+
+  ClipX = Viewport->Width;
+  ClipY = Viewport->Height;
+
+  return true;
+}
+
+void UCanvas::StrLen( FString* Str, float* XL, float* YL )
+{
+   // TODO
+}
+
+void UCanvas::DrawText( FString* Text, bool CR, int PolyFlags )
+{
+  // TODO: Implement CR (carriage return) functionality
+  FBoxInt2D Dim( CurX, CurY, ClipX, ClipY );
+  GEngine->Render->DrawText( Font, Dim, *Text, PolyFlags );
+}
+
+void UCanvas::DrawTile( UTexture* Tex, float XL, float YL, float U, float V, float UL, float VL, int PolyFlags )
+{
+  FBoxInt2D Dim( CurX, CurY, CurX + XL, CurY + YL );
+  FRotator Rot;
+  GEngine->Render->DrawTile( Tex, Dim, Rot, U, V, UL, VL, PolyFlags );
+}
+
+void UCanvas::DrawTileClipped( UTexture* Tex, float XL, float YL, float U, float V, float UL, float VL, int PolyFlags )
+{
+  FBoxInt2D Dim( CurX, CurY, CurX + XL, CurY + YL );
+  FRotator Rot;
+  GEngine->Render->DrawTile( Tex, Dim, Rot, U, V, UL, VL, PolyFlags );
 }
 
 #include "Core/UClass.h"

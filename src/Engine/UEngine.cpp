@@ -195,8 +195,8 @@ bool UEngine::Exit()
 
 void UEngine::Tick( float DeltaTime )
 {
-  if ( DeltaTime <= FLT_EPSILON )
-    DeltaTime = FLT_EPSILON;
+  if ( DeltaTime <= FLT_MIN )
+    DeltaTime = FLT_MIN;
 
   // Process audio
   if ( Audio )

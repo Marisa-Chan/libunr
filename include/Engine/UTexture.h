@@ -197,6 +197,9 @@ class LIBUNR_API UTexture : public UBitmap
   EXPOSE_TO_USCRIPT()
   UTexture();
 
+  virtual void Tick( float DeltaTime );
+  virtual FMipmap& GetMips( size_t MipLevel );
+
   virtual void Load();
   virtual bool ExportToFile( const char* Dir, const char* Type );
   //virtual bool ExportToBmp( const char* Dir );

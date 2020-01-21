@@ -37,6 +37,8 @@ class LIBUNR_API UCanvas : public UObject
 
   UCanvas();
 
+  bool Init();
+
   // Modifiable properties
   UFont* Font;
   float  SpaceX, SpaceY;

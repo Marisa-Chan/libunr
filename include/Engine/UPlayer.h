@@ -37,6 +37,8 @@ class LIBUNR_API UPlayer : public UObject
 
   UPlayer();
 
+  virtual void Possess( APlayerPawn* PlayerPawn );
+
   APlayerPawn* Actor;
   UConsole*    Console;
 

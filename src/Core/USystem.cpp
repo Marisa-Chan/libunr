@@ -744,18 +744,8 @@ bool USystem::MakeDir( const char* Path )
 double USystem::GetSeconds()
 {
 #if defined LIBUNR_WIN32
-  #if (_WIN32_WINNT >= 0x0601)
-    u64 Time;
-    if ( !QueryUnbiasedInterruptTime( &Time ) )
-    {
-      GLogf( LOG_CRIT, "QueryUnbiasedInterruptTime failed! Aborting program" );
-      GSystem->Exit( -1 );
-    }
-    return (double)Time / 1000000000.0;
-  #else
     u32 Time = timeGetTime();
     return (double)Time / 1000.0;
-  #endif
 #elif defined LIBUNR_POSIX
   timespec ts;
   clock_gettime( CLOCK_REALTIME, &ts );

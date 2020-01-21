@@ -144,7 +144,7 @@ class LIBUNR_API UPackage : public UObject
   UPackageHeader* GetHeader();
   FNameEntry*     GetNameEntry( size_t Index );
   FNameEntry*     GetNameEntryByObjRef( int ObjRef );
-  FExport*        GetExportByName( size_t Name );
+  FExport*        GetExportByNameAndType( size_t Name, UClass* Type );
   FExport*        GetClassExport( const char* ExportName );
   TArray<FNameEntry>& GetNameTable();
   TArray<FExport>& GetExportTable();

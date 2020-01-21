@@ -104,6 +104,9 @@ class LIBUNR_API URenderDevice : public USubsystem
    * Can be used for things like Canvas, texture and mesh browser, etc
   -----------------------------------------------------------------------------*/
 
+  // Draws text flat to the screen
+  virtual void DrawText( UFont* Font, FBoxInt2D& Dim, FString& Text, int PolyFlags = 0 ) {}
+
   // Draws a flat tile with a single texture
   virtual void DrawTile( UTexture* Tex, FBoxInt2D& Dim, FRotator& Rot, float U, float V, float UL, float VL, int PolyFlags = 0 ) {}
 

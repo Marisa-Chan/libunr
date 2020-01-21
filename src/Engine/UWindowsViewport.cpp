@@ -99,6 +99,7 @@ bool UWindowsViewport::Init( int InWidth, int InHeight )
   }
 
   DrawContext = GetDC( Window );
+  SetForegroundWindow( Window );
 
   if ( !GEngine->Render->InitViewport( this ) )
   {
@@ -151,9 +152,6 @@ LRESULT UWindowsViewport::StaticWndProc( HWND Hwnd, UINT Msg, WPARAM WParam, LPA
     This->Client->CloseViewport( This );
     if ( This->Client->Viewports.Size() == 0 )
       GSystem->Exit( 0 );
-    break;
-  case WM_PAINT:
-    ValidateRect( Hwnd, NULL );
     break;
   default:
     return DefWindowProc( Hwnd, Msg, WParam, LParam );

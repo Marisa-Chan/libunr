@@ -912,6 +912,12 @@ void UClass::Load()
   DefPropQueue.Push( this );
 
   *PkgFile >> ClassFlags;
+
+  // noexport has no purpose in libunr and has been repurposed
+  // It should only be used in native code, mask it out any classes
+  // that try to use it in script
+  ClassFlags &= ~(CLASS_NoExport);
+
   PkgFile->Read( ClassGuid, sizeof( ClassGuid ) );
   
   idx DepCount = 0;

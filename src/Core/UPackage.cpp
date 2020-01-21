@@ -406,12 +406,45 @@ FExport* UPackage::GetExport( size_t Index )
   return NULL;
 }
 
-FExport* UPackage::GetExportByName( size_t Name )
+FExport* UPackage::GetExportByNameAndType( size_t Name, UClass* Type )
 {
+  // Get the obj ref we're looking for
+  idx TypeObjRef = 0;
+  if ( Type->Pkg == this && !(Type->ClassFlags & CLASS_NoExport ) )
+  {
+    for ( TypeObjRef = 0; TypeObjRef < Exports.Size(); TypeObjRef++ )
+    {
+      FExport& Export = Exports[TypeObjRef];
+      if ( Export.Class == 0 )
+      {
+        if ( stricmp( Names[Exports[TypeObjRef].ObjectName].Data, Type->Name.Data() ) == 0 )
+        {
+          TypeObjRef += 1;
+          break;
+        }
+      }
+    }
+  }
+  else
+  {
+    for ( TypeObjRef = 0; TypeObjRef < Imports.Size(); TypeObjRef++ )
+    {
+      FImport& Import = Imports[TypeObjRef];
+      if ( stricmp( Names[Import.ClassName].Data, "Class" ) == 0 )
+      {
+        if ( stricmp( Names[Import.ObjectName].Data, Type->Name.Data() ) == 0 )
+        {
+          TypeObjRef = -(TypeObjRef + 1);
+          break;
+        }
+      }
+    }
+  }
+
   for ( int i = 0; i < Exports.Size(); i++ )
   {
     FExport* Export = &Exports[i];
-    if ( Export->ObjectName == Name )
+    if ( Export->ObjectName == Name && Export->Class == TypeObjRef )
       return Export;
   }
 
