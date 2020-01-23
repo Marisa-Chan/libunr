@@ -148,25 +148,6 @@ class LIBUNR_API UFireTexture : public UFractalTexture
     }
   };
 
-  struct Particle
-  {
-    Particle()
-    {
-      memset( this, 0, sizeof( Particle ) );
-    }
-
-    Particle( u8 InX, u8 InY, u8 InType, u8 InHeat )
-      : X(InX), Y(InY), Type(InType), Heat(InHeat) {}
-
-    Particle( const Particle& Copy )
-      : X(Copy.X), Y(Copy.Y), Type(Copy.Type), Heat(Copy.Heat) {}
-
-    u8 X;
-    u8 Y;
-    u8 Type;
-    i16 Heat;
-  };
-
   ESpark SparkType;
   u8     RenderHeat;
   bool   bRising;
@@ -185,7 +166,6 @@ class LIBUNR_API UFireTexture : public UFractalTexture
 
   int NumSparks;
   TArray<Spark>* Sparks;
-  TArray<Particle>* Particles;
 
   int OldRenderHeat;
   u8  RenderTable[1028];
