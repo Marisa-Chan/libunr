@@ -77,7 +77,7 @@ void UFireTexture::Tick( float DeltaTime )
 
   u8* Buf = Buffer->DataArray.Data();
 
-  #define BUF(x,y) (Buf[((y)*USize)+(x)])
+  #define BUF(x,y) (Buf[((y)<<UBits)+(x)])
   #define HEAT(h) (RenderTable[h&0x3FF])
 
   // TODO: SIMD acceleration?
