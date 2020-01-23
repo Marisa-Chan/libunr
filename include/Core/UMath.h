@@ -46,6 +46,16 @@ inline float FClamp( float A, float Min, float Max )
     return A;
 }
 
+inline int Clamp( int A, int Min, int Max )
+{
+  if ( A < Min )
+    return Min;
+  else if ( A > Max )
+    return Max;
+  else
+    return A;
+}
+
 /*-----------------------------------------------------------------------------
  * FVector
  * A 3D floating point coordinate

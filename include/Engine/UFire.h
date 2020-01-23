@@ -27,12 +27,17 @@
 
 #include "Engine/UTexture.h"
 
+/*-----------------------------------------------------------------------------
+ * UFractalTexture
+ * The base of all procedurally generated textures
+-----------------------------------------------------------------------------*/
 class LIBUNR_API UFractalTexture : public UTexture
 {
   DECLARE_NATIVE_CLASS( UFractalTexture, UTexture, CLASS_Abstract, Fire )
   EXPOSE_TO_USCRIPT();
 
   UFractalTexture();
+  virtual void Tick( float DeltaTime );
 
   int UMask;
   int VMask;
@@ -42,8 +47,16 @@ class LIBUNR_API UFractalTexture : public UTexture
   u8  DrawPhase;
   u8  AuxPhase;
   u8  bHasInit;
+  u8  bHardwareAccelerated; // TODO
+
+  // Software accelerated features
+  FMipmap* Buffer;
 };
 
+/*-----------------------------------------------------------------------------
+ * UFireTexture
+ * An animated fire texture 
+-----------------------------------------------------------------------------*/
 class LIBUNR_API UFireTexture : public UFractalTexture
 {
   DECLARE_NATIVE_CLASS( UFireTexture, UFractalTexture, 0, Fire )
@@ -51,6 +64,8 @@ class LIBUNR_API UFireTexture : public UFractalTexture
 
   UFireTexture();
   virtual void Tick( float DeltaTime );
+  virtual void Load();
+  virtual bool ExportToFile( const char* Dir, const char* Type );
 
   enum ESpark
   {
@@ -105,6 +120,51 @@ class LIBUNR_API UFireTexture : public UFractalTexture
     u8 ByteB;
     u8 ByteC;
     u8 ByteD;
+
+    friend FPackageFileIn& operator>>( FPackageFileIn& In, Spark& S )
+    {
+      In >> S.Type;
+      In >> S.Heat;
+      In >> S.X;
+      In >> S.Y;
+      In >> S.ByteA;
+      In >> S.ByteB;
+      In >> S.ByteC;
+      In >> S.ByteD;
+      return In;
+    }
+
+    friend FPackageFileOut& operator>>( FPackageFileOut& Out, Spark& S )
+    {
+      Out << S.Type;
+      Out << S.Heat;
+      Out << S.X;
+      Out << S.Y;
+      Out << S.ByteA;
+      Out << S.ByteB;
+      Out << S.ByteC;
+      Out << S.ByteD;
+      return Out;
+    }
+  };
+
+  struct Particle
+  {
+    Particle()
+    {
+      memset( this, 0, sizeof( Particle ) );
+    }
+
+    Particle( u8 InX, u8 InY, u8 InType, u8 InHeat )
+      : X(InX), Y(InY), Type(InType), Heat(InHeat) {}
+
+    Particle( const Particle& Copy )
+      : X(Copy.X), Y(Copy.Y), Type(Copy.Type), Heat(Copy.Heat) {}
+
+    u8 X;
+    u8 Y;
+    u8 Type;
+    i16 Heat;
   };
 
   ESpark SparkType;
@@ -125,6 +185,7 @@ class LIBUNR_API UFireTexture : public UFractalTexture
 
   int NumSparks;
   TArray<Spark>* Sparks;
+  TArray<Particle>* Particles;
 
   int OldRenderHeat;
   u8  RenderTable[1028];
@@ -133,6 +194,10 @@ class LIBUNR_API UFireTexture : public UFractalTexture
   u8  PenDownY;
 };
 
+/*-----------------------------------------------------------------------------
+ * UWaterTexture
+ * A base class for procedurally generated water textures
+-----------------------------------------------------------------------------*/
 class LIBUNR_API UWaterTexture : public UFractalTexture
 {
   DECLARE_NATIVE_CLASS( UWaterTexture, UFractalTexture, CLASS_Abstract, Fire )
@@ -199,6 +264,10 @@ class LIBUNR_API UWaterTexture : public UFractalTexture
   int OldWaveAmp;
 };
 
+/*-----------------------------------------------------------------------------
+ * UWaveTexture
+ * A wave texture with bump map and phong shading characteristics
+-----------------------------------------------------------------------------*/
 class LIBUNR_API UWaveTexture : public UWaterTexture
 {
   DECLARE_NATIVE_CLASS( UWaveTexture, UWaterTexture, 0, Fire )
@@ -212,6 +281,10 @@ class LIBUNR_API UWaveTexture : public UWaterTexture
   u8 PhongSize;
 };
 
+/*-----------------------------------------------------------------------------
+ * UWetTexture
+ * A wet texture with a specified, external background texture
+-----------------------------------------------------------------------------*/
 class LIBUNR_API UWetTexture : public UWaterTexture
 {
   DECLARE_NATIVE_CLASS( UWetTexture, UWaterTexture, 0, Fire )
@@ -224,6 +297,10 @@ class LIBUNR_API UWetTexture : public UWaterTexture
   int       LocalSourceBitmap;
 };
 
+/*-----------------------------------------------------------------------------
+ * UIceTexture
+ * An ice texture that uses two textures to produce an ice effect
+-----------------------------------------------------------------------------*/
 class LIBUNR_API UIceTexture : public UFractalTexture
 {
   DECLARE_NATIVE_CLASS( UIceTexture, UFractalTexture, 0, Fire )

@@ -28,6 +28,7 @@
 #include "Core/UMath.h"
 #include "Core/USystem.h"
 #include "Engine/UTexture.h"
+#include "Engine/UFire.h"
 
 class AActor;
 class APlayerPawn;
@@ -88,6 +89,8 @@ class LIBUNR_API URenderDevice : public USubsystem
   virtual bool Exit() { return false; }
   virtual void Tick( float DeltaTime ) {}
 
+  bool bAccelerateFractalTextures;
+
   /*-----------------------------------------------------------------------------
    * Complex drawing functions
    * Used for drawing the world, including occlusion and lighting
@@ -112,6 +115,9 @@ class LIBUNR_API URenderDevice : public USubsystem
 
   // Draws a mesh on the screen
   virtual void DrawMesh( UMesh* Mesh, FName AnimSeq, float AnimRate, FVector& Loc, FVector& Scale, FRotator& Rot, int PolyFlags = 0 ) {}
+
+  // Draws a frame of a fire texture with renderer accelerated method
+  virtual void DrawFireTexFrame( UFireTexture* Tex, float DeltaTime ) {}
 
   /*-----------------------------------------------------------------------------
    * Utility functions
