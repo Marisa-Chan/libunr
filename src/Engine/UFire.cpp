@@ -68,13 +68,19 @@ void UFireTexture::Tick( float DeltaTime )
   Accumulator = 0.0f;
   bRealtimeChanged = true;
 
+  // Make sure we catch any changes to variable state
+  if ( RenderHeat != OldRenderHeat )
+  {
+    CalculateRenderTable();
+    OldRenderHeat = RenderHeat;
+  }
+
   // Enforce number of sparks based on array size
   NumSparks = Sparks->Size();
 
   u8* Buf = Buffer->DataArray.Data();
 
   #define BUF(x,y) (Buf[((y)<<UBits)+(x)])
-  #define HEAT(h) (RenderTable[h&0x3FF])
 
   // TODO: SIMD acceleration?
   // Modify frame buffer
@@ -83,30 +89,22 @@ void UFireTexture::Tick( float DeltaTime )
     for ( int x = 0; x < USize; x++ )
     {
       int Value;
-      float HeatCoef;
       if ( bRising )
       {
-        Value  = BUF(x,y);
-        Value += BUF((x - 1) & UMask,(y + 1) & VMask);
-        Value += BUF(x,(y + 1) & VMask);
-        Value += BUF((x + 1) & UMask,(y + 1) & VMask);
-        Value += 64;
-        HeatCoef = 0.567;
+        Value  = BUF( x, (y + 2) & VMask );
+        Value += BUF( x, (y + 1) & VMask );
+        Value += BUF( (x + 1) & UMask, (y + 1) & VMask );
+        Value += BUF( (x - 1) & UMask, (y + 1) & VMask );
       }
       else
       {
-        Value  = BUF(x,(y + 1) & VMask); 
+        Value  = BUF(x,(y+1) & VMask); 
         Value += BUF(x,y);
         Value += BUF((x + 1) & UMask, y);
         Value += BUF((x - 1) & UMask, y);
-        HeatCoef = 0.06 * (255-RenderHeat);
       }
-      Value /= 4;
-      Value += (int)ceil( (float)(RenderHeat - 250) * HeatCoef );
-      if ( Value < 0 )
-        Value = 0;
 
-      BUF(x,y) = Value;
+      BUF(x,y) = RenderTable[Value];
     }
   }
 
@@ -156,13 +154,9 @@ void UFireTexture::Load()
       Buffer->DataArray.Resize( Buffer->USize * Buffer->VSize );
       UMask = Buffer->USize - 1;
       VMask = Buffer->VSize - 1;
-
-      // Construct render table for fast color lookup without
-      // necessarily caring about integer wraparound.
-      // I have no clue if this was the original use for it,
-      // but it seems like it can work here
-      for ( int i = 0; i < 1028; i++ )
-        RenderTable[i] = Clamp( (i / 8) * (RenderHeat / 8), 0, 255 );
+      
+      CalculateRenderTable();
+      OldRenderHeat = RenderHeat;
     }
     else
     {
@@ -175,6 +169,40 @@ void UFireTexture::Load()
 bool UFireTexture::ExportToFile( const char* dir, const char* Type )
 {
   return false;
+}
+
+void UFireTexture::CalculateRenderTable()
+{
+
+  // Construct render table for fast color lookup without
+  // necessarily caring about integer wraparound.
+  // I have no clue if this was the original use for it,
+  // but it seems like it can work here
+  for ( int i = 0; i < 1024; i++ )
+  {
+    // There's a couple of behaviors to observe here
+    //
+    // 1) On previous attempts, using RenderHeat on color values directly
+    //    seemed to not be totally accurate. RenderHeat=249 did not give
+    //    the desired result whereas lower RenderHeat values did
+    //
+    // 2) In the editor, any RenderHeat above 250 results in the image
+    //    slowly going through each of the palette entries until the
+    //    image is bright white
+    //
+    // Here, we try to set RenderTable colors based on RenderHeat and
+    // span this color distribution out through the whole table.
+    // Since the values we'll plug in here will be 0-255, and since
+    // the render table is 1028 entries long (slightly higher than
+    // 1024), we first try to divide i by 4 so that, as a baseline,
+    // the render table is evenly spaced regardless of RenderHeat
+    //
+    // From there, we can try to identify what RenderHeat this approximates
+    // to in the original engine and come up with a way of shifting the
+    // distribution of numbers into a bell-shape.
+    // 
+    RenderTable[i] = (Clamp( (i / 4) + ((RenderHeat - 250) / 12), 0, 255 ));
+  }
 }
 
 /*-----------------------------------------------------------------------------

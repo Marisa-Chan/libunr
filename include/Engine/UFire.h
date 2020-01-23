@@ -67,6 +67,8 @@ class LIBUNR_API UFireTexture : public UFractalTexture
   virtual void Load();
   virtual bool ExportToFile( const char* Dir, const char* Type );
 
+  void CalculateRenderTable();
+
   enum ESpark
   {
     SPARK_Burn,
