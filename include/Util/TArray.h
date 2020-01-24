@@ -91,12 +91,14 @@ public:
     Out << CINDEX( Array.Size() );
     for ( int i = 0; i < Array.Size(); i++ )
       Out << Array[i];
+    return Out;
   }
 
   friend FFileArchiveOut& operator>>( FFileArchiveOut& Out, TArray<T>& Array )
   {
     for ( int i = 0; i < Array.Size(); i++ )
       Out << Array[i];
+    return Out;
   }
 
   size_t ElementSize;
