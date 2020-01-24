@@ -6,6 +6,8 @@
 BUILD_DEBUG=0
 BUILD_SYMBOLS=0
 BUILD_32BIT=0
+BUILD_LIBX11_PATH=""
+BUILD_LIBX11_HEADER_PATH="/usr/include/X11"
 BUILD_LIBDUMB2_PATH=""
 BUILD_LIBDUMB2_HEADER_PATH=""
 BUILD_LIBGME_PATH=""
@@ -56,6 +58,18 @@ done
 #################################################
 # Default Arguments init
 #################################################
+
+if [ -z "$BUILD_LIBX11_PATH" ]
+then
+  if [ $BUILD_DEBUG -eq 1 ]
+    then
+      BUILD_LIBDUMB2="-lX11"
+    else
+      BUILD_LIBDUMB2="-lX11"
+    fi
+else
+  BUILD_LIBDUMB2=$BUILD_LIBDUMB2_PATH
+fi
 
 if [ -z "$BUILD_LIBDUMB2_PATH" ]
 then
