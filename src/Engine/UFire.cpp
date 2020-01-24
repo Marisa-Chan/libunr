@@ -107,7 +107,7 @@ void UFireTexture::Tick( float DeltaTime )
       // Setting render heat above 246 seems to make it go a bit crazy
       if ( RenderHeat > 246 && Value > 4 )
         Value += 2;
-      else if ( RenderHeat > 220 && Value > 240 )
+      else if ( RenderHeat > 220 && Value > 235 )
         Value += 1;
 
       BUF(x,y) = RenderTable[Value];
