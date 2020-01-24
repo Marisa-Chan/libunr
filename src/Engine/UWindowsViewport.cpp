@@ -22,6 +22,9 @@
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
+
+#include "Util/FMacro.h"
+
 #if defined LIBUNR_WIN32
 
 #include "Engine/UWindowsClient.h"
