@@ -147,6 +147,10 @@ void UFireTexture::Tick( float DeltaTime )
         S.ByteA += S.ByteD;
         BUF( S.X & UMask, S.Y & VMask ) = S.ByteA;
         break;
+      case SPARK_Signal:
+        Heat = 96 + (rand() % 127);
+        BUF( S.X & UMask, S.Y & VMask ) = Heat;
+        break;
       }
     }
   }
