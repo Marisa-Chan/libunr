@@ -19,7 +19,7 @@
 /*========================================================================
  * UFire.cpp - Fire texture functionality
  * 
- * Inspiration taken from YRex's "NuPlayer" FireTexture code
+ * Huge inspiration taken from YRex's "NuPlayer" FireTexture code
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
@@ -122,7 +122,13 @@ void UFireTexture::Tick( float DeltaTime )
     {
       Spark& S = Sparks->At( i );
       u8 Heat;
+      u8 Extra;
 
+      // General rules/mindset for figuring out how each spark type works
+      //
+      // 1) Effects seem to be very simple, don't over think it
+      // 2) The "Byte" variables in each Spark must have a use if they aren't 0
+      //
       switch ( S.Type )
       {
       case SPARK_Burn:
@@ -131,11 +137,15 @@ void UFireTexture::Tick( float DeltaTime )
         break;
       case SPARK_Sparkle:
         Heat = (rand() % S.Heat)-8;
-        u8 XOff = (rand() % 64)+16;
-        BUF( (S.X + XOff) & UMask, S.Y & VMask ) = Heat;
-        BUF( (S.X + XOff) & UMask, (S.Y-1) & VMask ) = Heat;
-        BUF( ((S.X+1) + XOff) & UMask, S.Y & VMask ) = Heat;
-        BUF( ((S.X-1) + XOff) & UMask, S.Y & VMask ) = Heat;
+        Extra = (rand() % 64)+16;
+        BUF( (S.X + Extra) & UMask, S.Y & VMask ) = Heat;
+        BUF( (S.X + Extra) & UMask, (S.Y-1) & VMask ) = Heat;
+        BUF( ((S.X+1) + Extra) & UMask, S.Y & VMask ) = Heat;
+        BUF( ((S.X-1) + Extra) & UMask, S.Y & VMask ) = Heat;
+        break;
+      case SPARK_Pulse:
+        S.ByteA += S.ByteD;
+        BUF( S.X & UMask, S.Y & VMask ) = S.ByteA;
         break;
       }
     }
@@ -155,6 +165,14 @@ void UFireTexture::Load()
   {
     Spark NewSpark;
     In >> NewSpark;
+    switch ( NewSpark.Type )
+    {
+      case SPARK_Pulse:
+        NewSpark.ByteA = NewSpark.Heat;
+        break;
+    }
+
+
     Sparks->PushBack( NewSpark );
   }
 
@@ -187,7 +205,6 @@ bool UFireTexture::ExportToFile( const char* dir, const char* Type )
 
 void UFireTexture::CalculateRenderTable()
 {
-
   // Construct render table for fast color lookup without
   // necessarily caring about integer wraparound.
   // I have no clue if this was the original use for it,
