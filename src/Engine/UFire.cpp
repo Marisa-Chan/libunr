@@ -104,6 +104,12 @@ void UFireTexture::Tick( float DeltaTime )
         Value += BUF((x - 1) & UMask, y);
       }
 
+      // Setting render heat above 246 seems to make it go a bit crazy
+      if ( RenderHeat > 246 && Value > 4 )
+        Value += 2;
+      else if ( RenderHeat > 220 && Value > 240 )
+        Value += 1;
+
       BUF(x,y) = RenderTable[Value];
     }
   }
@@ -197,11 +203,10 @@ void UFireTexture::CalculateRenderTable()
     // 1024), we first try to divide i by 4 so that, as a baseline,
     // the render table is evenly spaced regardless of RenderHeat
     //
-    // From there, we can try to identify what RenderHeat this approximates
-    // to in the original engine and come up with a way of shifting the
-    // distribution of numbers into a bell-shape.
+    // From there, we can use RenderHeat to adjust the color balance such
+    // that colors lower in the table aren't just black/background color
     // 
-    RenderTable[i] = (Clamp( (i / 4) + ((RenderHeat - 250) / 12), 0, 255 ));
+    RenderTable[i] = Clamp( (i / 4) + ((RenderHeat - 250) / 16), 0, 255 );
   }
 }
 
