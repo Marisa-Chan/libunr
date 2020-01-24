@@ -22,6 +22,7 @@
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
+#if defined LIBUNR_WIN32
 
 #include "Engine/UWindowsClient.h"
 #include "Engine/UWindowsViewport.h"
@@ -163,3 +164,5 @@ LRESULT UWindowsViewport::StaticWndProc( HWND Hwnd, UINT Msg, WPARAM WParam, LPA
 #include "Core/UClass.h"
 #include "Core/UPackage.h"
 IMPLEMENT_NATIVE_CLASS( UWindowsViewport );
+
+#endif //End win32 check

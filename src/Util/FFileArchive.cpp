@@ -27,7 +27,10 @@
 
 #include <stdarg.h>
 
-#if defined LIBUNR_WIN32
+#if defined LIBUNR_POSIX
+  #include <cstring>
+  #include <unistd.h>
+#elif defined LIBUNR_WIN32
   #include <direct.h>
 #endif
 
