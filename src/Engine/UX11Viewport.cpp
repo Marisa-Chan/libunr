@@ -45,6 +45,15 @@ bool UX11Viewport::Init( int InWidth, int InHeight )
   m_Display = ((UX11Client*)Client)->m_Display;
   
   m_Window = XCreateSimpleWindow( m_Display, RootWindow( m_Display, m_DefaultScreen ), 0, 0, InWidth, InHeight, 1, BlackPixel( m_Display, m_Screen ), WhitePixel( m_Display, m_Screen ) );
+  
+  if ( !GEngine->Render->InitViewport( this ) )
+  {
+    GLogf( LOG_ERR, "Failed to initialize X11 viewport with renderer" );
+    Exit();
+    return false;
+  }
+  
+  return true;
 }
 
 bool UX11Viewport::Exit()
