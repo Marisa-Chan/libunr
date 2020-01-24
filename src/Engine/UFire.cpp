@@ -129,6 +129,14 @@ void UFireTexture::Tick( float DeltaTime )
         Heat = rand() % 224;
         BUF( S.X & UMask, S.Y & VMask ) = Heat;
         break;
+      case SPARK_Sparkle:
+        Heat = (rand() % S.Heat)-8;
+        u8 XOff = (rand() % 64)+16;
+        BUF( (S.X + XOff) & UMask, S.Y & VMask ) = Heat;
+        BUF( (S.X + XOff) & UMask, (S.Y-1) & VMask ) = Heat;
+        BUF( ((S.X+1) + XOff) & UMask, S.Y & VMask ) = Heat;
+        BUF( ((S.X-1) + XOff) & UMask, S.Y & VMask ) = Heat;
+        break;
       }
     }
   }
