@@ -28,6 +28,24 @@
 #include "Engine/UEngine.h"
 #include "Engine/UFire.h"
 
+inline int rand1()
+{
+  return (rand() % 2) ? 1 : -1;
+}
+
+inline int rand2()
+{
+  int r = rand() % 3;
+  switch ( r )
+  {
+  case 0:
+  case 1:
+    return r;
+  case 2:
+    return -1;
+  }
+}
+
 /*-----------------------------------------------------------------------------
  * UFractalTexture
 -----------------------------------------------------------------------------*/
@@ -116,42 +134,75 @@ void UFireTexture::Tick( float DeltaTime )
 
 
   // Iterate through all sparks and generate new particles for them
-  for ( int i = 0; i < NumSparks; i++ )
+  for ( int i = 0; i < Sparks->Size(); i++ )
   {
-    if ( Sparks->Size() < SparksLimit )
-    {
-      Spark& S = Sparks->At( i );
-      u8 Heat;
-      u8 Extra;
+    Spark& S = Sparks->At( i );
+    Spark New;
+    u8 Heat;
+    u8 Extra;
 
-      // General rules/mindset for figuring out how each spark type works
-      //
-      // 1) Effects seem to be very simple, don't over think it
-      // 2) The "Byte" variables in each Spark must have a use if they aren't 0
-      //
-      switch ( S.Type )
+    // General rules/mindset for figuring out how each spark type works
+    //
+    // 1) Effects seem to be very simple, don't over think it
+    // 2) The "Byte" variables in each Spark must have a use if they aren't 0
+    //
+    switch ( S.Type )
+    {
+    case SPARK_Burn:
+      Heat = rand() % 224;
+      BUF( S.X & UMask, S.Y & VMask ) = Heat;
+      break;
+    case SPARK_Sparkle:
+      Heat = (rand() % S.Heat)-8;
+      Extra = (rand() % 64)+16;
+      BUF( (S.X + Extra) & UMask, S.Y & VMask ) = Heat;
+      BUF( (S.X + Extra) & UMask, (S.Y-1) & VMask ) = Heat;
+      BUF( ((S.X+1) + Extra) & UMask, S.Y & VMask ) = Heat;
+      BUF( ((S.X-1) + Extra) & UMask, S.Y & VMask ) = Heat;
+      break;
+    case SPARK_Pulse:
+      S.ByteA += S.ByteD;
+      BUF( S.X & UMask, S.Y & VMask ) = S.ByteA;
+      break;
+    case SPARK_Signal:
+      Heat = 96 + (rand() % 127);
+      BUF( S.X & UMask, S.Y & VMask ) = Heat;
+      break;
+    case SPARK_Blaze:
+      if ( !S.ByteC )
       {
-      case SPARK_Burn:
-        Heat = rand() % 224;
-        BUF( S.X & UMask, S.Y & VMask ) = Heat;
-        break;
-      case SPARK_Sparkle:
-        Heat = (rand() % S.Heat)-8;
-        Extra = (rand() % 64)+16;
-        BUF( (S.X + Extra) & UMask, S.Y & VMask ) = Heat;
-        BUF( (S.X + Extra) & UMask, (S.Y-1) & VMask ) = Heat;
-        BUF( ((S.X+1) + Extra) & UMask, S.Y & VMask ) = Heat;
-        BUF( ((S.X-1) + Extra) & UMask, S.Y & VMask ) = Heat;
-        break;
-      case SPARK_Pulse:
-        S.ByteA += S.ByteD;
-        BUF( S.X & UMask, S.Y & VMask ) = S.ByteA;
-        break;
-      case SPARK_Signal:
-        Heat = 96 + (rand() % 127);
-        BUF( S.X & UMask, S.Y & VMask ) = Heat;
-        break;
+        S.ByteD++;
+        if ( Sparks->Size() < SparksLimit && S.ByteD == 5 )
+        {
+          S.ByteD = 0;
+          New.ByteA = rand2();
+          New.ByteB = rand2();
+          New.ByteC = 1;
+          New.X = S.X;
+          New.Y = S.Y;
+          New.Heat = S.Heat;
+          New.Type = S.Type;
+          Sparks->PushBack( New );
+        }
       }
+      else
+      {
+        S.Heat -= 4;
+        if ( S.Heat < 4 )
+          Sparks->Erase( i );
+        else
+        {
+          S.ByteD++;
+          if ( S.ByteD & 1 )
+            S.X += S.ByteA + rand2();
+          else
+            S.Y += S.ByteB + rand2();
+          BUF( S.X & UMask, S.Y & VMask ) = S.Heat;
+          BUF( S.X & UMask, (S.Y-1) & VMask ) = S.Heat;
+          BUF( (S.X-1) & UMask, S.Y & VMask ) = S.Heat;
+        }
+      }
+      break;
     }
   }
 }

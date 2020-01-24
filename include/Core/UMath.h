@@ -56,6 +56,11 @@ inline int Clamp( int A, int Min, int Max )
     return A;
 }
 
+inline float FRand()
+{
+  return (float)rand() / (float)RAND_MAX;
+}
+
 /*-----------------------------------------------------------------------------
  * FVector
  * A 3D floating point coordinate
