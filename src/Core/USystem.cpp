@@ -760,6 +760,15 @@ const char* USystem::GetHomeDir()
   struct ::passwd* pw = getpwuid( getuid() );
   return pw->pw_dir;
 }
+
+const char* USystem::GetHomeLibunrDir()
+{
+  char* Out = new char[1024];
+  struct ::passwd* pw = getpwuid( getuid() );
+  strcpy( Out, pw->pw_dir );
+  strcat( Out, ".config/libunr" );
+  return Out;
+}
 #endif
 
 bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool bIsEditor, char* GameName )

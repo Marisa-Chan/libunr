@@ -94,6 +94,7 @@ class LIBUNR_API USystem : public USubsystem
   static double GetSeconds();
 #if defined LIBUNR_POSIX
   static const char* GetHomeDir();
+  static const char* GetHomeLibunrDir();
 #endif
 
   // libunr specific

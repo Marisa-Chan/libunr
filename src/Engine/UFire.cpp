@@ -200,6 +200,39 @@ void UFireTexture::Tick( float DeltaTime )
         }
       }
       break;
+    case SPARK_OzHasSpoken:
+      if ( !S.ByteC )
+      {
+        S.ByteD++;
+        if ( Sparks->Size() < SparksLimit && (rand() & 0xff) > 127 )
+        {
+          S.ByteD = 0;
+          New.ByteA = (rand() & 0x7f)-63;
+          New.ByteB = 127;
+          New.ByteC = 1;
+          New.X = S.X;
+          New.Y = S.Y;
+          New.Heat = S.Heat;
+          New.Type = S.Type;
+          Sparks->PushBack( New );
+        }
+      }
+      else
+      {
+        S.Heat -= 2;
+        if ( S.Heat < 2 )
+          Sparks->Erase( i );
+        else
+        {
+          if ( (rand() & 0x7f) < (S.ByteA & 0x7f) )
+            S.X += (S.ByteA & 0x80) ? -1 : 1;
+          if ( (rand() & 0x7f) < (S.ByteB & 0x7f) )
+            S.Y--;
+
+          BUF( S.X & UMask, S.Y & VMask ) = S.Heat;
+        }
+      }
+      break;
     }
   }
 }
