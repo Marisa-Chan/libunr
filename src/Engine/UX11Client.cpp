@@ -40,6 +40,7 @@ bool UX11Client::Init()
   m_Display = XOpenDisplay( NULL );
   if (!m_Display)
   {
+    GLogf( LOG_CRIT, "Failed to open a connection to X11.", GetLastError() );
     return false;
   }
   m_DefaultDisplay = DefaultScreen( m_Display );
