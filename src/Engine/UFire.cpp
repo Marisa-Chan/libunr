@@ -225,7 +225,10 @@ void UFireTexture::Tick( float DeltaTime )
         else
         {
           if ( (rand() & 0x7f) < (S.ByteA & 0x7f) )
-            S.X += (S.ByteA & 0x80) ? -1 : 1;
+            S.X += (S.ByteA & 0x80) ? 0 : 1;
+          else
+            S.X += (S.ByteA & 0x80) ? -1 : 0;
+
           if ( (rand() & 0x7f) < (S.ByteB & 0x7f) )
             S.Y--;
 
