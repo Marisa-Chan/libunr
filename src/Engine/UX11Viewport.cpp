@@ -17,30 +17,59 @@
 \*===========================================================================*/
 
 /*========================================================================
- * UX11Viewport.h - A viewport implemented in XCB.
+ * UX11Viewport.cpp
  *
  * written by Jesse 'Hyzoran' Kowalik
  *========================================================================
 */
-
-#pragma once
-
-#include <X11/Xlib.h>
+#if defined LIBUNR_POSIX
 
 #include "Engine/UX11Client.h"
-#include "Engine/UViewport.h"
+#include "Engine/UX11Viewport.h"
 
-class LIBUNR_API UX11Viewport : public UViewport
+UX11Viewport::UX11Viewport()
+  : UViewport()
 {
-  DECLARE_NATIVE_CLASS( UX11Viewport, UViewport, CLASS_NoExport, XDrv )
-  UX11Viewport();
+}
 
-  virtual bool Init( int InWidth = 0, int InHeight = 0 );
-  virtual bool Exit();
-  virtual void Show();
-  virtual void Hide();
-  virtual bool Resize( int NewWidth, int NewHeight );
+UX11Viewport::~UX11Viewport()
+{}
+
+bool UX11Viewport::Init( int InWidth, int InHeight )
+{
+  if ( !GEngine->Render )
+    return true;
+
+  Super::Init( InWidth, InHeight );
   
-  Display* m_Display;
-  Window* m_Window; //X11 Window
-};
+  m_Display = ((UX11Client*)Client)->m_Display;
+  
+  m_Window = XCreateSimpleWindow( m_Display, RootWindow( m_Display, m_DefaultScreen ), 0, 0, InWidth, InHeight, 1, BlackPixel( m_Display, m_Screen ), WhitePixel( m_Display, m_Screen ) );
+}
+
+bool UX11Viewport::Exit()
+{
+  XDestroyWindow( m_Display, m_Window );
+  return true;
+}
+
+bool UX11Viewport::Show()
+{
+   XMapWindow( m_Display, m_Window );
+}
+
+bool UX11Viewport::Hide()
+{
+   XUnmapWindow( m_Display, m_Window );
+}
+
+bool UX11Viewport::Resize( int NewWidth, int NewHeight )
+{
+  XMoveResizeWindow( m_Display, m_Window, 0, 0, InWidth, InHeight );
+}
+
+#include "Core/UClass.h"
+#include "Core/UPackage.h"
+IMPLEMENT_NATIVE_CLASS( UX11Viewport );
+
+#endif //End POSIX check

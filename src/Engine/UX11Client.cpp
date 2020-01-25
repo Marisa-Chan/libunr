@@ -17,54 +17,56 @@
 \*===========================================================================*/
 
 /*========================================================================
- * UWindowsClient.h - A windows client to interact with the engine
+ * UX11Client.cpp
  *
- * written by Adam 'Xaleros' Smith
+ * written by Jesse 'Hyzoran' Kowalik
  *========================================================================
 */
+#if defined LIBUNR_POSIX
 
-#if defined LIBUNR_WIN32
+#include "Engine/UX11Client.h"
 
-#include "Engine/UWindowsViewport.h"
-#include "Engine/UWindowsClient.h"
-#include "Actors/APlayerPawn.h"
-
-UWindowsClient::UWindowsClient()
+UX11Client::UX11Client()
   : UClient()
 {
-  hInstance = NULL;
+  m_Display = NULL;
 }
 
-UWindowsClient::~UWindowsClient()
+UX11Client::~UX11Client()
+{}
+
+bool UX11Client::Init()
 {
+  m_Display = XOpenDisplay( NULL );
+  if (!m_Display)
+  {
+    return false;
+  }
+  m_DefaultDisplay = DefaultScreen( m_Display );
 }
 
-bool UWindowsClient::Init()
-{
-  hInstance = GetModuleHandle( NULL );
-  return true;
-}
-
-bool UWindowsClient::Exit()
+bool UX11Client::Exit()
 {
   bool Result = true;
 
   // Close all viewports
+  // Close all viewports
   for ( int i = 0; i < Viewports.Size(); i++ )
   {
-    UWindowsViewport* WindowsViewport = (UWindowsViewport*)Viewports[i];
-    Result &= WindowsViewport->Exit();
+    UX11Viewport* ViewPort = (UX11Viewport*)Viewports[i];
+    Result &= UX11Viewport->Exit();
   }
-
+  
+  XCloseDisplay( m_Display );
   return Result;
 }
 
-UViewport* UWindowsClient::OpenViewport( int Width, int Height )
+UViewport* UX11Client::OpenViewport( int Width, int Height )
 {
-  UWindowsViewport* NewViewport = new UWindowsViewport();
+  UX11Viewport* NewViewport = new UX11Viewport();
   if ( !NewViewport->Init( Width, Height ) )
   {
-    GLogf( LOG_ERR, "Failed to create windows viewport" );
+    GLogf( LOG_ERR, "Failed to create X11 viewport" );
     delete NewViewport;
     return NULL;
   }
@@ -74,7 +76,7 @@ UViewport* UWindowsClient::OpenViewport( int Width, int Height )
   return NewViewport;
 }
 
-bool UWindowsClient::CloseViewport( UViewport* Viewport )
+bool UX11Client::CloseViewport( UViewport* Viewport )
 {
   bool Result = false;
 
@@ -94,24 +96,26 @@ bool UWindowsClient::CloseViewport( UViewport* Viewport )
   return Result;
 }
 
-void UWindowsClient::HandleInput( int Key, bool bDown )
+void UX11Client::HandleInput( int Key, bool bDown )
 {
 }
 
-void UWindowsClient::Tick( float DeltaTime )
+void UX11Client::Tick( float DeltaTime )
 {
-  MSG Msg;
+  XEvent event;
 
-  // Dispatch all incoming messages for each viewport
-  while ( PeekMessage( &Msg, NULL, 0, 0, PM_REMOVE ) )
+  while(1) 
   {
-    TranslateMessage( &Msg );
-    DispatchMessage( &Msg );
+     XNextEvent( m_Display, &event);
+
+     // Handle Windows Close Event
+     if(event.type==ClientMessage)
+        break;
   }
 }
 
 #include "Core/UClass.h"
 #include "Core/UPackage.h"
-IMPLEMENT_NATIVE_CLASS( UWindowsClient );
+IMPLEMENT_NATIVE_CLASS( UX11Client );
 
-#endif //End win32 check
+#endif //End POSIX check

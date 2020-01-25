@@ -17,7 +17,7 @@
 \*===========================================================================*/
 
 /*========================================================================
- * UX11Viewport.h - A viewport implemented in XCB.
+ * UX11Client.h - X11 Client Implementation.
  *
  * written by Jesse 'Hyzoran' Kowalik
  *========================================================================
@@ -27,20 +27,22 @@
 
 #include <X11/Xlib.h>
 
-#include "Engine/UX11Client.h"
-#include "Engine/UViewport.h"
+#include "Engine/UEngine.h"
 
-class LIBUNR_API UX11Viewport : public UViewport
+class LIBUNR_API UX11Client : public UClient
 {
-  DECLARE_NATIVE_CLASS( UX11Viewport, UViewport, CLASS_NoExport, XDrv )
-  UX11Viewport();
+  DECLARE_NATIVE_CLASS(  UX11Client, UClient, CLASS_NoExport | CLASS_Config, XDrv )
 
-  virtual bool Init( int InWidth = 0, int InHeight = 0 );
+  UX11Client();
+
+  virtual bool Init();
   virtual bool Exit();
-  virtual void Show();
-  virtual void Hide();
-  virtual bool Resize( int NewWidth, int NewHeight );
+
+  virtual UViewport* OpenViewport( int InWidth = 0, int InHeight = 0 );
+  virtual bool CloseViewport( UViewport* Viewport );
+  virtual void HandleInput( int Key, bool bDown );
+  virtual void Tick( float DeltaTime );
   
   Display* m_Display;
-  Window* m_Window; //X11 Window
+  int m_DefaultScreen;
 };

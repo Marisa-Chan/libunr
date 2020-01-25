@@ -7,7 +7,15 @@ BUILD_DEBUG=0
 BUILD_SYMBOLS=0
 BUILD_32BIT=0
 BUILD_LIBDUMB2_PATH=""
-BUILD_LIBDUMB2_HEADER_PATH="/usr/include/dumb.h"
+BUILD_LIBDUMB2_HEADER_PATH=""
+BUILD_LIBGME_PATH=""
+BUILD_LIBGME_HEADER_PATH="/usr/include/gme"
+BUILD_LIBOGG_PATH=""
+BUILD_LIBOGG_HEADER_PATH=""
+BUILD_LIBVORBIS_PATH=""
+BUILD_LIBVORBIS_HEADER_PATH=""
+BUILD_LIBMPG123_PATH=""
+BUILD_LIBMPG123_HEADER_PATH=""
 BUILD_VERBOSE=0
 BUILD_COMPILER="g++"
 BUILD_INSTALL_PATH="/usr"
@@ -18,19 +26,16 @@ BUILD_INSTALL_PATH="/usr"
 print_help()
 {
   echo
-  echo "libunr configure script - Written by Adam Smith"
+  echo "libunr configure script"
   echo "Usage: ./configure [options]"
   echo
   echo "Options:"
-  echo "   -h  Show help"
+  echo "   -h  Show this help"
   echo "   -d  Configure makefile with debug symbols and no optimization"
   echo "   -s  Configure makefile with debug symbols"
   echo "   -m  Configure makefile with 32-bit"
-  echo "   -t  Configure makefile to link against libdumb2 tracker library"
-  echo "   -u  Configure makefile to find libdumb2 header"
-  echo "   -c  Configure makefile to use a specified compiler"
-  echo "   -i  Configure makefile to install to specified directory"
   echo "   -v  Configure makefile with verbose output"
+  echo "   ( Linking and Header pathing options available in the future"
   echo
 }
 
@@ -44,13 +49,13 @@ while getopts "hdsc:vi:t:u:m" opt; do
   d) BUILD_DEBUG=1 ;;
   s) BUILD_SYMBOLS=1 ;;
   m) BUILD_32BIT=1 ;;
-  t) BUILD_LIBDUMB2_PATH="$OPTARG" ;;
-  u) BUILD_LIBDUMB2_HEADER_PATH="$OPTARG" ;;
-  c) BUILD_COMPILER="$OPTARG" ;;
-  i) BUILD_INSTALL_PATH="$OPTARG" ;;
   v) BUILD_VERBOSE=1 ;;
   esac
 done
+
+#################################################
+# Default Arguments init
+#################################################
 
 if [ -z "$BUILD_LIBDUMB2_PATH" ]
 then
@@ -61,7 +66,55 @@ then
       BUILD_LIBDUMB2="-ldumb"
     fi
 else
-  BUILD_LIBDUMB2="$BUILD_LIBDUMB2_PATH"
+  BUILD_LIBDUMB2=$BUILD_LIBDUMB2_PATH
+fi
+
+if [ -z "$BUILD_LIBGME_PATH" ]
+then
+  if [ $BUILD_DEBUG -eq 1 ]
+    then
+      BUILD_LIBGME="-lgme"
+    else
+      BUILD_LIBGME="-lgme"
+    fi
+else
+  BUILD_LIBGME=$BUILD_LIBGME_PATH
+fi
+
+if [ -z "$BUILD_LIBOGG_PATH" ]
+then
+  if [ $BUILD_DEBUG -eq 1 ]
+    then
+      BUILD_LIBOGG="-logg"
+    else
+      BUILD_LIBOGG="-logg"
+    fi
+else
+  BUILD_LIBOGG=$BUILD_LIBOGG_PATH
+fi
+
+if [ -z "$BUILD_LIBVORBIS_PATH" ]
+then
+  if [ $BUILD_DEBUG -eq 1 ]
+    then
+      BUILD_LIBVORBIS="-lvorbis"
+    else
+      BUILD_LIBVORBIS="-lvorbis"
+    fi
+else
+  BUILD_LIBVORBIS=$BUILD_LIBVORBIS_PATH
+fi
+
+if [ -z "$BUILD_LIBMPG123_PATH" ]
+then
+  if [ $BUILD_DEBUG -eq 1 ]
+    then
+      BUILD_LIBMPG123="-lmpg123"
+    else
+      BUILD_LIBMPG123="-lmpg123"
+    fi
+else
+  BUILD_LIBMPG123=$BUILD_LIBMPG123_PATH
 fi
 
 # Print build state
@@ -71,11 +124,26 @@ echo "--------------------------------------------------------------"
 echo "BUILD_DEBUG="$BUILD_DEBUG
 echo "BUILD_SYMBOLS="$BUILD_SYMBOLS
 echo "BUILD_32BIT="$BUILD_32BIT
-echo "BUILD_LIBDUMB2_PATH="$BUILD_LIBDUMB2_PATH
-echo "BUILD_LIBDUMB2_HEADER_PATH="$BUILD_LIBDUMB2_HEADER_PATH
 echo "BUILD_VERBOSE="$BUILD_VERBOSE
 echo "BUILD_COMPILER="$BUILD_COMPILER
-echo "BUILD_INSTALL_PATH="$BUILD_INSTALL_PATH
+echo "BUILD_LIBDUMB2="$BUILD_LIBDUMB2
+echo "BUILD_LIBDUMB2_HEADER_PATH="$BUILD_LIBDUMB2_HEADER_PATH
+echo "BUILD_LIBGME="$BUILD_LIBGME
+echo "BUILD_LIBGME_HEADER_PATH="$BUILD_LIBGME_HEADER_PATH
+echo "BUILD_LIBOGG="$BUILD_LIBOGG
+echo "BUILD_LIBOGG_HEADER_PATH="$BUILD_LIBOGG_HEADER_PATH
+echo "BUILD_LIBVORBIS="$BUILD_LIBVORBIS
+echo "BUILD_LIBVORBIS_HEADER_PATH="$BUILD_LIBVORBIS_HEADER_PATH
+echo "BUILD_LIBMPG123="$BUILD_LIBMPG123
+echo "BUILD_LIBMPG123_HEADER_PATH="$BUILD_LIBMPG123_HEADER_PATH
+
+BUILD_SETTINGS=\
+"$BUILD_LIBDUMB2 -I$BUILD_LIBDUMB2_HEADER_PATH \
+$BUILD_LIBGME -I$BUILD_LIBGME_HEADER_PATH \
+$BUILD_LIBOGG -I$BUILD_LIBOGG_HEADER_PATH \
+$BUILD_LIBVORBIS -I$BUILD_LIBVORBIS_HEADER_PATH \
+$BUILD_LIBMPG123 -I$BUILD_LIBMPG123_HEADER_PATH\
+"
 
 CONFIG_CFLAGS=""
 
@@ -92,7 +160,7 @@ BUILD_SRCS="$BUILD_SRCS $(find src/HPSS   | grep cpp)"
 # Compiler specific options
 if [ "$BUILD_COMPILER" = "g++" ] || [ "$BUILD_COMPILER" = "clang++" ] 
 then
-  CONFIG_CFLAGS="-fPIC -I/usr/include -I./include $BUILD_LIBDUMB2 -I$BUILD_LIBDUMB2_HEADER_PATH -fmax-errors=10 -std=c++11 -Wno-attributes -DINSTALL_PREFIX=\\\"$BUILD_INSTALL_PATH\\\""
+  CONFIG_CFLAGS="-fPIC -I/usr/include -I./include $BUILD_SETTINGS -fmax-errors=10 -std=c++11 -Wno-attributes -DINSTALL_PREFIX=\\\"$BUILD_INSTALL_PATH\\\""
 
   if [ "$BUILD_COMPILER" = "clang++" ]
   then
