@@ -106,6 +106,7 @@ class LIBUNR_API UFireTexture : public UFractalTexture
     SPARK_OzSpark,
     SPARK_ConeSpark,
     SPARK_BlazeLSpark,
+    SPARK_BlazeRSpark,
   };
 
   enum DMode

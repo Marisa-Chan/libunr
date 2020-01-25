@@ -284,6 +284,37 @@ void UFireTexture::Tick( float DeltaTime )
         BUF( S.X & UMask, S.Y & VMask ) = S.Heat;
       }
       break;
+    case SPARK_BlazeRight:
+      if ( Sparks->Size() < SparksLimit && (rand() & 0xff) < 128 )
+      {
+        New.ByteA = (rand() & 0x7f) - 63;
+        New.ByteC = 100;
+        New.ByteD = 0;
+        New.X = S.X;
+        New.Y = S.Y;
+        New.Heat = S.Heat;
+        New.Type = SPARK_BlazeRSpark;
+        Sparks->PushBack( New );
+      }
+      break;
+    case SPARK_BlazeRSpark:
+      S.ByteC -= 1;
+      if ( S.ByteC == 1 )
+        Sparks->Erase( i );
+      else
+      {
+        if ( (rand() & 0x7f) > (S.ByteA & 0x7f) )
+        {
+          S.X += 1;
+          S.ByteD++;
+        }
+
+        if ( S.ByteD > 8 && (rand() & 0x3f) < S.ByteD )
+          S.Y++;
+
+        BUF( S.X & UMask, S.Y & VMask ) = S.Heat;
+      }
+      break;
     }
   }
 }
