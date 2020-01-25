@@ -168,72 +168,89 @@ void UFireTexture::Tick( float DeltaTime )
       BUF( S.X & UMask, S.Y & VMask ) = Heat;
       break;
     case SPARK_Blaze:
-      if ( !S.ByteC )
+      if ( Sparks->Size() < SparksLimit && (rand() & 0xff) > 127 )
       {
-        S.ByteD++;
-        if ( Sparks->Size() < SparksLimit && (rand() & 0xff) > 127)
-        {
-          S.ByteD = 0;
-          New.ByteA = rand() & 0xff;
-          New.ByteB = rand() & 0xff;
-          New.ByteC = 1;
-          New.X = S.X;
-          New.Y = S.Y;
-          New.Heat = S.Heat;
-          New.Type = S.Type;
-          Sparks->PushBack( New );
-        }
+        New.ByteA = rand() & 0xff;
+        New.ByteB = rand() & 0xff;
+        New.ByteC = 1;
+        New.X = S.X;
+        New.Y = S.Y;
+        New.Heat = S.Heat;
+        New.Type = SPARK_BlazeSpark;
+        Sparks->PushBack( New );
       }
+      break;
+    case SPARK_BlazeSpark: // Spawned by SPARK_Blaze sparks
+      S.Heat -= 4;
+      if ( S.Heat < 4 )
+        Sparks->Erase( i );
       else
       {
-        S.Heat -= 4;
-        if ( S.Heat < 4 )
-          Sparks->Erase( i );
-        else
-        {
-          if ( (rand() & 0x7f) < (S.ByteA & 0x7f) )
-            S.X += (S.ByteA & 0x80) ? -1 : 1;
-          if ( (rand() & 0x7f) < (S.ByteB & 0x7f) )
-            S.Y += (S.ByteB & 0x80) ? -1 : 1;
+        if ( (rand() & 0x7f) < (S.ByteA & 0x7f) )
+          S.X += (S.ByteA & 0x80) ? -1 : 1;
+        if ( (rand() & 0x7f) < (S.ByteB & 0x7f) )
+          S.Y += (S.ByteB & 0x80) ? -1 : 1;
 
-          BUF( S.X & UMask, S.Y & VMask ) = S.Heat;
-        }
+        BUF( S.X & UMask, S.Y & VMask ) = S.Heat;
       }
       break;
     case SPARK_OzHasSpoken:
-      if ( !S.ByteC )
+      if ( Sparks->Size() < SparksLimit && (rand() & 0xff) < 128 )
       {
-        S.ByteD++;
-        if ( Sparks->Size() < SparksLimit && (rand() & 0xff) > 127 )
-        {
-          S.ByteD = 0;
-          New.ByteA = (rand() & 0x7f)-63;
-          New.ByteB = 127;
-          New.ByteC = 1;
-          New.X = S.X;
-          New.Y = S.Y;
-          New.Heat = S.Heat;
-          New.Type = S.Type;
-          Sparks->PushBack( New );
-        }
+        New.ByteA = (rand() & 0x7f)-63; // subtract by half max value to try and force negative values in a smaller range
+        New.ByteB = 127;
+        New.ByteC = 1;
+        New.X = S.X;
+        New.Y = S.Y;
+        New.Heat = S.Heat;
+        New.Type = SPARK_OzSpark;
+        Sparks->PushBack( New );
       }
+      break;
+    case SPARK_OzSpark: // Spawned by SPARK_OzSpark sparks
+      S.Heat -= 2;
+      if ( S.Heat < 2 )
+        Sparks->Erase( i );
       else
       {
-        S.Heat -= 2;
-        if ( S.Heat < 2 )
-          Sparks->Erase( i );
+        if ( (rand() & 0x7f) < (S.ByteA & 0x7f) )
+          S.X += (S.ByteA & 0x80) ? 0 : 1;
         else
-        {
-          if ( (rand() & 0x7f) < (S.ByteA & 0x7f) )
-            S.X += (S.ByteA & 0x80) ? 0 : 1;
-          else
-            S.X += (S.ByteA & 0x80) ? -1 : 0;
+          S.X += (S.ByteA & 0x80) ? -1 : 0;
 
-          if ( (rand() & 0x7f) < (S.ByteB & 0x7f) )
-            S.Y--;
+        if ( (rand() & 0x7f) < (S.ByteB & 0x7f) )
+          S.Y--;
 
-          BUF( S.X & UMask, S.Y & VMask ) = S.Heat;
-        }
+        BUF( S.X & UMask, S.Y & VMask ) = S.Heat;
+      }
+      break;
+    case SPARK_Cone:
+      if ( Sparks->Size() < SparksLimit && (rand() & 0xff) > 127 )
+      {
+        New.ByteA = (rand() & 0x7f) - 63; // subtract by half max value to try and force negative values in a smaller range
+        New.ByteC = 54; // seems to look right based on FractalTest.ConeTest, doesn't look like we trample anything either
+        New.X = S.X;
+        New.Y = S.Y;
+        New.Heat = S.Heat;
+        New.Type = SPARK_ConeSpark;
+        Sparks->PushBack( New );
+      }
+      break;
+    case SPARK_ConeSpark:
+      S.ByteC -= 1;
+      if ( S.ByteC == 1 )
+        Sparks->Erase( i );
+      else
+      {
+        if ( (rand() & 0x7f) < (S.ByteA & 0x7f) )
+          S.X += (S.ByteA & 0x80) ? 0 : 1;
+        else
+          S.X += (S.ByteA & 0x80) ? -1 : 0;
+
+        if ( (rand() & 0x1) )
+          S.Y++;
+
+        BUF( S.X & UMask, S.Y & VMask ) = S.Heat;
       }
       break;
     }

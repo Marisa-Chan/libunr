@@ -99,7 +99,12 @@ class LIBUNR_API UFireTexture : public UFractalTexture
     SPARK_SphereLightning,
     SPARK_Wheel,
     SPARK_Gametes,
-    SPARK_Sprinkler
+    SPARK_Sprinkler,
+
+    // Sparks spawned by other types of sparks
+    SPARK_BlazeSpark,
+    SPARK_OzSpark,
+    SPARK_ConeSpark
   };
 
   enum DMode
