@@ -171,11 +171,11 @@ void UFireTexture::Tick( float DeltaTime )
       if ( !S.ByteC )
       {
         S.ByteD++;
-        if ( Sparks->Size() < SparksLimit && S.ByteD == 5 )
+        if ( Sparks->Size() < SparksLimit && (rand() & 0xff) > 127)
         {
           S.ByteD = 0;
-          New.ByteA = rand() % 255;
-          New.ByteB = rand() % 255;
+          New.ByteA = rand() & 0xff;
+          New.ByteB = rand() & 0xff;
           New.ByteC = 1;
           New.X = S.X;
           New.Y = S.Y;
@@ -197,8 +197,6 @@ void UFireTexture::Tick( float DeltaTime )
             S.Y += (S.ByteB & 0x80) ? -1 : 1;
 
           BUF( S.X & UMask, S.Y & VMask ) = S.Heat;
-          BUF( S.X & UMask, (S.Y-1) & VMask ) = S.Heat;
-          BUF( (S.X-1) & UMask, S.Y & VMask ) = S.Heat;
         }
       }
       break;
