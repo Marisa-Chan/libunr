@@ -92,6 +92,17 @@ class LIBUNR_API URenderDevice : public USubsystem
   bool bAccelerateFractalTextures;
 
   /*-----------------------------------------------------------------------------
+   * Matrix functions
+   * Used for generating matrices for the render device to use
+-  ----------------------------------------------------------------------------*/
+
+  // Generates an orthographic matrix for 2D drawing
+  virtual void GetOrthoMatrix( FMatrix4x4& Mat, float Left, float Right, float Top, float Bottom, float zNear, float zFar );
+
+  // Generates a perspective matrix for 3D drawing
+  virtual void GetPerspectiveMatrix( FMatrix4x4& Mat, float FOV, float Width, float Height, float zNear, float zFar );
+
+  /*-----------------------------------------------------------------------------
    * Complex drawing functions
    * Used for drawing the world, including occlusion and lighting
 -  ----------------------------------------------------------------------------*/
@@ -127,17 +138,14 @@ class LIBUNR_API URenderDevice : public USubsystem
   // Draws a grid in 3D space
   virtual void DrawGrid( FBox& Dim, FColor& Color ) {}
 
+  // Test drawing a cube
+  virtual void DrawCube( FVector& Loc, FRotator& Rot, FVector& Scale, UTexture* Tex ) {}
+
   // Initializes a viewport for use with the renderer
   virtual bool InitViewport( UViewport* Viewport ) { return false; }
 
   // Sets the current viewport to render to
   virtual bool SetActiveViewport( UViewport* Viewport ) { return false; }
-
-  // Generates an orthographic matrix for 2D drawing
-  virtual void GetOrthoMatrix( FMatrix4x4& Mat, float Left, float Right, float Top, float Bottom, float zNear, float zFar );
-
-  // Generates a perspective matrix for 3D drawing
-  virtual void GetPerspectiveMatrix( FMatrix4x4& Mat, float Left, float Right, float Top, float Bottom, float zNear, float zFar );
 };
 
 /*-----------------------------------------------------------------------------

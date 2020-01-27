@@ -28,6 +28,8 @@
 #include "Engine/UEngine.h"
 #include "Engine/UFire.h"
 
+// TODO: Super fast random number generation
+// Calling rand() over and over again can't be very efficient...
 inline int rand1()
 {
   return (rand() % 2) ? 1 : -1;

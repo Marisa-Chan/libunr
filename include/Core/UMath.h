@@ -30,6 +30,9 @@
 #include "Util/FTypes.h"
 #include "Core/UPackage.h"
 
+#define PI 3.14159265359
+#define DEG2RAD(angle) ((angle) * (PI/180.0f));
+
 // Floating point math functions
 inline bool FltEqual( float A, float B )
 {
@@ -67,6 +70,12 @@ inline float FRand()
 -----------------------------------------------------------------------------*/
 struct LIBUNR_API FVector
 {
+  FVector()
+    : X(0), Y(0), Z(0) {}
+
+  FVector( float InX, float InY, float InZ )
+    : X(InX), Y(InY), Z(InZ) {}
+
   float X;
   float Y;
   float Z;
@@ -167,6 +176,20 @@ struct LIBUNR_API FRotator
     Pitch = InPitch;
     Yaw = InYaw;
     Roll = InRoll;
+  }
+
+  void GetRadians( FVector& Out )
+  {
+    // Convert rotator coordinates to radians
+    // 16384 rotation units = 90 degree turn, 16384 / 90 = 182.0444444 rotation units per degree
+    // Therefore, (Rot * 90) / 16384 = Rot in degrees -> Degrees to radians = (angle) * (PI/180)
+    // Simplify -> 90/180 = 1/2 -> ((Rot*PI)/16384) * (1/2) -> (Rot*PI) / 32768
+    // Use multiplication for speed, so 1/32768 = 0.000030517578125
+
+    #define UU_ROT_TO_RAD(angle) (((double)angle*PI) * 0.000030517578125)
+    Out.X = UU_ROT_TO_RAD( Pitch );
+    Out.Y = UU_ROT_TO_RAD( Yaw );
+    Out.Z = UU_ROT_TO_RAD( Roll );
   }
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FRotator& Rotator )

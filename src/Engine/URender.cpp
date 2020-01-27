@@ -75,23 +75,24 @@ void URenderDevice::GetOrthoMatrix( FMatrix4x4& Mat, float Left, float Right, fl
 }
 
 // TODO: Platform specific optimizations
-void URenderDevice::GetPerspectiveMatrix( FMatrix4x4& Mat, float Left, float Right, float Top, float Bottom, float zNear, float zFar )
+void URenderDevice::GetPerspectiveMatrix( FMatrix4x4& Mat, float FOV, float Width, float Height, float zNear, float zFar )
 {
   // Validate parameters
-  if ( fabsf( Left - Right ) <= FLT_EPSILON || fabsf( Top - Bottom ) <= FLT_EPSILON || fabsf( zNear - zFar ) <= FLT_EPSILON )
+  if ( Width <= FLT_EPSILON || Height <= FLT_EPSILON || fabsf( zNear - zFar ) <= FLT_EPSILON )
   {
     GLogf( LOG_WARN, "Invalid ortho matrix parameters" );
     return;
   }
 
+  float Aspect = (Width) / (Height);
+  float tanFov = tanf( FOV / 2 );
+
   memset( &Mat, 0, sizeof( Mat ) );
-  Mat.Data[0][0] = (2.0f * zNear) / (Right - Left);
-  Mat.Data[1][0] = (2.0f * zNear) / (Top - Bottom);
-  Mat.Data[2][0] = (Right + Left) / (Right - Left);
-  Mat.Data[2][1] = (Top + Bottom) / (Top - Bottom);
-  Mat.Data[2][2] = (zFar + zNear) / (zFar - zNear);
+  Mat.Data[0][0] = 1 / (Aspect * tanFov );
+  Mat.Data[1][1] = 1 / tanFov;
+  Mat.Data[2][2] = -(zFar + zNear) / (zFar - zNear);
   Mat.Data[2][3] = -1.0f;
-  Mat.Data[3][2] = (-2.0f * zFar * zNear) / (zFar - zNear);
+  Mat.Data[3][2] = -(2 * zFar * zNear) / (zFar - zNear);
 }
 
 URenderBase::URenderBase()
