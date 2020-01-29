@@ -294,6 +294,48 @@ void* USystem::RunThread( ThreadFunc Func, void* Args )
 #endif
 }
 
+int USystem::JoinThread(void* Thread, void** OutReturnVal)
+{
+    int out;
+    int index = -1;
+
+    //Thread is NULL, return fail.
+    if ( Thread == NULL )
+        return 2;
+
+    //Check thread exists.
+    for (size_t i = 0; i < Threads.Size(); i++)
+    {
+        if (Threads[i] == Thread)
+        {
+            index = i;
+        }
+    }
+
+    //Thread doesnt exist, return fail.
+    if( index == -1 )
+        return 1;
+
+#if defined LIBUNR_WIN32
+
+    WaitForSingleObject( Thread, INFINITE );
+    Threads[index] = NULL;
+    out = 0;
+
+#elif defined LIBUNR_POSIX
+
+    out = pthread_join(Thread, OutReturnVal);
+
+    if( out == 0 )
+        Threads[index] = NULL;
+
+#else
+#error "Unknown operating system!Please add a section to USystem::RunThread()"
+#endif
+
+    return out;
+}
+
 bool USystem::IsEditor()
 {
   return bIsEditor;

@@ -80,6 +80,7 @@ class LIBUNR_API USystem : public USubsystem
   bool PromptForDeviceInfo();
   void* RunThread( ThreadFunc Func, void* Args );
   bool IsThreadActive( void* Thread );
+  int JoinThread( void* Thread, void** OutReturnVal = NULL );
   
   // Global methods
   static bool StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool InIsEditor, char* InGameName = NULL );
