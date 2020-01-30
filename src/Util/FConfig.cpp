@@ -674,6 +674,26 @@ makeEntry:
   return Entry->Values;
 }
 
+FConfig::FConfigCategory* FConfig::GetCategoryFromName( const char* Str )
+{
+  size_t n = 0;
+  
+  while( Str[n] != '\0' ) //Is this even safe? probably not.
+  {
+    n++;
+  }
+
+  for ( size_t i = 0; i < Categories.Size(); i++ )
+  {
+    if ( strncmp( Categories[i]->Name, Str, n ) == 0 )
+    {
+      return Categories[i];
+    }
+  }
+
+  return NULL;
+}
+
 const char* FConfig::GetName()
 {
   return Name;
@@ -719,6 +739,26 @@ FConfig::FConfigCategory::~FConfigCategory()
   if ( Entries != NULL )
     for ( int i = 0; i < Entries->Size(); i++ )
       delete (*Entries)[i];
+}
+
+FConfig::FConfigEntry* FConfig::FConfigCategory::GetEntryFromName( const char* Str )
+{
+  size_t n = 0;
+
+  while( Str[n] != '\0' ) //This is probably a bad idea. Please give me null characters.
+  {
+    n++;
+  }
+
+  for ( size_t i = 0; i < Entries->Size(); i++ )
+  {
+    if ( strncmp( (*Entries)[i]->Name, Str, n ) == 0 )
+    {
+      return (*Entries)[i];
+    }
+  }
+
+  return NULL;
 }
 
 FConfigManager::FConfigManager()

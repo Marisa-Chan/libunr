@@ -90,7 +90,6 @@ public:
   // Accessors
   const char* GetName();
 
-private:
   struct FConfigEntry
   {
     FConfigEntry();
@@ -108,11 +107,16 @@ private:
     FConfigCategory();
     ~FConfigCategory();
 
+    FConfigEntry* GetEntryFromName( const char* Str );
+
     char* Name;
     u32   Hash;
     TArray<FConfigEntry*>* Entries;
   };
 
+  FConfigCategory* GetCategoryFromName( const char* Str );
+
+private:
   TArray<FConfigCategory*> Categories;
   char* Name;
   char* Path;
