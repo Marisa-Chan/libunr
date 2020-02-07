@@ -50,6 +50,19 @@ bool UClient::Exit()
   return false;
 }
 
+void UClient::HandleInput( int Key, bool bDown )
+{
+  if ( Key < 0xFF && Key >= 0x00 )
+    if ( InputFuncs[Key] != NULL )
+      InputFuncs[Key]( (EInputKey)Key, Engine->CurrentDeltaTime, bDown );
+}
+
+void UClient::RegisterInputFunc( EInputKey Key, InputFunc Func )
+{
+  if ( Key < 0xFF && Key >= 0x00 )
+    InputFuncs[Key] = Func;
+}
+
 /*-----------------------------------------------------------------------------
  * UEngine
 -----------------------------------------------------------------------------*/
@@ -97,6 +110,7 @@ bool UEngine::Init()
     GLogf( LOG_CRIT, "Failed to initialize local client" );
     return false;
   }
+  Client->Engine = this;
   
   // Init audio device
   FString Device( GSystem->AudioDevice );
@@ -197,6 +211,8 @@ void UEngine::Tick( float DeltaTime )
 {
   if ( DeltaTime <= FLT_MIN )
     DeltaTime = FLT_MIN;
+
+  CurrentDeltaTime = DeltaTime;
 
   // Process audio
   if ( Audio )
