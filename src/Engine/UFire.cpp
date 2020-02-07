@@ -345,7 +345,7 @@ void UFireTexture::Load()
     Sparks->PushBack( NewSpark );
   }
 
-  if ( GEngine->Render )
+  if ( GEngine && GEngine->Render )
   {
     if ( !GEngine->Render->bAccelerateFractalTextures )
     {

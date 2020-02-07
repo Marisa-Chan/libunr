@@ -64,6 +64,54 @@ inline float FRand()
   return (float)rand() / (float)RAND_MAX;
 }
 
+struct FVector;
+
+/*-----------------------------------------------------------------------------
+ * FMatrix4x4
+ * A 4x4 floating point matrix
+-----------------------------------------------------------------------------*/
+class LIBUNR_API FMatrix4x4
+{
+public:
+  float Data[4][4];
+
+  FMatrix4x4()
+  {
+    memset( Data, 0, sizeof( Data ) );
+  }
+  FMatrix4x4( float* InData )
+  {
+    memcpy( Data, InData, sizeof( Data ) );
+  }
+
+  FMatrix4x4& operator*=( FMatrix4x4& B );
+  friend LIBUNR_API FVector operator*( FMatrix4x4& A, FVector& B );
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FMatrix4x4& Mat )
+  {
+    for ( int i = 0; i < 4; i++ )
+    {
+      In >> Mat.Data[i][0];
+      In >> Mat.Data[i][1];
+      In >> Mat.Data[i][2];
+      In >> Mat.Data[i][3];
+    }
+    return In;
+  }
+
+  friend FPackageFileOut& operator<<( FPackageFileOut& Out, FMatrix4x4& Mat )
+  {
+    for ( int i = 0; i < 4; i++ )
+    {
+      Out << Mat.Data[i][0];
+      Out << Mat.Data[i][1];
+      Out << Mat.Data[i][2];
+      Out << Mat.Data[i][3];
+    }
+    return Out;
+  }
+};
+
 /*-----------------------------------------------------------------------------
  * FVector
  * A 3D floating point coordinate
@@ -96,9 +144,18 @@ struct LIBUNR_API FVector
     return Out;
   }
 
-  friend void operator+=( FVector& A, FVector& B );
-  friend FVector operator+( FVector& A, FVector& B );
-  friend FVector operator-( FVector& A, FVector& B );
+  float VSize();
+  float Dot( FVector& A );
+  void  Cross( FVector& B );
+  void  Normalize();
+  void  GetTranslationMatrix( FMatrix4x4& Mat );
+  void  GetScaleMatrix( FMatrix4x4& Mat );
+
+  friend LIBUNR_API FVector& operator+=( FVector& A, FVector& B );
+  friend LIBUNR_API FVector& operator-=( FVector& A, FVector& B );
+  friend LIBUNR_API FVector& operator*=( FVector& A, float B );
+  friend LIBUNR_API FVector operator+( FVector& A, FVector& B );
+  friend LIBUNR_API FVector operator-( FVector& A, FVector& B );
 };
 
 /*-----------------------------------------------------------------------------
@@ -134,6 +191,11 @@ struct LIBUNR_API FQuat
   float Y;
   float Z;
   float W;
+
+  FQuat()
+  {
+    memset( &X, 0, sizeof( FQuat ) );
+  }
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FQuat& Quat )
   {
@@ -178,19 +240,9 @@ struct LIBUNR_API FRotator
     Roll = InRoll;
   }
 
-  void GetRadians( FVector& Out )
-  {
-    // Convert rotator coordinates to radians
-    // 16384 rotation units = 90 degree turn, 16384 / 90 = 182.0444444 rotation units per degree
-    // Therefore, (Rot * 90) / 16384 = Rot in degrees -> Degrees to radians = (angle) * (PI/180)
-    // Simplify -> 90/180 = 1/2 -> ((Rot*PI)/16384) * (1/2) -> (Rot*PI) / 32768
-    // Use multiplication for speed, so 1/32768 = 0.000030517578125
-
-    #define UU_ROT_TO_RAD(angle) (((double)angle*PI) * 0.000030517578125)
-    Out.X = UU_ROT_TO_RAD( Pitch );
-    Out.Y = UU_ROT_TO_RAD( Yaw );
-    Out.Z = UU_ROT_TO_RAD( Roll );
-  }
+  void GetRadians( FVector& Out );
+  void GetMatrix( FMatrix4x4& Out );
+  void GetAxes( FVector& X, FVector& Y, FVector& Z );
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FRotator& Rotator )
   {
@@ -387,6 +439,8 @@ struct LIBUNR_API FScale
 
   ESheerAxis SheerAxis;
 
+  void GetMatrix( FMatrix4x4& Mat );
+
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FScale& Scale )
   {
     In >> Scale.Scale;
@@ -400,48 +454,6 @@ struct LIBUNR_API FScale
     Out << Scale.Scale;
     Out << Scale.SheerRate;
     Out << (u8&)Scale.SheerAxis;
-    return Out;
-  }
-};
-
-/*-----------------------------------------------------------------------------
- * FMatrix4x4
- * A 4x4 floating point matrix
------------------------------------------------------------------------------*/
-struct LIBUNR_API FMatrix4x4
-{
-  float Data[4][4];
-
-  FMatrix4x4()
-  {
-    memset( Data, 0, sizeof( Data ) );
-  }
-  FMatrix4x4( float* InData )
-  {
-    memcpy( Data, InData, sizeof( Data ) );
-  }
-
-  friend FPackageFileIn& operator>>( FPackageFileIn& In, FMatrix4x4& Mat )
-  {
-    for ( int i = 0; i < 4; i++ )
-    {
-      In >> Mat.Data[i][0];
-      In >> Mat.Data[i][1];
-      In >> Mat.Data[i][2];
-      In >> Mat.Data[i][3];
-    }
-    return In;
-  }
-
-  friend FPackageFileOut& operator<<( FPackageFileOut& Out, FMatrix4x4& Mat )
-  {
-    for ( int i = 0; i < 4; i++ )
-    {
-      Out << Mat.Data[i][0];
-      Out << Mat.Data[i][1];
-      Out << Mat.Data[i][2];
-      Out << Mat.Data[i][3];
-    }
     return Out;
   }
 };

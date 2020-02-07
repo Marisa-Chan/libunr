@@ -95,6 +95,12 @@ class LIBUNR_API URenderDevice : public USubsystem
    * Matrix functions
    * Used for generating matrices for the render device to use
 -  ----------------------------------------------------------------------------*/
+  
+  // Generates a model matrix based on given properties
+  virtual void GetModelMatrix( FMatrix4x4& Mat, FVector& Location, FRotator& Rotation, FVector& Scale );
+
+  // Generates a view matrix based on the camera
+  virtual void GetViewMatrix( FMatrix4x4& Mat, FVector& ViewLoc, FRotator& ViewRot );
 
   // Generates an orthographic matrix for 2D drawing
   virtual void GetOrthoMatrix( FMatrix4x4& Mat, float Left, float Right, float Top, float Bottom, float zNear, float zFar );
