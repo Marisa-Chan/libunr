@@ -52,47 +52,126 @@ URenderDevice::~URenderDevice()
 {
 }
 
+void URenderDevice::GetModelMatrix( FMatrix4x4& Mat, FVector& Location, FRotator& Rotation, FVector& Scale )
+{
+  FMatrix4x4 RotMat;
+  FMatrix4x4 ScaleMat;
+
+  // Set up translation matrix first
+  Location.GetTranslationMatrix( Mat );
+
+  // Get rotation matrix and multiply
+  Rotation.GetMatrix( RotMat );
+  Mat *= RotMat;
+
+  // Get scale matrix and multiply
+  Scale.GetScaleMatrix( ScaleMat );
+  Mat *= ScaleMat;
+}
+
+void URenderDevice::GetViewMatrix( FMatrix4x4& Mat, FVector& ViewLoc, FRotator& ViewRot )
+{
+  // Convert rotation to radians
+  FVector Rads;
+  ViewRot.GetRadians( Rads );
+
+  // Get a vector for where the camera is looking at (directly in front)
+  float cosYaw = cosf( Rads.Y );
+  float sinYaw = sinf( Rads.Y );
+  float cosPitch = cosf( Rads.Z );
+  float sinPitch = sinf( Rads.Z );
+
+  FVector Direction( cosYaw * sinPitch, sinYaw, cosYaw * cosPitch );
+
+  // Now get the orthogonal vector to the right of the camera
+  // TODO: The camera roll is factored in here
+  float PiOverTwo = 3.14f * 0.5f;
+  float cosPitchRight = cosf( Rads.Z - PiOverTwo );
+  float sinPitchRight = sinf( Rads.Z - PiOverTwo );
+
+  FVector Right( sinPitchRight, 0, cosPitchRight );
+
+  // Get the up vector by taking a cross product of direction and right
+  FVector Up( Right );
+  Up.Cross( Direction );
+
+  // Calculate view matrix
+  FVector F( Direction );
+  F.Normalize();
+
+  FVector S( F );
+  S.Cross( Up );
+  S.Normalize();
+
+  FVector U( S );
+  U.Cross( F );
+
+  float SDotView = S.Dot( ViewLoc );
+  float UDotView = U.Dot( ViewLoc );
+  float FDotView = F.Dot( ViewLoc );
+
+  Mat.Data[0][0] = S.X; 
+  Mat.Data[0][1] = S.Y; 
+  Mat.Data[0][2] = S.Z;
+  Mat.Data[0][3] = -SDotView;
+  Mat.Data[1][0] = Up.X; 
+  Mat.Data[1][1] = Up.Y;    
+  Mat.Data[1][2] = Up.Z;
+  Mat.Data[1][3] = -UDotView;
+  Mat.Data[2][0] = -Direction.X;
+  Mat.Data[2][1] = -Direction.Y;
+  Mat.Data[2][2] = -Direction.Z;
+  Mat.Data[2][3] = FDotView;
+  Mat.Data[3][0] = 0.0f;
+  Mat.Data[3][1] = 0.0f;
+  Mat.Data[3][2] = 0.0f;
+  Mat.Data[3][3] = 1.0f;
+}
+
 // TODO: Platform specific optimizations
 void URenderDevice::GetOrthoMatrix( FMatrix4x4& Mat, float Left, float Right, float Top, float Bottom, float zNear, float zFar )
 {
-#ifndef ARCH_OPTIMIZATIONS
+  float zFarMinusNear = (zFar - zNear);
+  float RightMinusLeft = (Right - Left);
+  float TopMinusBottom = (Top - Bottom);
+
   // Validate parameters
-  if ( fabsf( Left - Right ) <= FLT_EPSILON || fabsf( Top - Bottom ) <= FLT_EPSILON || fabsf( zNear - zFar ) <= FLT_EPSILON )
+  if ( fabsf( RightMinusLeft ) <= FLT_EPSILON || fabsf( TopMinusBottom ) <= FLT_EPSILON || fabsf( zFarMinusNear ) <= FLT_EPSILON )
   {
     GLogf( LOG_WARN, "Invalid ortho matrix parameters" );
     return;
   }
 
   memset( &Mat, 0, sizeof( Mat ) );
-  Mat.Data[0][0] = 2.0f / (Right - Left);
-  Mat.Data[1][1] = 2.0f / (Top - Bottom);
-  Mat.Data[2][2] = -2.0f / (zFar - zNear);
-  Mat.Data[3][0] = -(Right + Left) / (Right - Left);
-  Mat.Data[3][1] = -(Top + Bottom) / (Top - Bottom);
-  Mat.Data[3][2] = -(zFar + zNear) / (zFar - zNear);
+  Mat.Data[0][0] = 2.0f / RightMinusLeft;
+  Mat.Data[1][1] = 2.0f / TopMinusBottom;
+  Mat.Data[2][2] = -2.0f / zFarMinusNear;
+  Mat.Data[3][0] = -(Right + Left) / RightMinusLeft;
+  Mat.Data[3][1] = -(Top + Bottom) / TopMinusBottom;
+  Mat.Data[3][2] = -(zFar + zNear) / zFarMinusNear;
   Mat.Data[3][3] = 1.0f;
-#endif
 }
 
 // TODO: Platform specific optimizations
 void URenderDevice::GetPerspectiveMatrix( FMatrix4x4& Mat, float FOV, float Width, float Height, float zNear, float zFar )
 {
+  float zFarMinusNear = (zFar - zNear);
+  float Aspect = (Width) / (Height);
+  float tanFov = tanf( FOV / 2 );
+
   // Validate parameters
-  if ( Width <= FLT_EPSILON || Height <= FLT_EPSILON || fabsf( zNear - zFar ) <= FLT_EPSILON )
+  if ( Width <= FLT_EPSILON || Height <= FLT_EPSILON || fabsf( zFarMinusNear ) <= FLT_EPSILON )
   {
     GLogf( LOG_WARN, "Invalid ortho matrix parameters" );
     return;
   }
 
-  float Aspect = (Width) / (Height);
-  float tanFov = tanf( FOV / 2 );
-
   memset( &Mat, 0, sizeof( Mat ) );
-  Mat.Data[0][0] = 1 / (Aspect * tanFov );
+  Mat.Data[0][0] = 1 / (Aspect * tanFov);
   Mat.Data[1][1] = 1 / tanFov;
-  Mat.Data[2][2] = -(zFar + zNear) / (zFar - zNear);
+  Mat.Data[2][2] = -(zFar + zNear) / zFarMinusNear;
   Mat.Data[2][3] = -1.0f;
-  Mat.Data[3][2] = -(2 * zFar * zNear) / (zFar - zNear);
+  Mat.Data[3][2] = -(2.0f * zFar * zNear) / zFarMinusNear;
 }
 
 URenderBase::URenderBase()
