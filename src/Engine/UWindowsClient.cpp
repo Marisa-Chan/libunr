@@ -96,10 +96,6 @@ bool UWindowsClient::CloseViewport( UViewport* Viewport )
   return Result;
 }
 
-void UWindowsClient::HandleInput( int Key, bool bDown )
-{
-}
-
 void UWindowsClient::Tick( float DeltaTime )
 {
   MSG Msg;
