@@ -34,15 +34,13 @@
 FMatrix4x4& FMatrix4x4::operator*=( FMatrix4x4& A )
 {
   FMatrix4x4 Result;
+
   for ( int i = 0; i < 4; i++ )
   {
-    for ( int j = 0; j < 4; j++ )
-    {
-      Result.Data[i][0] += Data[i][0] * A.Data[j][0];
-      Result.Data[i][1] += Data[i][1] * A.Data[j][1];
-      Result.Data[i][2] += Data[i][2] * A.Data[j][2];
-      Result.Data[i][3] += Data[i][3] * A.Data[j][3];
-    }
+    Result.Data[i][0] = (Data[i][0] * A.Data[0][0]) + (Data[i][1] * A.Data[1][0]) + (Data[i][2] * A.Data[2][0]) + (Data[i][3] * A.Data[3][0]);
+    Result.Data[i][1] = (Data[i][0] * A.Data[0][1]) + (Data[i][1] * A.Data[1][1]) + (Data[i][2] * A.Data[2][1]) + (Data[i][3] * A.Data[3][1]);
+    Result.Data[i][2] = (Data[i][0] * A.Data[0][2]) + (Data[i][1] * A.Data[1][2]) + (Data[i][2] * A.Data[2][2]) + (Data[i][3] * A.Data[3][2]);
+    Result.Data[i][3] = (Data[i][0] * A.Data[0][3]) + (Data[i][1] * A.Data[1][3]) + (Data[i][2] * A.Data[2][3]) + (Data[i][3] * A.Data[3][3]);
   }
 
   memcpy( this->Data, Result.Data, sizeof( float ) * 16 );
@@ -226,9 +224,9 @@ void FRotator::GetMatrix( FMatrix4x4& Out )
 void FRotator::GetAxes( FVector& X, FVector& Y, FVector& Z )
 {
   // Set up unit vectors
-  FVector UnitX = FVector( 0, 0, 1 );
+  FVector UnitX = FVector( 1, 0, 0 );
   FVector UnitY = FVector( 0, 1, 0 );
-  FVector UnitZ = FVector( 1, 0, 0 );
+  FVector UnitZ = FVector( 0, 0, 1 );
 
   // Get rotation matrix
   FMatrix4x4 Mat;

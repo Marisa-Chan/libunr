@@ -78,16 +78,16 @@ void URenderDevice::GetViewMatrix( FMatrix4x4& Mat, FVector& ViewLoc, FRotator& 
   // Get a vector for where the camera is looking at (directly in front)
   float cosYaw = cosf( Rads.Y );
   float sinYaw = sinf( Rads.Y );
-  float cosPitch = cosf( Rads.Z );
-  float sinPitch = sinf( Rads.Z );
+  float cosPitch = cosf( Rads.X );
+  float sinPitch = sinf( Rads.X );
 
   FVector Direction( cosYaw * sinPitch, sinYaw, cosYaw * cosPitch );
 
   // Now get the orthogonal vector to the right of the camera
   // TODO: The camera roll is factored in here
   float PiOverTwo = 3.14f * 0.5f;
-  float cosPitchRight = cosf( Rads.Z - PiOverTwo );
-  float sinPitchRight = sinf( Rads.Z - PiOverTwo );
+  float cosPitchRight = cosf( Rads.X - PiOverTwo );
+  float sinPitchRight = sinf( Rads.X - PiOverTwo );
 
   FVector Right( sinPitchRight, 0, cosPitchRight );
 
@@ -113,18 +113,15 @@ void URenderDevice::GetViewMatrix( FMatrix4x4& Mat, FVector& ViewLoc, FRotator& 
   Mat.Data[0][0] = S.X; 
   Mat.Data[0][1] = S.Y; 
   Mat.Data[0][2] = S.Z;
-  Mat.Data[0][3] = -SDotView;
-  Mat.Data[1][0] = Up.X; 
-  Mat.Data[1][1] = Up.Y;    
-  Mat.Data[1][2] = Up.Z;
-  Mat.Data[1][3] = -UDotView;
-  Mat.Data[2][0] = -Direction.X;
-  Mat.Data[2][1] = -Direction.Y;
-  Mat.Data[2][2] = -Direction.Z;
-  Mat.Data[2][3] = FDotView;
-  Mat.Data[3][0] = 0.0f;
-  Mat.Data[3][1] = 0.0f;
-  Mat.Data[3][2] = 0.0f;
+  Mat.Data[1][0] = U.X; 
+  Mat.Data[1][1] = U.Y;    
+  Mat.Data[1][2] = U.Z;
+  Mat.Data[2][0] = -F.X;
+  Mat.Data[2][1] = -F.Y;
+  Mat.Data[2][2] = -F.Z;
+  Mat.Data[3][0] = -SDotView;
+  Mat.Data[3][1] = -UDotView;
+  Mat.Data[3][2] = FDotView;
   Mat.Data[3][3] = 1.0f;
 }
 
