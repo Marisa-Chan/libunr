@@ -99,12 +99,12 @@ void URenderDevice::GetViewMatrix( FMatrix4x4& Mat, FVector& ViewLoc, FRotator& 
   FVector F( Direction );
   F.Normalize();
 
-  FVector S( F );
-  S.Cross( Up );
+  FVector S( Up );
+  S.Cross( F );
   S.Normalize();
 
-  FVector U( S );
-  U.Cross( F );
+  FVector U( F );
+  U.Cross( S );
 
   float SDotView = S.Dot( ViewLoc );
   float UDotView = U.Dot( ViewLoc );
@@ -116,12 +116,12 @@ void URenderDevice::GetViewMatrix( FMatrix4x4& Mat, FVector& ViewLoc, FRotator& 
   Mat.Data[1][0] = U.X; 
   Mat.Data[1][1] = U.Y;    
   Mat.Data[1][2] = U.Z;
-  Mat.Data[2][0] = -F.X;
-  Mat.Data[2][1] = -F.Y;
-  Mat.Data[2][2] = -F.Z;
+  Mat.Data[2][0] = F.X;
+  Mat.Data[2][1] = F.Y;
+  Mat.Data[2][2] = F.Z;
   Mat.Data[3][0] = -SDotView;
   Mat.Data[3][1] = -UDotView;
-  Mat.Data[3][2] = FDotView;
+  Mat.Data[3][2] = -FDotView;
   Mat.Data[3][3] = 1.0f;
 }
 
