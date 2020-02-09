@@ -64,6 +64,9 @@ inline float FRand()
   return (float)rand() / (float)RAND_MAX;
 }
 
+// The legendary inverse square root from Quake III
+LIBUNR_API float rsqrt( float n );
+
 struct FVector;
 
 /*-----------------------------------------------------------------------------
@@ -145,12 +148,12 @@ struct LIBUNR_API FVector
   }
 
   float VSize();
-  float Dot( FVector& A );
-  void  Cross( FVector& B );
-  void  Normalize();
   void  GetTranslationMatrix( FMatrix4x4& Mat );
   void  GetScaleMatrix( FMatrix4x4& Mat );
 
+  friend LIBUNR_API FVector Normalize( FVector& V );
+  friend LIBUNR_API float Dot( FVector& A, FVector& B );
+  friend LIBUNR_API FVector Cross( FVector& A, FVector& B );
   friend LIBUNR_API FVector& operator+=( FVector& A, FVector& B );
   friend LIBUNR_API FVector& operator-=( FVector& A, FVector& B );
   friend LIBUNR_API FVector& operator*=( FVector& A, float B );
@@ -240,7 +243,7 @@ struct LIBUNR_API FRotator
     Roll = InRoll;
   }
 
-  void GetRadians( FVector& Out );
+  FVector GetRadians();
   void GetMatrix( FMatrix4x4& Out );
   void GetAxes( FVector& X, FVector& Y, FVector& Z );
 

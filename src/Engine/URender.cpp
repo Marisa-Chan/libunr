@@ -71,57 +71,47 @@ void URenderDevice::GetModelMatrix( FMatrix4x4& Mat, FVector& Location, FRotator
 
 void URenderDevice::GetViewMatrix( FMatrix4x4& Mat, FVector& ViewLoc, FRotator& ViewRot )
 {
-  // Convert rotation to radians
-  FVector Rads;
-  ViewRot.GetRadians( Rads );
+  // Get rotation in radians
+  FVector Rads = ViewRot.GetRadians();
 
-  // Get a vector for where the camera is looking at (directly in front)
-  float cosYaw = cosf( Rads.Y );
-  float sinYaw = sinf( Rads.Y );
-  float cosPitch = cosf( Rads.X );
-  float sinPitch = sinf( Rads.X );
+  // Actual 3D coordinates operate on different axes
+  FVector ActualViewLoc
+  (
+    ViewLoc.Y,
+    ViewLoc.Z,
+    ViewLoc.X
+  );
 
-  FVector Direction( cosYaw * sinPitch, sinYaw, cosYaw * cosPitch );
+  float PiOverTwo = 3.14f / 2.0f;
 
-  // Now get the orthogonal vector to the right of the camera
-  // TODO: The camera roll is factored in here
-  float PiOverTwo = 3.14f * 0.5f;
-  float cosPitchRight = cosf( Rads.X - PiOverTwo );
-  float sinPitchRight = sinf( Rads.X - PiOverTwo );
+  float cy = cos( Rads.Y );
+  float cz = cos( Rads.Z );
+  float czh = cos( Rads.Z - PiOverTwo );
+  float sy = sin( Rads.Y );
+  float sz = sin( Rads.Z );
+  float szh = sin( Rads.Z - PiOverTwo );
 
-  FVector Right( sinPitchRight, 0, cosPitchRight );
+  FVector Direction( cy * sz, sy, cy * cz );
+  FVector Right( szh, 0, czh );
+  FVector Up = Cross( Right, Direction );
 
-  // Get the up vector by taking a cross product of direction and right
-  FVector Up( Right );
-  Up.Cross( Direction );
+  FVector F = Normalize( Direction );
+  FVector S = Cross( F, Up );
+  S = Normalize( S );
+  FVector U = Cross( S, F );
 
-  // Calculate view matrix
-  FVector F( Direction );
-  F.Normalize();
-
-  FVector S( Up );
-  S.Cross( F );
-  S.Normalize();
-
-  FVector U( F );
-  U.Cross( S );
-
-  float SDotView = S.Dot( ViewLoc );
-  float UDotView = U.Dot( ViewLoc );
-  float FDotView = F.Dot( ViewLoc );
-
-  Mat.Data[0][0] = S.X; 
-  Mat.Data[0][1] = S.Y; 
-  Mat.Data[0][2] = S.Z;
-  Mat.Data[1][0] = U.X; 
-  Mat.Data[1][1] = U.Y;    
-  Mat.Data[1][2] = U.Z;
-  Mat.Data[2][0] = F.X;
-  Mat.Data[2][1] = F.Y;
-  Mat.Data[2][2] = F.Z;
-  Mat.Data[3][0] = -SDotView;
-  Mat.Data[3][1] = -UDotView;
-  Mat.Data[3][2] = -FDotView;
+  Mat.Data[0][0] =  S.X;
+  Mat.Data[1][0] =  S.Y;
+  Mat.Data[2][0] =  S.Z;
+  Mat.Data[0][1] =  U.X;
+  Mat.Data[1][1] =  U.Y;
+  Mat.Data[2][1] =  U.Z;
+  Mat.Data[0][2] = -F.X;
+  Mat.Data[1][2] = -F.Y;
+  Mat.Data[2][2] = -F.Z;
+  Mat.Data[3][0] = -Dot( S, ActualViewLoc );
+  Mat.Data[3][1] = -Dot( U, ActualViewLoc );
+  Mat.Data[3][2] =  Dot( F, ActualViewLoc );
   Mat.Data[3][3] = 1.0f;
 }
 

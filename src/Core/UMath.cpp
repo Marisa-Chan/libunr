@@ -18,6 +18,8 @@
 
 /*========================================================================
  * UMath.cpp - Math functions
+ * glm was a massive help for some of these
+ * https://glm.g-truc.net/0.9.9/index.html
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
@@ -30,6 +32,22 @@
 #elif defined __GNUG__
   #include <immintrin.h>
 #endif
+
+// The legendary inverse square root from Quake III
+float rsqrt( float n )
+{
+  long i;
+  float x2, y;
+  const float threehalfs = 1.5F;
+
+  x2 = n * 0.5F;
+  y = n;
+  i = *(long*)&y;						// evil floating point bit level hacking
+  i = 0x5f3759df - (i >> 1);               // what the fuck?
+  y = *(float*)&i;
+  y = y * (threehalfs - (x2 * y * y));   // 1st iteration
+  return y;
+}
 
 FMatrix4x4& FMatrix4x4::operator*=( FMatrix4x4& A )
 {
@@ -67,31 +85,30 @@ float FVector::VSize()
   return sqrtf( X2 + Y2 + Z2 );
 }
 
-float FVector::Dot( FVector& A )
+LIBUNR_API float Dot( FVector& A, FVector& B )
 {
-  float x = X * A.X;
-  float y = Y * A.Y;
-  float z = Z * A.Z;
+  float x = A.X * B.X;
+  float y = A.Y * B.Y;
+  float z = A.Z * B.Z;
   return x + y + z;
 }
 
-void FVector::Cross( FVector& B )
+LIBUNR_API FVector Cross( FVector& A, FVector& B )
 {
-  float NewX = (Y * B.Z) - (Z * B.Y);
-  float NewY = (Z * B.X) - (X * B.Z);
-  float NewZ = (X * B.Y) - (Y * B.X);
+  float NewX = (A.Y * B.Z) - (A.Z * B.Y);
+  float NewY = (A.Z * B.X) - (A.X * B.Z);
+  float NewZ = (A.X * B.Y) - (A.Y * B.X);
 
-  X = NewX;
-  Y = NewY;
-  Z = NewZ;
+  return FVector( NewX, NewY, NewZ );
 }
 
-void FVector::Normalize()
+LIBUNR_API FVector Normalize( FVector& V )
 {
-  float Mag = 1.0f / VSize();
-  X *= Mag;
-  Y *= Mag;
-  Z *= Mag;
+  float X2 = V.X * V.X;
+  float Y2 = V.Y * V.Y;
+  float Z2 = V.Z * V.Z;
+  float Mag = rsqrt( X2 + Y2 + Z2 );
+  return FVector( V.X * Mag, V.Y * Mag, V.Z * Mag );
 }
 
 // Treat vector as a positional vector and get a translation matrix
@@ -159,7 +176,7 @@ LIBUNR_API FVector operator-( FVector& A, FVector& B )
   return Y;
 }
 
-void FRotator::GetRadians( FVector& Out )
+FVector FRotator::GetRadians()
 {
   // Convert rotator coordinates to radians
   // 16384 rotation units = 90 degree turn, 16384 / 90 = 182.0444444 rotation units per degree
@@ -169,71 +186,70 @@ void FRotator::GetRadians( FVector& Out )
 
   #define UU_ROT_TO_RAD(angle) (((double)angle*PI) * 0.000030517578125)
 
-  Out.X = UU_ROT_TO_RAD( Roll );
-  Out.Y = UU_ROT_TO_RAD( Yaw );
-  Out.Z = UU_ROT_TO_RAD( Pitch );
+  return FVector( UU_ROT_TO_RAD( Roll ), UU_ROT_TO_RAD( Pitch ), UU_ROT_TO_RAD( Yaw ) );
 }
 
 void FRotator::GetMatrix( FMatrix4x4& Out )
 {
   FMatrix4x4 Tmp;
 
-  FVector Rads;
-  GetRadians( Rads );
+  FVector Rads = GetRadians();
 
-  float cx = cosf( Rads.X );
-  float sx = sinf( Rads.X );
-  float cy = cosf( Rads.Y );
-  float sy = sinf( Rads.Y );
-  float cz = cosf( Rads.Z );
-  float sz = sinf( Rads.Z );
+  float cp = cosf( Rads.Y );
+  float sp = sinf( Rads.Y );
+  float cy = cosf( Rads.Z );
+  float sy = sinf( Rads.Z );
+  float cr = cosf( Rads.X );
+  float sr = sinf( Rads.X );
 
-  // Set up Rx
-  Out.Data[0][0] = 1.0f;
-  Out.Data[1][1] = cx;
-  Out.Data[1][2] = -sx;
-  Out.Data[2][1] = sx;
-  Out.Data[2][2] = cx;
+  // Get rotation matrix based on euler angles
+  // see glm::eulerAnglesYXZ
+  Out.Data[0][0] = cy * cr + sy * sp * sr;
+  Out.Data[0][1] = sr * cp;
+  Out.Data[0][2] = -sy * sr + cy * sp * sr;
+  Out.Data[0][3] = 0;
+  Out.Data[1][0] = -cy * sr + sy * sp * cr;
+  Out.Data[1][1] = cr * cp;
+  Out.Data[1][2] = sr * sy + cy * sp * cr;
+  Out.Data[1][3] = 0;
+  Out.Data[2][0] = sy * cp;
+  Out.Data[2][1] = -sp;
+  Out.Data[2][2] = cy * cp;
+  Out.Data[3][0] = 0.0f;
+  Out.Data[3][1] = 0.0f;
+  Out.Data[3][2] = 0.0f;
   Out.Data[3][3] = 1.0f;
-
-  // Set up Ry
-  Tmp.Data[0][0] = cy;
-  Tmp.Data[0][2] = sy;
-  Tmp.Data[1][1] = 1.0f;
-  Tmp.Data[2][0] = -sy;
-  Tmp.Data[2][2] = cy;
-  Tmp.Data[3][3] = 1.0f;
-
-  // Rx * Ry
-  Out *= Tmp;
-
-  // Set up Rz
-  Tmp.Data[0][0] = cz;
-  Tmp.Data[0][1] = -sz;
-  Tmp.Data[0][2] = 0.0f;
-  Tmp.Data[1][0] = sz;
-  Tmp.Data[1][1] = cz;
-  Tmp.Data[2][0] = 0.0f;
-  Tmp.Data[2][2] = 1.0f;
-  Tmp.Data[3][3] = 1.0f;
-
-  // (Rx * Ry) * Rz
-  Out *= Tmp;
 }
 
 void FRotator::GetAxes( FVector& X, FVector& Y, FVector& Z )
 {
-  // Set up unit vectors
-  FVector UnitX = FVector( 1, 0, 0 );
-  FVector UnitY = FVector( 0, 1, 0 );
-  FVector UnitZ = FVector( 0, 0, 1 );
+  // Get rotation in radians
+  FVector Rads = GetRadians();
 
-  // Get rotation matrix
-  FMatrix4x4 Mat;
-  GetMatrix( Mat );
+  float PiOverTwo = 3.14f / 2.0f;
 
-  // Transform each vector
-  X = Mat * UnitX;
-  Y = Mat * UnitY;
-  Z = Mat * UnitZ;
+  float cy = cos( Rads.Y );
+  float cz = cos( Rads.Z );
+  float czh = cos( Rads.Z - PiOverTwo );
+  float sy = sin( Rads.Y );
+  float sz = sin( Rads.Z );
+  float szh = sin( Rads.Z - PiOverTwo );
+
+  // Get axes vectors
+  FVector Direction( cy * sz, sy, cy * cz );
+  FVector Right( szh, 0, czh );
+  FVector Up = Cross( Right, Direction );
+
+  // Adjust to Unreal world coordinates
+  X.X = Direction.Z;
+  X.Y = Direction.X;
+  X.Z = Direction.Y;
+
+  Y.X = Right.Z;
+  Y.Y = Right.X;
+  Y.Z = Right.Y;
+
+  Z.X = Up.Z;
+  Z.Y = Up.X;
+  Z.Z = Up.Y;
 }
