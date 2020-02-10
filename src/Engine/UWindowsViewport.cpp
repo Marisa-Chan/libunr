@@ -29,6 +29,7 @@
 
 #include "Engine/UWindowsClient.h"
 #include "Engine/UWindowsViewport.h"
+#include <Windowsx.h>
 
 UWindowsViewport::UWindowsViewport()
   : UViewport()
@@ -146,6 +147,9 @@ LRESULT UWindowsViewport::StaticWndProc( HWND Hwnd, UINT Msg, WPARAM WParam, LPA
 
   switch ( Msg )
   {
+  case WM_MOUSEMOVE:
+    This->Client->HandleMouseInput( GET_X_LPARAM( LParam ), GET_Y_LPARAM( LParam ) );
+    break;
   case WM_KEYDOWN:
     This->Client->HandleInput( WParam, true );
     break;

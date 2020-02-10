@@ -108,6 +108,19 @@ void UWindowsClient::Tick( float DeltaTime )
   }
 }
 
+void UWindowsClient::HandleMouseInput( int XPos, int YPos )
+{
+  // Handle normal mouse input
+  Super::HandleMouseInput( XPos, YPos );
+
+  // Reset mouse to center of screen
+  POINT Center;
+  Center.x = CurrentViewport->Width / 2;
+  Center.y = CurrentViewport->Height / 2;
+  ClientToScreen( ((UWindowsViewport*)CurrentViewport)->Window, &Center );
+  SetCursorPos( Center.x, Center.y );
+}
+
 #include "Core/UClass.h"
 #include "Core/UPackage.h"
 IMPLEMENT_NATIVE_CLASS( UWindowsClient );

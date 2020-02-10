@@ -40,6 +40,7 @@ class LIBUNR_API UWindowsClient : public UClient
   virtual UViewport* OpenViewport( int InWidth = 0, int InHeight = 0 );
   virtual bool CloseViewport( UViewport* Viewport );
   virtual void Tick( float DeltaTime );
+  virtual void HandleMouseInput( int XPos, int YPos );
 
   HINSTANCE hInstance;
 };

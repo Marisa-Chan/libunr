@@ -104,10 +104,14 @@ enum EInputKey
 /*-----------------------------------------------------------------------------
  * InputFunc
  * A function type which is called when a particular key is pressed/released
- * float DeltaTime
- * bool bKeyDown
 -----------------------------------------------------------------------------*/
-typedef void (*InputFunc)(EInputKey Key, float, bool);
+typedef void (*InputFunc)(EInputKey Key, float DeltaTime, bool bKeyDown);
+
+/*-----------------------------------------------------------------------------
+ * MouseInputFunc
+ * A function type which is called when an input device with two axes is moved
+-----------------------------------------------------------------------------*/
+typedef void (*AxisInputFunc)(float DeltaTime, int DeltaX, int DeltaY);
 
 /*-----------------------------------------------------------------------------
 
@@ -127,7 +131,9 @@ class LIBUNR_API UClient : public UObject
   virtual UViewport* OpenViewport( int InWidth = 0, int InHeight = 0 ) { return NULL; }
   virtual bool CloseViewport( UViewport* Viewport ) { return false; }
   virtual void HandleInput( int Key, bool bDown );
-  virtual void RegisterInputFunc( EInputKey Key, InputFunc Func );
+  virtual void HandleMouseInput( int XPos, int YPos );
+  virtual void BindKeyInput( EInputKey Key, InputFunc Func );
+  virtual void BindMouseInput( AxisInputFunc Func );
 
   UClass* ViewportClass;
   UEngine* Engine;
@@ -136,6 +142,7 @@ class LIBUNR_API UClient : public UObject
 
 private:
   InputFunc InputFuncs[0xFF];
+  AxisInputFunc MouseFunc;
 };
 
 /*-----------------------------------------------------------------------------
