@@ -144,7 +144,7 @@ void URenderDevice::GetPerspectiveMatrix( FMatrix4x4& Mat, float FOV, float Widt
 {
   float zFarMinusNear = (zFar - zNear);
   float Aspect = (Width) / (Height);
-  float tanFov = tanf( FOV / 2 );
+  float tanFov = tanf( DEG2RAD(FOV) / 2 );
 
   // Validate parameters
   if ( Width <= FLT_EPSILON || Height <= FLT_EPSILON || fabsf( zFarMinusNear ) <= FLT_EPSILON )

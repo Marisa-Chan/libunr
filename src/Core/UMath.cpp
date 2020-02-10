@@ -116,11 +116,11 @@ void FVector::GetTranslationMatrix( FMatrix4x4& Mat )
 {
   memset( &Mat, 0, sizeof( Mat ) );
   Mat.Data[0][0] = 1.0f;
-  Mat.Data[0][3] = X;
   Mat.Data[1][1] = 1.0f;
-  Mat.Data[1][3] = Y;
   Mat.Data[2][2] = 1.0f;
-  Mat.Data[2][3] = Z;
+  Mat.Data[3][0] = X;
+  Mat.Data[3][1] = Y;
+  Mat.Data[3][2] = Z;
   Mat.Data[3][3] = 1.0f;
 }
 
@@ -195,30 +195,31 @@ void FRotator::GetMatrix( FMatrix4x4& Out )
 
   FVector Rads = GetRadians();
 
-  float cp = cosf( Rads.Y );
-  float sp = sinf( Rads.Y );
-  float cy = cosf( Rads.Z );
-  float sy = sinf( Rads.Z );
-  float cr = cosf( Rads.X );
-  float sr = sinf( Rads.X );
+  // See glm::eulerAngleYZX for original implementation
+  // Here, pitch and yaw were negated to match expected rotation direction compared to UE1
+  float c1 = cos( -Rads.Z );
+  float s1 = sin( -Rads.Z );
+  float c2 = cos( Rads.X );
+  float s2 = sin( Rads.X );
+  float c3 = cos( -Rads.Y );
+  float s3 = sin( -Rads.Y );
 
-  // Get rotation matrix based on euler angles
-  // see glm::eulerAnglesYXZ
-  Out.Data[0][0] = cy * cr + sy * sp * sr;
-  Out.Data[0][1] = sr * cp;
-  Out.Data[0][2] = -sy * sr + cy * sp * sr;
+  Out.Data[0][0] = c1 * c2;
+  Out.Data[0][1] = s2;
+  Out.Data[0][2] = -c2 * s1;
   Out.Data[0][3] = 0;
-  Out.Data[1][0] = -cy * sr + sy * sp * cr;
-  Out.Data[1][1] = cr * cp;
-  Out.Data[1][2] = sr * sy + cy * sp * cr;
+  Out.Data[1][0] = s1 * s3 - c1 * c3 * s2;
+  Out.Data[1][1] = c2 * c3;
+  Out.Data[1][2] = c1 * s3 + c3 * s1 * s2;
   Out.Data[1][3] = 0;
-  Out.Data[2][0] = sy * cp;
-  Out.Data[2][1] = -sp;
-  Out.Data[2][2] = cy * cp;
-  Out.Data[3][0] = 0.0f;
-  Out.Data[3][1] = 0.0f;
-  Out.Data[3][2] = 0.0f;
-  Out.Data[3][3] = 1.0f;
+  Out.Data[2][0] = c3 * s1 + c1 * s2 * s3;
+  Out.Data[2][1] = -c2 * s3;
+  Out.Data[2][2] = c1 * c3 - s1 * s2 * s3;
+  Out.Data[2][3] = 0;
+  Out.Data[3][0] = 0;
+  Out.Data[3][1] = 0;
+  Out.Data[3][2] = 0;
+  Out.Data[3][3] = 1;
 }
 
 void FRotator::GetAxes( FVector& X, FVector& Y, FVector& Z )

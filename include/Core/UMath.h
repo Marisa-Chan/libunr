@@ -31,7 +31,7 @@
 #include "Core/UPackage.h"
 
 #define PI 3.14159265359
-#define DEG2RAD(angle) ((angle) * (PI/180.0f));
+#define DEG2RAD(angle) ((angle) * (PI/180.0f))
 
 // Floating point math functions
 inline bool FltEqual( float A, float B )
