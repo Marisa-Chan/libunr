@@ -27,6 +27,7 @@
 
 #include "Core/UMath.h"
 #include "Core/USystem.h"
+#include "Engine/UMesh.h"
 #include "Engine/UTexture.h"
 #include "Engine/UFire.h"
 
@@ -131,7 +132,7 @@ class LIBUNR_API URenderDevice : public USubsystem
   virtual void DrawTile( UTexture* Tex, FBoxInt2D& Dim, FRotator& Rot, float U, float V, float UL, float VL, int PolyFlags = 0 ) {}
 
   // Draws a mesh on the screen
-  virtual void DrawMesh( UMesh* Mesh, FName AnimSeq, float AnimRate, FVector& Loc, FVector& Scale, FRotator& Rot, int PolyFlags = 0 ) {}
+  virtual void DrawMesh( UMesh* Mesh, FMeshAnimSeq& AnimSeq, float AnimFrame, FVector& Loc, FVector& Scale, FRotator& Rot, int PolyFlags = 0 ) {}
 
   // Draws a frame of a fire texture with renderer accelerated method
   virtual void DrawFireTexFrame( UFireTexture* Tex, float DeltaTime ) {}

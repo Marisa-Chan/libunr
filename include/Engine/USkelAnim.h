@@ -122,6 +122,7 @@ class LIBUNR_API USkeletalMeshInstance : public UObject
   EXPOSE_TO_USCRIPT()
 
   USkeletalMeshInstance();
+  virtual void Tick( float DeltaTime );
 
   struct Matrix
   {
@@ -150,20 +151,20 @@ class LIBUNR_API USkeletalMeshInstance : public UObject
     idx     AnimName;
   };
 
-  TArray<FCoords>*    SpaceBases; // Last computed skeleton coordinates.
-  TArray<int>*        CachedLinks; // Initialized links with animation and skeleton
-  u8                       bHasUpdated; // Has this mesh been updated this tick yet?
-  USkeletalMesh*           LastDrawnMesh; // Last mesh used on this render actor.
-  UAnimation*              CachedAnim; // Last used animation on the render actor.
-  TArray<FCoords>*    CachedOrientations; // Cached data (for tweening)
-  TArray<FVector>*    CachedPositions; // Cached data (for tweening)
-  float                    TweenStartFrame; // Starting frame for tweening
-  Matrix                   Base; // Temp data
-  u8                       bHasCachedFrame, bWasTweening; // Temp data
-  idx                      CachedTweenSeq; // Temp data
+  TArray<FCoords>*          SpaceBases; // Last computed skeleton coordinates.
+  TArray<int>*              CachedLinks; // Initialized links with animation and skeleton
+  u8                        bHasUpdated; // Has this mesh been updated this tick yet?
+  USkeletalMesh*            LastDrawnMesh; // Last mesh used on this render actor.
+  UAnimation*               CachedAnim; // Last used animation on the render actor.
+  TArray<FCoords>*          CachedOrientations; // Cached data (for tweening)
+  TArray<FVector>*          CachedPositions; // Cached data (for tweening)
+  float                     TweenStartFrame; // Starting frame for tweening
+  Matrix                    Base; // Temp data
+  u8                        bHasCachedFrame, bWasTweening; // Temp data
+  idx                       CachedTweenSeq; // Temp data
   TArray<MeshModifierType>* Modifiers; // Bone rotation/scale modifiers
   TArray<AnimationChannel>* Channels; // Animation channels effected on this actor.
-  int                      TChannelPtr; // Temp data
+  int                       TChannelPtr; // Temp data
 
   TArray<AActor*>* AttachedActors; // Actors attached to this skeletal mesh.
   int AttachedBoneIndex; // Bone where this actor is attached to.

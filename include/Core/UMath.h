@@ -39,6 +39,11 @@ inline bool FltEqual( float A, float B )
   return fabsf( A - B ) <= FLT_MIN;
 }
 
+inline float Lerp( float A, float B, float T )
+{
+  return A + (T * (B - A));
+}
+
 inline float FClamp( float A, float Min, float Max )
 {
   if ( A < Min )

@@ -82,6 +82,7 @@ enum EPolyFlags
   PF_FlatShaded  = 0x40000000,  // FPoly has been split by SplitPolyWithPlane.
 
   // Internal.
+  PF_Detail       = 0x20000000,  // Polygon should blend detail texture with main texture
   PF_EdProcessed  = 0x40000000,  // FPoly was already processed in editorBuildFPolys.
   PF_EdCut        = 0x80000000,  // FPoly has been split by SplitPolyWithPlane.
   PF_RenderFog    = 0x40000000,  // Render with fogmapping.

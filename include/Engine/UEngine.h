@@ -172,6 +172,9 @@ class LIBUNR_API UEngine : public USubsystem
   URenderDevice*   Render;
   UAudioSubsystem* Audio;
 
+  UTexture* DefaultTexture;
+  UTexture* WhiteTexture;
+
   int TickCycles;
   int GameCycles;
   int ClientCycles;

@@ -110,6 +110,12 @@ UEngine::~UEngine()
 
 bool UEngine::Init()
 {
+  Pkg = UPackage::StaticLoadPackage( "Engine" );
+
+  // Load default & white texture
+  DefaultTexture = (UTexture*)StaticLoadObject( Pkg, "DefaultTexture", UTexture::StaticClass(), NULL );
+  WhiteTexture = (UTexture*)StaticLoadObject( Pkg, "WhiteTexture", UTexture::StaticClass(), NULL );
+
   // Initialize our client
   FString ClientClassStr = GLibunrConfig->ReadString( "Engine.Engine", "Client", 0, DEFAULT_CLIENT );
   

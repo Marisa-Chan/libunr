@@ -129,7 +129,7 @@ void ULodMesh::Load()
     for ( int i = 0; i < Wedges.Size() - (SpecialFaces.Size()*3); i++ )
       Wedges[i].VertexIndex += SpecialVerts;
   }
-};
+}
 
 bool ULodMesh::ExportUnreal3DMesh( const char* Dir, int Frame ) 
 {
