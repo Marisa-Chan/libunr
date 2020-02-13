@@ -18,6 +18,7 @@
 
 /*========================================================================
  * URender.cpp - Rendering Functionality
+ * BSP Rendering inspired by UShock Level Viewer
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
@@ -52,6 +53,21 @@ URenderDevice::URenderDevice()
 
 URenderDevice::~URenderDevice()
 {
+}
+
+void URenderDevice::Tick( float DeltaTime )
+{
+  UViewport* CurrentViewport = GEngine->Client->CurrentViewport;
+
+  // Translate UE1 axes to OpenGL
+  FVector& CameraLoc = CurrentViewport->Actor->Location;
+  FRotator& CameraRot = CurrentViewport->Actor->Rotation;
+
+  // Create view matrix for this viewport
+  GetViewMatrix( ViewMatrix, CameraLoc, CameraRot );
+
+  // Assemble clipping planes for this viewport
+  CurrentViewport->AssembleClipPlanes();
 }
 
 void URenderDevice::GetModelMatrix( FMatrix4x4& Mat, FVector& Location, FRotator& Rotation, FVector& Scale )
@@ -166,57 +182,59 @@ void URenderDevice::GetPerspectiveMatrix( FMatrix4x4& Mat, float FOV, float Widt
 /*-----------------------------------------------------------------------------
  * DrawWorld
 -----------------------------------------------------------------------------*/
+
 void URenderDevice::DrawWorld( ULevel* Level, UViewport* Viewport )
 {
   // Get the root node and start there
   FBspNode& Node = Level->Model->Nodes[0];
-  TraverseBspNode( Level->Model, Node, Viewport );
+  TraverseBspNode( Level->Model, Node, Viewport, false );
 }
 
-void URenderDevice::TraverseBspNode( UModel* Model, FBspNode& Node, UViewport* Viewport )
+void URenderDevice::TraverseBspNode( UModel* Model, FBspNode& Node, UViewport* Viewport, bool bAccept )
 {
-  // TODO: Figure out if we can see this node
-
-  // TODO: Draw any actors in this node
-
-  // Figure out which side of the node we're on
-  // Wow, this is really confusing. Each node stores a 'Plane' which has a W coordinate and
-  // one of the X/Y/Z coordinates set to 1 or -1. It seems like that the non-zero cartesian
-  // axis is the axis that the node 'slices' through. The W coordinate might then be used as
-  // the actual value to figure out which side of the axis you're on.
-
-  // Get the coordinate of the non-zero axis
-  float NonZeroCoord = Dot( Node.Plane, Viewport->Actor->Location );
-
-  // Subtract the W coordinate with the non-zero coordinate
-  // Using a test map, the W coordinate is always some multiple of the brush dimensions
-  // Definitely needs verification for correctness, but Quake 2 looks like it does something
-  // kind of similar in R_RecursiveWorldNode
-  float Leaf = NonZeroCoord - Node.Plane.W;
-
-  // Viewport actor behind node
-  int Nodes[2];
-  if ( Leaf < 0.0f )
+  // If we haven't accepted this node, that means we need to check if we can see it
+  if ( !bAccept && Node.iRenderBound >= 0 )
   {
-    Nodes[0] = Node.iFront;
-    Nodes[1] = Node.iBack;
-  }
-  else
-  {
-    Nodes[0] = Node.iBack;
-    Nodes[1] = Node.iFront;
+    bool bCrossOrient = false;
+    FBox& RenderBox = Model->Bounds[Node.iRenderBound];
+
+    // Figure out which side of the box our camera is in to determine visibility to this node
+    int Orientation = Viewport->NearPlane.GetBoxOrientation( RenderBox );
+    if ( Orientation == ORIENT_BACK )
+      return; // Nope, box is behind us, nothing to process
+    if ( Orientation == ORIENT_CROSS )
+      bCrossOrient = true;
+
+    // Check frustum planes
+    for ( int i = 0; i < 4; i++ )
+    {
+      Orientation = Viewport->Frustum[i].GetBoxOrientation( RenderBox );
+      if ( Orientation == ORIENT_BACK )
+        return; // Nope, box is outside of a frustum plane
+      if ( Orientation == ORIENT_CROSS )
+        bCrossOrient = true;
+    }
+
+    if ( bCrossOrient )
+      bAccept = false; // We're partially inside, meaning children need to be checked too
+    else
+      bAccept = true;  // We're fully inside, meaning child nodes are too (?)
   }
 
-  // Traverse down the first node
-  TraverseBspNode( Model, Model->Nodes[Nodes[0]], Viewport );
+  // Traverse down the front node
+  if ( Node.iFront >= 0 )
+    TraverseBspNode( Model, Model->Nodes[Node.iFront], Viewport, bAccept );
 
-  // TODO: Figure out if we can see the node we're in
+  // Traverse down the back node
+  if ( Node.iBack >= 0 )
+    TraverseBspNode( Model, Model->Nodes[Node.iBack], Viewport, bAccept );
 
-  // Draw node surface
+  // Plane child nodes are always recursed through
+  if ( Node.iPlane >= 0 )
+    TraverseBspNode( Model, Model->Nodes[Node.iPlane], Viewport, bAccept );
+
+  // Draw ourselves
   DrawBspSurface( Model, Node, Viewport );
-
-  // Traverse down the last node
-  TraverseBspNode( Model, Model->Nodes[Nodes[1]], Viewport );
 }
 
 URenderBase::URenderBase()

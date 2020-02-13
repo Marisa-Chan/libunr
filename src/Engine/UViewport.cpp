@@ -26,6 +26,7 @@
 #include "Util/FConfig.h"
 #include "Engine/UEngine.h"
 #include "Engine/UViewport.h"
+#include "Actors/APlayerPawn.h"
 
 UViewport::UViewport()
   : UPlayer()
@@ -47,6 +48,10 @@ bool UViewport::Init( int InWidth, int InHeight )
   Height = (InHeight) ? InHeight : GLibunrConfig->ReadInt32( "libunr", "RenderHeight", 0, 768 );
   BitsPerPixel = GLibunrConfig->ReadUInt8( "libunr", "RenderBpp", 0, 24 ); // Usually ignored
 
+  FOV = GLibunrConfig->ReadFloat( "libunr", "RenderFOV", 0, 90.0f );
+  TanHalfXFov = tan( FOV / 2.0 );
+  TanHalfYFov = ((double)Height / (double)Width) * TanHalfXFov;
+
   Client = GEngine->Client;
   return true;
 }
@@ -64,6 +69,29 @@ void UViewport::Show()
 void UViewport::Hide()
 {
 
+}
+
+void UViewport::AssembleClipPlanes()
+{
+  // Get rotation axes
+  FVector Fwd, Right, Up;
+  Actor->Rotation.GetAxes( Fwd, Right, Up );
+
+  // Assemble view frustum
+  Frustum[0] = (Up    ^ (Fwd    + (Right * TanHalfXFov))).Normalize();
+  Frustum[1] = ((Fwd  + (-Right * TanHalfXFov)) ^ Up).Normalize();
+  Frustum[2] = ((Fwd  + (Up     * TanHalfYFov)) ^ Right).Normalize();
+  Frustum[3] = (Right ^ (Fwd    + (-Up * TanHalfYFov))).Normalize();
+
+  for ( int i = 0; i < 4; i++ )
+    Frustum[i].W = Frustum[i] | Actor->Location;
+
+  // Assemble near clipping plane
+  NearPlane = Fwd;
+  NearPlane.W = NearPlane | (Actor->Location + (Fwd * ZNEAR));
+
+  FarPlane = -Fwd;
+  FarPlane.W = FarPlane | (Actor->Location + (Fwd * ZFAR));
 }
 
 #include "Core/UClass.h"

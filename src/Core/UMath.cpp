@@ -176,6 +176,50 @@ LIBUNR_API FVector operator-( FVector& A, FVector& B )
   return Y;
 }
 
+int FPlane::GetBoxOrientation( FBox& Box )
+{
+  float Dist[2];
+  FVector Corners[2];
+
+  // Get true min/max corners in case they're backwards
+  for ( int i = 0; i < 3; i++ )
+  {
+    if ( V[i] < 0.0f )
+    {
+      Corners[0].V[i] = Box.Min.V[i];
+      Corners[1].V[i] = Box.Max.V[i];
+    }
+    else
+    {
+      Corners[1].V[i] = Box.Min.V[i];
+      Corners[0].V[i] = Box.Max.V[i];
+    }
+  }
+
+  // Get point orientations
+  Dist[0] = Dot( Corners[0], *this );
+  Dist[1] = Dot( Corners[1], *this );
+
+  if ( Dist[0] >= 0.0f )
+  {
+    if ( Dist[1] < 0.0f ) // Plane crossing the box
+      return ORIENT_CROSS;
+    else                  // Plane in front of box
+      return ORIENT_FRONT;
+  }
+
+  if ( Dist[1] < 0.0f )
+    return ORIENT_BACK; // Plane behind the box
+
+  // Plane crossing the box in every other case
+  return ORIENT_CROSS;
+}
+
+LIBUNR_API float Dot( FVector& V, FPlane& P )
+{
+  return ((V.X * P.X) + (V.Y * P.Y) + (V.Z * P.Z)) - P.W;
+}
+
 FVector FRotator::GetRadians()
 {
   // Convert rotator coordinates to radians

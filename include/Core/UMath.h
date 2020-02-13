@@ -33,6 +33,11 @@
 #define PI 3.14159265359
 #define DEG2RAD(angle) ((angle) * (PI/180.0f))
 
+#define ORIENT_FRONT  0
+#define ORIENT_BACK   1
+#define ORIENT_ON     2
+#define ORIENT_CROSS -2
+
 // Floating point math functions
 inline bool FltEqual( float A, float B )
 {
@@ -132,9 +137,11 @@ struct LIBUNR_API FVector
   FVector( float InX, float InY, float InZ )
     : X(InX), Y(InY), Z(InZ) {}
 
-  float X;
-  float Y;
-  float Z;
+  union
+  {
+    struct { float X, Y, Z; };
+    float V[3];
+  };
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FVector& Vector )
   {
@@ -166,108 +173,6 @@ struct LIBUNR_API FVector
   friend LIBUNR_API FVector operator-( FVector& A, FVector& B );
 };
 
-/*-----------------------------------------------------------------------------
- * FVector
- * A 4D floating point coordinate
------------------------------------------------------------------------------*/
-struct LIBUNR_API FPlane : public FVector
-{
-  float W;
-
-  friend FPackageFileIn& operator>>( FPackageFileIn& In, FPlane& Plane )
-  {
-    In >> (FVector&)Plane;
-    In >> Plane.W;
-    return In;
-  }
-
-  friend FPackageFileOut& operator<<( FPackageFileOut& Out, FPlane& Plane )
-  {
-    Out << (FVector&)Plane;
-    Out << Plane.W;
-    return Out;
-  }
-};
-
-/*-----------------------------------------------------------------------------
- * FQuat
- * A floating point quaternion
------------------------------------------------------------------------------*/
-struct LIBUNR_API FQuat
-{
-  float X;
-  float Y;
-  float Z;
-  float W;
-
-  FQuat()
-  {
-    memset( &X, 0, sizeof( FQuat ) );
-  }
-
-  friend FPackageFileIn& operator>>( FPackageFileIn& In, FQuat& Quat )
-  {
-    In >> Quat.X;
-    In >> Quat.Y; 
-    In >> Quat.Z; 
-    In >> Quat.W;
-    return In;
-  }
-
-  friend FPackageFileOut& operator<<( FPackageFileOut& Out, FQuat& Quat )
-  {
-    Out << Quat.X; 
-    Out << Quat.Y;
-    Out << Quat.Z;
-    Out << Quat.W;
-    return Out;
-  }
-};
-
-/*-----------------------------------------------------------------------------
- * FRotator
- * A 3D rotation descriptor
------------------------------------------------------------------------------*/
-struct LIBUNR_API FRotator
-{
-  int Pitch;
-  int Yaw;
-  int Roll;
-
-  FRotator()
-  {
-    Pitch = 0;
-    Yaw = 0;
-    Roll = 0;
-  }
-
-  FRotator( int InPitch, int InYaw, int InRoll )
-  {
-    Pitch = InPitch;
-    Yaw = InYaw;
-    Roll = InRoll;
-  }
-
-  FVector GetRadians();
-  void GetMatrix( FMatrix4x4& Out );
-  void GetAxes( FVector& X, FVector& Y, FVector& Z );
-
-  friend FPackageFileIn& operator>>( FPackageFileIn& In, FRotator& Rotator )
-  {
-    In >> Rotator.Pitch;
-    In >> Rotator.Yaw;
-    In >> Rotator.Roll;
-    return In;
-  }
-
-  friend FPackageFileOut& operator<<( FPackageFileOut& Out, FRotator& Rotator )
-  {
-    Out << Rotator.Pitch;
-    Out << Rotator.Yaw;
-    Out << Rotator.Roll;
-    return Out;
-  }
-};
 
 /*-----------------------------------------------------------------------------
  * FBox
@@ -362,6 +267,8 @@ struct LIBUNR_API FBoxInt2D
     return (Width == 0 && Height == 0);
   }
 
+  friend LIBUNR_API float Dot( FVector& A, FPlane& P );
+
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FBoxInt2D& Box )
   {
     In >> Box.X;
@@ -377,6 +284,111 @@ struct LIBUNR_API FBoxInt2D
     Out << Box.Y;
     Out << Box.Width;
     Out << Box.Height;
+    return Out;
+  }
+};
+
+/*-----------------------------------------------------------------------------
+ * FVector
+ * A 4D floating point coordinate
+-----------------------------------------------------------------------------*/
+struct LIBUNR_API FPlane : public FVector
+{
+  float W;
+
+  int GetBoxOrientation( FBox& Box );
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FPlane& Plane )
+  {
+    In >> (FVector&)Plane;
+    In >> Plane.W;
+    return In;
+  }
+
+  friend FPackageFileOut& operator<<( FPackageFileOut& Out, FPlane& Plane )
+  {
+    Out << (FVector&)Plane;
+    Out << Plane.W;
+    return Out;
+  }
+};
+
+/*-----------------------------------------------------------------------------
+ * FQuat
+ * A floating point quaternion
+-----------------------------------------------------------------------------*/
+struct LIBUNR_API FQuat
+{
+  float X;
+  float Y;
+  float Z;
+  float W;
+
+  FQuat()
+  {
+    memset( &X, 0, sizeof( FQuat ) );
+  }
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FQuat& Quat )
+  {
+    In >> Quat.X;
+    In >> Quat.Y; 
+    In >> Quat.Z; 
+    In >> Quat.W;
+    return In;
+  }
+
+  friend FPackageFileOut& operator<<( FPackageFileOut& Out, FQuat& Quat )
+  {
+    Out << Quat.X; 
+    Out << Quat.Y;
+    Out << Quat.Z;
+    Out << Quat.W;
+    return Out;
+  }
+};
+
+/*-----------------------------------------------------------------------------
+ * FRotator
+ * A 3D rotation descriptor
+-----------------------------------------------------------------------------*/
+struct LIBUNR_API FRotator
+{
+  int Pitch;
+  int Yaw;
+  int Roll;
+
+  FRotator()
+  {
+    Pitch = 0;
+    Yaw = 0;
+    Roll = 0;
+  }
+
+  FRotator( int InPitch, int InYaw, int InRoll )
+  {
+    Pitch = InPitch;
+    Yaw = InYaw;
+    Roll = InRoll;
+  }
+
+  FVector GetRadians();
+  void GetMatrix( FMatrix4x4& Out );
+  void GetAxes( FVector& X, FVector& Y, FVector& Z );
+
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, FRotator& Rotator )
+  {
+    In >> Rotator.Pitch;
+    In >> Rotator.Yaw;
+    In >> Rotator.Roll;
+    return In;
+  }
+
+  friend FPackageFileOut& operator<<( FPackageFileOut& Out, FRotator& Rotator )
+  {
+    Out << Rotator.Pitch;
+    Out << Rotator.Yaw;
+    Out << Rotator.Roll;
     return Out;
   }
 };

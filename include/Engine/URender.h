@@ -89,9 +89,10 @@ class LIBUNR_API URenderDevice : public USubsystem
 
   virtual bool Init() { return false; }
   virtual bool Exit() { return false; }
-  virtual void Tick( float DeltaTime ) {}
+  virtual void Tick( float DeltaTime );
 
   bool bAccelerateFractalTextures;
+  FMatrix4x4 ViewMatrix;
 
   /*-----------------------------------------------------------------------------
    * Matrix functions
@@ -122,7 +123,7 @@ class LIBUNR_API URenderDevice : public USubsystem
   virtual void DrawActor( AActor* Actor ) {}
 
   // Recursively traverses bsp nodes, drawing bsp surfaces along the way
-  virtual void TraverseBspNode( UModel* Model, FBspNode& Node, UViewport* Viewport );
+  virtual void TraverseBspNode( UModel* Model, FBspNode& Node, UViewport* Viewport, bool bAccept );
 
   // Draws a bsp surface
   virtual void DrawBspSurface( UModel* Model, FBspNode& Node, UViewport* Viewport ) {}
