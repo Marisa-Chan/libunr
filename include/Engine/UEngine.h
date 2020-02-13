@@ -175,6 +175,8 @@ class LIBUNR_API UEngine : public USubsystem
   UTexture* DefaultTexture;
   UTexture* WhiteTexture;
 
+  ULevel* Level;
+
   int TickCycles;
   int GameCycles;
   int ClientCycles;

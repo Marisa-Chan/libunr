@@ -27,6 +27,7 @@
 
 #include "Core/UMath.h"
 #include "Core/USystem.h"
+#include "Engine/UModel.h"
 #include "Engine/UMesh.h"
 #include "Engine/UTexture.h"
 #include "Engine/UFire.h"
@@ -115,10 +116,16 @@ class LIBUNR_API URenderDevice : public USubsystem
 -  ----------------------------------------------------------------------------*/
 
   // Draws the current world from the perspective of a viewport
-  virtual void DrawWorld( ULevel* Level, UViewport* Viewport ) {}
+  virtual void DrawWorld( ULevel* Level, UViewport* Viewport );
 
   // Draws an actor in the world
   virtual void DrawActor( AActor* Actor ) {}
+
+  // Recursively traverses bsp nodes, drawing bsp surfaces along the way
+  virtual void TraverseBspNode( UModel* Model, FBspNode& Node, UViewport* Viewport );
+
+  // Draws a bsp surface
+  virtual void DrawBspSurface( UModel* Model, FBspNode& Node, UViewport* Viewport ) {}
 
   /*-----------------------------------------------------------------------------
    * Simple drawing functions

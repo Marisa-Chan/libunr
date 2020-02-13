@@ -122,7 +122,7 @@ class LIBUNR_API USkeletalMeshInstance : public UObject
   EXPOSE_TO_USCRIPT()
 
   USkeletalMeshInstance();
-  virtual void Tick( float DeltaTime );
+  //virtual void Tick( float DeltaTime );
 
   struct Matrix
   {

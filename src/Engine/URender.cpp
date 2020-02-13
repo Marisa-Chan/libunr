@@ -25,8 +25,10 @@
 
 #include "Core/UClass.h"
 #include "Core/UPackage.h"
+#include "Engine/ULevel.h"
 #include "Engine/URender.h"
-//#include "APlayerPawn.h"
+#include "Engine/UViewport.h"
+#include "Actors/APlayerPawn.h"
 
 URenderIterator::URenderIterator()
   : UObject()
@@ -159,6 +161,62 @@ void URenderDevice::GetPerspectiveMatrix( FMatrix4x4& Mat, float FOV, float Widt
   Mat.Data[2][2] = -(zFar + zNear) / zFarMinusNear;
   Mat.Data[2][3] = -1.0f;
   Mat.Data[3][2] = -(2.0f * zFar * zNear) / zFarMinusNear;
+}
+
+/*-----------------------------------------------------------------------------
+ * DrawWorld
+-----------------------------------------------------------------------------*/
+void URenderDevice::DrawWorld( ULevel* Level, UViewport* Viewport )
+{
+  // Get the root node and start there
+  FBspNode& Node = Level->Model->Nodes[0];
+  TraverseBspNode( Level->Model, Node, Viewport );
+}
+
+void URenderDevice::TraverseBspNode( UModel* Model, FBspNode& Node, UViewport* Viewport )
+{
+  // TODO: Figure out if we can see this node
+
+  // TODO: Draw any actors in this node
+
+  // Figure out which side of the node we're on
+  // Wow, this is really confusing. Each node stores a 'Plane' which has a W coordinate and
+  // one of the X/Y/Z coordinates set to 1 or -1. It seems like that the non-zero cartesian
+  // axis is the axis that the node 'slices' through. The W coordinate might then be used as
+  // the actual value to figure out which side of the axis you're on.
+
+  // Get the coordinate of the non-zero axis
+  float NonZeroCoord = Dot( Node.Plane, Viewport->Actor->Location );
+
+  // Subtract the W coordinate with the non-zero coordinate
+  // Using a test map, the W coordinate is always some multiple of the brush dimensions
+  // Definitely needs verification for correctness, but Quake 2 looks like it does something
+  // kind of similar in R_RecursiveWorldNode
+  float Leaf = NonZeroCoord - Node.Plane.W;
+
+  // Viewport actor behind node
+  int Nodes[2];
+  if ( Leaf < 0.0f )
+  {
+    Nodes[0] = Node.iFront;
+    Nodes[1] = Node.iBack;
+  }
+  else
+  {
+    Nodes[0] = Node.iBack;
+    Nodes[1] = Node.iFront;
+  }
+
+  // Traverse down the first node
+  TraverseBspNode( Model, Model->Nodes[Nodes[0]], Viewport );
+
+  // TODO: Figure out if we can see the node we're in
+
+  // Draw node surface
+  DrawBspSurface( Model, Node, Viewport );
+
+  // Traverse down the last node
+  TraverseBspNode( Model, Model->Nodes[Nodes[1]], Viewport );
 }
 
 URenderBase::URenderBase()

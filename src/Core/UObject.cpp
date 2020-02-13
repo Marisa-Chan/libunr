@@ -645,14 +645,6 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
 
       return StaticLoadObject( ObjPkg, ObjName, ObjClass, InOuter, bLoadClassNow );
     }
-    else if ( UNLIKELY( stricmp( ObjPkg->Name.Data(), "UnrealShare" ) == 0 ) )
-    {
-      ObjPkg = UPackage::StaticLoadPackage( "UnrealI" );
-      if ( UNLIKELY( ObjPkg == NULL ) )
-        goto Error;
-
-      return StaticLoadObject( ObjPkg, ObjName, ObjClass, InOuter, bLoadClassNow );
-    }
 
   Error:
     GLogf( LOG_CRIT, "Can't load object '%s.%s', object does not exist", ObjPkgName, ObjName );
