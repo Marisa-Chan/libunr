@@ -176,6 +176,27 @@ LIBUNR_API FVector operator-( FVector& A, FVector& B )
   return Y;
 }
 
+LIBUNR_API FVector operator-( FVector& V )
+{
+  return FVector( -V.X, -V.Y, -V.Z );
+}
+
+LIBUNR_API FVector operator*( FVector& A, float B )
+{
+  return FVector( A.X * B, A.Y * B, A.Z * B );
+}
+
+FPlane::FPlane()
+{
+  memset( this, 0, sizeof( FPlane ) );
+}
+
+FPlane::FPlane( FVector& V )
+  : FVector( V )
+{
+  W = 1.0;
+}
+
 int FPlane::GetBoxOrientation( FBox& Box )
 {
   float Dist[2];

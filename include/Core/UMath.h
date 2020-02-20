@@ -171,6 +171,8 @@ struct LIBUNR_API FVector
   friend LIBUNR_API FVector& operator*=( FVector& A, float B );
   friend LIBUNR_API FVector operator+( FVector& A, FVector& B );
   friend LIBUNR_API FVector operator-( FVector& A, FVector& B );
+  friend LIBUNR_API FVector operator-( FVector& V );
+  friend LIBUNR_API FVector operator*( FVector& A, float B );
 };
 
 
@@ -289,11 +291,14 @@ struct LIBUNR_API FBoxInt2D
 };
 
 /*-----------------------------------------------------------------------------
- * FVector
+ * FPlane
  * A 4D floating point coordinate
 -----------------------------------------------------------------------------*/
 struct LIBUNR_API FPlane : public FVector
 {
+  FPlane();
+  FPlane( FVector& V );
+
   float W;
 
   int GetBoxOrientation( FBox& Box );
