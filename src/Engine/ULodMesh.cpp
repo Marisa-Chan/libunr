@@ -80,13 +80,14 @@ void ULodMesh::Load()
   SpecialFaces.Resize( SpecialFaceCount );
   In.Read( SpecialFaces.Data(), SpecialFaceCount * sizeof(FLodFace) );
  
-  // 227 seems to change the material type to 0x81, I guess
-  // for clearly identifying weapon triangles. Can't rely on this
-  // behavior as it isn't seen anywhere else. Check also for an
-  // extremely large MaterialIndex, which seems to occur in the UTBeta 
+  // Merge special faces into regular mesh
   for ( int i = 0; i < SpecialFaceCount; i++ )
   {
-    if ( SpecialFaces[i].MaterialIndex == 0x81 || SpecialFaces[i].MaterialIndex > Materials.Size() )
+    // 227 seems to change the material type to 0x81, I guess
+    // for clearly identifying weapon triangles. Can't rely on this
+    // behavior as it isn't seen anywhere else. Check also for an
+    // extremely large MaterialIndex, which seems to occur in UT
+    if ( SpecialFaces[i].MaterialIndex == 0x81 || SpecialFaces[i].MaterialIndex >= Materials.Size() )
       SpecialFaces[i].MaterialIndex = 0;
 
     // Separate weapon triangle wedges
