@@ -132,7 +132,11 @@ void UVectors::Load()
   if ( Outer->IsA( UModel::StaticClass() ) )
   {
     Super::Load();
-    Data = &((UModel*)Outer)->Vectors;
+
+    if ( ((UModel*)Outer)->bLoadingPoints )
+      Data = &((UModel*)Outer)->Points;
+    else
+      Data = &((UModel*)Outer)->Vectors;
 
     int Num, Max;
     *PkgFile >> Num;
@@ -309,12 +313,16 @@ void UModel::Load()
   if ( PkgFile->Ver < PKG_VER_UT_400 )
   {
     *PkgFile >> CINDEX( ObjRef );
+    bLoadingPoints = false;
     UVectors* OldVectors = (UVectors*)LoadObject( ObjRef, UVectors::StaticClass(), this );
     delete OldVectors;
 
     *PkgFile >> CINDEX( ObjRef );
+    bLoadingPoints = true;
     UVectors* OldPoints = (UVectors*)LoadObject( ObjRef, UVectors::StaticClass(), this );
     delete OldPoints;
+
+    bLoadingPoints = false;
 
     *PkgFile >> CINDEX( ObjRef );
     UBspNodes* OldNodes = (UBspNodes*)LoadObject( ObjRef, UBspNodes::StaticClass(), this );

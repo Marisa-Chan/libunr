@@ -31,8 +31,8 @@
 class UClient;
 class UTexture;
 
-#define ZNEAR (0.001f)
-#define ZFAR  (1000.0f)
+#define ZNEAR (0.1f)
+#define ZFAR  (65536.0f)
 
 class LIBUNR_API UViewport : public UPlayer
 {

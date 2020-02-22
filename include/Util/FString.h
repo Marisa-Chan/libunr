@@ -203,6 +203,7 @@ LIBUNR_API FString operator+( char lhs, const string& rhs );
 LIBUNR_API FString operator+( char lhs, const FString& rhs );
 
 #ifdef LIBUNR_WIN32
+  #pragma warning(push)
   #pragma warning(disable:4273)
 #endif
 

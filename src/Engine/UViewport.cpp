@@ -84,21 +84,28 @@ void UViewport::AssembleClipPlanes()
   FVector FwdNear = Fwd * ZNEAR;
   FVector FwdFar = Fwd * ZFAR;
 
+  RTHXF  += Fwd;
+  NRTHXF += Fwd;
+  UTHYF  += Fwd;
+  NUTHYF += Fwd;
+  FwdNear += Actor->Location;
+  FwdFar  += Actor->Location;
+
   // Assemble view frustum
-  Frustum[0] = (Up    ^ (Fwd + RTHXF)).Normalize();
-  Frustum[1] = ((Fwd  + NRTHXF) ^ Up).Normalize();
-  Frustum[2] = ((Fwd  + UTHYF) ^ Right).Normalize();
-  Frustum[3] = (Right ^ (Fwd + NUTHYF)).Normalize();
-
+  *((FVector*)&Frustum[0]) = Cross( Up, RTHXF );
+  *((FVector*)&Frustum[1]) = Cross( NRTHXF, Up );
+  *((FVector*)&Frustum[2]) = Cross( UTHYF, Right );
+  *((FVector*)&Frustum[3]) = Cross( Right, NUTHYF );
+  
   for ( int i = 0; i < 4; i++ )
-    Frustum[i].W = Frustum[i] | Actor->Location;
-
+    Frustum[i].W = Dot( Frustum[i], Actor->Location );
+  
   // Assemble near clipping plane
   NearPlane = Fwd;
-  NearPlane.W = NearPlane | (Actor->Location + FwdNear);
-
-  FarPlane = -Fwd;
-  FarPlane.W = FarPlane | (Actor->Location + FwdFar);
+  NearPlane.W = Dot( NearPlane, FwdNear );
+  
+  *((FVector*)&FarPlane) = -Fwd;
+  FarPlane.W = Dot( FarPlane, FwdFar );
 }
 
 #include "Core/UClass.h"

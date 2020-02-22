@@ -197,14 +197,14 @@ void URenderDevice::TraverseBspNode( UModel* Model, FBspNode& Node, UViewport* V
   {
     bool bCrossOrient = false;
     FBox& RenderBox = Model->Bounds[Node.iRenderBound];
-
+  
     // Figure out which side of the box our camera is in to determine visibility to this node
     int Orientation = Viewport->NearPlane.GetBoxOrientation( RenderBox );
     if ( Orientation == ORIENT_BACK )
       return; // Nope, box is behind us, nothing to process
     if ( Orientation == ORIENT_CROSS )
       bCrossOrient = true;
-
+  
     // Check frustum planes
     for ( int i = 0; i < 4; i++ )
     {
@@ -214,7 +214,7 @@ void URenderDevice::TraverseBspNode( UModel* Model, FBspNode& Node, UViewport* V
       if ( Orientation == ORIENT_CROSS )
         bCrossOrient = true;
     }
-
+  
     if ( bCrossOrient )
       bAccept = false; // We're partially inside, meaning children need to be checked too
     else

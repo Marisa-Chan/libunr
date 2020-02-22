@@ -246,6 +246,7 @@ struct LIBUNR_API FBox2D
  * FBoxInt2D
  * An integer based 2D rectangular area
 -----------------------------------------------------------------------------*/
+struct FPlane;
 struct LIBUNR_API FBoxInt2D
 {
   int X, Y;
@@ -302,6 +303,7 @@ struct LIBUNR_API FPlane : public FVector
   float W;
 
   int GetBoxOrientation( FBox& Box );
+  float GetVectorOrientation( FVector& V );
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FPlane& Plane )
   {
@@ -380,6 +382,7 @@ struct LIBUNR_API FRotator
   FVector GetRadians();
   void GetMatrix( FMatrix4x4& Out );
   void GetAxes( FVector& X, FVector& Y, FVector& Z );
+  void GetAxesStandard( FVector& X, FVector& Y, FVector& Z );
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FRotator& Rotator )
   {

@@ -42,10 +42,10 @@ float rsqrt( float n )
 
   x2 = n * 0.5F;
   y = n;
-  i = *(long*)&y;						// evil floating point bit level hacking
-  i = 0x5f3759df - (i >> 1);               // what the fuck?
+  i = *(long*)&y;						           // evil floating point bit level hacking
+  i = 0x5f3759df - (i >> 1);           // what the fuck?
   y = *(float*)&i;
-  y = y * (threehalfs - (x2 * y * y));   // 1st iteration
+  y = y * (threehalfs - (x2 * y * y)); // 1st iteration
   return y;
 }
 
@@ -218,8 +218,8 @@ int FPlane::GetBoxOrientation( FBox& Box )
   }
 
   // Get point orientations
-  Dist[0] = Dot( Corners[0], *this );
-  Dist[1] = Dot( Corners[1], *this );
+  Dist[0] = Dot( Corners[0], *this ) - W;
+  Dist[1] = Dot( Corners[1], *this ) - W;
 
   if ( Dist[0] >= 0.0f )
   {
@@ -285,6 +285,39 @@ void FRotator::GetMatrix( FMatrix4x4& Out )
   Out.Data[3][1] = 0;
   Out.Data[3][2] = 0;
   Out.Data[3][3] = 1;
+}
+
+void FRotator::GetAxesStandard( FVector& X, FVector& Y, FVector& Z )
+{
+  // Get rotation in radians
+  FVector Rads = GetRadians();
+
+  float PiOverTwo = 3.14f / 2.0f;
+
+  float cy = cos( Rads.Y );
+  float cz = cos( Rads.Z );
+  float czh = cos( Rads.Z - PiOverTwo );
+  float sy = sin( Rads.Y );
+  float sz = sin( Rads.Z );
+  float szh = sin( Rads.Z - PiOverTwo );
+
+  // Get axes vectors
+  FVector Direction( cy * sz, sy, cy * cz );
+  FVector Right( szh, 0, czh );
+  FVector Up = Cross( Right, Direction );
+
+  // Use standard 3D axis definitions
+  X.X = Direction.X;
+  X.Y = Direction.Y;
+  X.Z = Direction.Z;
+
+  Y.X = Right.X;
+  Y.Y = Right.Y;
+  Y.Z = Right.Z;
+
+  Z.X = Up.X;
+  Z.Y = Up.Y;
+  Z.Z = Up.Z;
 }
 
 void FRotator::GetAxes( FVector& X, FVector& Y, FVector& Z )

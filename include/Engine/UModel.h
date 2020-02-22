@@ -337,6 +337,7 @@ class LIBUNR_API UModel : public UPrimitive
   TArray<FLeaf> Leaves;
   TArray<AActor*> Lights;
 
+  bool bLoadingPoints;
   bool RootOutside;
   bool Linked;
   int MoverLink;
