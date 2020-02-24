@@ -48,8 +48,8 @@ bool UViewport::Init( int InWidth, int InHeight )
   Height = (InHeight) ? InHeight : GLibunrConfig->ReadInt32( "libunr", "RenderHeight", 0, 768 );
   BitsPerPixel = GLibunrConfig->ReadUInt8( "libunr", "RenderBpp", 0, 24 ); // Usually ignored
 
-  FOV = GLibunrConfig->ReadFloat( "libunr", "RenderFOV", 0, 90.0f );
-  TanHalfXFov = tan( FOV / 2.0 );
+  Fov = GLibunrConfig->ReadFloat( "libunr", "RenderFOV", 0, 90.0f );
+  TanHalfXFov = tan( Fov / 2.0 );
   TanHalfYFov = ((double)Height / (double)Width) * TanHalfXFov;
 
   Client = GEngine->Client;
@@ -71,9 +71,8 @@ void UViewport::Hide()
 
 }
 
-void UViewport::AssembleClipPlanes()
+void UViewport::SetupFrustum()
 {
-  // Get rotation axes
   FVector Fwd, Right, Up;
   Actor->Rotation.GetAxes( Fwd, Right, Up );
 
@@ -84,29 +83,43 @@ void UViewport::AssembleClipPlanes()
   FVector FwdNear = Fwd * ZNEAR;
   FVector FwdFar = Fwd * ZFAR;
 
-  RTHXF  += Fwd;
+  RTHXF += Fwd;
   NRTHXF += Fwd;
-  UTHYF  += Fwd;
+  UTHYF += Fwd;
   NUTHYF += Fwd;
   FwdNear += Actor->Location;
-  FwdFar  += Actor->Location;
+  FwdFar += Actor->Location;
 
   // Assemble view frustum
   *((FVector*)&Frustum[0]) = Cross( Up, RTHXF );
   *((FVector*)&Frustum[1]) = Cross( NRTHXF, Up );
   *((FVector*)&Frustum[2]) = Cross( UTHYF, Right );
   *((FVector*)&Frustum[3]) = Cross( Right, NUTHYF );
-  
+
   for ( int i = 0; i < 4; i++ )
     Frustum[i].W = Dot( Frustum[i], Actor->Location );
-  
+
   // Assemble near clipping plane
   NearPlane = Fwd;
   NearPlane.W = Dot( NearPlane, FwdNear );
-  
+
   *((FVector*)&FarPlane) = -Fwd;
   FarPlane.W = Dot( FarPlane, FwdFar );
 }
+
+bool UViewport::IsBoxVisible( FBox& Box )
+{
+  // Check all frustum planes to make sure box is in all of them
+  for ( int i = 0; i < 4; i++ )
+  {
+    if ( Frustum[i].FindBoxSide( Box ) == ORIENT_BACK )
+      return false;
+  }
+
+  // All planes passed
+  return true;
+}
+
 
 #include "Core/UClass.h"
 #include "Core/UPackage.h"

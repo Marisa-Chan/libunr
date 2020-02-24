@@ -30,13 +30,15 @@
 #include "Util/FTypes.h"
 #include "Core/UPackage.h"
 
-#define PI 3.14159265359
-#define DEG2RAD(angle) ((angle) * (PI/180.0f))
+#define PI         3.1415926535897932384626433832795
+#define PIOVER180  0.01745329251994329576923690768489
+#define NPIOVER180 57.295779513082320876798154817014
+#define DEG2RAD(angle) ((angle) * PIOVER180)
 
-#define ORIENT_FRONT  0
-#define ORIENT_BACK   1
-#define ORIENT_ON     2
-#define ORIENT_CROSS -2
+#define ORIENT_FRONT  1
+#define ORIENT_BACK   2
+#define ORIENT_BOTH   (ORIENT_FRONT|ORIENT_BACK)
+//#define ORIENT_CROSS -2
 
 // Floating point math functions
 inline bool FltEqual( float A, float B )
@@ -169,10 +171,10 @@ struct LIBUNR_API FVector
   friend LIBUNR_API FVector& operator+=( FVector& A, FVector& B );
   friend LIBUNR_API FVector& operator-=( FVector& A, FVector& B );
   friend LIBUNR_API FVector& operator*=( FVector& A, float B );
-  friend LIBUNR_API FVector operator+( FVector& A, FVector& B );
-  friend LIBUNR_API FVector operator-( FVector& A, FVector& B );
+  friend LIBUNR_API FVector operator+( FVector A, FVector B );
+  friend LIBUNR_API FVector operator-( FVector A, FVector B );
   friend LIBUNR_API FVector operator-( FVector& V );
-  friend LIBUNR_API FVector operator*( FVector& A, float B );
+  friend LIBUNR_API FVector operator*( FVector A, float B );
 };
 
 
@@ -190,6 +192,13 @@ struct LIBUNR_API FBox
   {
     FVector Sub = Max - Min;
     return (Sub.X == 0 && Sub.Y == 0 && Sub.Z == 0);
+  }
+
+  bool IsVectorIn( FVector& V )
+  {
+    return ( V.X >= Min.X && V.X <= Max.X ) &&
+           ( V.Y >= Min.Y && V.Y <= Max.Y ) &&
+           ( V.Z >= Min.Z && V.Z <= Max.Z );
   }
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FBox& Box )
@@ -298,12 +307,14 @@ struct LIBUNR_API FBoxInt2D
 struct LIBUNR_API FPlane : public FVector
 {
   FPlane();
-  FPlane( FVector& V );
+  FPlane( FVector V );
 
   float W;
 
-  int GetBoxOrientation( FBox& Box );
+  int FindBoxSide( FBox& Box );
   float GetVectorOrientation( FVector& V );
+
+  friend LIBUNR_API float Dot( FVector& V, FPlane& P );
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FPlane& Plane )
   {
@@ -379,10 +390,10 @@ struct LIBUNR_API FRotator
     Roll = InRoll;
   }
 
+  FVector GetDegrees();
   FVector GetRadians();
   void GetMatrix( FMatrix4x4& Out );
-  void GetAxes( FVector& X, FVector& Y, FVector& Z );
-  void GetAxesStandard( FVector& X, FVector& Y, FVector& Z );
+  void GetAxes( FVector& Fwd, FVector& Right, FVector& Up );
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, FRotator& Rotator )
   {

@@ -46,7 +46,9 @@ class LIBUNR_API UViewport : public UPlayer
   virtual bool Resize( int NewWidth, int NewHeight ) { return false; }
   virtual bool SetCursor( UTexture* Cursor ) { return false; }
   virtual void SetViewportTitle( const char* NewTitle ) {}
-  virtual void AssembleClipPlanes();
+  virtual void SetupFrustum();
+
+  bool IsBoxVisible( FBox& Box );
 
   int Width;
   int Height;
@@ -54,7 +56,7 @@ class LIBUNR_API UViewport : public UPlayer
   const char* Title;
 
   // FOV properties
-  float FOV;
+  float Fov;
   float TanHalfXFov;
   float TanHalfYFov;
 

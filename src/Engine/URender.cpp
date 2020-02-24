@@ -67,7 +67,7 @@ void URenderDevice::Tick( float DeltaTime )
   GetViewMatrix( ViewMatrix, CameraLoc, CameraRot );
 
   // Assemble clipping planes for this viewport
-  CurrentViewport->AssembleClipPlanes();
+  CurrentViewport->SetupFrustum();
 }
 
 void URenderDevice::GetModelMatrix( FMatrix4x4& Mat, FVector& Location, FRotator& Rotation, FVector& Scale )
@@ -91,23 +91,24 @@ void URenderDevice::GetViewMatrix( FMatrix4x4& Mat, FVector& ViewLoc, FRotator& 
 {
   // Get rotation in radians
   FVector Rads = ViewRot.GetRadians();
+  Rads.Y = -Rads.Y;
 
   // Actual 3D coordinates operate on different axes
   FVector ActualViewLoc
   (
-    ViewLoc.Y,
+    -ViewLoc.Y,
     ViewLoc.Z,
     ViewLoc.X
   );
 
   float PiOverTwo = 3.14f / 2.0f;
 
-  float cy = cos( Rads.Y );
-  float cz = cos( Rads.Z );
-  float czh = cos( Rads.Z - PiOverTwo );
-  float sy = sin( Rads.Y );
-  float sz = sin( Rads.Z );
-  float szh = sin( Rads.Z - PiOverTwo );
+  float cy = cos( Rads.X );
+  float cz = cos( Rads.Y );
+  float czh = cos( Rads.Y - PiOverTwo );
+  float sy = sin( Rads.X );
+  float sz = sin( Rads.Y );
+  float szh = sin( Rads.Y - PiOverTwo );
 
   FVector Direction( cy * sz, sy, cy * cz );
   FVector Right( szh, 0, czh );
@@ -192,33 +193,13 @@ void URenderDevice::DrawWorld( ULevel* Level, UViewport* Viewport )
 
 void URenderDevice::TraverseBspNode( UModel* Model, FBspNode& Node, UViewport* Viewport, bool bAccept )
 {
+  bool bNoDraw = false;
   // If we haven't accepted this node, that means we need to check if we can see it
   if ( !bAccept && Node.iRenderBound >= 0 )
   {
-    bool bCrossOrient = false;
     FBox& RenderBox = Model->Bounds[Node.iRenderBound];
-  
-    // Figure out which side of the box our camera is in to determine visibility to this node
-    int Orientation = Viewport->NearPlane.GetBoxOrientation( RenderBox );
-    if ( Orientation == ORIENT_BACK )
-      return; // Nope, box is behind us, nothing to process
-    if ( Orientation == ORIENT_CROSS )
-      bCrossOrient = true;
-  
-    // Check frustum planes
-    for ( int i = 0; i < 4; i++ )
-    {
-      Orientation = Viewport->Frustum[i].GetBoxOrientation( RenderBox );
-      if ( Orientation == ORIENT_BACK )
-        return; // Nope, box is outside of a frustum plane
-      if ( Orientation == ORIENT_CROSS )
-        bCrossOrient = true;
-    }
-  
-    if ( bCrossOrient )
-      bAccept = false; // We're partially inside, meaning children need to be checked too
-    else
-      bAccept = true;  // We're fully inside, meaning child nodes are too (?)
+    if ( !Viewport->IsBoxVisible( RenderBox ) )
+      bNoDraw = true;
   }
 
   // Traverse down the front node
@@ -231,10 +212,11 @@ void URenderDevice::TraverseBspNode( UModel* Model, FBspNode& Node, UViewport* V
 
   // Plane child nodes are always recursed through
   if ( Node.iPlane >= 0 )
-    TraverseBspNode( Model, Model->Nodes[Node.iPlane], Viewport, bAccept );
+    TraverseBspNode( Model, Model->Nodes[Node.iPlane], Viewport, true );
 
   // Draw ourselves
-  DrawBspSurface( Model, Node, Viewport );
+  if ( !bNoDraw )
+    DrawBspSurface( Model, Node, Viewport );
 }
 
 URenderBase::URenderBase()

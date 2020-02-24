@@ -158,7 +158,7 @@ LIBUNR_API FVector& operator*=( FVector& A, float B )
   return A;
 }
 
-LIBUNR_API FVector operator+( FVector& A, FVector& B )
+LIBUNR_API FVector operator+( FVector A, FVector B )
 {
   FVector Y;
   Y.X = A.X + B.X;
@@ -167,7 +167,7 @@ LIBUNR_API FVector operator+( FVector& A, FVector& B )
   return Y;
 }
 
-LIBUNR_API FVector operator-( FVector& A, FVector& B )
+LIBUNR_API FVector operator-( FVector A, FVector B )
 {
   FVector Y;
   Y.X = A.X - B.X;
@@ -181,7 +181,7 @@ LIBUNR_API FVector operator-( FVector& V )
   return FVector( -V.X, -V.Y, -V.Z );
 }
 
-LIBUNR_API FVector operator*( FVector& A, float B )
+LIBUNR_API FVector operator*( FVector A, float B )
 {
   return FVector( A.X * B, A.Y * B, A.Z * B );
 }
@@ -191,14 +191,15 @@ FPlane::FPlane()
   memset( this, 0, sizeof( FPlane ) );
 }
 
-FPlane::FPlane( FVector& V )
+FPlane::FPlane( FVector V )
   : FVector( V )
 {
   W = 1.0;
 }
 
-int FPlane::GetBoxOrientation( FBox& Box )
+int FPlane::FindBoxSide( FBox& Box )
 {
+  int Side = 0;
   float Dist[2];
   FVector Corners[2];
 
@@ -218,27 +219,28 @@ int FPlane::GetBoxOrientation( FBox& Box )
   }
 
   // Get point orientations
-  Dist[0] = Dot( Corners[0], *this ) - W;
-  Dist[1] = Dot( Corners[1], *this ) - W;
+  Dist[0] = Dot( Corners[0], *this );
+  Dist[1] = Dot( Corners[1], *this );
 
   if ( Dist[0] >= 0.0f )
-  {
-    if ( Dist[1] < 0.0f ) // Plane crossing the box
-      return ORIENT_CROSS;
-    else                  // Plane in front of box
-      return ORIENT_FRONT;
-  }
-
+    Side = ORIENT_FRONT;
   if ( Dist[1] < 0.0f )
-    return ORIENT_BACK; // Plane behind the box
+    Side |= ORIENT_BACK;
 
-  // Plane crossing the box in every other case
-  return ORIENT_CROSS;
+  return Side;
 }
 
 LIBUNR_API float Dot( FVector& V, FPlane& P )
 {
   return ((V.X * P.X) + (V.Y * P.Y) + (V.Z * P.Z)) - P.W;
+}
+
+FVector FRotator::GetDegrees()
+{
+  // Convert rotator coordinates to degrees
+  // 16384 rotation units = 90 degree turn, 16384 / 90 = 182.0444444 rotation units per degree
+  #define UU_ROT_TO_DEG(angle) (((double)angle * 90.0) / 16384.0)
+  return FVector( UU_ROT_TO_DEG( Pitch ), UU_ROT_TO_DEG( Yaw ), UU_ROT_TO_DEG( Roll ) );
 }
 
 FVector FRotator::GetRadians()
@@ -251,7 +253,7 @@ FVector FRotator::GetRadians()
 
   #define UU_ROT_TO_RAD(angle) (((double)angle*PI) * 0.000030517578125)
 
-  return FVector( UU_ROT_TO_RAD( Roll ), UU_ROT_TO_RAD( Pitch ), UU_ROT_TO_RAD( Yaw ) );
+  return FVector( UU_ROT_TO_RAD( Pitch ), UU_ROT_TO_RAD( Yaw ), UU_ROT_TO_RAD( Roll ) );
 }
 
 void FRotator::GetMatrix( FMatrix4x4& Out )
@@ -262,12 +264,12 @@ void FRotator::GetMatrix( FMatrix4x4& Out )
 
   // See glm::eulerAngleYZX for original implementation
   // Here, pitch and yaw were negated to match expected rotation direction compared to UE1
-  float c1 = cos( -Rads.Z );
-  float s1 = sin( -Rads.Z );
-  float c2 = cos( Rads.X );
-  float s2 = sin( Rads.X );
-  float c3 = cos( -Rads.Y );
-  float s3 = sin( -Rads.Y );
+  float c1 = cos( Rads.Y );
+  float s1 = sin( Rads.Y );
+  float c2 = cos( Rads.Z );
+  float s2 = sin( Rads.Z );
+  float c3 = cos( -Rads.X );
+  float s3 = sin( -Rads.X );
 
   Out.Data[0][0] = c1 * c2;
   Out.Data[0][1] = s2;
@@ -287,68 +289,29 @@ void FRotator::GetMatrix( FMatrix4x4& Out )
   Out.Data[3][3] = 1;
 }
 
-void FRotator::GetAxesStandard( FVector& X, FVector& Y, FVector& Z )
+void FRotator::GetAxes( FVector& Fwd, FVector& Right, FVector& Up )
 {
   // Get rotation in radians
   FVector Rads = GetRadians();
+  Rads.X = -Rads.X;
+  float cp, sp, cy, sy, cr, sr;
 
-  float PiOverTwo = 3.14f / 2.0f;
+  cp = cos( Rads.X );
+  cy = cos( Rads.Y );
+  cr = cos( Rads.Z );
+  sp = sin( Rads.X );
+  sy = sin( Rads.Y );
+  sr = sin( Rads.Z );
 
-  float cy = cos( Rads.Y );
-  float cz = cos( Rads.Z );
-  float czh = cos( Rads.Z - PiOverTwo );
-  float sy = sin( Rads.Y );
-  float sz = sin( Rads.Z );
-  float szh = sin( Rads.Z - PiOverTwo );
+  Fwd.X = cp * cy;
+  Fwd.Y = cp * sy;
+  Fwd.Z = -sp;
 
-  // Get axes vectors
-  FVector Direction( cy * sz, sy, cy * cz );
-  FVector Right( szh, 0, czh );
-  FVector Up = Cross( Right, Direction );
+  Right.X = (-sr * sp * cy) - (cr * -sy);
+  Right.Y = (-sr * sp * sy) - (cr * cy);
+  Right.Z = -sr * cp;
 
-  // Use standard 3D axis definitions
-  X.X = Direction.X;
-  X.Y = Direction.Y;
-  X.Z = Direction.Z;
-
-  Y.X = Right.X;
-  Y.Y = Right.Y;
-  Y.Z = Right.Z;
-
-  Z.X = Up.X;
-  Z.Y = Up.Y;
-  Z.Z = Up.Z;
-}
-
-void FRotator::GetAxes( FVector& X, FVector& Y, FVector& Z )
-{
-  // Get rotation in radians
-  FVector Rads = GetRadians();
-
-  float PiOverTwo = 3.14f / 2.0f;
-
-  float cy = cos( Rads.Y );
-  float cz = cos( Rads.Z );
-  float czh = cos( Rads.Z - PiOverTwo );
-  float sy = sin( Rads.Y );
-  float sz = sin( Rads.Z );
-  float szh = sin( Rads.Z - PiOverTwo );
-
-  // Get axes vectors
-  FVector Direction( cy * sz, sy, cy * cz );
-  FVector Right( szh, 0, czh );
-  FVector Up = Cross( Right, Direction );
-
-  // Adjust to Unreal world coordinates
-  X.X = Direction.Z;
-  X.Y = Direction.X;
-  X.Z = Direction.Y;
-
-  Y.X = Right.Z;
-  Y.Y = Right.X;
-  Y.Z = Right.Y;
-
-  Z.X = Up.Z;
-  Z.Y = Up.X;
-  Z.Z = Up.Y;
+  Up.X = (cr * sp * cy) - (sr * -sy);
+  Up.Y = (cr * sp * sy) - (sr * cy);
+  Up.Z = cr * cp;
 }
