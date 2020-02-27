@@ -193,13 +193,12 @@ void URenderDevice::DrawWorld( ULevel* Level, UViewport* Viewport )
 
 void URenderDevice::TraverseBspNode( UModel* Model, FBspNode& Node, UViewport* Viewport, bool bAccept )
 {
-  bool bNoDraw = false;
   // If we haven't accepted this node, that means we need to check if we can see it
   if ( !bAccept && Node.iRenderBound >= 0 )
   {
     FBox& RenderBox = Model->Bounds[Node.iRenderBound];
     if ( !Viewport->IsBoxVisible( RenderBox ) )
-      bNoDraw = true;
+      return;
   }
 
   // Traverse down the front node
@@ -214,9 +213,8 @@ void URenderDevice::TraverseBspNode( UModel* Model, FBspNode& Node, UViewport* V
   if ( Node.iPlane >= 0 )
     TraverseBspNode( Model, Model->Nodes[Node.iPlane], Viewport, true );
 
-  // Draw ourselves
-  if ( !bNoDraw )
-    DrawBspSurface( Model, Node, Viewport );
+  // Draw this node
+  DrawBspSurface( Model, Node, Viewport );
 }
 
 URenderBase::URenderBase()
