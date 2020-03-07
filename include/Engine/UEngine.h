@@ -177,7 +177,7 @@ class LIBUNR_API UEngine : public USubsystem
 
   ULevel* Level;
 
-  int TickCycles;
+  u32 TickCycles;
   int GameCycles;
   int ClientCycles;
   int MinDesiredFramerate;
@@ -187,7 +187,6 @@ class LIBUNR_API UEngine : public USubsystem
 
   float CurrentTickRate;
   float CurrentDeltaTime;
-  u32   CurrentTick;
 
 protected:
   UNativeModule* AudioModule;

@@ -81,10 +81,10 @@ UTexture::~UTexture()
 void UTexture::Tick( float DeltaTime )
 {
   // Tick once per frame
-  if ( CurrentTick == GEngine->CurrentTick )
+  if ( CurrentTick == GEngine->TickCycles )
     return;
 
-  CurrentTick = GEngine->CurrentTick;
+  CurrentTick = GEngine->TickCycles;
 
   // Handle texture animation if necessary
   if ( AnimCurrent->AnimNext != NULL )
@@ -133,6 +133,7 @@ void UTexture::Load()
 
     // Read mip map data
     *PkgFile >> CINDEX( MipMapSize );
+    memset( &Mips[i], 0, sizeof( FMipmap ) );
     Mips[i].DataArray.Resize( MipMapSize );
     PkgFile->Read( Mips[i].DataArray.Data(), MipMapSize );
 

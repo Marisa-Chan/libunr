@@ -28,57 +28,316 @@
 #include "Util/FMacro.h"
 #include "Util/FTypes.h"
 #include "Util/FFileArchive.h"
+#include "Util/TDestructorInfo.h"
 
-using std::vector;
-template<class T> class TArray : public vector<T>
+//using std::vector;
+template<class T> class TArray// : public vector<T>
 {
 public:
-  TArray<T>() : vector<T>() 
-  { ElementSize = sizeof(T); }
+  TArray<T>() 
+  { 
+    ElementSize = sizeof(T);
+    NumBytes = 0;
+    NumElements = 0;
+    NumReserved = 0;
+    Array = NULL;
+  }
 
-  TArray<T>( size_t n ) : vector<T>( n ) 
-  { ElementSize = sizeof(T); }
+  TArray<T>( size_t n )
+  { 
+    ElementSize = sizeof(T); 
+    NumBytes = n * sizeof( T );
+    NumElements = n;
+    NumReserved = n * 2;
+    Array = (T*)malloc( NumReserved * sizeof(T) );
+    memset( Array, 0, NumReserved * sizeof( T ) );
+  }
   
-  TArray<T>( size_t n, const T& Value ) : vector<T>( n, Value ) 
-  { ElementSize = sizeof(T); }
+  TArray<T>( size_t n, const T& Value )
+  { 
+    ElementSize = sizeof(T);
+    NumBytes = n * sizeof( T );
+    NumElements = n;
+    NumReserved = n * 2;
+    Array = (T*)malloc( NumReserved * sizeof(T) );
+    
+    for ( int i = 0; i < n; i++ )
+      Array[i] = Value;
+  }
 
-  FORCEINLINE size_t Size() const                     { return vector<T>::size(); }
-  FORCEINLINE size_t MaxSize() const                  { return vector<T>::max_size(); }
-  FORCEINLINE void Resize( size_t n )                 { vector<T>::resize(n); }
-  FORCEINLINE void Resize( size_t n, const T& Value ) { vector<T>::resize(n,Value); }
-  FORCEINLINE size_t Capacity()                       { return vector<T>::capacity(); }
-  FORCEINLINE bool IsEmpty() const                    { return vector<T>::empty(); }
-  FORCEINLINE void Reserve( size_t n )                { vector<T>::reserve(n); }
-  FORCEINLINE void Reclaim ()                         { vector<T>::shrink_to_fit(); }
-  FORCEINLINE T& At ( size_t n )                      { return vector<T>::at(n); }
-  FORCEINLINE T& Front ()                             { return vector<T>::front(); }
-  FORCEINLINE T& Back ()                              { return vector<T>::back(); }
-  FORCEINLINE T* Data ()                              { return vector<T>::data(); }
-  FORCEINLINE void Assign( size_t n, const T& Value ) { vector<T>::assign(n,Value); }
-  FORCEINLINE void PushBack( const T& Val )           { vector<T>::push_back(Val); }
-  FORCEINLINE void PushBack( T& Val )                 { vector<T>::push_back(Val); }
-  FORCEINLINE void PopBack()                          { vector<T>::pop_back(); }
-  FORCEINLINE void Swap( TArray<T>& x )               { vector<T>::swap(x); }
-  FORCEINLINE void Clear()                            { vector<T>::clear(); }
+  TArray<T>( TArray<T>& x )
+  {
+    ElementSize = sizeof( T );
+    NumBytes = x.NumBytes;
+    NumElements = x.NumElements;
+    NumReserved = x.NumReserved;
+    Array = (T*)malloc( NumReserved * sizeof( T ) );
+
+    for ( int i = 0; i < NumElements; i++ )
+      Array[i] = x[i];
+  }
+
+  TArray<T>& operator=( const TArray<T>& Rhs )
+  {
+    ElementSize = sizeof( T );
+    NumBytes = Rhs.NumBytes;
+    NumElements = Rhs.NumElements;
+    NumReserved = Rhs.NumReserved;
+    Array = (T*)malloc( NumReserved * sizeof( T ) );
+
+    for ( int i = 0; i < NumElements; i++ )
+      Array[i] = Rhs[i];
+
+    return *this;
+  }
+
+  FORCEINLINE size_t Size() const                     
+  { 
+    return NumElements;
+  }
+
+  FORCEINLINE size_t MaxSize() const                  
+  { 
+    return MAX_UINT64 / sizeof( T );
+  }
+
+  FORCEINLINE void Resize( size_t n )                 
+  { 
+    Reserve( n );
+    NumBytes = n * sizeof( T );
+
+    if ( n > NumElements )
+    {
+      if ( TDestructorInfo<T>::NeedsDestructor() )
+        for ( int i = NumElements; i < n; i++ )
+          new (&Array[i]) T();
+      else
+        memset( &Array[NumElements], 0, (n - NumElements) * sizeof( T ) );
+    }
+
+    NumElements = n;
+  }
+
+  FORCEINLINE void Resize( size_t n, const T& Value ) 
+  { 
+    Reserve( n );
+
+    if ( n > NumElements )
+    {
+      for ( int i = NumElements; i < n; i++ )
+        Array[i] = Value;
+    }
+    NumBytes = n * sizeof( T );
+    NumElements = n;
+    NumReserved = n;
+  }
+
+  FORCEINLINE size_t Capacity()
+  {
+    return NumReserved;
+  }
+
+  FORCEINLINE bool IsEmpty() const                    
+  { 
+    return (NumElements == 0);
+  }
+
+  FORCEINLINE void Reserve( size_t n )                
+  { 
+    // Call destructors if needed
+    if ( TDestructorInfo<T>::NeedsDestructor() && n < NumElements )
+    {
+      for ( int i = n; i < NumElements; i++ )
+        Array[i].~T();
+
+      NumElements = n;
+    }
+
+    T* NewArray = NULL;
+    if ( n == 0 )
+    {
+      free( Array );
+    }
+    else
+    {
+      NewArray = (T*)realloc( Array, n * sizeof( T ) );
+      if ( NewArray == NULL )
+      {
+        // throw an error here if we fail
+        return;
+      }
+    }
+
+    Array = NewArray;
+    NumReserved = n;
+  }
+
+  FORCEINLINE void Reclaim ()                         
+  { 
+    Reserve( NumElements );
+  }
+
+  FORCEINLINE T& At ( size_t n ) const
+  { 
+#ifdef LIBUNR_DEBUG
+    if ( n >= NumElements )
+      DEBUGBREAK();
+#endif
+    return Array[n];
+  }
+
+  FORCEINLINE T& operator[]( size_t n ) const
+  {
+#ifdef LIBUNR_DEBUG
+    if ( n >= NumElements )
+      DEBUGBREAK();
+#endif
+    return Array[n];
+  }
+
+  FORCEINLINE T& Front ()
+  { 
+  #ifdef LIBUNR_DEBUG
+    if ( NumElements == 0 )
+      DEBUGBREAK();
+  #endif
+    return Array[0];
+  }
+
+  FORCEINLINE T& Back ()
+  { 
+  #ifdef LIBUNR_DEBUG
+    if ( NumElements == 0 )
+      DEBUGBREAK();
+  #endif
+  }
+
+  FORCEINLINE T* Data ()
+  { 
+    return Array;
+  }
+
+  FORCEINLINE void Assign( size_t n, const T& Value ) 
+  { 
+  #ifdef LIBUNR_DEBUG
+    if ( n >= NumElements )
+      DEBUGBREAK();
+  #endif
+    Array[n] = Value;
+  }
+
+  FORCEINLINE void PushBack( const T& Val )
+  { 
+    if ( !Array || NumElements == NumReserved )
+      Reserve( NumReserved + 4 );
+
+    NumBytes += sizeof( T );
+    Array[NumElements] = Val;
+    NumElements++;
+  }
+
+  FORCEINLINE void PushBack( T& Val )
+  {
+    if ( !Array || NumElements == NumReserved )
+      Reserve( NumReserved + 4 );
+
+    NumBytes += sizeof( T );
+    Array[NumElements] = Val;
+    NumElements++;
+  }
+
+  FORCEINLINE void PopBack()
+  { 
+    if ( NumElements > 0 )
+    {
+      NumBytes -= sizeof( T );
+      NumElements--;
+      if ( TDestructorInfo<T>::NeedsDestructor() )
+        Array[NumElements].~T();
+    }
+  }
+
+  FORCEINLINE void Swap( TArray<T>& x )
+  { 
+    T* TmpArray = Array;
+    size_t TmpBytes = NumBytes;
+    size_t TmpElements = NumElements;
+    size_t TmpReserved = NumReserved;
+
+    Array = x.Array;
+    NumBytes = x.NumBytes;
+    NumElements = x.NumElements;
+    NumReserved = x.NumReserved;
+
+    x.Array = TmpArray;
+    x.NumBytes = TmpBytes;
+    x.NumElements = TmpElements;
+    x.NumReserved = TmpReserved;
+  }
+
+  FORCEINLINE void Clear()
+  { 
+    if ( TDestructorInfo<T>::NeedsDestructor() )
+    {
+      for ( int i = 0; i < NumElements; i++ )
+        Array[i].~T();
+    }
+
+    NumElements = 0;
+    NumBytes = 0;
+  }
+
   FORCEINLINE void Append( TArray<T>& x )
   {
-    vector<T>::insert( vector<T>::end(), x.begin(), x.end() );
+    if ( !Array || x.NumElements > NumReserved - NumElements )
+      Reserve( (NumReserved + x.NumElements) * 2 );
+
+    for ( int i = 0; i < x.NumElements; i++ )
+      Array[i + NumElements] = x[i];
+
+    NumBytes += x.NumElements * sizeof( T );
+    NumElements += x.NumElements;
   }
+
   FORCEINLINE void Append( T* x, size_t n )
   {
-    for ( size_t i = 0; i < n; i++ )
-      vector<T>::push_back( x[i] );
+    if ( !Array || n > NumReserved - NumElements )
+      Reserve( ( NumReserved + n ) * 2 );
+
+    for ( int i = 0; i < n; i++ )
+      Array[i + NumElements] = x[i];
+
+    NumBytes += n * sizeof( T );
+    NumElements += n;
   }
+
   FORCEINLINE void Erase( size_t Index )
   {
-    // Get iterator by doing some math on the array
-    vector<T>::erase( vector<T>::begin() + Index );
+  #ifdef LIBUNR_DEBUG
+    if ( Index >= NumElements )
+      DEBUGBREAK();
+  #endif
+
+    // Destroy selected index
+    if ( TDestructorInfo<T>::NeedsDestructor() )
+      Array[Index].~T();
+
+    // Copy everything backwards by one
+    NumBytes -= sizeof( T );
+    NumElements--;
+    memmove( &Array[Index], &Array[Index + 1], ElementSize * (NumElements - Index) );
   }
+
   FORCEINLINE void Insert( T& x, size_t Pos )
   {
-    typename vector<T>::iterator It = vector<T>::begin();
-    for ( int i = 0; i < Pos && It != vector<T>::end(); i++, It++ );
-    vector<T>::insert( It, x );
+    if ( NumElements + 1 >= NumReserved )
+      Reserve( NumElements + 5 );
+
+    // Copy everything forward by one
+    NumBytes += sizeof( T );
+    memmove( &Array[Pos + 1], &Array[Pos], ElementSize * (NumElements - Pos) );
+    NumElements++;
+    Array[Pos] = x;
   }
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, TArray<T>& Array )
@@ -108,6 +367,11 @@ public:
   }
 
   size_t ElementSize;
+protected:
+  T* Array;
+  size_t NumBytes;
+  size_t NumElements;
+  size_t NumReserved;
 };
 
 template<class T> class TArrayNotify : public TArray<T>
@@ -126,10 +390,9 @@ protected:
 class FGenericArray : public TArray<unsigned char>
 {
 public:
-  FORCEINLINE size_t Size() const    { return vector<unsigned char>::size() / ElementSize; }
-  FORCEINLINE size_t MaxSize() const { return vector<unsigned char>::max_size() / ElementSize; }
-  FORCEINLINE void   Resize( size_t n )  { vector<unsigned char>::resize( n * ElementSize ); }
-  FORCEINLINE void   Reserve( size_t n ) { vector<unsigned char>::reserve( n * ElementSize ); }
+  FORCEINLINE size_t Size() const    { return NumBytes / ElementSize; }
+  FORCEINLINE void   Resize( size_t n )  { Resize( n * ElementSize ); }
+  FORCEINLINE void   Reserve( size_t n ) { Resize( n * ElementSize ); }
   
   FORCEINLINE void* operator[]( size_t n ) { return PtrAdd( Data(), n * ElementSize ); }
 

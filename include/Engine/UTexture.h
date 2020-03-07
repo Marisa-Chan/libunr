@@ -100,6 +100,7 @@ public:
   {
     USize = 0;
     VSize = 0;
+    DataArray = TArray<u8>();
   }
   
   FMipmap( int InUSize, int InVSize )
@@ -109,7 +110,7 @@ public:
   
   void Clear()
   {
-    memset( DataArray.data(), 0, (size_t)USize * (size_t)VSize );
+    memset( DataArray.Data(), 0, (size_t)USize * (size_t)VSize );
   }
   
   int USize, VSize;

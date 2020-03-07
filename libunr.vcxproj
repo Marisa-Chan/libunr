@@ -88,6 +88,7 @@
     <ClInclude Include="include\Util\FString.h" />
     <ClInclude Include="include\Util\FTypes.h" />
     <ClInclude Include="include\Util\TArray.h" />
+    <ClInclude Include="include\Util\TDestructorInfo.h" />
     <ClInclude Include="include\Util\TMap.h" />
     <ClInclude Include="include\Util\TQueue.h" />
     <ClInclude Include="include\Util\TRingQueue.h" />
@@ -212,7 +213,7 @@
       <WarningLevel>Level2</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;LIBUNR_EXPORTS;_WINDOWS;_USRDLL;HAVE_SIMD;HAVE_SSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;LIBUNR_DEBUG;LIBUNR_EXPORTS;_WINDOWS;_USRDLL;HAVE_SIMD;HAVE_SSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>

@@ -93,7 +93,6 @@ UEngine::UEngine()
   Console = NULL;
   NetworkDevice = NULL;
   Language = NULL;
-  CurrentTick = 0;
 }
 
 UEngine::~UEngine()
@@ -236,7 +235,6 @@ void UEngine::Tick( float DeltaTime )
     DeltaTime = FLT_MIN;
 
   CurrentDeltaTime = DeltaTime;
-  CurrentTick++;
 
   // Process audio
   if ( Audio )

@@ -81,10 +81,10 @@ UFireTexture::~UFireTexture()
 void UFireTexture::Tick( float DeltaTime )
 {
   // Tick once per frame
-  if ( CurrentTick == GEngine->CurrentTick )
+  if ( CurrentTick == GEngine->TickCycles )
     return;
 
-  CurrentTick = GEngine->CurrentTick;
+  CurrentTick = GEngine->TickCycles;
 
   Accumulator += DeltaTime;
   if ( Accumulator < (1.0f/40.0f) )
@@ -167,7 +167,7 @@ void UFireTexture::Tick( float DeltaTime )
       break;
     case SPARK_Sparkle:
       Extra = ((rand() % 64) + 16);
-      BUF( S.X + Extra, S.Y ) = (rand() % S.Heat) - 8;
+      BUF( (S.X + Extra) & UMask, S.Y ) = (rand() % S.Heat) - 8;
       break;
     case SPARK_Pulse:
       S.ByteA += S.ByteD;
@@ -199,6 +199,9 @@ void UFireTexture::Tick( float DeltaTime )
         if ( (rand() & 0x7f) < (S.ByteB & 0x7f) )
           S.Y += (S.ByteB & 0x80) ? -1 : 1;
 
+        S.X &= UMask;
+        S.Y &= VMask;
+
         BUF( S.X, S.Y ) = S.Heat;
       }
       break;
@@ -228,7 +231,10 @@ void UFireTexture::Tick( float DeltaTime )
         if ( (rand() & 0x7f) < (S.ByteB & 0x7f) )
           S.Y--;
 
-        BUF( S.X & UMask, S.Y & VMask ) = S.Heat;
+        S.X &= UMask;
+        S.Y &= VMask;
+
+        BUF( S.X, S.Y ) = S.Heat;
       }
       break;
     case SPARK_Cone:
@@ -257,7 +263,10 @@ void UFireTexture::Tick( float DeltaTime )
         if ( (rand() & 0x1) )
           S.Y++;
 
-        BUF( S.X & UMask, S.Y & VMask ) = S.Heat;
+        S.X &= UMask;
+        S.Y &= VMask;
+
+        BUF( S.X, S.Y ) = S.Heat;
       }
       break;
     case SPARK_BlazeLeft:
@@ -287,6 +296,9 @@ void UFireTexture::Tick( float DeltaTime )
 
         if ( (rand() & 0x3f) < S.ByteD )
           S.Y++;
+
+        S.X &= UMask;
+        S.Y &= VMask;
 
         BUF( S.X, S.Y ) = S.Heat;
       }
@@ -319,7 +331,10 @@ void UFireTexture::Tick( float DeltaTime )
         if ( S.ByteD > 8 && (rand() & 0x3f) < S.ByteD )
           S.Y++;
 
-        DRAW_POINT( S.X, S.Y, MIN( S.Heat, RenderHeat ) );
+        S.X &= UMask;
+        S.Y &= VMask;
+
+        BUF( S.X, S.Y ) = S.Heat;
       }
       break;
     case SPARK_Cylinder:
