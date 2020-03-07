@@ -74,6 +74,12 @@ public:
     // Get iterator by doing some math on the array
     vector<T>::erase( vector<T>::begin() + Index );
   }
+  FORCEINLINE void Insert( T& x, size_t Pos )
+  {
+    typename vector<T>::iterator It = vector<T>::begin();
+    for ( int i = 0; i < Pos && It != vector<T>::end(); i++, It++ );
+    vector<T>::insert( It, x );
+  }
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, TArray<T>& Array )
   {

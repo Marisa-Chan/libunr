@@ -27,6 +27,7 @@
 //#include "FLog.h"
 #include "Core/UPackage.h"
 #include "Core/UProperty.h"
+#include "Engine/UEngine.h"
 #include "Engine/UTexture.h"
 
 UPalette::UPalette()
@@ -79,6 +80,12 @@ UTexture::~UTexture()
 
 void UTexture::Tick( float DeltaTime )
 {
+  // Tick once per frame
+  if ( CurrentTick == GEngine->CurrentTick )
+    return;
+
+  CurrentTick = GEngine->CurrentTick;
+
   // Handle texture animation if necessary
   if ( AnimCurrent->AnimNext != NULL )
   {

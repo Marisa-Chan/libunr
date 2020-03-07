@@ -213,6 +213,9 @@ void URenderDevice::TraverseBspNode( UModel* Model, FBspNode& Node, UViewport* V
   if ( Node.iPlane >= 0 )
     TraverseBspNode( Model, Model->Nodes[Node.iPlane], Viewport, true );
 
+  // Tick this texture if necessary
+  Model->Surfs[Node.iSurf].Texture->Tick( GEngine->CurrentDeltaTime );
+
   // Draw this node
   DrawBspSurface( Model, Node, Viewport );
 }

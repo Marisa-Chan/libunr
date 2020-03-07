@@ -32,6 +32,7 @@
     <ClInclude Include="include\Core\UClass.h" />
     <ClInclude Include="include\Core\ULocale.h" />
     <ClInclude Include="include\Core\UMath.h" />
+    <ClInclude Include="include\Core\UMemory.h" />
     <ClInclude Include="include\Core\UNativeModule.h" />
     <ClInclude Include="include\Core\UObject.h" />
     <ClInclude Include="include\Core\UObjGetSet.h" />

@@ -267,6 +267,7 @@ class LIBUNR_API UTexture : public UBitmap
   u8 PrimeCurrent;
   float MinFrameRate, MaxFrameRate;
   float Accumulator;
+  u32   CurrentTick;
   
   TArray<FMipmap> Mips;
   TArray<FMipmap> DecompMips;

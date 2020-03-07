@@ -70,7 +70,6 @@ void UFractalTexture::Tick( float DeltaTime )
 UFireTexture::UFireTexture()
   : UFractalTexture()
 {
-  Sparks = new TArray<Spark>();
 }
 
 UFireTexture::~UFireTexture()
@@ -81,6 +80,12 @@ UFireTexture::~UFireTexture()
 
 void UFireTexture::Tick( float DeltaTime )
 {
+  // Tick once per frame
+  if ( CurrentTick == GEngine->CurrentTick )
+    return;
+
+  CurrentTick = GEngine->CurrentTick;
+
   Accumulator += DeltaTime;
   if ( Accumulator < (1.0f/40.0f) )
     return;
@@ -102,13 +107,22 @@ void UFireTexture::Tick( float DeltaTime )
 
   #define BUF(x,y) (Buf[((y)<<UBits)+(x)])
 
+  #define DRAW_BURN_POINT(x,y,h) \
+  if ( bRising ) {BUF( (x-1) & UMask, y & VMask ) = h;} \
+  {BUF( x & UMask, y & VMask ) = h; BUF( x & UMask, (y-1) & VMask ) = h; BUF( (x+1) & UMask, y & VMask ) = h;}
+
+  #define DRAW_POINT(x, y, h) \
+  Heat = h; \
+  if ( bRising ) {BUF( (x+1) & UMask, y & VMask ) = Heat;} \
+  {BUF( x & UMask, y & VMask ) = Heat; BUF( x & UMask, (y-1) & VMask ) = Heat; BUF( (x-1) & UMask, y & VMask ) = Heat;}
+
   // TODO: SIMD acceleration?
   // Modify frame buffer
   for ( int y = 0; y < VSize; y++ )
   {
     for ( int x = 0; x < USize; x++ )
     {
-      int Value;
+      int Value; 
       if ( bRising )
       {
         Value  = BUF( x, (y + 2) & VMask );
@@ -127,8 +141,6 @@ void UFireTexture::Tick( float DeltaTime )
       // Setting render heat above 246 seems to make it go a bit crazy
       if ( RenderHeat > 246 && Value > 4 )
         Value += 2;
-      else if ( RenderHeat > 220 && Value > 235 )
-        Value += 1;
 
       BUF(x,y) = RenderTable[Value];
     }
@@ -151,30 +163,24 @@ void UFireTexture::Tick( float DeltaTime )
     switch ( S.Type )
     {
     case SPARK_Burn:
-      Heat = rand() % 255;
-      BUF( S.X & UMask, S.Y & VMask ) = Heat;
+      BUF( S.X, S.Y ) = rand() % RenderHeat;
       break;
     case SPARK_Sparkle:
-      Heat = S.Heat;
-      BUF( (S.X + Extra) & UMask, S.Y & VMask ) = Heat;
-      BUF( (S.X + Extra) & UMask, (S.Y-1) & VMask ) = Heat;
-      BUF( ((S.X+1) + Extra) & UMask, S.Y & VMask ) = Heat;
-      BUF( ((S.X-1) + Extra) & UMask, S.Y & VMask ) = Heat;
+      Extra = ((rand() % 64) + 16);
+      BUF( S.X + Extra, S.Y ) = (rand() % S.Heat) - 8;
       break;
     case SPARK_Pulse:
       S.ByteA += S.ByteD;
       BUF( S.X & UMask, S.Y & VMask ) = S.ByteA;
       break;
     case SPARK_Signal:
-      Heat = 96 + (rand() % 127);
-      BUF( S.X & UMask, S.Y & VMask ) = Heat;
+      DRAW_BURN_POINT( S.X, S.Y, 96 + (rand() % 127) );
       break;
     case SPARK_Blaze:
-      if ( Sparks->Size() < SparksLimit && (rand() & 0xff) > 127 )
+      if ( Sparks->Size() < SparksLimit && (rand() & 0xff) < 64 )
       {
         New.ByteA = rand() & 0xff;
         New.ByteB = rand() & 0xff;
-        New.ByteC = 1;
         New.X = S.X;
         New.Y = S.Y;
         New.Heat = S.Heat;
@@ -183,8 +189,8 @@ void UFireTexture::Tick( float DeltaTime )
       }
       break;
     case SPARK_BlazeSpark: // Spawned by SPARK_Blaze sparks
-      S.Heat -= 4;
-      if ( S.Heat < 4 )
+      S.Heat -= 5;
+      if ( S.Heat < 5 )
         Sparks->Erase( i );
       else
       {
@@ -193,15 +199,14 @@ void UFireTexture::Tick( float DeltaTime )
         if ( (rand() & 0x7f) < (S.ByteB & 0x7f) )
           S.Y += (S.ByteB & 0x80) ? -1 : 1;
 
-        BUF( S.X & UMask, S.Y & VMask ) = S.Heat;
+        BUF( S.X, S.Y ) = S.Heat;
       }
       break;
     case SPARK_OzHasSpoken:
       if ( Sparks->Size() < SparksLimit && (rand() & 0xff) < 128 )
       {
-        New.ByteA = (rand() & 0x7f)-63; // subtract by half max value to try and force negative values in a smaller range
+        New.ByteA = (rand() & 0x7f) - 63; // subtract by half max value to try and force negative values in a smaller range
         New.ByteB = 127;
-        New.ByteC = 1;
         New.X = S.X;
         New.Y = S.Y;
         New.Heat = S.Heat;
@@ -259,11 +264,11 @@ void UFireTexture::Tick( float DeltaTime )
       if ( Sparks->Size() < SparksLimit && (rand() & 0xff) < 128 )
       {
         New.ByteA = (rand() & 0x7f) - 63;
-        New.ByteC = 100;
+        New.ByteC = 64;
         New.ByteD = 0;
         New.X = S.X;
         New.Y = S.Y;
-        New.Heat = S.Heat;
+        New.Heat = MIN( S.Heat, RenderHeat );
         New.Type = SPARK_BlazeLSpark;
         Sparks->PushBack( New );
       }
@@ -283,7 +288,7 @@ void UFireTexture::Tick( float DeltaTime )
         if ( (rand() & 0x3f) < S.ByteD )
           S.Y++;
 
-        BUF( S.X & UMask, S.Y & VMask ) = S.Heat;
+        BUF( S.X, S.Y ) = S.Heat;
       }
       break;
     case SPARK_BlazeRight:
@@ -294,14 +299,14 @@ void UFireTexture::Tick( float DeltaTime )
         New.ByteD = 0;
         New.X = S.X;
         New.Y = S.Y;
-        New.Heat = S.Heat;
+        New.Heat = S.Heat - S.ByteB;
         New.Type = SPARK_BlazeRSpark;
         Sparks->PushBack( New );
       }
       break;
     case SPARK_BlazeRSpark:
-      S.ByteC -= 1;
-      if ( S.ByteC == 1 )
+      S.ByteC -= 4;
+      if ( S.ByteC < 4 )
         Sparks->Erase( i );
       else
       {
@@ -314,8 +319,48 @@ void UFireTexture::Tick( float DeltaTime )
         if ( S.ByteD > 8 && (rand() & 0x3f) < S.ByteD )
           S.Y++;
 
-        BUF( S.X & UMask, S.Y & VMask ) = S.Heat;
+        DRAW_POINT( S.X, S.Y, MIN( S.Heat, RenderHeat ) );
       }
+      break;
+    case SPARK_Cylinder:
+      break;
+    case SPARK_Cylinder3D:
+      break;
+    case SPARK_Lissajous:
+      break;
+    case SPARK_Jugglers:
+      break;
+    case SPARK_Emit:
+      break;
+    case SPARK_Fountain:
+      break;
+    case SPARK_Flocks:
+      break;
+    case SPARK_Eels:
+      break;
+    case SPARK_Organic:
+      break;
+    case SPARK_WanderOrganic:
+      break;
+    case SPARK_RandomCloud:
+      break;
+    case SPARK_CustomCloud:
+      break;
+    case SPARK_LocalCloud:
+      break;
+    case SPARK_Stars:
+      break;
+    case SPARK_LineLightning:
+      break;
+    case SPARK_RampLightning:
+      break;
+    case SPARK_SphereLightning:
+      break;
+    case SPARK_Wheel:
+      break;
+    case SPARK_Gametes:
+      break;
+    case SPARK_Sprinkler:
       break;
     }
   }
@@ -328,6 +373,7 @@ void UFireTexture::Load()
 
   // Probably an index, but im unsure
   In >> CINDEX( NumSparks );
+  Sparks = new TArray<Spark>();
   Sparks->Reserve( NumSparks );
 
   for ( int i = 0; i < NumSparks; i++ )
@@ -400,7 +446,10 @@ void UFireTexture::CalculateRenderTable()
     // From there, we can use RenderHeat to adjust the color balance such
     // that colors lower in the table aren't just black/background color
     // 
-    RenderTable[i] = Clamp( (i / 4) + ((RenderHeat - 250) / 16), 0, 255 );
+    float HeatIndex = i / 4.0;
+    float RenderHeatContrib = -(255 - RenderHeat) / 16.0;
+    float Adjust = 1.0;
+    RenderTable[i] = (int)FClamp( HeatIndex + RenderHeatContrib + Adjust, 0.0, RenderHeat );
   }
 }
 
