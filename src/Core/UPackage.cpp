@@ -674,6 +674,20 @@ UPackage* UPackage::StaticLoadPackage( const char* PkgName, bool bSearch )
 
     if ( !Pkg->Load( Path ) )
     {
+      //Remove package from Packages array.
+      // FIXME: Does libunr look for empty slots when loading packages?
+      
+      for ( int i = 0; i < Packages->Size(); i++ )
+      {
+      UPackage** lpkg = &Packages->Data()[i];
+
+        if ( *lpkg == Pkg )
+        {
+        *lpkg = NULL;
+        }
+      }
+      
+
       delete Pkg;
       return NULL;
     }
@@ -686,7 +700,20 @@ UPackage* UPackage::StaticLoadPackage( const char* PkgName, bool bSearch )
     // Native-only package needs to have it's scripted counter-part loaded
     if ( !Pkg->Load( Path ) )
     {
-      // FIXME: Package needs to be removed from the array here
+      //Remove package from Packages array.
+      // FIXME: Does libunr look for empty slots when loading packages?
+      
+      for ( int i = 0; i < Packages->Size(); i++ )
+      {
+        UPackage** lpkg = &Packages->Data()[i];
+
+        if ( *lpkg == Pkg )
+        {
+          *lpkg = NULL;
+        }
+      }
+      
+
       delete Pkg;
       return NULL;
     }
