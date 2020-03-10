@@ -82,6 +82,7 @@ enum EPolyFlags
   PF_FlatShaded  = 0x40000000,  // FPoly has been split by SplitPolyWithPlane.
 
   // Internal.
+  PF_Detail       = 0x20000000,  // Polygon should blend detail texture with main texture
   PF_EdProcessed  = 0x40000000,  // FPoly was already processed in editorBuildFPolys.
   PF_EdCut        = 0x80000000,  // FPoly has been split by SplitPolyWithPlane.
   PF_RenderFog    = 0x40000000,  // Render with fogmapping.
@@ -149,11 +150,14 @@ struct LIBUNR_API FBspNode
 {
   friend LIBUNR_API FPackageFileIn& operator>>( FPackageFileIn& In, FBspNode& BN );
 
-  FPlane Plane;
-  u64    ZoneMask;
-  int    iVertPool;
-  int    iSurf;
+  FPlane Plane;      // Plane the node falls into (X, Y, Z, W).
+  u64    ZoneMask;   // Bit mask for all zones at or below this node (up to 64).
+  int    iVertPool;  // Index of first vertex in vertex pool, =iTerrain if NumVertices==0 and NF_TerrainFront.
+  int    iSurf;      // Index to surface information.
 
+  // iBack:  Index to node in front (in direction of Normal).
+  // iFront: Index to node in back  (opposite direction as Normal).
+  // iPlane: Index to next coplanar poly in coplanar list.
   union
   {
     int iBack;
@@ -162,31 +166,31 @@ struct LIBUNR_API FBspNode
   int iFront;
   int iPlane;
 
-  int iCollisionBound;
-  int iRenderBound;
-  u8  iZone[2];
-  u8  NumVertices;
-  u8  NodeFlags;
-  int iLeaf[2];
+  int iCollisionBound; // Bounding box for collision testing
+  int iRenderBound;    // Bounding box for rendering (use to determine if you're in the node?)
+  u8  iZone[2];        // Visibility zone in 1=front, 0=back.
+  u8  NumVertices;     // Number of vertices in node.
+  u8  NodeFlags;       // Node flags.
+  int iLeaf[2];        // Leaf in back and front, INDEX_NONE=not a leaf.
 };
 
 struct LIBUNR_API FBspSurf
 {
   friend LIBUNR_API FPackageFileIn& operator>>( FPackageFileIn& In, FBspSurf& BS );
 
-  UTexture* Texture;
-  u32 PolyFlags;
-  int pBase;
-  int vNormal;
-  int vTextureU;
-  int vTextureV;
-  int iLightMap;
-  int iBrushPoly;
-  i16 PanU;
-  i16 PanV;
-  class ABrush* Brush;
-  TArray<FDecal> Decals;
-  TArray<FProjector> Projectors;
+  UTexture* Texture;             // Texture map.
+  u32 PolyFlags;                 // Polygon flags.
+  int pBase;                     // Polygon & texture base point index (where U,V==0,0).
+  int vNormal;                   // Index to polygon normal.
+  int vTextureU;                 // Texture U-vector index.
+  int vTextureV;                 // Texture V-vector index.
+  int iLightMap;                 // Light mesh.
+  int iBrushPoly;                // Editor brush polygon index.
+  i16 PanU;                      // U-Panning value.
+  i16 PanV;                      // V-Panning value.
+  class ABrush* Brush;           // Brush actor owning this Bsp surface.
+  TArray<FDecal> Decals;         // Array decals on this surface
+  TArray<FProjector> Projectors; // Nodes which make up this surface
   TArray<int> Nodes;
 };
 
@@ -333,6 +337,7 @@ class LIBUNR_API UModel : public UPrimitive
   TArray<FLeaf> Leaves;
   TArray<AActor*> Lights;
 
+  bool bLoadingPoints;
   bool RootOutside;
   bool Linked;
   int MoverLink;

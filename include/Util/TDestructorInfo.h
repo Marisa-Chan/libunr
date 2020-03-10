@@ -17,30 +17,24 @@
 \*===========================================================================*/
 
 /*========================================================================
- * UWindowsClient.h - A windows client to interact with the engine
+ * TDestructorInfo.h - Helpers for determining type destructability
  *
  * written by Adam 'Xaleros' Smith
  *========================================================================
 */
 
 #pragma once
+#include "Util/FTypes.h"
 
-#include <Windows.h>
-#include "Engine/UEngine.h"
-
-class LIBUNR_API UWindowsClient : public UClient
-{
-  DECLARE_NATIVE_CLASS( UWindowsClient, UClient, CLASS_NoExport | CLASS_Config, WinDrv )
-
-  UWindowsClient();
-
-  virtual bool Init();
-  virtual bool Exit();
-
-  virtual UViewport* OpenViewport( int InWidth = 0, int InHeight = 0 );
-  virtual bool CloseViewport( UViewport* Viewport );
-  virtual void Tick( float DeltaTime );
-  virtual void HandleMouseInput( int XPos, int YPos );
-
-  HINSTANCE hInstance;
-};
+// For determining if a type needs a destructor called or not
+template<class T> struct TDestructorInfo   { static FORCEINLINE bool NeedsDestructor() { return true; } };
+template <> struct TDestructorInfo<u8>     { static FORCEINLINE bool NeedsDestructor() { return false; } };
+template <> struct TDestructorInfo<u16>    { static FORCEINLINE bool NeedsDestructor() { return false; } };
+template <> struct TDestructorInfo<u32>    { static FORCEINLINE bool NeedsDestructor() { return false; } };
+template <> struct TDestructorInfo<u64>    { static FORCEINLINE bool NeedsDestructor() { return false; } };
+template <> struct TDestructorInfo<i8>     { static FORCEINLINE bool NeedsDestructor() { return false; } };
+template <> struct TDestructorInfo<i16>    { static FORCEINLINE bool NeedsDestructor() { return false; } };
+template <> struct TDestructorInfo<i32>    { static FORCEINLINE bool NeedsDestructor() { return false; } };
+template <> struct TDestructorInfo<i64>    { static FORCEINLINE bool NeedsDestructor() { return false; } };
+template <> struct TDestructorInfo<float>  { static FORCEINLINE bool NeedsDestructor() { return false; } };
+template <> struct TDestructorInfo<double> { static FORCEINLINE bool NeedsDestructor() { return false; } };

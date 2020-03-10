@@ -118,10 +118,10 @@ FConfig::FConfig( const char* Filename )
 
 FConfig::~FConfig()
 {
-  for ( size_t i = 0; i < Categories.size(); i++ )
+  for ( size_t i = 0; i < Categories.Size(); i++ )
     delete Categories[i];
 
-  Categories.clear();
+  Categories.Clear();
 }
 
 int FConfig::Load( const char* Filename )
@@ -303,7 +303,7 @@ int FConfig::Load( const char* Filename )
         }
 
         Index = strtol( IndexBuf, NULL, 10 );
-        Entry->Values->resize( Index+1 );
+        Entry->Values->Resize( Index+1 );
         memset( IndexBuf, 0, sizeof( IndexBuf ) );
 
         Entry->bWriteIndices = true;
@@ -374,17 +374,17 @@ int FConfig::Save()
   int WriteLen = 0;
   char WriteBuf[512];
   char NewLine[] = "\r\n";
-  for( size_t i = 0; i < Categories.size(); i++ )
+  for( size_t i = 0; i < Categories.Size(); i++ )
   {
     memset( WriteBuf, 0, sizeof( WriteBuf ) );
     FConfigCategory* Category = Categories[i];
     WriteLen = snprintf( WriteBuf, sizeof( WriteBuf ), "[%s]\r\n", Category->Name );
     IniFile.Write( WriteBuf, MIN( WriteLen, sizeof( WriteBuf ) ) );
 
-    for( size_t j = 0; j < Category->Entries->size(); j++ )
+    for( size_t j = 0; j < Category->Entries->Size(); j++ )
     {
       FConfigEntry* Entry = (*Category->Entries)[j];
-      for ( size_t k = 0; k < Entry->Values->size(); k++ )
+      for ( size_t k = 0; k < Entry->Values->Size(); k++ )
       {
         char* Value = (*Entry->Values)[k];
         memset( WriteBuf, 0, sizeof( WriteBuf ) );
@@ -417,19 +417,19 @@ char* FConfig::ReadString( const char* Category, const char* Variable, size_t In
   u32 CatHash = SuperFastHashString( Category ); // meow
   u32 VarHash = SuperFastHashString( Variable );
 
-  for ( size_t i = 0; i < Categories.size(); i++ )
+  for ( size_t i = 0; i < Categories.Size(); i++ )
   {
     // Get Variable
     CatIter = Categories[i];
     if ( CatIter->Hash == CatHash )
     {
       // Found Category, get Entry
-      for ( size_t j = 0; j < CatIter->Entries->size(); j++ )
+      for ( size_t j = 0; j < CatIter->Entries->Size(); j++ )
       {
         Entry = (*CatIter->Entries)[j];
         if ( Entry->Hash == VarHash )
         {
-          if ( UNLIKELY( Index >= Entry->Values->size() ) )
+          if ( UNLIKELY( Index >= Entry->Values->Size() ) )
           {
             GLogf( LOG_ERR, "Config variable '%s.%s' index out of bounds in '%s.ini'", Category, Variable, Name );
             return NULL;
@@ -594,7 +594,7 @@ void FConfig::WriteString( const char* Category, const char* Variable, const cha
   FConfigCategory* Cat = NULL; // meow
   FConfigEntry* Entry = NULL;
   u32 CatHash = SuperFastHashString( Category );
-  for ( size_t i = 0; i < Categories.size(); i++ )
+  for ( size_t i = 0; i < Categories.Size(); i++ )
   {
     FConfigCategory* CatIter = Categories[i];
     if ( CatIter->Hash == CatHash )
@@ -612,7 +612,7 @@ void FConfig::WriteString( const char* Category, const char* Variable, const cha
   }
 
   u32 VarHash = SuperFastHashString( Variable );
-  for ( size_t j = 0; j < Cat->Entries->size(); j++ )
+  for ( size_t j = 0; j < Cat->Entries->Size(); j++ )
   {
     FConfigEntry* EntryIter = (*Cat->Entries)[j];
     if ( EntryIter->Hash == VarHash )
@@ -627,16 +627,16 @@ void FConfig::WriteString( const char* Category, const char* Variable, const cha
     Entry = new FConfigEntry();
     Entry->Name = strdup( Variable );
     Entry->Hash = VarHash;
-    Cat->Entries->push_back( Entry );
+    Cat->Entries->PushBack( Entry );
   }
 
-  if ( Index >= Entry->Values->size() )
+  if ( Index >= Entry->Values->Size() )
   {
     const char* Empty = "";
-    Entry->Values->resize( Index+1, (char*)Empty );
+    Entry->Values->Resize( Index+1, (char*)Empty );
   }
      
-  char** Val = &Entry->Values->data()[ Index ];
+  char** Val = &Entry->Values->At( Index );
   *Val = strdup( Value );
 }
 
@@ -645,13 +645,13 @@ TArray<char*>* FConfig::CreateEntry( const char* Category, const char* Variable 
   FConfigCategory* CatIter;
   FConfigEntry* Entry;
   u32 CatHash = SuperFastHashString( Category ); // meow
-  for ( size_t i = 0; i < Categories.size(); i++ )
+  for ( size_t i = 0; i < Categories.Size(); i++ )
   {
     CatIter = Categories[i];
     if ( CatIter->Hash == CatHash )
     {
       u32 VarHash = SuperFastHashString( Variable );
-      for ( size_t j = 0; j < CatIter->Entries->size(); j++ )
+      for ( size_t j = 0; j < CatIter->Entries->Size(); j++ )
       {
         Entry = (*CatIter->Entries)[j];
         if ( Entry->Hash == VarHash )
@@ -714,7 +714,7 @@ FConfig::FConfigEntry::~FConfigEntry()
     delete Name;
 
   if ( Values != NULL )
-    for ( int i = 0; i < Values->size(); i++ )
+    for ( int i = 0; i < Values->Size(); i++ )
       delete (*Values)[i];
   
   if ( StructVars != NULL )
@@ -782,7 +782,7 @@ void FConfigManager::AddConfig( FConfig* Cfg )
 FConfig* FConfigManager::GetConfig( const char* Name )
 {
   size_t NameLen = strlen( Name );
-  for ( int i = 0; i < Configs.size(); i++ )
+  for ( int i = 0; i < Configs.Size(); i++ )
   {
     if ( strnicmp( Name, Configs[i]->GetName(), NameLen ) == 0 )
       return Configs[i];
@@ -793,19 +793,19 @@ FConfig* FConfigManager::GetConfig( const char* Name )
 
 void FConfigManager::DelConfig( FConfig* Cfg )
 {
-  for ( int i = 0; i < Configs.size(); i++ )
+  for ( int i = 0; i < Configs.Size(); i++ )
   {
     if ( Configs[i] == Cfg )
     {
       delete Cfg;
-      Configs.data()[i] = NULL;
+      Configs.Data()[i] = NULL;
     }
   }
 }
 
 void FConfigManager::SaveAndCloseConfigs()
 {
-  for ( int i = 0; i < Configs.size(); i++ )
+  for ( int i = 0; i < Configs.Size(); i++ )
   {
     if ( !Configs[i]->Save() )
       GLogf( LOG_WARN, "Failed to save config file '%s'", Configs[i]->GetName() );
@@ -813,16 +813,16 @@ void FConfigManager::SaveAndCloseConfigs()
     delete Configs[i];
   }
 
-  Configs.clear();
-  Configs.shrink_to_fit();
+  Configs.Clear();
+  Configs.Reclaim();
 }
 
 void FConfigManager::CloseConfigs()
 {
-  for ( int i = 0; i < Configs.size(); i++ )
+  for ( int i = 0; i < Configs.Size(); i++ )
     delete Configs[i];
 
-  Configs.clear();
-  Configs.shrink_to_fit();
+  Configs.Clear();
+  Configs.Reclaim();
 }
 

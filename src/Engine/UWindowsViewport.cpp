@@ -29,6 +29,7 @@
 
 #include "Engine/UWindowsClient.h"
 #include "Engine/UWindowsViewport.h"
+#include <Windowsx.h>
 
 UWindowsViewport::UWindowsViewport()
   : UViewport()
@@ -146,11 +147,44 @@ LRESULT UWindowsViewport::StaticWndProc( HWND Hwnd, UINT Msg, WPARAM WParam, LPA
 
   switch ( Msg )
   {
+  case WM_MOUSEMOVE:
+    This->Client->HandleMouseInput( GET_X_LPARAM( LParam ), GET_Y_LPARAM( LParam ) );
+    break;
   case WM_KEYDOWN:
     This->Client->HandleInput( WParam, true );
     break;
   case WM_KEYUP:
     This->Client->HandleInput( WParam, false );
+    break;
+  case WM_LBUTTONDOWN:
+    This->Client->HandleInput( VK_LBUTTON, true );
+    break;
+  case WM_LBUTTONUP:
+    This->Client->HandleInput( VK_LBUTTON, false );
+    break;
+  case WM_RBUTTONDOWN:
+    This->Client->HandleInput( VK_RBUTTON, true );
+    break;
+  case WM_RBUTTONUP:
+    This->Client->HandleInput( VK_RBUTTON, false );
+    break;
+  case WM_MBUTTONDOWN:
+    This->Client->HandleInput( VK_MBUTTON, true );
+    break;
+  case WM_MBUTTONUP:
+    This->Client->HandleInput( VK_MBUTTON, false );
+    break;
+  case WM_XBUTTONDOWN:
+    if ( GET_XBUTTON_WPARAM( WParam ) == XBUTTON1 )
+      This->Client->HandleInput( VK_XBUTTON1, true );
+    else
+      This->Client->HandleInput( VK_XBUTTON2, true );
+    break;
+  case WM_XBUTTONUP:
+    if ( GET_XBUTTON_WPARAM( WParam ) == XBUTTON1 )
+      This->Client->HandleInput( VK_XBUTTON1, false );
+    else
+      This->Client->HandleInput( VK_XBUTTON2, false );
     break;
   case WM_DESTROY:
     This->Client->CloseViewport( This );

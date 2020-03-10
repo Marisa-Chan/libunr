@@ -410,32 +410,35 @@ FExport* UPackage::GetExportByNameAndType( size_t Name, UClass* Type )
 {
   // Get the obj ref we're looking for
   idx TypeObjRef = 0;
-  if ( Type->Pkg == this && !(Type->ClassFlags & CLASS_NoExport ) )
+  if ( Type != UClass::StaticClass() )
   {
-    for ( TypeObjRef = 0; TypeObjRef < Exports.Size(); TypeObjRef++ )
+    if ( Type->Pkg == this && !(Type->ClassFlags & CLASS_NoExport) )
     {
-      FExport& Export = Exports[TypeObjRef];
-      if ( Export.Class == 0 )
+      for ( TypeObjRef = 0; TypeObjRef < Exports.Size(); TypeObjRef++ )
       {
-        if ( stricmp( Names[Exports[TypeObjRef].ObjectName].Data, Type->Name.Data() ) == 0 )
+        FExport& Export = Exports[TypeObjRef];
+        if ( Export.Class == 0 )
         {
-          TypeObjRef += 1;
-          break;
+          if ( stricmp( Names[Exports[TypeObjRef].ObjectName].Data, Type->Name.Data() ) == 0 )
+          {
+            TypeObjRef += 1;
+            break;
+          }
         }
       }
     }
-  }
-  else
-  {
-    for ( TypeObjRef = 0; TypeObjRef < Imports.Size(); TypeObjRef++ )
+    else
     {
-      FImport& Import = Imports[TypeObjRef];
-      if ( stricmp( Names[Import.ClassName].Data, "Class" ) == 0 )
+      for ( TypeObjRef = 0; TypeObjRef < Imports.Size(); TypeObjRef++ )
       {
-        if ( stricmp( Names[Import.ObjectName].Data, Type->Name.Data() ) == 0 )
+        FImport& Import = Imports[TypeObjRef];
+        if ( stricmp( Names[Import.ClassName].Data, "Class" ) == 0 )
         {
-          TypeObjRef = -(TypeObjRef + 1);
-          break;
+          if ( stricmp( Names[Import.ObjectName].Data, Type->Name.Data() ) == 0 )
+          {
+            TypeObjRef = -(TypeObjRef + 1);
+            break;
+          }
         }
       }
     }

@@ -175,11 +175,11 @@ public:
   FString& operator+=( char c );
   FString& operator+=( FName Name );
  
-  FString operator+( const FString& Str ) const;
-  FString operator+( const string& Str ) const;
-  FString operator+( const char* s ) const;
-  FString operator+( char c ) const;
-  FString& operator+( FName Name );
+  friend LIBUNR_API FString operator+( FString& A, const FString& Str );
+  friend LIBUNR_API FString operator+( FString& A, const string& Str );
+  friend LIBUNR_API FString operator+( FString& A, const char* s );
+  friend LIBUNR_API FString operator+( FString& A, char c );
+  friend LIBUNR_API FString operator+( FString& A, FName Name );
 
   friend LIBUNR_API FPackageFileIn&  operator>>( FPackageFileIn& In, FString& Str );
   friend LIBUNR_API FPackageFileOut& operator<<( FPackageFileOut& Out, FString& Str );
@@ -197,12 +197,13 @@ public:
   friend bool operator!=( const string& lhs,  const FString& rhs );
 };
   
-FString operator+( const char* lhs, const string& rhs );
-FString operator+( const char* lhs, const FString& rhs );
-FString operator+( char lhs, const string& rhs );
-FString operator+( char lhs, const FString& rhs );
+LIBUNR_API FString operator+( const char* lhs, const string& rhs );
+LIBUNR_API FString operator+( const char* lhs, const FString& rhs );
+LIBUNR_API FString operator+( char lhs, const string& rhs );
+LIBUNR_API FString operator+( char lhs, const FString& rhs );
 
 #ifdef LIBUNR_WIN32
+  #pragma warning(push)
   #pragma warning(disable:4273)
 #endif
 

@@ -18,6 +18,7 @@
 
 /*========================================================================
  * URender.cpp - Rendering Functionality
+ * BSP Rendering inspired by UShock Level Viewer
  * 
  * written by Adam 'Xaleros' Smith
  *========================================================================
@@ -25,8 +26,10 @@
 
 #include "Core/UClass.h"
 #include "Core/UPackage.h"
+#include "Engine/ULevel.h"
 #include "Engine/URender.h"
-//#include "APlayerPawn.h"
+#include "Engine/UViewport.h"
+#include "Actors/APlayerPawn.h"
 
 URenderIterator::URenderIterator()
   : UObject()
@@ -52,47 +55,169 @@ URenderDevice::~URenderDevice()
 {
 }
 
+void URenderDevice::Tick( float DeltaTime )
+{
+  UViewport* CurrentViewport = GEngine->Client->CurrentViewport;
+
+  // Translate UE1 axes to OpenGL
+  FVector& CameraLoc = CurrentViewport->Actor->Location;
+  FRotator& CameraRot = CurrentViewport->Actor->Rotation;
+
+  // Create view matrix for this viewport
+  GetViewMatrix( ViewMatrix, CameraLoc, CameraRot );
+
+  // Assemble clipping planes for this viewport
+  CurrentViewport->SetupFrustum();
+}
+
+void URenderDevice::GetModelMatrix( FMatrix4x4& Mat, FVector& Location, FRotator& Rotation, FVector& Scale )
+{
+  FMatrix4x4 RotMat;
+  FMatrix4x4 ScaleMat;
+
+  // Set up translation matrix first
+  Location.GetTranslationMatrix( Mat );
+
+  // Get rotation matrix and multiply
+  Rotation.GetMatrix( RotMat );
+  Mat *= RotMat;
+
+  // Get scale matrix and multiply
+  Scale.GetScaleMatrix( ScaleMat );
+  Mat *= ScaleMat;
+}
+
+void URenderDevice::GetViewMatrix( FMatrix4x4& Mat, FVector& ViewLoc, FRotator& ViewRot )
+{
+  // Get rotation in radians
+  FVector Rads = ViewRot.GetRadians();
+  Rads.Y = -Rads.Y;
+
+  // Actual 3D coordinates operate on different axes
+  FVector ActualViewLoc
+  (
+    -ViewLoc.Y,
+    ViewLoc.Z,
+    ViewLoc.X
+  );
+
+  float PiOverTwo = 3.14f / 2.0f;
+
+  float cy = cos( Rads.X );
+  float cz = cos( Rads.Y );
+  float czh = cos( Rads.Y - PiOverTwo );
+  float sy = sin( Rads.X );
+  float sz = sin( Rads.Y );
+  float szh = sin( Rads.Y - PiOverTwo );
+
+  FVector Direction( cy * sz, sy, cy * cz );
+  FVector Right( szh, 0, czh );
+  FVector Up = Cross( Right, Direction );
+
+  FVector F = Normalize( Direction );
+  FVector S = Cross( F, Up );
+  S = Normalize( S );
+  FVector U = Cross( S, F );
+
+  Mat.Data[0][0] =  S.X;
+  Mat.Data[1][0] =  S.Y;
+  Mat.Data[2][0] =  S.Z;
+  Mat.Data[0][1] =  U.X;
+  Mat.Data[1][1] =  U.Y;
+  Mat.Data[2][1] =  U.Z;
+  Mat.Data[0][2] = -F.X;
+  Mat.Data[1][2] = -F.Y;
+  Mat.Data[2][2] = -F.Z;
+  Mat.Data[3][0] = -Dot( S, ActualViewLoc );
+  Mat.Data[3][1] = -Dot( U, ActualViewLoc );
+  Mat.Data[3][2] =  Dot( F, ActualViewLoc );
+  Mat.Data[3][3] = 1.0f;
+}
+
 // TODO: Platform specific optimizations
 void URenderDevice::GetOrthoMatrix( FMatrix4x4& Mat, float Left, float Right, float Top, float Bottom, float zNear, float zFar )
 {
-#ifndef ARCH_OPTIMIZATIONS
+  float zFarMinusNear = (zFar - zNear);
+  float RightMinusLeft = (Right - Left);
+  float TopMinusBottom = (Top - Bottom);
+
   // Validate parameters
-  if ( fabsf( Left - Right ) <= FLT_EPSILON || fabsf( Top - Bottom ) <= FLT_EPSILON || fabsf( zNear - zFar ) <= FLT_EPSILON )
+  if ( fabsf( RightMinusLeft ) <= FLT_EPSILON || fabsf( TopMinusBottom ) <= FLT_EPSILON || fabsf( zFarMinusNear ) <= FLT_EPSILON )
   {
     GLogf( LOG_WARN, "Invalid ortho matrix parameters" );
     return;
   }
 
   memset( &Mat, 0, sizeof( Mat ) );
-  Mat.Data[0][0] = 2.0f / (Right - Left);
-  Mat.Data[1][1] = 2.0f / (Top - Bottom);
-  Mat.Data[2][2] = -2.0f / (zFar - zNear);
-  Mat.Data[3][0] = -(Right + Left) / (Right - Left);
-  Mat.Data[3][1] = -(Top + Bottom) / (Top - Bottom);
-  Mat.Data[3][2] = -(zFar + zNear) / (zFar - zNear);
+  Mat.Data[0][0] = 2.0f / RightMinusLeft;
+  Mat.Data[1][1] = 2.0f / TopMinusBottom;
+  Mat.Data[2][2] = -2.0f / zFarMinusNear;
+  Mat.Data[3][0] = -(Right + Left) / RightMinusLeft;
+  Mat.Data[3][1] = -(Top + Bottom) / TopMinusBottom;
+  Mat.Data[3][2] = -(zFar + zNear) / zFarMinusNear;
   Mat.Data[3][3] = 1.0f;
-#endif
 }
 
 // TODO: Platform specific optimizations
 void URenderDevice::GetPerspectiveMatrix( FMatrix4x4& Mat, float FOV, float Width, float Height, float zNear, float zFar )
 {
+  float zFarMinusNear = (zFar - zNear);
+  float Aspect = (Width) / (Height);
+  float tanFov = tanf( DEG2RAD(FOV) / 2 );
+
   // Validate parameters
-  if ( Width <= FLT_EPSILON || Height <= FLT_EPSILON || fabsf( zNear - zFar ) <= FLT_EPSILON )
+  if ( Width <= FLT_EPSILON || Height <= FLT_EPSILON || fabsf( zFarMinusNear ) <= FLT_EPSILON )
   {
     GLogf( LOG_WARN, "Invalid ortho matrix parameters" );
     return;
   }
 
-  float Aspect = (Width) / (Height);
-  float tanFov = tanf( FOV / 2 );
-
   memset( &Mat, 0, sizeof( Mat ) );
-  Mat.Data[0][0] = 1 / (Aspect * tanFov );
+  Mat.Data[0][0] = 1 / (Aspect * tanFov);
   Mat.Data[1][1] = 1 / tanFov;
-  Mat.Data[2][2] = -(zFar + zNear) / (zFar - zNear);
+  Mat.Data[2][2] = -(zFar + zNear) / zFarMinusNear;
   Mat.Data[2][3] = -1.0f;
-  Mat.Data[3][2] = -(2 * zFar * zNear) / (zFar - zNear);
+  Mat.Data[3][2] = -(2.0f * zFar * zNear) / zFarMinusNear;
+}
+
+/*-----------------------------------------------------------------------------
+ * DrawWorld
+-----------------------------------------------------------------------------*/
+
+void URenderDevice::DrawWorld( ULevel* Level, UViewport* Viewport )
+{
+  // Get the root node and start there
+  FBspNode& Node = Level->Model->Nodes[0];
+  TraverseBspNode( Level->Model, Node, Viewport, false );
+}
+
+void URenderDevice::TraverseBspNode( UModel* Model, FBspNode& Node, UViewport* Viewport, bool bAccept )
+{
+  // If we haven't accepted this node, that means we need to check if we can see it
+  if ( !bAccept && Node.iRenderBound >= 0 )
+  {
+    FBox& RenderBox = Model->Bounds[Node.iRenderBound];
+    if ( !Viewport->IsBoxVisible( RenderBox ) )
+      return;
+  }
+
+  // Traverse down the front node
+  if ( Node.iFront >= 0 )
+    TraverseBspNode( Model, Model->Nodes[Node.iFront], Viewport, bAccept );
+
+  // Traverse down the back node
+  if ( Node.iBack >= 0 )
+    TraverseBspNode( Model, Model->Nodes[Node.iBack], Viewport, bAccept );
+
+  // Plane child nodes are always recursed through
+  if ( Node.iPlane >= 0 )
+    TraverseBspNode( Model, Model->Nodes[Node.iPlane], Viewport, true );
+
+  // Tick this texture if necessary
+  Model->Surfs[Node.iSurf].Texture->Tick( GEngine->CurrentDeltaTime );
+
+  // Draw this node
+  DrawBspSurface( Model, Node, Viewport );
 }
 
 URenderBase::URenderBase()

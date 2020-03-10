@@ -27,6 +27,8 @@
 
 #include "Core/UMath.h"
 #include "Core/USystem.h"
+#include "Engine/UModel.h"
+#include "Engine/UMesh.h"
 #include "Engine/UTexture.h"
 #include "Engine/UFire.h"
 
@@ -87,14 +89,21 @@ class LIBUNR_API URenderDevice : public USubsystem
 
   virtual bool Init() { return false; }
   virtual bool Exit() { return false; }
-  virtual void Tick( float DeltaTime ) {}
+  virtual void Tick( float DeltaTime );
 
   bool bAccelerateFractalTextures;
+  FMatrix4x4 ViewMatrix;
 
   /*-----------------------------------------------------------------------------
    * Matrix functions
    * Used for generating matrices for the render device to use
 -  ----------------------------------------------------------------------------*/
+  
+  // Generates a model matrix based on given properties
+  virtual void GetModelMatrix( FMatrix4x4& Mat, FVector& Location, FRotator& Rotation, FVector& Scale );
+
+  // Generates a view matrix based on the camera
+  virtual void GetViewMatrix( FMatrix4x4& Mat, FVector& ViewLoc, FRotator& ViewRot );
 
   // Generates an orthographic matrix for 2D drawing
   virtual void GetOrthoMatrix( FMatrix4x4& Mat, float Left, float Right, float Top, float Bottom, float zNear, float zFar );
@@ -108,10 +117,16 @@ class LIBUNR_API URenderDevice : public USubsystem
 -  ----------------------------------------------------------------------------*/
 
   // Draws the current world from the perspective of a viewport
-  virtual void DrawWorld( ULevel* Level, UViewport* Viewport ) {}
+  virtual void DrawWorld( ULevel* Level, UViewport* Viewport );
 
   // Draws an actor in the world
   virtual void DrawActor( AActor* Actor ) {}
+
+  // Recursively traverses bsp nodes, drawing bsp surfaces along the way
+  virtual void TraverseBspNode( UModel* Model, FBspNode& Node, UViewport* Viewport, bool bAccept );
+
+  // Draws a bsp surface
+  virtual void DrawBspSurface( UModel* Model, FBspNode& Node, UViewport* Viewport ) {}
 
   /*-----------------------------------------------------------------------------
    * Simple drawing functions
@@ -125,7 +140,7 @@ class LIBUNR_API URenderDevice : public USubsystem
   virtual void DrawTile( UTexture* Tex, FBoxInt2D& Dim, FRotator& Rot, float U, float V, float UL, float VL, int PolyFlags = 0 ) {}
 
   // Draws a mesh on the screen
-  virtual void DrawMesh( UMesh* Mesh, FName AnimSeq, float AnimRate, FVector& Loc, FVector& Scale, FRotator& Rot, int PolyFlags = 0 ) {}
+  virtual void DrawMesh( UMesh* Mesh, FMeshAnimSeq& AnimSeq, float AnimFrame, FVector& Loc, FVector& Scale, FRotator& Rot, int PolyFlags = 0 ) {}
 
   // Draws a frame of a fire texture with renderer accelerated method
   virtual void DrawFireTexFrame( UFireTexture* Tex, float DeltaTime ) {}

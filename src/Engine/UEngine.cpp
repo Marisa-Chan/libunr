@@ -50,6 +50,35 @@ bool UClient::Exit()
   return false;
 }
 
+void UClient::HandleInput( int Key, bool bDown )
+{
+  if ( Key < 0xFF && Key >= 0x00 )
+    if ( InputFuncs[Key] != NULL )
+      InputFuncs[Key]( (EInputKey)Key, Engine->CurrentDeltaTime, bDown );
+}
+
+void UClient::HandleMouseInput( int XPos, int YPos )
+{
+  if ( MouseFunc != NULL )
+  {
+    // Get delta movement from center of screen
+    int DeltaX = (CurrentViewport->Width / 2) - XPos;
+    int DeltaY = (CurrentViewport->Height / 2) - YPos;
+    MouseFunc( Engine->CurrentDeltaTime, DeltaX, DeltaY );
+  }
+}
+
+void UClient::BindKeyInput( EInputKey Key, InputFunc Func )
+{
+  if ( Key < 0xFF && Key >= 0x00 )
+    InputFuncs[Key] = Func;
+}
+
+void UClient::BindMouseInput( AxisInputFunc Func )
+{
+  MouseFunc = Func;
+}
+
 /*-----------------------------------------------------------------------------
  * UEngine
 -----------------------------------------------------------------------------*/
@@ -81,6 +110,12 @@ UEngine::~UEngine()
 
 bool UEngine::Init()
 {
+  Pkg = UPackage::StaticLoadPackage( "Engine" );
+
+  // Load default & white texture
+  DefaultTexture = (UTexture*)StaticLoadObject( Pkg, "DefaultTexture", UTexture::StaticClass(), NULL );
+  WhiteTexture = (UTexture*)StaticLoadObject( Pkg, "WhiteTexture", UTexture::StaticClass(), NULL );
+
   // Initialize our client
   FString ClientClassStr = GLibunrConfig->ReadString( "Engine.Engine", "Client", 0, DEFAULT_CLIENT );
   
@@ -97,6 +132,7 @@ bool UEngine::Init()
     GLogf( LOG_CRIT, "Failed to initialize local client" );
     return false;
   }
+  Client->Engine = this;
   
   // Init audio device
   FString Device( GSystem->AudioDevice );
@@ -197,6 +233,8 @@ void UEngine::Tick( float DeltaTime )
 {
   if ( DeltaTime <= FLT_MIN )
     DeltaTime = FLT_MIN;
+
+  CurrentDeltaTime = DeltaTime;
 
   // Process audio
   if ( Audio )

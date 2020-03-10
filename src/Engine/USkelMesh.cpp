@@ -127,7 +127,7 @@ bool USkeletalMesh::ExportToFile( const char* Dir, const char* Type )
 
   // Open psk file
   FStringFilePath Filename( Dir, Name.Data(), Type );
-  FFileArchiveOut Out();
+  FFileArchiveOut Out;
   if ( Out.Open( Filename ) != 0 )
   {
     GLogf( LOG_WARN, "Failed to export skeletal mesh to file '%s'", Filename.Data() );

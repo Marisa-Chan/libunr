@@ -71,6 +71,7 @@
   #define DLL_IMPORT __declspec(dllimport)
 
   #define ALIGN(n) __declspec(align(n))
+  #define DEBUGBREAK __debugbreak
 
 #ifdef LIBUNR_EXPORTS
   #define LIBUNR_API DLL_EXPORT

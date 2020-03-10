@@ -60,6 +60,41 @@ FString& FString::operator+=( FName Name )
   return *this;
 }
 
+FString operator+( FString& A, const FString& Str )
+{
+  FString Out = A;
+  A.Append( Str );
+  return Out;
+}
+
+FString operator+( FString& A, const string& Str )
+{
+  FString Out = A;
+  A.Append( Str );
+  return Out;
+}
+
+FString operator+( FString& A, const char* s )
+{
+  FString Out = A;
+  A.Append( s );
+  return Out;
+}
+
+FString operator+( FString& A, char c )
+{
+  FString Out = A;
+  A.Append( c );
+  return Out;
+}
+
+FString operator+( FString& A, FName Name )
+{
+  FString Out = A;
+  A.Append( Name.Data() );
+  return Out;
+}
+
 bool operator==( const FString& lhs, const FString& rhs )
 {
   return (string&)lhs == (string&)rhs;

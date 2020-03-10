@@ -96,10 +96,6 @@ bool UWindowsClient::CloseViewport( UViewport* Viewport )
   return Result;
 }
 
-void UWindowsClient::HandleInput( int Key, bool bDown )
-{
-}
-
 void UWindowsClient::Tick( float DeltaTime )
 {
   MSG Msg;
@@ -110,6 +106,19 @@ void UWindowsClient::Tick( float DeltaTime )
     TranslateMessage( &Msg );
     DispatchMessage( &Msg );
   }
+}
+
+void UWindowsClient::HandleMouseInput( int XPos, int YPos )
+{
+  // Handle normal mouse input
+  Super::HandleMouseInput( XPos, YPos );
+
+  // Reset mouse to center of screen
+  POINT Center;
+  Center.x = CurrentViewport->Width / 2;
+  Center.y = CurrentViewport->Height / 2;
+  ClientToScreen( ((UWindowsViewport*)CurrentViewport)->Window, &Center );
+  SetCursorPos( Center.x, Center.y );
 }
 
 #include "Core/UClass.h"

@@ -86,7 +86,7 @@ class LIBUNR_API UFireTexture : public UFractalTexture
     SPARK_Jugglers,
     SPARK_Emit,
     SPARK_Fountain,
-    SPARK_FLocks,
+    SPARK_Flocks,
     SPARK_Eels,
     SPARK_Organic,
     SPARK_WanderOrganic,

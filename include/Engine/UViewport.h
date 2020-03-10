@@ -31,6 +31,9 @@
 class UClient;
 class UTexture;
 
+#define ZNEAR (0.1f)
+#define ZFAR  (65536.0f)
+
 class LIBUNR_API UViewport : public UPlayer
 {
   DECLARE_NATIVE_CLASS( UViewport, UPlayer, CLASS_NoExport, Engine )
@@ -43,11 +46,24 @@ class LIBUNR_API UViewport : public UPlayer
   virtual bool Resize( int NewWidth, int NewHeight ) { return false; }
   virtual bool SetCursor( UTexture* Cursor ) { return false; }
   virtual void SetViewportTitle( const char* NewTitle ) {}
+  virtual void SetupFrustum();
+
+  bool IsBoxVisible( FBox& Box );
 
   int Width;
   int Height;
   int BitsPerPixel;
   const char* Title;
+
+  // FOV properties
+  float Fov;
+  float TanHalfXFov;
+  float TanHalfYFov;
+
+  // Viewport clipping properties
+  FPlane Frustum[4];
+  FPlane NearPlane;
+  FPlane FarPlane;
 
   UClient* Client;
   URenderDevice* RenderDevice;

@@ -27,6 +27,7 @@
 //#include "FLog.h"
 #include "Core/UPackage.h"
 #include "Core/UProperty.h"
+#include "Engine/UEngine.h"
 #include "Engine/UTexture.h"
 
 UPalette::UPalette()
@@ -79,6 +80,12 @@ UTexture::~UTexture()
 
 void UTexture::Tick( float DeltaTime )
 {
+  // Tick once per frame
+  if ( CurrentTick == GEngine->TickCycles )
+    return;
+
+  CurrentTick = GEngine->TickCycles;
+
   // Handle texture animation if necessary
   if ( AnimCurrent->AnimNext != NULL )
   {
@@ -126,6 +133,7 @@ void UTexture::Load()
 
     // Read mip map data
     *PkgFile >> CINDEX( MipMapSize );
+    memset( &Mips[i], 0, sizeof( FMipmap ) );
     Mips[i].DataArray.Resize( MipMapSize );
     PkgFile->Read( Mips[i].DataArray.Data(), MipMapSize );
 
