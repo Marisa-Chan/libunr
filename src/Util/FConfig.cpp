@@ -761,6 +761,11 @@ FConfig::FConfigEntry* FConfig::FConfigCategory::GetEntryFromName( const char* S
   return NULL;
 }
 
+TArray<FConfig::FConfigCategory*>* FConfig::GetCategories()
+{
+    return &Categories;
+}
+
 FConfigManager::FConfigManager()
 {
 }
