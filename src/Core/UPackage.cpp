@@ -679,7 +679,7 @@ UPackage* UPackage::StaticLoadPackage( const char* PkgName, bool bSearch )
       
       for ( int i = 0; i < Packages->Size(); i++ )
       {
-      UPackage** lpkg = &Packages->Data()[i];
+      UPackage** lpkg = &(Packages->Data()[i]);
 
         if ( *lpkg == Pkg )
         {
@@ -693,7 +693,26 @@ UPackage* UPackage::StaticLoadPackage( const char* PkgName, bool bSearch )
     }
 
     Pkg->Name = FName( ActualName, RF_LoadContextFlags );
-    Packages->PushBack( Pkg );
+
+    //Search for empty package slot.
+    int newIndex = -1;
+
+    for ( int i = 0; i < Packages->Size(); i++ )
+    {
+      UPackage** lpkg = &(Packages->Data()[i]);
+
+      //Fill slot.
+      if ( *lpkg == NULL )
+      {
+        *lpkg = Pkg;
+        newIndex = i;
+        break;
+      }
+    }
+
+    //If we didn't find an empty slot, just throw it at the end.
+    if( newIndex == -1 )
+      Packages->PushBack( Pkg );
   }
   else if ( Pkg->Stream == NULL )
   {
@@ -705,7 +724,7 @@ UPackage* UPackage::StaticLoadPackage( const char* PkgName, bool bSearch )
       
       for ( int i = 0; i < Packages->Size(); i++ )
       {
-        UPackage** lpkg = &Packages->Data()[i];
+        UPackage** lpkg = &(Packages->Data()[i]);
 
         if ( *lpkg == Pkg )
         {
@@ -727,7 +746,27 @@ UPackage* UPackage::StaticLoadPackage( const char* PkgName, bool bSearch )
 UPackage* UPackage::StaticCreatePackage( const char* InName, UNativeModule* InNativeModule )
 {
   UPackage* Pkg = new UPackage( InName, InNativeModule );
-  Packages->PushBack( Pkg );
+
+  //Search for empty package slot.
+  int newIndex = -1;
+
+  for ( int i = 0; i < Packages->Size(); i++ )
+  {
+    UPackage** lpkg = &(Packages->Data()[i]);
+
+    //Fill slot.
+    if ( *lpkg == NULL )
+    {
+      *lpkg = Pkg;
+      newIndex = i;
+      break;
+    }
+  }
+
+  //If we didn't find an empty slot, just throw it at the end.
+  if( newIndex == -1 )
+    Packages->PushBack( Pkg );
+
   return Pkg;
 }
 
