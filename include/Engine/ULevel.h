@@ -26,7 +26,6 @@
 #pragma once
 
 #include "Util/FString.h"
-#include "Util/TMap.h"
 #include "Core/UClass.h"
 #include "Engine/UEngine.h"
 #include "Engine/UModel.h"
@@ -87,6 +86,5 @@ class LIBUNR_API ULevel : public ULevelBase
   UModel* Model;
   UTextBuffer* TextBlocks[16];
   double TimeSeconds;
-  TMap<FString,FString> TravelInfo;
 };
 

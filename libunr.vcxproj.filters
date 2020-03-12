@@ -258,9 +258,6 @@
     <ClInclude Include="include\Util\TArray.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
-    <ClInclude Include="include\Util\TMap.h">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
     <ClInclude Include="include\Util\TQueue.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>

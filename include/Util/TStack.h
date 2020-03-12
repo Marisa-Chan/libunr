@@ -24,21 +24,46 @@
 */
 
 #pragma once
-#include <stack>
-#include "Util/FMacro.h"
+#include "Util/TArray.h"
 
-using std::stack;
-template<class T> class TStack : public stack<T>
+template<class T> class TStack : protected TArray<T>
 {
 public:
-  TStack<T>() : stack<T>() {}
+  TStack<T>() : TArray<T>() {}
 
-  FORCEINLINE bool   Empty() const          { return stack<T>::empty(); }
-  FORCEINLINE void   Pop()                  { stack<T>::pop(); }
-  FORCEINLINE void   Push( const T& Value ) { stack<T>::push(Value); }
-  FORCEINLINE size_t Size() const           { return stack<T>::size(); }
-  FORCEINLINE void Swap( TStack<T>& x )     { stack<T>::swap(x); }
-  FORCEINLINE T& Top()                      { return stack<T>::top(); }
-  FORCEINLINE const T& Top() const          { return stack<T>::top(); }
+  FORCEINLINE bool IsEmpty()
+  { 
+    return TArray<T>::IsEmpty(); 
+  }
+
+  FORCEINLINE void Pop()
+  {
+    TArray<T>::PopBack();
+  }
+
+  FORCEINLINE void Push( const T& Value )
+  {
+    TArray<T>::PushBack( Value );
+  }
+
+  FORCEINLINE size_t Size() const
+  { 
+    return TArray<T>::NumElements;
+  }
+
+  FORCEINLINE void Swap( TStack<T>& x )
+  {
+    TArray<T>::Swap( (TArray<T>&)x );
+  }
+
+  FORCEINLINE T& Top()
+  { 
+    return TArray<T>::Back();
+  }
+
+  FORCEINLINE const T& Top() const
+  { 
+    return TArray<T>::Back();
+  }
 };
 

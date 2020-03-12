@@ -89,7 +89,6 @@
     <ClInclude Include="include\Util\FTypes.h" />
     <ClInclude Include="include\Util\TArray.h" />
     <ClInclude Include="include\Util\TDestructorInfo.h" />
-    <ClInclude Include="include\Util\TMap.h" />
     <ClInclude Include="include\Util\TQueue.h" />
     <ClInclude Include="include\Util\TRingQueue.h" />
     <ClInclude Include="include\Util\TStack.h" />
