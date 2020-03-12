@@ -292,17 +292,6 @@ bool UPackage::Load( const char* File )
   Path.Assign( File );
   Path.ReplaceChars( '\\', '/' );
   
-  u64 LastDirSlash = Path.FindLastOf( "/" );
- 
-  FString PkgName;
-  if (LastDirSlash != MAX_SIZE)
-    PkgName = Path.Substr( Path.FindLastOf( "/" ) );
-  else
-    PkgName = Path;
-  
-  
-  PkgName.Erase( PkgName.FindLastOf( "." ) );
-  
   Stream = new FPackageFileIn();
   if ( Stream->Open( Path ) != 0 )
     return false;

@@ -103,6 +103,16 @@ public:
       Array[i] = x[i];
   }
 
+  ~TArray<T>()
+  {
+    if ( TDestructorInfo<T>::NeedsDestructor() )
+      for ( int i = 0; i < NumElements; i++ )
+        Array[i].~T();
+
+    NumElements = 0;
+    Reclaim();
+  }
+
   TArray<T>& operator=( const TArray<T>& Rhs )
   {
     ElementSize = sizeof( T );
@@ -170,14 +180,8 @@ public:
 
   FORCEINLINE void Reserve( size_t n )                
   { 
-    // Call destructors if needed
-    if ( TDestructorInfo<T>::NeedsDestructor() && n < NumElements )
-    {
-      for ( int i = n; i < NumElements; i++ )
-        Array[i].~T();
-
-      NumElements = n;
-    }
+    if ( n < NumElements )
+      return;
 
     T* NewArray = NULL;
     if ( n == 0 )
@@ -200,7 +204,26 @@ public:
 
   FORCEINLINE void Reclaim ()                         
   { 
-    Reserve( NumElements );
+    if ( NumElements == NumReserved )
+      return;
+
+    T* NewArray = NULL;
+    if ( NumElements == 0 )
+    {
+      free( Array );
+    }
+    else
+    {
+      NewArray = (T*)realloc( Array, NumElements * sizeof( T ) );
+      if ( NewArray == NULL )
+      {
+        // throw an error here if we fail
+        return;
+      }
+    }
+
+    Array = NewArray;
+    NumReserved = NumElements;
   }
 
   FORCEINLINE T& At ( size_t n ) const

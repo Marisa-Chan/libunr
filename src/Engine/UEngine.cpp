@@ -179,7 +179,7 @@ bool UEngine::Init()
   
   // Init Render Device
   Device = FString( GSystem->RenderDevice );
-  if ( Device == FString( "None" ) || Device.IsEmpty() )
+  if ( Device == "None" || Device.IsEmpty() )
   {
     GLogf( LOG_WARN, "Null RenderDevice selected." );
   }

@@ -37,6 +37,7 @@ public:
   FString();
   FString( const FString& Str );
   FString( const FString& Str, size_t Pos, size_t Len = MAX_SIZE );
+  FString( FString&& Str ) noexcept;
   FString( const char* s );
   FString( const char* s, size_t n );
   FString( size_t n, char c );
@@ -190,26 +191,30 @@ public:
   FString Substr( size_t Pos = 0, size_t Len = MAX_SIZE ) const;
   void ReplaceChars( char Old, char New );
 
+  FString& operator=( const FString& Str );
+  FString& operator=( FString&& Str ) noexcept;
+
   FString& operator+=( const FString& Str );
   FString& operator+=( const char* s );
   FString& operator+=( char c );
   FString& operator+=( FName Name );
  
   friend LIBUNR_API FString operator+( const FString& lhs, const FString& rhs );
-  friend LIBUNR_API FString operator+( const FString& lhs, const char* rhs );
+  friend LIBUNR_API FString operator+( const char* const lhs, const FString& rhs );
+  friend LIBUNR_API FString operator+( const FString& lhs, const char* const rhs );
   friend LIBUNR_API FString operator+( const FString& lhs, char rhs );
   friend LIBUNR_API FString operator+( const FString& lhs, FName rhs );
 
   friend LIBUNR_API FPackageFileIn&  operator>>( FPackageFileIn& In, FString& Str );
   friend LIBUNR_API FPackageFileOut& operator<<( FPackageFileOut& Out, FString& Str );
 
-  friend bool operator==( const FString& lhs, const FString& rhs );
-  friend bool operator==( const char* lhs,    const FString& rhs );
-  friend bool operator==( const FString& lhs, const char*   rhs );
+  friend LIBUNR_API bool operator==( const FString& lhs, const FString& rhs );
+  friend LIBUNR_API bool operator==( const char* const lhs, const FString& rhs );
+  friend LIBUNR_API bool operator==( const FString& lhs,    const char* const rhs );
 
-  friend bool operator!=( const FString& lhs, const FString& rhs );
-  friend bool operator!=( const char* lhs,    const FString& rhs );
-  friend bool operator!=( const FString& lhs, const char*   rhs );
+  friend LIBUNR_API bool operator!=( const FString& lhs,    const FString& rhs );
+  friend LIBUNR_API bool operator!=( const char* const lhs, const FString& rhs );
+  friend LIBUNR_API bool operator!=( const FString& lhs,    const char* const rhs );
 
 protected:
   char* Array;

@@ -43,7 +43,7 @@ FString::FString( const FString& Str )
   NumElements = Str.NumElements;
   NumReserved = Str.NumElements * 2;
   Array = (char*)malloc( NumReserved );
-  memset( Array, 0, NumReserved );
+  memcpy( Array, Str.Array, NumElements + 1 );
 }
 
 FString::FString( const FString& Str, size_t Pos, size_t Len )
@@ -52,6 +52,17 @@ FString::FString( const FString& Str, size_t Pos, size_t Len )
   NumReserved = Len * 2;
   Array = (char*)malloc( NumReserved );
   Append( Str, Pos, Len );
+}
+
+FString::FString( FString&& Str ) noexcept
+{
+  Array = Str.Array;
+  NumElements = Str.NumElements;
+  NumReserved = Str.NumReserved;
+
+  Str.Array = NULL;
+  Str.NumElements = 0;
+  Str.NumReserved = 0;
 }
 
 FString::FString( const char* s )
@@ -89,7 +100,7 @@ FString::FString( int I )
 
   do
   {
-    *--Ptr = '0' - (I % 10);
+    *--Ptr = '0' + (I % 10);
     I /= 10;
   } while ( I );
 
@@ -112,7 +123,7 @@ FString::FString( i64 I )
 
   do
   {
-    *--Ptr = '0' - (I % 10);
+    *--Ptr = '0' + (I % 10);
     I /= 10;
   } while ( I );
 
@@ -133,7 +144,7 @@ FString::FString( u32 U )
 
   do
   {
-    *--Ptr = '0' - (U % 10);
+    *--Ptr = '0' + (U % 10);
     U /= 10;
   } while ( U );
 
@@ -151,7 +162,7 @@ FString::FString( u64 U )
 
   do
   {
-    *--Ptr = '0' - (U % 10);
+    *--Ptr = '0' + (U % 10);
     U /= 10;
   } while ( U );
 
@@ -163,6 +174,10 @@ FString::FString( u64 U )
 
 FString::FString( float F )
 {
+  NumElements = 0;
+  NumReserved = 0;
+  Array = NULL;
+
   Resize( 64 );
   sprintf( Array, "%0.6f", F );
   NumElements = strlen( Array );
@@ -170,6 +185,10 @@ FString::FString( float F )
 
 FString::FString( double D )
 {
+  NumElements = 0;
+  NumReserved = 0;
+  Array = NULL;
+
   Resize( 64 );
   sprintf( Array, "%0.12lf", D );
   NumElements = strlen( Array );
@@ -186,8 +205,11 @@ FString::FString( bool B )
 
 FString::~FString()
 {
-  free( Array );
-  Array = NULL;
+  if ( Array )
+  {
+    free( Array );
+    Array = NULL;
+  }
 }
 
 void FString::Resize( size_t n )
@@ -212,7 +234,13 @@ void FString::Resize( size_t n, char c )
 
 void FString::Reserve( size_t n )
 {
-  // Call destructors if needed
+  if ( Array == NULL )
+  {
+    Array = (char*)malloc( n );
+    NumReserved = n;
+    return;
+  }
+
   if ( n < NumElements )
   {
     NumElements = n;
@@ -266,8 +294,9 @@ FString& FString::Append( const char* s, size_t n )
   if ( !Array || n + 1 > NumReserved - NumElements )
     Reserve( (NumReserved + n) * 2 );
 
-  for ( int i = 0; i < n; i++ )
-    Array[i + NumElements] = s[i];
+  //for ( int i = 0; i < n; i++ )
+  //  Array[i + NumElements] = s[i];
+  memcpy( &Array[NumElements], s, n );
 
   NumElements += n;
   Array[NumElements] = '\0';
@@ -379,18 +408,21 @@ FString& FString::Insert( size_t Pos, size_t n, char c )
 
 FString& FString::Erase( size_t Pos, size_t Len )
 {
-  if ( Len == MAX_SIZE )
+  if ( Array )
   {
-    NumElements = Pos;
-  }
-  else
-  {
-    NumElements -= Len;
-    if ( Pos < NumElements )
-      memmove( &Array[Pos], &Array[Pos + Len], NumElements - Len );
-  }
+    if ( Len == MAX_SIZE )
+    {
+      NumElements = Pos;
+    }
+    else
+    {
+      NumElements -= Len;
+      if ( Pos < NumElements )
+        memmove( &Array[Pos], &Array[Pos + Len], NumElements - Len );
+    }
 
-  Array[NumElements] = '\0';
+    Array[NumElements] = '\0';
+  }
   return *this;
 }
 
@@ -891,6 +923,24 @@ void FString::ReplaceChars( char Old, char New )
   }
 }
 
+FString& FString::operator=( const FString& Str )
+{
+  return Assign( Str );
+}
+
+FString& FString::operator=( FString&& Str ) noexcept
+{
+  Array = Str.Array;
+  NumElements = Str.NumElements;
+  NumReserved = Str.NumReserved;
+
+  Str.Array = NULL;
+  Str.NumElements = 0;
+  Str.NumReserved = 0;
+
+  return *this;
+}
+
 FString& FString::operator+=( const FString& Str )
 {
   return Append( Str );
@@ -918,7 +968,13 @@ FString operator+( const FString& lhs, const FString& rhs )
   return Out.Append( rhs );
 }
 
-FString operator+( const FString& lhs, const char* rhs )
+FString operator+( const char* const lhs, const FString& rhs )
+{
+  FString Out = lhs;
+  return Out.Append( rhs );
+}
+
+FString operator+( const FString& lhs, const char* const rhs )
 {
   FString Out = lhs;
   return Out.Append( rhs );
@@ -944,12 +1000,44 @@ bool operator==( const FString& lhs, const FString& rhs )
   return (memcmp( lhs.Array, rhs.Array, lhs.NumElements ) == 0);
 }
 
+bool operator==( const char* const lhs, const FString& rhs )
+{
+  if ( strlen( lhs ) != rhs.NumElements )
+    return false;
+
+  return (memcmp( lhs, rhs.Array, rhs.NumElements ) == 0);
+}
+
+bool operator==( const FString& lhs, const char* rhs )
+{
+  if ( lhs.NumElements != strlen( rhs ) )
+    return false;
+
+  return (memcmp( lhs.Array, rhs, lhs.NumElements ) == 0);
+}
+
 bool operator!=( const FString& lhs, const FString& rhs )
 {
   if ( lhs.NumElements != rhs.NumElements )
     return true;
 
   return (memcmp( lhs.Array, rhs.Array, lhs.NumElements ) != 0);
+}
+
+bool operator!=( const char* lhs, const FString& rhs )
+{
+  if ( strlen( lhs ) == rhs.NumElements )
+    return true;
+
+  return (memcmp( lhs, rhs.Array, rhs.NumElements ) != 0);
+}
+
+bool operator!=( const FString& lhs, const char* rhs )
+{
+  if ( lhs.NumElements == strlen( rhs ) )
+    return true;
+
+  return (memcmp( lhs.Array, rhs, lhs.NumElements ) != 0);
 }
 
 LIBUNR_API FPackageFileIn& operator>>( FPackageFileIn& In, FString& Str )

@@ -497,3 +497,13 @@ struct LIBUNR_API FScale
   }
 };
 
+template <> struct TDestructorInfo<FBox>      { static FORCEINLINE bool NeedsDestructor() { return false; } };
+template <> struct TDestructorInfo<FBox2D>    { static FORCEINLINE bool NeedsDestructor() { return false; } };
+template <> struct TDestructorInfo<FBoxInt2D> { static FORCEINLINE bool NeedsDestructor() { return false; } };
+template <> struct TDestructorInfo<FCoords>   { static FORCEINLINE bool NeedsDestructor() { return false; } };
+template <> struct TDestructorInfo<FPlane>    { static FORCEINLINE bool NeedsDestructor() { return false; } };
+template <> struct TDestructorInfo<FQuat>     { static FORCEINLINE bool NeedsDestructor() { return false; } };
+template <> struct TDestructorInfo<FRotator>  { static FORCEINLINE bool NeedsDestructor() { return false; } };
+template <> struct TDestructorInfo<FScale>    { static FORCEINLINE bool NeedsDestructor() { return false; } };
+template <> struct TDestructorInfo<FSphere>   { static FORCEINLINE bool NeedsDestructor() { return false; } };
+template <> struct TDestructorInfo<FVector>   { static FORCEINLINE bool NeedsDestructor() { return false; } };
