@@ -97,6 +97,8 @@ FString::FString( int I )
   *--Ptr = '\0';
 
   bool Neg = (I < 0);
+  if ( Neg )
+    I = -I;
 
   do
   {
@@ -120,7 +122,9 @@ FString::FString( i64 I )
   *--Ptr = '\0';
 
   bool Neg = (I < 0);
-
+  if ( Neg )
+    I = -I;
+  
   do
   {
     *--Ptr = '0' + (I % 10);
