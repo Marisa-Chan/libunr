@@ -25,6 +25,7 @@
 
 #pragma once
 #include "Util/FGuid.h"
+#include "Util/FString.h"
 #include "Core/UObject.h"
 #include "Core/UNativeModule.h"
 

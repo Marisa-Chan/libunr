@@ -23,6 +23,7 @@
  *========================================================================
 */
 
+#include "Util/FString.h"
 #include "Core/UNativeModule.h"
 #include "Core/USystem.h"
 #include "Core/UClass.h"

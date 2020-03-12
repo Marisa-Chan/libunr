@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include "Util/FString.h"
 #include "Util/TMap.h"
 #include "Core/UClass.h"
 #include "Engine/UEngine.h"

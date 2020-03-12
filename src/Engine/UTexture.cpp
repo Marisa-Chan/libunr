@@ -24,7 +24,7 @@
  *========================================================================
 */
 
-//#include "FLog.h"
+#include "Util/FString.h"
 #include "Core/UPackage.h"
 #include "Core/UProperty.h"
 #include "Engine/UEngine.h"

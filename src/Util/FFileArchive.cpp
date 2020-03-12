@@ -24,6 +24,7 @@
 */
 
 #include "Util/FFileArchive.h"
+#include "Util/FString.h"
 
 #include <stdarg.h>
 

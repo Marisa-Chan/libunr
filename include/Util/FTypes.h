@@ -41,7 +41,7 @@ typedef signed long long i64;
 #define MAX_UINT8  0xff
 #define MAX_UINT16 0xffff
 #define MAX_UINT32 0xffffffff
-#define MAX_UINT64 0xfffffffffffffff
+#define MAX_UINT64 0xffffffffffffffff
 
 #define MAX_INT8  0x7f
 #define MAX_INT16 0x7fff

@@ -23,6 +23,7 @@
  *========================================================================
 */
 
+#include "Util/FString.h"
 #include "Core/UClass.h"
 #include "Core/UPackage.h"
 #include "Core/UProperty.h"

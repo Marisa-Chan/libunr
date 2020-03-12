@@ -145,7 +145,7 @@ bool UEngine::Init()
   {
   
     size_t Dot = Device.Find( '.' );
-    if ( Dot == string::npos )
+    if ( Dot == MAX_SIZE )
     {
       GLogf( LOG_ERR, "Incorrectly formatted AudioDevice setting in libunr.ini" );
       return false;
@@ -186,7 +186,7 @@ bool UEngine::Init()
   else
   {
     size_t Dot = Device.Find( '.' );
-    if ( Dot == string::npos )
+    if ( Dot == MAX_SIZE )
     {
       GLogf( LOG_ERR, "Incorrectly formatted RenderDevice setting in libunr.ini" );
       return false;

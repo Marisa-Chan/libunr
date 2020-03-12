@@ -24,14 +24,17 @@
 */
 
 #pragma once
-#include <vector>
+#include <new>
+#include <string.h>
 #include "Util/FMacro.h"
 #include "Util/FTypes.h"
 #include "Util/FFileArchive.h"
 #include "Util/TDestructorInfo.h"
 
-//using std::vector;
-template<class T> class TArray// : public vector<T>
+class FPackageFileIn;
+class FPackageFileOut;
+
+template<class T> class TArray
 {
 public:
   TArray<T>() 
@@ -65,7 +68,30 @@ public:
       Array[i] = Value;
   }
 
+  TArray<T>( const T* Ptr, size_t n )
+  {
+    ElementSize = sizeof( T );
+    NumBytes = n * sizeof( T );
+    NumElements = n;
+    NumReserved = n * 2;
+    Array = (T*)malloc( NumReserved * sizeof( T ) );
+
+    memcpy( Array, Ptr, n * sizeof( T ) );
+  }
+
   TArray<T>( TArray<T>& x )
+  {
+    ElementSize = sizeof( T );
+    NumBytes = x.NumBytes;
+    NumElements = x.NumElements;
+    NumReserved = x.NumReserved;
+    Array = (T*)malloc( NumReserved * sizeof( T ) );
+
+    for ( int i = 0; i < NumElements; i++ )
+      Array[i] = x[i];
+  }
+
+  TArray<T>( const TArray<T>& x )
   {
     ElementSize = sizeof( T );
     NumBytes = x.NumBytes;
@@ -210,10 +236,34 @@ public:
     if ( NumElements == 0 )
       DEBUGBREAK();
   #endif
+    return Array[NumElements - 1];
+  }
+
+  FORCEINLINE const T& Front() const
+  { 
+  #ifdef LIBUNR_DEBUG
+    if ( NumElements == 0 )
+      DEBUGBREAK();
+  #endif
+    return Array[0];
+  }
+
+  FORCEINLINE const T& Back() const
+  { 
+  #ifdef LIBUNR_DEBUG
+    if ( NumElements == 0 )
+      DEBUGBREAK();
+  #endif
+    return Array[NumElements - 1];
   }
 
   FORCEINLINE T* Data ()
   { 
+    return Array;
+  }
+
+  FORCEINLINE const T* Data() const
+  {
     return Array;
   }
 
@@ -229,7 +279,7 @@ public:
   FORCEINLINE void PushBack( const T& Val )
   { 
     if ( !Array || NumElements == NumReserved )
-      Reserve( NumReserved + 4 );
+      Reserve( (NumReserved * 2) + 4 );
 
     NumBytes += sizeof( T );
     Array[NumElements] = Val;
@@ -239,7 +289,7 @@ public:
   FORCEINLINE void PushBack( T& Val )
   {
     if ( !Array || NumElements == NumReserved )
-      Reserve( NumReserved + 4 );
+      Reserve( (NumReserved * 2) + 4 );
 
     NumBytes += sizeof( T );
     Array[NumElements] = Val;
@@ -311,6 +361,18 @@ public:
     NumElements += n;
   }
 
+  FORCEINLINE void Append( const T* x, size_t n )
+  {
+    if ( !Array || n > NumReserved - NumElements )
+      Reserve( (NumReserved + n) * 2 );
+
+    for ( int i = 0; i < n; i++ )
+      Array[i + NumElements] = x[i];
+
+    NumBytes += n * sizeof( T );
+    NumElements += n;
+  }
+
   FORCEINLINE void Erase( size_t Index )
   {
   #ifdef LIBUNR_DEBUG
@@ -325,19 +387,57 @@ public:
     // Copy everything backwards by one
     NumBytes -= sizeof( T );
     NumElements--;
-    memmove( &Array[Index], &Array[Index + 1], ElementSize * (NumElements - Index) );
+    
+    if ( Index < NumElements )
+      memmove( &Array[Index], &Array[Index + 1], ElementSize * (NumElements - Index) );
+  }
+
+  FORCEINLINE void Erase( size_t Index, size_t Num )
+  {
+  #ifdef LIBUNR_DEBUG
+    if ( Index >= NumElements )
+      DEBUGBREAK();
+  #endif
+
+    NumBytes -= Num * sizeof( T );
+    NumElements -= Num;
+
+    if ( Index < NumElements )
+      memmove( &Array[Index], &Array[Index + Num], ElementSize * (NumElements - Index) );
   }
 
   FORCEINLINE void Insert( T& x, size_t Pos )
   {
     if ( NumElements + 1 >= NumReserved )
-      Reserve( NumElements + 5 );
+      Reserve( (NumElements * 2) + 4 );
 
     // Copy everything forward by one
     NumBytes += sizeof( T );
     memmove( &Array[Pos + 1], &Array[Pos], ElementSize * (NumElements - Pos) );
     NumElements++;
     Array[Pos] = x;
+  }
+
+  FORCEINLINE void Insert( TArray<T>& x, size_t Pos )
+  {
+    if ( NumElements + x.NumElements >= NumReserved )
+      Reserve( (NumElements + x.NumElements) * 2 );
+
+    NumBytes += x.NumElements * sizeof( T );
+    memmove( &Array[Pos + x.NumElements], &Array[Pos], ElementSize * (NumElements - Pos) );
+    NumElements += x.NumElements;
+    memcpy( &Array[Pos], x.Array, ElementSize * x.NumElements );
+  }
+
+  FORCEINLINE void Insert( const T* x, size_t n, size_t Pos )
+  {
+    if ( NumElements + n >= NumReserved )
+      Reserve( (NumElements + n) * 2 );
+
+    NumBytes += n * sizeof( T );
+    memmove( &Array[Pos + n], &Array[Pos], ElementSize * (NumElements - Pos) );
+    NumElements += n;
+    memcpy( &Array[Pos], x, ElementSize * n );
   }
 
   friend FPackageFileIn& operator>>( FPackageFileIn& In, TArray<T>& Array )
@@ -351,17 +451,17 @@ public:
     return In;
   }
 
-  friend FPackageFileOut& operator>>( FPackageFileOut& Out, TArray<T>& Array )
+  friend FPackageFileOut& operator<<( FPackageFileOut& Out, TArray<T>& Array )
   {
-    Out << CINDEX( Array.Size() );
-    for ( int i = 0; i < Array.Size(); i++ )
+    Out << CINDEX( Array.NumElements );
+    for ( int i = 0; i < Array.NumElements; i++ )
       Out << Array[i];
     return Out;
   }
 
-  friend FFileArchiveOut& operator>>( FFileArchiveOut& Out, TArray<T>& Array )
+  friend FFileArchiveOut& operator<<( FFileArchiveOut& Out, TArray<T>& Array )
   {
-    for ( int i = 0; i < Array.Size(); i++ )
+    for ( int i = 0; i < Array.NumElements; i++ )
       Out << Array[i];
     return Out;
   }

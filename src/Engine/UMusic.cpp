@@ -24,6 +24,7 @@
  *========================================================================
 */
 
+#include "Util/FString.h"
 #include "Core/UPackage.h"
 #include "Core/USystem.h"
 #include "Engine/UEngine.h"

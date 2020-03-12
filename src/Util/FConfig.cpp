@@ -34,6 +34,7 @@
 #include "Util/FConfig.h"
 #include "Util/FFileArchive.h"
 #include "Util/FLogFile.h"
+#include "Util/FString.h"
 
 LIBUNR_API FConfigManager* GConfigManager = NULL;
 LIBUNR_API FConfig* GLibunrConfig = NULL;

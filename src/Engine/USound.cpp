@@ -24,6 +24,7 @@
  *========================================================================
 */
 
+#include "Util/FString.h"
 #include "Core/UPackage.h"
 #include "Engine/USound.h"
 

@@ -27,7 +27,8 @@
 
 #include "Util/FMacro.h"
 #include "Util/FTypes.h"
-#include "Util/FString.h"
+
+class FString;
 
 #ifdef LIBUNR_BIG_ENDIAN
   #define conditional_bswap_16 bswap_16
@@ -60,6 +61,12 @@ public:
   virtual size_t Seek( size_t Off, ESeekBase Base ) { return 0; }
   virtual size_t Tell() { return 0; }
   
+  friend FORCEINLINE FArchive& operator>>( FArchive& S, char& c )
+  {
+    S.Read( &c, 1 );
+    return S;
+  }
+
   friend FORCEINLINE FArchive& operator>>( FArchive& S, u8& b )
   { 
     S.Read( &b, 1 ); 
@@ -128,6 +135,12 @@ public:
     return S; 
   }
   
+  friend FORCEINLINE FArchive& operator<<( FArchive& S, char& c )
+  {
+    S.Write( &c, 1 );
+    return S;
+  }
+
   friend FORCEINLINE FArchive& operator<<( FArchive& S, u8& b )
   { 
     S.Write( &b, 1 ); 

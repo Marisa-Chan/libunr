@@ -27,6 +27,8 @@
 #define _FFILEARCHIVE_H_
 
 #pragma once
+#include <stdio.h>
+#include <stdlib.h>
 #include "Util/FArchive.h"
 
 /*-----------------------------------------------------------------------------
@@ -77,37 +79,6 @@ class LIBUNR_API FFileArchiveOut : public FFileArchive
 public:
   virtual int Open( const char* Filename );
   virtual int Open( const FString& Filename );
-};
-
-/*-----------------------------------------------------------------------------
- * FStringFilePath
- * An FString variant that ensures consistent state for a file path
------------------------------------------------------------------------------*/
-class LIBUNR_API FStringFilePath : public FString
-{
-public:
-  FStringFilePath( const char* InDir, const char* InName, const char* InExt=NULL );
-  FStringFilePath( const char* Path );
-  ~FStringFilePath()
-  {
-    if ( Dir )
-      free( Dir );
-
-    if ( Name )
-      free( Name );
-
-    if ( Ext )
-      free( Ext );
-  }
-
-  const char* GetDir();
-  const char* GetName();
-  const char* GetExt();
-
-protected:
-  char* Dir;
-  char* Name;
-  char* Ext;
 };
 
 #endif

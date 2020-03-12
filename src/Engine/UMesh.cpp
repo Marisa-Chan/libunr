@@ -23,6 +23,7 @@
  *========================================================================
 */
 
+#include "Util/FString.h"
 #include "Engine/UMesh.h"
 #include "Engine/UModel.h"
 

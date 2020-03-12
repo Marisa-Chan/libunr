@@ -28,6 +28,7 @@
 #include <sys/types.h>
 #include "Util/FBacktrace.h"
 #include "Util/FConfig.h"
+#include "Util/FString.h"
 #include "Core/USystem.h"
 #include "Core/UPackage.h"
 #include "Engine/UEngine.h"

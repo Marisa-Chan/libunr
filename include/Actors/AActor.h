@@ -24,7 +24,6 @@
 */
 
 #pragma once
-
 #include "Core/UMath.h"
 #include "Core/UObject.h"
 #include "Engine/UMesh.h"

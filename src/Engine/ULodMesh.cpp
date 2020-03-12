@@ -25,6 +25,7 @@
  *========================================================================
 */
 
+#include "Util/FString.h"
 #include "Core/UClass.h"
 #include "Engine/UModel.h"
 #include "Engine/ULodMesh.h"
