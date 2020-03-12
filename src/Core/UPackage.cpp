@@ -674,19 +674,65 @@ UPackage* UPackage::StaticLoadPackage( const char* PkgName, bool bSearch )
 
     if ( !Pkg->Load( Path ) )
     {
+      //Remove package from Packages array.
+      // FIXME: Does libunr look for empty slots when loading packages?
+      
+      for ( int i = 0; i < Packages->Size(); i++ )
+      {
+      UPackage** lpkg = &(Packages->Data()[i]);
+
+        if ( *lpkg == Pkg )
+        {
+        *lpkg = NULL;
+        }
+      }
+      
+
       delete Pkg;
       return NULL;
     }
 
     Pkg->Name = FName( ActualName, RF_LoadContextFlags );
-    Packages->PushBack( Pkg );
+
+    //Search for empty package slot.
+    int newIndex = -1;
+
+    for ( int i = 0; i < Packages->Size(); i++ )
+    {
+      UPackage** lpkg = &(Packages->Data()[i]);
+
+      //Fill slot.
+      if ( *lpkg == NULL )
+      {
+        *lpkg = Pkg;
+        newIndex = i;
+        break;
+      }
+    }
+
+    //If we didn't find an empty slot, just throw it at the end.
+    if( newIndex == -1 )
+      Packages->PushBack( Pkg );
   }
   else if ( Pkg->Stream == NULL )
   {
     // Native-only package needs to have it's scripted counter-part loaded
     if ( !Pkg->Load( Path ) )
     {
-      // FIXME: Package needs to be removed from the array here
+      //Remove package from Packages array.
+      // FIXME: Does libunr look for empty slots when loading packages?
+      
+      for ( int i = 0; i < Packages->Size(); i++ )
+      {
+        UPackage** lpkg = &(Packages->Data()[i]);
+
+        if ( *lpkg == Pkg )
+        {
+          *lpkg = NULL;
+        }
+      }
+      
+
       delete Pkg;
       return NULL;
     }
@@ -700,7 +746,27 @@ UPackage* UPackage::StaticLoadPackage( const char* PkgName, bool bSearch )
 UPackage* UPackage::StaticCreatePackage( const char* InName, UNativeModule* InNativeModule )
 {
   UPackage* Pkg = new UPackage( InName, InNativeModule );
-  Packages->PushBack( Pkg );
+
+  //Search for empty package slot.
+  int newIndex = -1;
+
+  for ( int i = 0; i < Packages->Size(); i++ )
+  {
+    UPackage** lpkg = &(Packages->Data()[i]);
+
+    //Fill slot.
+    if ( *lpkg == NULL )
+    {
+      *lpkg = Pkg;
+      newIndex = i;
+      break;
+    }
+  }
+
+  //If we didn't find an empty slot, just throw it at the end.
+  if( newIndex == -1 )
+    Packages->PushBack( Pkg );
+
   return Pkg;
 }
 

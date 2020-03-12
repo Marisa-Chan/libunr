@@ -102,7 +102,7 @@ public:
     bool bWriteIndices;
   };
 
-  struct FConfigCategory
+  struct LIBUNR_API FConfigCategory
   {
     FConfigCategory();
     ~FConfigCategory();
@@ -115,6 +115,7 @@ public:
   };
 
   FConfigCategory* GetCategoryFromName( const char* Str );
+  TArray<FConfigCategory*>* GetCategories();
 
 private:
   TArray<FConfigCategory*> Categories;
