@@ -24,23 +24,147 @@
 */
 
 #pragma once
-#include <queue>
 #include "Util/FMacro.h"
 
-using std::queue;
-template<class T> class TQueue : public queue<T>
+#include <queue>
+
+template<class T> class TQueue
 {
 public:
-  TQueue<T>() : queue<T>() {}
+  TQueue<T>()
+  {
+    Num = 0;
+  }
 
-  FORCEINLINE bool   Empty() const   { return queue<T>::empty(); }
-  FORCEINLINE size_t Size() const    { return queue<T>::size(); }
-  FORCEINLINE T&     Front()         { return queue<T>::front(); }
-  FORCEINLINE T&     Back()          { return queue<T>::back(); }
-  FORCEINLINE const T& Front() const { return queue<T>::front(); }
-  FORCEINLINE const T& Back() const  { return queue<T>::back(); }
-  FORCEINLINE void Pop()             { return queue<T>::pop(); }
-  FORCEINLINE void Push( const T& Value ) { return queue<T>::push(Value); }
-  FORCEINLINE void Swap( TQueue<T>& x ){ queue<T>::swap(x); }
+  TQueue<T>( const TQueue<T>& Q ) 
+  {
+    if ( Q.Num )
+    {
+      for ( TQueueNode* Node = Q.FrontNode; Node != NULL; Node = Node->Next )
+        Push( Node->Data );
+    }
+  }
+
+  TQueue<T>( TQueue<T>&& Q )
+  {
+    FrontNode = Q.FrontNode;
+    BackNode = Q.BackNode;
+    Num = Q.Num;
+
+    Q.Num = 0;
+  }
+
+  ~TQueue<T>()
+  {
+    while ( Num )
+      Pop();
+  }
+
+ bool IsEmpty() const 
+ { 
+   return (Num == 0);
+ }
+
+ size_t Size() const    
+ { 
+   return Num;
+ }
+
+ T& Front()         
+ { 
+   return FrontNode->Data; 
+ }
+
+ T& Back()          
+ { 
+   return BackNode->Data; 
+ }
+
+ const T& Front() const 
+ { 
+   return FrontNode->Data;
+ }
+
+ const T& Back() const  
+ { 
+   return BackNode->Data;
+ }
+
+ void Pop()             
+ { 
+   if ( FrontNode == NULL )
+     return;
+
+   TQueueNode* OutNode = FrontNode;
+   if ( FrontNode == BackNode )
+   {
+     FrontNode = NULL;
+     BackNode = NULL;
+   }
+   else
+   {
+     FrontNode = FrontNode->Next;
+   }
+
+   Num--;
+   delete OutNode;
+ }
+
+ void Push( const T& Value )
+ { 
+   TQueueNode* NewNode = new TQueueNode( Value );
+   Num++;
+
+   if ( FrontNode == NULL )
+   {
+     FrontNode = NewNode;
+     BackNode = NewNode;
+   }
+   else if ( FrontNode == BackNode )
+   {
+     FrontNode->Next = NewNode;
+     BackNode = NewNode;
+   }
+   else
+   {
+     BackNode->Next = NewNode;
+     BackNode = NewNode;
+   }
+ }
+
+ void Swap( TQueue<T>& x )
+ { 
+   TQueueNode* TmpFront = FrontNode;
+   TQueueNode* TmpBack = BackNode;
+   int TmpNum = Num;
+
+   FrontNode = x.FrontNode;
+   BackNode = x.BackNode;
+   Num = x.Num;
+
+   x.FrontNode = TmpFront;
+   x.BackNode = TmpBack;
+   x.Num = TmpNum;
+ }
+
+protected:
+  struct TQueueNode
+  {
+    TQueueNode( const T& Value )
+    {
+      Data = Value;
+      Next = NULL;
+    }
+
+    TQueueNode* Next;
+    T Data;
+
+  private:
+    TQueueNode() {}
+  };
+
+  TQueueNode* FrontNode;
+  TQueueNode* BackNode;
+  int Num;
 };
 
