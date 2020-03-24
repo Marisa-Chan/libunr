@@ -677,26 +677,7 @@ UPackage* UPackage::StaticLoadPackage( const char* PkgName, bool bSearch )
 UPackage* UPackage::StaticCreatePackage( const char* InName, UNativeModule* InNativeModule )
 {
   UPackage* Pkg = new UPackage( InName, InNativeModule );
-
-  //Search for empty package slot.
-  int newIndex = -1;
-
-  for ( int i = 0; i < Packages->Size(); i++ )
-  {
-    UPackage** lpkg = &(Packages->Data()[i]);
-
-    //Fill slot.
-    if ( *lpkg == NULL )
-    {
-      *lpkg = Pkg;
-      newIndex = i;
-      break;
-    }
-  }
-
-  //If we didn't find an empty slot, just throw it at the end.
-  if( newIndex == -1 )
-    Packages->PushBack( Pkg );
+  Packages->PushBack( Pkg );
 
   return Pkg;
 }
