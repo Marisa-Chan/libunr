@@ -187,6 +187,7 @@ class LIBUNR_API UEngine : public USubsystem
 
   float CurrentTickRate;
   float CurrentDeltaTime;
+  float TimeSeconds;
 
 protected:
   UNativeModule* AudioModule;

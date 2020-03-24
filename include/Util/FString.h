@@ -237,13 +237,13 @@ public:
   ~FStringFilePath()
   {
     if ( Dir )
-      free( Dir );
+      FGlobalMem::Free( Dir );
 
     if ( Name )
-      free( Name );
+      FGlobalMem::Free( Name );
 
     if ( Ext )
-      free( Ext );
+      FGlobalMem::Free( Ext );
   }
 
   const char* GetDir();

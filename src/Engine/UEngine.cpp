@@ -235,6 +235,7 @@ void UEngine::Tick( float DeltaTime )
     DeltaTime = FLT_MIN;
 
   CurrentDeltaTime = DeltaTime;
+  TimeSeconds += DeltaTime;
 
   // Process audio
   if ( Audio )

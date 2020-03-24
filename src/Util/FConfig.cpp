@@ -347,7 +347,7 @@ int FConfig::Load( const char* Filename )
   }
   else
   {
-    free( Path );
+    FGlobalMem::Free( Path );
     Path = new char[296];
     getcwd( Path, 296 );
   }
@@ -471,7 +471,7 @@ bool FConfig::ReadBool( const char* Category, const char* Variable, size_t Index
     if ( strncmp( StrVar, "true", 4 ) == 0 )
       Value = true;
 
-    free( StrVar );
+    FGlobalMem::Free( StrVar );
   }
   return Value;
 }
@@ -489,7 +489,7 @@ static inline u64 ReadUInt( FConfig* Config, const char* Category, const char* V
     if ( Value == MAX_UINT64 )
       Value = 0;
 
-    free( StrVar );
+    FGlobalMem::Free( StrVar );
   }
   return Value;
 }
@@ -527,7 +527,7 @@ static inline i64 ReadInt( FConfig* Config, const char* Category, const char* Va
     if ( Value == MAX_INT64 || Value == MIN_INT64 )
       Value = 0;
 
-    free( StrVar );
+    FGlobalMem::Free( StrVar );
   }
   return Value;
 }
@@ -562,7 +562,7 @@ float FConfig::ReadFloat( const char* Category, const char* Variable, size_t Ind
   if ( LIKELY( StrVar ) )
   {
     Value = strtof( StrVar, NULL );
-    free( StrVar );
+    FGlobalMem::Free( StrVar );
   }
   return Value;
 }
@@ -577,7 +577,7 @@ double FConfig::ReadDouble( const char* Category, const char* Variable, size_t I
   if ( LIKELY( StrVar ) )
   {
     Value = strtod( StrVar, NULL );
-    free( StrVar );
+    FGlobalMem::Free( StrVar );
   }
   return Value;
 }

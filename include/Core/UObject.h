@@ -228,27 +228,27 @@ public: \
   typedef supcls Super; \
   void* operator new( size_t sz ) \
   { \
-    void* Mem = malloc( sz ); \
+    void* Mem = FObjectMem::Alloc( sz ); \
     ((UObject*)Mem)->Class = ObjectClass; \
     return Mem; \
   } \
   void* operator new( size_t sz, size_t ObjSize ) \
   { \
-    void* Mem = malloc( ObjSize ); \
+    void* Mem = FObjectMem::Alloc( ObjSize ); \
     memset( Mem, 0, ObjSize ); \
     return Mem; \
   } \
   void operator delete( void* Obj, size_t ObjSize ) \
   { \
-    free( Obj ); \
+    FObjectMem::Free( Obj ); \
   } \
   void operator delete( void* Obj ) \
   { \
-    free( Obj );  \
+    FObjectMem::Free( Obj );  \
   } \
   void operator delete[]( void* Obj ) \
   { \
-    free( Obj ); \
+    FObjectMem::Free( Obj ); \
   } \
   static UClass* StaticClass() \
   { return ObjectClass; } \

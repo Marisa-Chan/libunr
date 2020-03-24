@@ -136,11 +136,11 @@ void UConst::Load()
   *PkgFile >> CINDEX( Size );
 
   // Size includes null terminator
-  char* Str = (char*)malloc( Size ); 
+  char* Str = (char*)FGlobalMem::Alloc( Size ); 
   PkgFile->Read( Str, Size );
 
   Value = new FString( Str );
-  free( Str );
+  FGlobalMem::Free( Str );
 }
 
 UEnum::UEnum()

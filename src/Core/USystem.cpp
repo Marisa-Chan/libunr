@@ -28,6 +28,7 @@
 #include <sys/types.h>
 #include "Util/FBacktrace.h"
 #include "Util/FConfig.h"
+#include "Util/FMemory.h"
 #include "Util/FString.h"
 #include "Core/USystem.h"
 #include "Core/UPackage.h"
@@ -487,7 +488,7 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool
     PkgPathString->ReplaceChars( '\\', '/' );
 #endif
     GSystem->Paths.PushBack( PkgPathString );
-    free( PkgPath );
+    FGlobalMem::Free( PkgPath );
   }
 
   // Set up config manager
@@ -821,11 +822,36 @@ bool LibunrInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool bIsEdito
 //  sa.sa_sigaction = &SigsegvHandler;
 //  sa.sa_flags = SA_SIGINFO;
 
+  // Set up log file
   if ( GLogFile == NULL )
   {
-    GLogFile = new FLogFile();
+    GLogFile = new(EStandardAlloc) FLogFile();
     GLogFile->Open("libunr.log");
   }
+
+  // Set up memory allocation
+  if ( !FPoolAllocator::Init() )
+  {
+    GLogf( LOG_CRIT, "FPoolAllocator::Init() failed!" );
+    return false;
+  }
+
+  if ( !FHugePageAllocator::Init() )
+  {
+    GLogf( LOG_CRIT, "FHugePageAllocator::Init() failed!" );
+    return false;
+  }
+
+  // TODO: Make these configurable?
+  FGlobalMem::Alloc   = FStandardAllocator::Alloc;
+  FGlobalMem::Realloc = FStandardAllocator::Realloc;
+  FGlobalMem::Calloc  = FStandardAllocator::Calloc;
+  FGlobalMem::Free    = FStandardAllocator::Free;
+  
+  FObjectMem::Alloc   = FStandardAllocator::Alloc;
+  FObjectMem::Realloc = FStandardAllocator::Realloc;
+  FObjectMem::Calloc  = FStandardAllocator::Calloc;
+  FObjectMem::Free    = FStandardAllocator::Free;
 
 //  if (sigaction(SIGSEGV, &sa, NULL) < 0)
 //  {

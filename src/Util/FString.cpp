@@ -42,7 +42,7 @@ FString::FString( const FString& Str )
 {
   NumElements = Str.NumElements;
   NumReserved = Str.NumElements * 2;
-  Array = (char*)malloc( NumReserved );
+  Array = (char*)FGlobalMem::Alloc( NumReserved );
   memcpy( Array, Str.Array, NumElements + 1 );
 }
 
@@ -50,7 +50,7 @@ FString::FString( const FString& Str, size_t Pos, size_t Len )
 {
   NumElements = 0;
   NumReserved = Len * 2;
-  Array = (char*)malloc( NumReserved );
+  Array = (char*)FGlobalMem::Alloc( NumReserved );
   Append( Str, Pos, Len );
 }
 
@@ -69,7 +69,7 @@ FString::FString( const char* s )
 {
   NumElements = strlen( s );
   NumReserved = NumElements * 2;
-  Array = (char*)malloc( NumReserved );
+  Array = (char*)FGlobalMem::Alloc( NumReserved );
   memcpy( Array, s, NumElements + 1 );
 }
 
@@ -77,7 +77,7 @@ FString::FString( const char* s, size_t n )
 {
   NumElements = n;
   NumReserved = n * 2;
-  Array = (char*)malloc( NumReserved );
+  Array = (char*)FGlobalMem::Alloc( NumReserved );
   memcpy( Array, s, n + 1 );
 }
 
@@ -85,7 +85,7 @@ FString::FString( size_t n, char c )
 {
   NumElements = n;
   NumReserved = n * 2;
-  Array = (char*)malloc( NumReserved );
+  Array = (char*)FGlobalMem::Alloc( NumReserved );
   memset( Array, c, NumElements );
   Array[NumElements] = '\0';
 }
@@ -203,7 +203,7 @@ FString::FString( bool B )
   const char* Str = (B) ? "true" : "false";
   NumElements = 0;
   NumReserved = 6;
-  Array = (char*)malloc( NumReserved );
+  Array = (char*)FGlobalMem::Alloc( NumReserved );
   Append( Str );
 }
 
@@ -211,7 +211,7 @@ FString::~FString()
 {
   if ( Array )
   {
-    free( Array );
+    FGlobalMem::Free( Array );
     Array = NULL;
   }
 }
@@ -240,7 +240,7 @@ void FString::Reserve( size_t n )
 {
   if ( Array == NULL )
   {
-    Array = (char*)malloc( n );
+    Array = (char*)FGlobalMem::Alloc( n );
     NumReserved = n;
     return;
   }
@@ -254,11 +254,11 @@ void FString::Reserve( size_t n )
   char* NewArray = NULL;
   if ( n == 0 )
   {
-    free( Array );
+    FGlobalMem::Free( Array );
   }
   else
   {
-    NewArray = (char*)realloc( Array, n );
+    NewArray = (char*)FGlobalMem::Realloc( Array, n );
     if ( NewArray == NULL )
     {
       // throw an error here if we fail

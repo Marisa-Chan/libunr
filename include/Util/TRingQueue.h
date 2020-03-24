@@ -31,7 +31,7 @@ template<class T> class TRingQueue
 public:
   TRingQueue<T>( size_t n )
   {
-    Data = (T*)malloc( sizeof( T ) * n );
+    Data = (T*)FGlobalMem::Alloc( sizeof( T ) * n );
     Len = n;
     Num = 0;
     Current = 0;
@@ -39,7 +39,7 @@ public:
 
   TRingQueue<T>( size_t n, const T& Value )
   { 
-    Data = (T*)malloc( sizeof( T ) * n );
+    Data = (T*)FGlobalMem::Alloc( sizeof( T ) * n );
     for ( int i = 0; i < n; i++ )
       Data[i] = Value;
 
@@ -50,7 +50,7 @@ public:
 
   ~TRingQueue<T>()
   {
-    free( Data );
+    FGlobalMem::Free( Data );
   }
 
   bool Empty()
@@ -115,7 +115,7 @@ public:
 
   bool Resize( size_t NewSize )
   {
-    T* NewData = (T*)realloc( Data, sizeof(T) * NewSize );
+    T* NewData = (T*)FGlobalMem::Realloc( Data, sizeof(T) * NewSize );
     if ( NewData == NULL )
       return false;
 

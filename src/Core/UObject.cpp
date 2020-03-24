@@ -64,7 +64,7 @@ void FNativePropertyList::AppendList( FNativePropertyList* List )
 
   Num += List->Num;
 
-  Properties = (FNativePropertyLink*)realloc( Properties, sizeof(FNativePropertyLink) * Num );
+  Properties = (FNativePropertyLink*)FGlobalMem::Realloc( Properties, sizeof(FNativePropertyLink) * Num );
   memcpy( &Properties[Added], List->Properties, sizeof(FNativePropertyLink)*List->Added );
 
   Added += List->Added;

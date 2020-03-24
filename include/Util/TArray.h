@@ -26,18 +26,24 @@
 #pragma once
 #include <new>
 #include <string.h>
-#include "Util/FMacro.h"
-#include "Util/FTypes.h"
+#include "Util/FMemory.h"
 #include "Util/FFileArchive.h"
 #include "Util/TDestructorInfo.h"
 
 class FPackageFileIn;
 class FPackageFileOut;
 
-template<class T> class TArray
+/*-----------------------------------------------------------------------------
+ * TArray
+ * Simple array class, takes a type and a method of memory allocation
+-----------------------------------------------------------------------------*/
+template<
+  class T,
+  class Allocator = FGlobalMem
+> class TArray
 {
 public:
-  TArray<T>() 
+  TArray<T,Allocator>() 
   { 
     ElementSize = sizeof(T);
     NumBytes = 0;
@@ -46,64 +52,64 @@ public:
     Array = NULL;
   }
 
-  TArray<T>( size_t n )
+  TArray<T,Allocator>( size_t n )
   { 
     ElementSize = sizeof(T); 
     NumBytes = n * sizeof( T );
     NumElements = n;
     NumReserved = n * 2;
-    Array = (T*)malloc( NumReserved * sizeof(T) );
+    Array = (T*)Allocator::Alloc( NumReserved * sizeof(T) );
     memset( Array, 0, NumReserved * sizeof( T ) );
   }
   
-  TArray<T>( size_t n, const T& Value )
+  TArray<T,Allocator>( size_t n, const T& Value )
   { 
     ElementSize = sizeof(T);
     NumBytes = n * sizeof( T );
     NumElements = n;
     NumReserved = n * 2;
-    Array = (T*)malloc( NumReserved * sizeof(T) );
+    Array = (T*)Allocator::Alloc( NumReserved * sizeof(T) );
     
     for ( int i = 0; i < n; i++ )
       Array[i] = Value;
   }
 
-  TArray<T>( const T* Ptr, size_t n )
+  TArray<T,Allocator>( const T* Ptr, size_t n )
   {
     ElementSize = sizeof( T );
     NumBytes = n * sizeof( T );
     NumElements = n;
     NumReserved = n * 2;
-    Array = (T*)malloc( NumReserved * sizeof( T ) );
+    Array = (T*)Allocator::Alloc( NumReserved * sizeof( T ) );
 
     memcpy( Array, Ptr, n * sizeof( T ) );
   }
 
-  TArray<T>( TArray<T>& x )
+  TArray<T,Allocator>( TArray<T,Allocator>& x )
   {
     ElementSize = sizeof( T );
     NumBytes = x.NumBytes;
     NumElements = x.NumElements;
     NumReserved = x.NumReserved;
-    Array = (T*)malloc( NumReserved * sizeof( T ) );
+    Array = (T*)Allocator::Alloc( NumReserved * sizeof( T ) );
 
     for ( int i = 0; i < NumElements; i++ )
       Array[i] = x[i];
   }
 
-  TArray<T>( const TArray<T>& x )
+  TArray<T,Allocator>( const TArray<T,Allocator>& x )
   {
     ElementSize = sizeof( T );
     NumBytes = x.NumBytes;
     NumElements = x.NumElements;
     NumReserved = x.NumReserved;
-    Array = (T*)malloc( NumReserved * sizeof( T ) );
+    Array = (T*)Allocator::Alloc( NumReserved * sizeof( T ) );
 
     for ( int i = 0; i < NumElements; i++ )
       Array[i] = x[i];
   }
 
-  ~TArray<T>()
+  ~TArray<T,Allocator>()
   {
     if ( TDestructorInfo<T>::NeedsDestructor() )
       for ( int i = 0; i < NumElements; i++ )
@@ -113,13 +119,13 @@ public:
     Reclaim();
   }
 
-  TArray<T>& operator=( const TArray<T>& Rhs )
+  TArray<T,Allocator>& operator=( const TArray<T,Allocator>& Rhs )
   {
     ElementSize = sizeof( T );
     NumBytes = Rhs.NumBytes;
     NumElements = Rhs.NumElements;
     NumReserved = Rhs.NumReserved;
-    Array = (T*)malloc( NumReserved * sizeof( T ) );
+    Array = (T*)Allocator::Alloc( NumReserved * sizeof( T ) );
 
     for ( int i = 0; i < NumElements; i++ )
       Array[i] = Rhs[i];
@@ -186,11 +192,11 @@ public:
     T* NewArray = NULL;
     if ( n == 0 )
     {
-      free( Array );
+      Allocator::Free( Array );
     }
     else
     {
-      NewArray = (T*)realloc( Array, n * sizeof( T ) );
+      NewArray = (T*)Allocator::Realloc( Array, n * sizeof( T ) );
       if ( NewArray == NULL )
       {
         // throw an error here if we fail
@@ -210,11 +216,11 @@ public:
     T* NewArray = NULL;
     if ( NumElements == 0 )
     {
-      free( Array );
+      Allocator::Free( Array );
     }
     else
     {
-      NewArray = (T*)realloc( Array, NumElements * sizeof( T ) );
+      NewArray = (T*)Allocator::Realloc( Array, NumElements * sizeof( T ) );
       if ( NewArray == NULL )
       {
         // throw an error here if we fail
@@ -330,7 +336,7 @@ public:
     }
   }
 
-  FORCEINLINE void Swap( TArray<T>& x )
+  FORCEINLINE void Swap( TArray<T,Allocator>& x )
   { 
     T* TmpArray = Array;
     size_t TmpBytes = NumBytes;
@@ -360,7 +366,7 @@ public:
     NumBytes = 0;
   }
 
-  FORCEINLINE void Append( TArray<T>& x )
+  FORCEINLINE void Append( TArray<T,Allocator>& x )
   {
     if ( !Array || x.NumElements > NumReserved - NumElements )
       Reserve( (NumReserved + x.NumElements) * 2 );
@@ -441,7 +447,7 @@ public:
     Array[Pos] = x;
   }
 
-  FORCEINLINE void Insert( TArray<T>& x, size_t Pos )
+  FORCEINLINE void Insert( TArray<T,Allocator>& x, size_t Pos )
   {
     if ( NumElements + x.NumElements >= NumReserved )
       Reserve( (NumElements + x.NumElements) * 2 );
@@ -463,7 +469,7 @@ public:
     memcpy( &Array[Pos], x, ElementSize * n );
   }
 
-  friend FPackageFileIn& operator>>( FPackageFileIn& In, TArray<T>& Array )
+  friend FPackageFileIn& operator>>( FPackageFileIn& In, TArray<T,Allocator>& Array )
   {
     idx ArrCount;
     In >> CINDEX( ArrCount );
@@ -474,7 +480,7 @@ public:
     return In;
   }
 
-  friend FPackageFileOut& operator<<( FPackageFileOut& Out, TArray<T>& Array )
+  friend FPackageFileOut& operator<<( FPackageFileOut& Out, TArray<T,Allocator>& Array )
   {
     Out << CINDEX( Array.NumElements );
     for ( int i = 0; i < Array.NumElements; i++ )
@@ -482,7 +488,7 @@ public:
     return Out;
   }
 
-  friend FFileArchiveOut& operator<<( FFileArchiveOut& Out, TArray<T>& Array )
+  friend FFileArchiveOut& operator<<( FFileArchiveOut& Out, TArray<T,Allocator>& Array )
   {
     for ( int i = 0; i < Array.NumElements; i++ )
       Out << Array[i];
@@ -497,12 +503,15 @@ protected:
   size_t NumReserved;
 };
 
-template<class T> class TArrayNotify : public TArray<T>
+template<
+  class T, 
+  class Allocator = FGlobalMem
+> class TArrayNotify : public TArray<T,Allocator>
 {
 public:
-  TArrayNotify<T>() : TArray<T>() {}
-  TArrayNotify<T>( size_t n ) : TArray<T>( n ) {}
-  TArrayNotify<T>( size_t n, const T& Value ) : TArray<T>( n, Value ) {}
+  TArrayNotify<T, Allocator>() : TArray<T,Allocator>() {}
+  TArrayNotify<T, Allocator>( size_t n ) : TArray<T,Allocator>( n ) {}
+  TArrayNotify<T, Allocator>( size_t n, const T& Value ) : TArray<T,Allocator>( n, Value ) {}
 
   typedef void (*NotifyCallback)(int);
 
