@@ -11,7 +11,7 @@ BUILD_LIBX11_HEADER_PATH=""
 BUILD_LIBDUMB2_PATH=""
 BUILD_LIBDUMB2_HEADER_PATH=""
 BUILD_LIBGME_PATH=""
-BUILD_LIBGME_HEADER_PATH=""
+BUILD_LIBGME_HEADER_PATH="/usr/include/gme"
 BUILD_LIBOGG_PATH=""
 BUILD_LIBOGG_HEADER_PATH=""
 BUILD_LIBVORBIS_PATH=""
@@ -177,7 +177,7 @@ BUILD_SRCS="$BUILD_SRCS $(find src/HPSS   | grep cpp)"
 # Compiler specific options
 if [ "$BUILD_COMPILER" = "g++" ] || [ "$BUILD_COMPILER" = "clang++" ] 
 then
-  CONFIG_CFLAGS="-fPIC -I/usr/include -I./include $BUILD_SETTINGS -fmax-errors=10 -std=c++11 -Wno-attributes -DINSTALL_PREFIX=\\\"$BUILD_INSTALL_PATH\\\""
+  CONFIG_CFLAGS="-fPIC -I/usr/include -I./include -luuid -lpthread $BUILD_SETTINGS -fmax-errors=10 -std=c++11 -Wno-attributes -Wl,--no-undefined -DINSTALL_PREFIX=\\\"$BUILD_INSTALL_PATH\\\""
 
   if [ "$BUILD_COMPILER" = "clang++" ]
   then

@@ -326,7 +326,7 @@ int USystem::JoinThread(void* Thread, void** OutReturnVal)
 
 #elif defined LIBUNR_POSIX
 
-    out = pthread_join(Thread, OutReturnVal);
+    out = pthread_join( (pthread_t)Thread, OutReturnVal);
 
     if( out == 0 )
         Threads[index] = NULL;
