@@ -27,7 +27,7 @@
 
 #include "Core/UObject.h"
 
-#if defined __linux__ || defined __unix__
+#if defined __linux__ || defined __unix__ || defined __APPLE__
   #include <dlfcn.h>
 #endif
 //TODO: LIne 65, fix that shit

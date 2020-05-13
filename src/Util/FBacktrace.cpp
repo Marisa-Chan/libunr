@@ -107,7 +107,7 @@
 }
 #elif defined LIBUNR_WIN32
 #else
-  #error "Backtracing code cannot get symbols"
+  //#error "Backtracing code cannot get symbols"
 #endif
 
 
