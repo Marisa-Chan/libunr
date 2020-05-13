@@ -28,7 +28,9 @@
 #include "Util/FLogFile.h"
 #include "Util/FBacktrace.h"
 
-#if defined LIBUNR_POSIX
+#if defined __APPLE__
+#warning "Backtrace not supported on Apple platforms"
+#elif defined LIBUNR_POSIX
   #include <dlfcn.h>
   const char* GetSymbolName( void* Addr )
   {

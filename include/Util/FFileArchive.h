@@ -27,6 +27,9 @@
 #define _FFILEARCHIVE_H_
 
 #pragma once
+#include <sys/types.h>
+#include <sys/uio.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "Util/FArchive.h"
