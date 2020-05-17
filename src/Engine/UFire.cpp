@@ -488,70 +488,27 @@ void UWaterTexture::Load()
   {
     bHardwareAccelerated = false;
 
-    Mips.Resize( 3 );
+    Mips.Resize( 1 );
 
     Buffer = &Mips[0];
     Buffer->DataArray.Resize( Buffer->USize * Buffer->VSize );
 
-    Velocity = &Mips[1];
-    Velocity->DataArray.Resize( Buffer->USize * Buffer->VSize );
-
-    Position = &Mips[2];
-    Position->DataArray.Resize( Buffer->USize * Buffer->VSize );
-
     UMask = Buffer->USize - 1;
     VMask = Buffer->VSize - 1;
+    
+    size_t SourceSize = Buffer->USize * Buffer->VSize * 2;
+    SourceFields = new int[SourceSize];
+    memset( SourceFields, 0, SourceSize * sizeof(int) );
 
+    // Calculate color lookup render table
     CalculateRenderTable();
   }
 }
 
+
 void UWaterTexture::Tick( float DeltaTime )
 {
-  bRealtimeChanged = true;
 
-  // Get velocity raw buffer
-  u8* VelBuf = Velocity->DataArray.Data();
-  u8* PosBuf = Position->DataArray.Data();
-
-  #define VELOCITY(x,y) (VelBuf[((y)<<UBits)+(x)])
-  #define POSITION(x,y) (PosBuf[((y)<<UBits)+(x)])
-
-  // Iterate through all drops and set their velocity at the source
-  for ( int i = 0; i < NumDrops; i++ )
-  {
-    ADrop& Drop = Drops[i];
-    double SinComponent = sin( (GEngine->TimeSeconds * 7) + ((Drop.ByteC) / (512.0 * PI)) );
-    VELOCITY( Drop.X, Drop.Y ) = (u8)(SinComponent * (double)Drop.Depth);
-  }
-
-  // Adjust surrounding velocity points
-  u8* VelPtr = VelBuf;
-  u8* PosArrayPtr = PosBuf;
-  for ( int x = 0; x < USize; x++ )
-  {
-    for ( int y = 0; y < VSize; y++ )
-    {
-      int Value = POSITION( x, (y - 1) & VMask );
-      Value    += POSITION( x, (y + 1) & VMask );
-      Value    += POSITION( (x - 1) & UMask, y );
-      Value    += POSITION( (x + 1) & UMask, y );
-
-      VELOCITY( x, y ) = RenderTable[Value];
-    }
-  }
-}
-
-void UWaterTexture::CalculateRenderTable()
-{
-  // Adapted from fire texture render table
-  for ( int i = 0; i < 1024; i++ )
-  {
-    float WaveIndex = i / 4.0;
-    float RenderHeatContrib = -(255 - WaveAmp) / 16.0;
-    float Adjust = 1.0;
-    RenderTable[i] = (int)FClamp( WaveIndex + RenderHeatContrib + Adjust, 0.0, WaveAmp );
-  }
 }
 
 /*-----------------------------------------------------------------------------
@@ -564,6 +521,38 @@ UWaveTexture::UWaveTexture()
 
 UWaveTexture::~UWaveTexture()
 {
+}
+
+void UWaveTexture::Tick( float DeltaTime )
+{
+  // Tick once per frame
+  if ( CurrentTick == GEngine->TickCycles )
+    return;
+  CurrentTick = GEngine->TickCycles;
+
+  // Tick at 40 fps
+  Accumulator += DeltaTime;
+  if ( Accumulator < (1.0f / 40.0f) )
+    return;
+  Accumulator = 0.0f;
+
+  // Update wave state
+  Super::Tick( DeltaTime );  
+}
+
+bool UWaveTexture::ExportToFile( const char* dir, const char* Type )
+{
+  return false;
+}
+
+void UWaveTexture::CalculateRenderTable()
+{
+  // Calculate the table so that it effectively follows a sine wave that gradually settles to a medium color (127)
+
+  for ( int i = 0; i < 1024; i++ )
+  {
+
+  }
 }
 
 /*-----------------------------------------------------------------------------
@@ -594,38 +583,64 @@ void UWetTexture::Tick( float DeltaTime )
   // Update pixel velocities
   Super::Tick( DeltaTime );
 
-  // Wet textures take from a source texture, so plot the whole texture
-  // We need to scale the source texture up if it's too small
-  u32 SrcXRatio = USize / SourceTexture->USize;
-  u32 SrcYRatio = VSize / SourceTexture->VSize;
 
-  // If our dimensions are smaller than the source, reject any animation
-  if ( !SrcXRatio || !SrcYRatio )
-    return;
+  int* Vel = SourceFields;
+  int* Pos = &SourceFields[(VSize << UBits) + USize];
+  #define VEL(x,y) (Vel[((y)<<UBits)+(x)])
+  #define POS(x,y) (Pos[((y)<<UBits)+(x)])
 
-  // Get our output buffer
-  u8* VelBuf = Velocity->DataArray.Data();
-  u8* DstBuf = Buffer->DataArray.Data();
-  u8* SrcBuf = SourceTexture->Mips[0].DataArray.Data();
+  for ( int i = 0; i < NumDrops; i++ )
+  {
+    ADrop& Drop = Drops[i];
+    int why = (int)(sin( GEngine->TimeSeconds * 7 + Drop.ByteC / 256 * 2 * PI ) * Drop.Depth * 256);
+    int idx = ((Drop.Y << 1) << UBits) + (Drop.X<<1);
+    Vel[idx] = why;
+  }
 
-  #define VELOCITY(x,y) (VelBuf[((y)<<UBits)+(x)])
-  #define DSTBUF(x,y) (DstBuf[((y)<<UBits)+(x)])
-  #define SRCBUF(x,y) (SrcBuf[((y)<<UBits)+(x)])
+  int PosOff  = 0;
+  int OffMask = Mips[0].DataArray.Size()-1;
+  for ( int x = 0; x < USize; x++ )
+  {
+    for ( int y = 0; y < VSize; y++ )
+    {
+      *Vel += ((Pos[(PosOff + y - VSize) & OffMask] + 
+                    Pos[(PosOff + y + VSize) & OffMask] + 
+                    Pos[(PosOff + y - 1) & OffMask] + 
+                    Pos[(PosOff + y + 1) & OffMask] ) * 79) >> 8;
+      *Vel -= (Pos[PosOff+y]*316) >> 8;
+      *Vel = (*Vel * 485) >> 9;
+      Vel++;
+    }
+    PosOff += VSize;
+  }
 
-  // Mix source texture and water effect
+  Vel = (int*)SourceFields;
+  for ( int i = 0; i < Mips[0].DataArray.Size(); i++ )
+    Pos[i] += Vel[i];
+  
+  u8* Buf = Buffer->DataArray.Data();
+  u8* Src = SourceTexture->Mips[0].DataArray.Data();
   for ( int y = 0; y < VSize; y++ )
   {
     for ( int x = 0; x < USize; x++ )
     {
-      u32 XWave = x + VELOCITY( x, y ) * WaveAmp;
-      DSTBUF( x, y ) = SRCBUF( XWave & UMask, y );
+      //*dstptr = srclineptr[(x + ((position( x, y ) * WaveAmp) shr( 16 + 2 ))) and UMask];
+      int SrcIdx = (x + ((POS( x, y ) * WaveAmp) >> (16 + 2)))& UMask;
+      *Buf = Src[SrcIdx];
+      Buf++;
     }
+    Src += USize;
   }
 }
 
 bool UWetTexture::ExportToFile( const char* dir, const char* Type )
 {
   return false;
+}
+
+void UWetTexture::CalculateRenderTable()
+{
+  // TODO
 }
 
 /*-----------------------------------------------------------------------------
@@ -696,8 +711,8 @@ BEGIN_PROPERTY_LINK( UWaterTexture, 17 )
   LINK_NATIVE_ARRAY   ( Drops );
   LINK_NATIVE_PROPERTY( SourceFields );
   LINK_NATIVE_ARRAY   ( RenderTable );
-  LINK_NATIVE_ARRAY   ( WaterTable );
-  LINK_NATIVE_PROPERTY( WaterParity );
+  LINK_NATIVE_ARRAY   ( WaveTable );
+  LINK_NATIVE_PROPERTY( WaveParity );
   LINK_NATIVE_PROPERTY( OldWaveAmp );
 END_PROPERTY_LINK()
 
