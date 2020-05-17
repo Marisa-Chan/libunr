@@ -25,6 +25,12 @@
 
 #pragma once
 
+#if defined LIBUNR_POSIX
+  #include <unistd.h>
+  #include <uuid/uuid.h>
+  #include <errno.h>
+#endif
+
 #include "Util/FMacro.h"
 
 // short hand data types
