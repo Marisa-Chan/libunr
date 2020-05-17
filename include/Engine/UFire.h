@@ -255,11 +255,6 @@ class LIBUNR_API UWaterTexture : public UFractalTexture
   u8  WaveTable[1536];
   u8  WaveParity;
   int OldWaveAmp;
-
-  u8 WaveMaskU;
-  u8 WaveMaskV;
-  u8 WaveSizeU;
-  u8 WaveSizeV;
 };
 
 /*-----------------------------------------------------------------------------
