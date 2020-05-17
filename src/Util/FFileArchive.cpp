@@ -32,6 +32,8 @@
   #include <cstring>
 #elif defined LIBUNR_WIN32
   #include <direct.h>
+#else
+#	include <unistd.h>
 #endif
 
 /*-----------------------------------------------------------------------------

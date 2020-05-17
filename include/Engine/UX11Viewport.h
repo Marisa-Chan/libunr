@@ -42,5 +42,5 @@ class LIBUNR_API UX11Viewport : public UViewport
   virtual bool Resize( int NewWidth, int NewHeight );
   
   Display* m_Display;
-  Window* m_Window; //X11 Window
+  Window m_Window; //X11 Window
 };
