@@ -24,6 +24,9 @@
 */
 
 #pragma once
+
+#include <string>
+
 #include "Core/UObject.h"
 
 // Game specific flags
@@ -94,8 +97,8 @@ class LIBUNR_API USystem : public USubsystem
   static bool IsEditor();
   static double GetSeconds();
 #if defined LIBUNR_POSIX
-  static const char* GetHomeDir();
-  static const char* GetHomeLibunrDir();
+  static std::string GetHomeDir();
+  static std::string GetHomeLibunrDir();
 #endif
 
   // libunr specific

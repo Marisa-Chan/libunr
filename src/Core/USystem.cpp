@@ -366,7 +366,7 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool
     // Create an ini if its missing
     GLogf( LOG_WARN, "Main ini file '%s' does not exist; creating one", LibunrIniPath );
 #if defined LIBUNR_POSIX
-    FString* ConfigLibunr = new FString( GetHomeDir() );
+    FString* ConfigLibunr = new FString( GetHomeDir().c_str() );
     ConfigLibunr->Append( "/.config/libunr/" );
     DIR* ConfigLibunrDir = opendir( ConfigLibunr->Data() );
     if ( ConfigLibunrDir == NULL )
@@ -529,7 +529,7 @@ const char* USystem::GetLibunrIniPath()
 {
 #if defined LIBUNR_POSIX
   static char LibUnrPath[1024] = { 0 };
-  strcpy( LibUnrPath, GetHomeDir() );
+  strcpy( LibUnrPath, GetHomeDir().c_str() );
   strcat( LibUnrPath, "/.config/libunr/libunr.ini" ); 
   return LibUnrPath;
 #elif defined LIBUNR_WIN32
@@ -640,7 +640,7 @@ void USystem::RealPath( const char* Path, char* FullPath, size_t FullPathSize )
 #ifndef LIBUNR_WIN32
     if ( *p == '~' )
     {
-      strcat( FullPath, GetHomeDir() );
+      strcat( FullPath, GetHomeDir().c_str() );
       p++;
       f += strlen( FullPath );
     }
@@ -799,18 +799,16 @@ double USystem::GetSeconds()
 }
 
 #if defined LIBUNR_POSIX
-const char* USystem::GetHomeDir()
+std::string USystem::GetHomeDir()
 {
   struct ::passwd* pw = getpwuid( getuid() );
   return pw->pw_dir;
 }
 
-const char* USystem::GetHomeLibunrDir()
+std::string USystem::GetHomeLibunrDir()
 {
-  char* Out = new char[1024];
-  struct ::passwd* pw = getpwuid( getuid() );
-  strcpy( Out, pw->pw_dir );
-  strcat( Out, ".config/libunr" );
+  std::string Out(GetHomeDir());
+  Out += ".config/libunr";
   return Out;
 }
 #endif
