@@ -102,7 +102,7 @@ UEngine::~UEngine()
 
 #if defined LIBUNR_WIN32
   #define DEFAULT_CLIENT "WindowsClient"
-#elif defined LIBUNR_POSX
+#elif defined LIBUNR_POSIX
   #define DEFAULT_CLIENT "X11Client"
 #else
   #define DEFAULT_CLIENT "Client"

@@ -23,7 +23,7 @@
  *========================================================================
 */
 
-#include <gme.h>
+#include <gme/gme.h>
 
 class FGmeMusicStream : public FMusicStream
 {

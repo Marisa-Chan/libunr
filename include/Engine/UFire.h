@@ -196,7 +196,7 @@ class LIBUNR_API UWaterTexture : public UFractalTexture
   virtual void Tick( float DeltaTime );
   virtual void Load();
 
-  void CalculateRenderTable();
+  virtual void CalculateRenderTable() {}
 
   enum WDrop
   {
@@ -250,14 +250,11 @@ class LIBUNR_API UWaterTexture : public UFractalTexture
   int NumDrops;
   ADrop Drops[256];
 
-  int SourceFields;
+  int* SourceFields;
   u8  RenderTable[1028];
-  u8  WaterTable[1536];
-  u8  WaterParity;
+  u8  WaveTable[1536];
+  u8  WaveParity;
   int OldWaveAmp;
-
-  FMipmap* Velocity;
-  FMipmap* Position;
 };
 
 /*-----------------------------------------------------------------------------
@@ -270,6 +267,9 @@ class LIBUNR_API UWaveTexture : public UWaterTexture
   EXPOSE_TO_USCRIPT()
 
   UWaveTexture();
+  virtual void Tick( float DeltaTime );
+  virtual bool ExportToFile( const char* Dir, const char* Type );
+  virtual void CalculateRenderTable();
 
   u8 BumpMapLight;
   u8 BumpMapAngle;
@@ -289,6 +289,7 @@ class LIBUNR_API UWetTexture : public UWaterTexture
   UWetTexture();
   virtual void Tick( float DeltaTime );
   virtual bool ExportToFile( const char* Dir, const char* Type );
+  virtual void CalculateRenderTable();
 
   UTexture* SourceTexture;
   UTexture* OldSourceTex;

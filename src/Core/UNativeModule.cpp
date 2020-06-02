@@ -35,7 +35,7 @@ IMPLEMENT_NATIVE_CLASS( UDynamicNativeModule );
 #if defined __linux__ || defined __unix__
   #define NATIVE_MODULE_EXT "so"
 #elif defined __APPLE__
-  #define NATIVE_MODULE_EXT "dylib" //Temporary
+  #define NATIVE_MODULE_EXT "dylib"
 #elif defined _WIN32
   #define NATIVE_MODULE_EXT "dll"
   #include <Windows.h>

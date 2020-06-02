@@ -22,8 +22,12 @@
  * written by Jesse 'Hyzoran' Kowalik
  *========================================================================
 */
+
+#include "Util/FMacro.h"
+
 #if defined LIBUNR_POSIX
 
+#include "Engine/UX11Viewport.h"
 #include "Engine/UX11Client.h"
 
 UX11Client::UX11Client()
@@ -40,10 +44,12 @@ bool UX11Client::Init()
   m_Display = XOpenDisplay( NULL );
   if (!m_Display)
   {
-    GLogf( LOG_CRIT, "Failed to open a connection to X11.", GetLastError() );
+    GLogf( LOG_CRIT, "Failed to open a connection to X11." );
     return false;
   }
-  m_DefaultDisplay = DefaultScreen( m_Display );
+  m_DefaultScreen = DefaultScreen( m_Display );
+
+  return true;
 }
 
 bool UX11Client::Exit()
@@ -55,7 +61,7 @@ bool UX11Client::Exit()
   for ( int i = 0; i < Viewports.Size(); i++ )
   {
     UX11Viewport* ViewPort = (UX11Viewport*)Viewports[i];
-    Result &= UX11Viewport->Exit();
+    Result &= ViewPort->Exit();
   }
   
   XCloseDisplay( m_Display );
@@ -105,7 +111,7 @@ void UX11Client::Tick( float DeltaTime )
 {
   XEvent event;
 
-  while(1) 
+  while (XPending(m_Display) > 0)
   {
      XNextEvent( m_Display, &event);
 

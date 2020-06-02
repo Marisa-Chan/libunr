@@ -22,7 +22,13 @@
  * written by Jesse 'Hyzoran' Kowalik
  *========================================================================
 */
+
+#include "Util/FMacro.h"
+
 #if defined LIBUNR_POSIX
+
+#include "Core/UClass.h"
+#include "Core/UPackage.h"
 
 #include "Engine/UX11Client.h"
 #include "Engine/UX11Viewport.h"
@@ -43,9 +49,10 @@ bool UX11Viewport::Init( int InWidth, int InHeight )
   Super::Init( InWidth, InHeight );
   
   m_Display = ((UX11Client*)Client)->m_Display;
-  
-  m_Window = XCreateSimpleWindow( m_Display, RootWindow( m_Display, m_DefaultScreen ), 0, 0, InWidth, InHeight, 1, BlackPixel( m_Display, m_Screen ), WhitePixel( m_Display, m_Screen ) );
-  
+  auto screen = ((UX11Client*)Client)->m_DefaultScreen;
+
+  m_Window = XCreateSimpleWindow( m_Display, RootWindow( m_Display, screen ), 0, 0, Width, Height, 1, BlackPixel( m_Display, screen ), WhitePixel( m_Display, screen ) );
+
   if ( !GEngine->Render->InitViewport( this ) )
   {
     GLogf( LOG_ERR, "Failed to initialize X11 viewport with renderer" );
@@ -62,23 +69,21 @@ bool UX11Viewport::Exit()
   return true;
 }
 
-bool UX11Viewport::Show()
+void UX11Viewport::Show()
 {
    XMapWindow( m_Display, m_Window );
 }
 
-bool UX11Viewport::Hide()
+void UX11Viewport::Hide()
 {
    XUnmapWindow( m_Display, m_Window );
 }
 
 bool UX11Viewport::Resize( int NewWidth, int NewHeight )
 {
-  XMoveResizeWindow( m_Display, m_Window, 0, 0, InWidth, InHeight );
+  XMoveResizeWindow( m_Display, m_Window, 0, 0, NewWidth, NewHeight );
 }
 
-#include "Core/UClass.h"
-#include "Core/UPackage.h"
 IMPLEMENT_NATIVE_CLASS( UX11Viewport );
 
 #endif //End POSIX check

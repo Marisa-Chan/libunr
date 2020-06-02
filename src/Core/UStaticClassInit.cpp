@@ -69,11 +69,15 @@
 #include "Actors/AZoneInfo.h"
 
 // Deus Ex specific headers
-#include "DeusEx/UEventManager.h"
-#include "DeusEx/ACameraPoint.h"
+#ifdef BUILD_DEUSEX
+#	include "DeusEx/UEventManager.h"
+#	include "DeusEx/ACameraPoint.h"
+#endif /* BUILD_DEUSEX */
 
 // Rune specific headers
-#include "Rune/ARuneActor.h"
+#ifdef BUILD_RUNE
+#	include "Rune/ARuneActor.h"
+#endif /* BUILD_RUNE */
 
 // Harry Potter specific headers
 #include "HPSS/UParticleList.h"
@@ -247,7 +251,7 @@ bool UObject::StaticInit()
 #if defined LIBUNR_WIN32
   Result &= UWindowsClient::StaticClassInit();
   Result &= UWindowsViewport::StaticClassInit();
-#else if defined LIBUNR_POSIX
+#elif defined LIBUNR_POSIX
   #if defined BUILD_X11
     Result &= UX11Client::StaticClassInit();
     Result &= UX11Viewport::StaticClassInit();
@@ -323,13 +327,16 @@ bool UObject::StaticInit()
     Result &= ATriggers::StaticClassInit();
       Result &= ATrigger::StaticClassInit();
 
+#	ifdef BUILD_DEUSEX
   // Init Deus Ex classes (if needed)
   if ( GSystem->GameFlags & GAME_DeusEx )
   {
     Result &= UEventManager::StaticClassInit();
     Result &= ACameraPoint::StaticClassInit();
   }
+#	endif /* BUILD_DEUSEX */
 
+#	ifdef BUILD_RUNE
   if ( GSystem->GameFlags & GAME_Rune )
   {
     Result &= AAnimationProxy::StaticClassInit();
@@ -342,6 +349,7 @@ bool UObject::StaticInit()
     Result &= AScriptAction::StaticClassInit();
     Result &= ASoundPlayer::StaticClassInit(); // useful for all games but why native?
   }
+#	endif /* BUILD_RUNE */
 
   if ( GSystem->GameFlags & GAME_HPSS )
   {
@@ -363,6 +371,7 @@ bool UObject::StaticInit()
   AUdpLink::StaticClass()->Load();
   AUdpLink::StaticClass()->PostLoad();
 
+#	ifdef BUILD_DEUSEX
   // Load Deus Ex engine classes (if needed)
   if ( GSystem->GameFlags & GAME_DeusEx )
   {
@@ -370,6 +379,7 @@ bool UObject::StaticInit()
     ACameraPoint::StaticClass()->Load();
     ACameraPoint::StaticClass()->PostLoad();
   }
+#	endif /* BUILD_DEUSEX */
 
   if ( GSystem->IsEditor() )
   {

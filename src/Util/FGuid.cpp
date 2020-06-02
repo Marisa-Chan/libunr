@@ -28,7 +28,7 @@
 #if defined LIBUNR_WIN32
   #include <Objbase.h>
 #elif defined LIBUNR_POSIX
-  #if defined __linux__ || __APPLE__
+  #if defined __linux__ || defined __APPLE__
     #include <uuid/uuid.h>
   #elif defined _SYSTYPE_BSD
     #include <uuid.h>
@@ -40,7 +40,7 @@ void FGuid::Generate()
 #if defined LIBUNR_WIN32
   CoCreateGuid( (GUID*)Data );
 #elif defined LIBUNR_POSIX
-  #if defined __linux__  || __APPLE__
+  #if defined __linux__ || defined __APPLE__
     uuid_generate( Data );
   #elif defined _SYSTYPE_BSD
     u32 Status;
