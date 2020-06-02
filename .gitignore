@@ -3,6 +3,7 @@ build/*
 .vs/*
 *.user
 CMakeFiles/
+cmake_install.cmake
 *.o
 *.tmp
 *swp
@@ -19,7 +20,6 @@ CMakeCache.txt
 *.log
 Makefile
 *.sh
-*.cmake
 tags
 libunr-test
 .gdb_history
