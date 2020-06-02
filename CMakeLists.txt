@@ -12,7 +12,6 @@ set (UNR_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 set (UNR_INC ${UNR_ROOT}/include)
 set (UNR_SRC ${UNR_ROOT}/src)
 
-option( BUILD32 "Build 32bit binary" OFF )
 option( BUILD_CYGWIN "Build_Cygwin" OFF )
 option( BUILD_DEUXEX "DeusEx support" OFF)
 option( BUILD_RUNE "Rune support" OFF)
