@@ -560,7 +560,7 @@ const char* USystem::GetNativeModulesPath()
 #if defined LIBUNR_POSIX
   static char DefLibUnrPath[1024] = { 0 };
   strcpy( DefLibUnrPath, INSTALL_PREFIX );
-  strcat( DefLibUnrPath, "/share/libunr/modules/" );
+  strcat( DefLibUnrPath, "/lib/libunr/modules/" );
   return DefLibUnrPath;
 #elif defined LIBUNR_WIN32
   return LibunrPath;
