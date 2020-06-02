@@ -1,11 +1,7 @@
 cmake_minimum_required (VERSION 3.10)
 project (UNR CXX)
 
-# Build options
-# Choose: Debug Release RelWithDebInfo
-if( NOT CMAKE_BUILD_TYPE )
-  set( CMAKE_BUILD_TYPE Release )
-endif()
+set(CMAKE_CXX_STANDARD 11)
 
 set( CMAKE_MODULE_PATH cmake/Modules ${CMAKE_MODULE_PATH} )
 
@@ -129,6 +125,7 @@ set (UTIL_SOURCES
 
 find_package(X11)
 find_package(Mpg123 REQUIRED)
+find_package(Vorbisfile REQUIRED)
 find_package(Dumb REQUIRED)
 find_package(Gme REQUIRED)
 
@@ -138,9 +135,8 @@ include_directories(
 	${LIBGME_INCLUDE_DIRS}
 	${LIBDUMB_INCLUDE_DIRS}
 	${X11_INCLUDE_DIR}
+	${VORBISFILE_INCLUDE_DIRS}
 )
-
-set(CMAKE_CXX_STANDARD 11)
 
 add_definitions("-DINSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"" )
 message(STATUS "Install prefix: " ${CMAKE_INSTALL_PREFIX})
@@ -177,48 +173,18 @@ if ( BUILD_RUNE )
 	add_definitions("-DBUILD_RUNE=1")
 endif()
 
-add_library( unr SHARED ${LIBUNR_SOURCES} )
+add_library(unr SHARED
+	${LIBUNR_SOURCES}
+)
 
-if ( WIN32 )
-	target_link_libraries(unr)
-else()
-	target_link_libraries(unr
-		dl
-		${LIBMPG123_LIBRARIES}
-		${LIBGME_LIBRARIES}
-		${LIBDUMB_LIBRARIES}
-		${X11_LIBRARIES}
-	)
-endif()
+target_link_libraries(unr
+	dl
+	${LIBMPG123_LIBRARIES}
+	${LIBGME_LIBRARIES}
+	${LIBDUMB_LIBRARIES}
+	${LIBVORBISFILE_LIBRARIES}
+	${X11_LIBRARIES}
+)
 
-# Debug symbols & optimization levels
-if ( CMAKE_BUILD_TYPE STREQUAL "Debug" )
-  add_definitions("-O0" "-g")
-elseif ( CMAKE_BUILD_TYPE STREQUAL "Release" )
-  add_definitions("-O2")
-elseif ( CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo" )
-  add_definitions("-O2" "-g")
-else()
-  message(FATAL_ERROR "Unknown build type: " ${CMAKE_BUILD_TYPE})
-endif()
-
-# 32 bit support + install targets
-if ( BUILD32 )
-
-  add_definitions("-m32")
-  set_target_properties (unr PROPERTIES LINK_FLAGS "-m32")
-  if ( WIN32 )
-    install(TARGETS unr DESTINATION "${WINDOWS_32_INSTALL_PATH}\\libunr")
-  elseif ( UNIX )
-    install(TARGETS unr DESTINATION lib32/libunr)
-  endif()
-
-else()
-
-	if ( WIN32 )
-        install(TARGETS unr DESTINATION libunr)
-	elseif ( UNIX )
-		install(TARGETS unr LIBRARY DESTINATION lib)
-    endif()
-
-endif()
+install(TARGETS unr LIBRARY
+        DESTINATION lib)
