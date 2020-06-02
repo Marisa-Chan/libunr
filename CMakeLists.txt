@@ -158,6 +158,10 @@ if ( WIN32 )
 	set(LIBUNR_SOURCES ${LIBUNR_SOURCES} ${WINDOWS_ENGINE_SOURCES} )
 endif()
 
+if ( APPLE )
+	add_definitions("-D_XOPEN_SOURCE=600")
+endif()
+
 if ( X11_FOUND )
 	set(LIBUNR_SOURCES ${LIBUNR_SOURCES} ${X11_ENGINE_SOURCES} )
 	add_definitions("-DBUILD_X11=1")
