@@ -186,6 +186,21 @@ void URenderDevice::GetPerspectiveMatrix( FMatrix4x4& Mat, float FOV, float Widt
 
 void URenderDevice::DrawWorld( ULevel* Level, UViewport* Viewport )
 {
+  if (!Level)
+  {
+    return;
+  }
+
+  if (!Level->Model)
+  {
+    return;
+  }
+
+  if (Level->Model->Nodes.Size() < 1)
+  {
+    return;
+  }
+
   // Get the root node and start there
   FBspNode& Node = Level->Model->Nodes[0];
   TraverseBspNode( Level->Model, Node, Viewport, false );
