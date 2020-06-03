@@ -24,3 +24,4 @@ tags
 libunr-test
 .gdb_history
 install_manifest.txt
+*.FileListAbsolute.txt
