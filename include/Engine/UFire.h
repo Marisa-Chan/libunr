@@ -267,6 +267,7 @@ class LIBUNR_API UWaveTexture : public UWaterTexture
   EXPOSE_TO_USCRIPT()
 
   UWaveTexture();
+  virtual void Load();
   virtual void Tick( float DeltaTime );
   virtual bool ExportToFile( const char* Dir, const char* Type );
   virtual void CalculateRenderTable();
@@ -287,6 +288,7 @@ class LIBUNR_API UWetTexture : public UWaterTexture
   EXPOSE_TO_USCRIPT()
 
   UWetTexture();
+  virtual void Load();
   virtual void Tick( float DeltaTime );
   virtual bool ExportToFile( const char* Dir, const char* Type );
   virtual void CalculateRenderTable();
@@ -306,6 +308,7 @@ class LIBUNR_API UIceTexture : public UFractalTexture
   EXPOSE_TO_USCRIPT()
 
   UIceTexture();
+  virtual void Load();
 
   enum PanningType
   {

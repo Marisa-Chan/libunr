@@ -523,6 +523,15 @@ UWaveTexture::~UWaveTexture()
 {
 }
 
+void UWaveTexture::Load()
+{
+  Super::Load();
+
+  // FIXME: Remove this once we actually implement wave textures
+  if ( GEngine && GEngine->Render )
+    memset( Buffer->DataArray.Data(), 127, Buffer->USize * Buffer->VSize );
+}
+
 void UWaveTexture::Tick( float DeltaTime )
 {
   // Tick once per frame
@@ -565,6 +574,15 @@ UWetTexture::UWetTexture()
 
 UWetTexture::~UWetTexture()
 {
+}
+
+void UWetTexture::Load()
+{
+  Super::Load();
+
+  // FIXME: Remove this once we actually implement wet textures
+  if ( GEngine && GEngine->Render && SourceTexture != NULL )
+    memcpy( Buffer->DataArray.Data(), SourceTexture->Mips[0].DataArray.Data(), Buffer->USize * Buffer->VSize );
 }
 
 void UWetTexture::Tick( float DeltaTime )
@@ -653,6 +671,18 @@ UIceTexture::UIceTexture()
 
 UIceTexture::~UIceTexture()
 {
+}
+
+void UIceTexture::Load()
+{
+  Super::Load();
+
+  // FIXME: Remove this once we actually implement ice textures
+  Mips.Resize( 1 );
+  Mips[0].DataArray.Resize( SourceTexture->USize * SourceTexture->VSize );
+
+  if ( GEngine && GEngine->Render && SourceTexture != NULL )
+    memcpy( Mips[0].DataArray.Data(), SourceTexture->Mips[0].DataArray.Data(), SourceTexture->USize * SourceTexture->VSize );
 }
 
 IMPLEMENT_NATIVE_CLASS( UFractalTexture );
