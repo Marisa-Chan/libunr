@@ -174,7 +174,6 @@ bool UEngine::Init()
       GLogf( LOG_ERR, "Audio device initialization failed" );
       return false;
     }
-  
   }
   
   // Init Render Device
@@ -218,6 +217,7 @@ bool UEngine::Init()
 
   }
 
+  bInitialized = true;
   return true;
 }
 

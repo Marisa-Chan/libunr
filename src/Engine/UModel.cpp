@@ -310,7 +310,7 @@ void UModel::Load()
   Super::Load();
 
   idx Num, ObjRef;
-  if ( PkgFile->Ver < PKG_VER_UT_400 )
+  if ( PkgFile->Ver < PKG_VER_UN_220 )
   {
     *PkgFile >> CINDEX( ObjRef );
     bLoadingPoints = false;
