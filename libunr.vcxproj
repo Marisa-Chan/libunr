@@ -217,7 +217,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)deps\dumb-2.0.3\include;$(ProjectDir)deps\libogg-1.3.4\include;$(ProjectDir)deps\libvorbis-1.3.6\include;$(ProjectDir)deps\mpg123-1.25.13\ports\MSVC++;$(ProjectDir)deps\mpg123-1.25.13\src;$(ProjectDir)deps\mpg123-1.25.13\src\libmpg123;$(ProjectDir)deps\game-music-emu-0.6.2\gme;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)deps\dumb-2.0.3\include;$(ProjectDir)deps\libogg-1.3.4\include;$(ProjectDir)deps\libvorbis-1.3.6\include;$(ProjectDir)deps\mpg123-1.25.13\ports\MSVC++;$(ProjectDir)deps\mpg123-1.25.13\src;$(ProjectDir)deps\mpg123-1.25.13\src\libmpg123;$(ProjectDir)deps\game-music-emu-0.6.2\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
