@@ -556,12 +556,7 @@ bool UWaveTexture::ExportToFile( const char* dir, const char* Type )
 
 void UWaveTexture::CalculateRenderTable()
 {
-  // Calculate the table so that it effectively follows a sine wave that gradually settles to a medium color (127)
-
-  for ( int i = 0; i < 1024; i++ )
-  {
-
-  }
+  // TODO: Calculate the table so that it effectively follows a sine wave that gradually settles to a medium color (127)
 }
 
 /*-----------------------------------------------------------------------------
@@ -601,8 +596,7 @@ void UWetTexture::Tick( float DeltaTime )
   // Update pixel velocities
   Super::Tick( DeltaTime );
 
-
-  int* Vel = SourceFields;
+/*  int* Vel = SourceFields;
   int* Pos = &SourceFields[(VSize << UBits) + USize];
   #define VEL(x,y) (Vel[((y)<<UBits)+(x)])
   #define POS(x,y) (Pos[((y)<<UBits)+(x)])
@@ -648,7 +642,7 @@ void UWetTexture::Tick( float DeltaTime )
       Buf++;
     }
     Src += USize;
-  }
+  }*/
 }
 
 bool UWetTexture::ExportToFile( const char* dir, const char* Type )
