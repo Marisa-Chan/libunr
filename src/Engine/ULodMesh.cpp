@@ -27,6 +27,7 @@
 
 #include "Util/FString.h"
 #include "Core/UClass.h"
+#include "Core/USystem.h"
 #include "Engine/UModel.h"
 #include "Engine/ULodMesh.h"
 
@@ -96,15 +97,15 @@ void ULodMesh::Load()
     
     SpecialWedge.VertexIndex = 0;
     Wedges.PushBack( SpecialWedge );
-    SpecialFaces[i].WedgeIndex[0] = Wedges.Size() - 1;
+    SpecialFaces[i].WedgeIndex[0] = (u16)(Wedges.Size() - 1);
 
     SpecialWedge.VertexIndex = 1;
     Wedges.PushBack( SpecialWedge );
-    SpecialFaces[i].WedgeIndex[1] = Wedges.Size() - 1;
+    SpecialFaces[i].WedgeIndex[1] = (u16)(Wedges.Size() - 1);
 
     SpecialWedge.VertexIndex = 2;
     Wedges.PushBack( SpecialWedge );
-    SpecialFaces[i].WedgeIndex[2] = Wedges.Size() - 1;
+    SpecialFaces[i].WedgeIndex[2] = (u16)(Wedges.Size() - 1);
   }
 
   Faces.Append( SpecialFaces );
@@ -157,7 +158,7 @@ bool ULodMesh::ExportUnreal3DMesh( const char* Dir, int Frame )
 
   FVertexDataHeader DataHdr;
   memset( &DataHdr, 0, sizeof(DataHdr) ); // Everything else goes unused
-  DataHdr.NumPolygons = Faces.Size();
+  DataHdr.NumPolygons = (u16)Faces.Size();
   DataHdr.NumVertices = FrameVerts;
   
   Out.Write( &DataHdr, sizeof(DataHdr) );
@@ -223,11 +224,14 @@ bool ULodMesh::ExportUnreal3DMesh( const char* Dir, int Frame )
   Out.Write( &AnivHdr, sizeof(AnivHdr) );
 
   uint32_t VtxOut;
-  for ( int i = 0; i < AnimFrames; i++ )
+  for ( u32 i = 0; i < AnimFrames; i++ )
   {
-    for ( int j = 0; j < FrameVerts; j++ )
+    FORTIFY_LOOP_SLOW( i, MAX_UINT32 );
+    for ( u32 j = 0; j < FrameVerts; j++ )
     {
-      FMeshVert Vtx = Verts[(i*FrameVerts)+j];
+      FORTIFY_LOOP_SLOW( i, MAX_UINT32 );
+      u32 Index = (i * FrameVerts) + j;
+      FMeshVert Vtx = Verts[Index];
       VtxOut = ((int)(-Vtx.X * 8.0) & 0x7ff) | (((int)(-Vtx.Y * 8.0) & 0x7ff) << 11) | (((int)(Vtx.Z * 4.0) & 0x3ff) << 22);
       Out.Write( &VtxOut, sizeof(VtxOut) );
     }
@@ -268,9 +272,10 @@ bool ULodMesh::ExportObjMesh( const char* Dir, int Frame )
   Out.Printf("o %s\n", Name.Data());
 
   // Vertex coordinates
-  int FirstVert = Frame * FrameVerts;
-  for ( int i = 0; i < FrameVerts; i++ )
+  size_t FirstVert = (size_t)Frame * FrameVerts;
+  for ( u32 i = 0; i < FrameVerts; i++ )
   {
+    FORTIFY_LOOP_SLOW( i, MAX_UINT32 );
     FMeshVert Vtx = Verts[FirstVert+i];
     Out.Printf("v %.6f %.6f %.6f\n", -Vtx.X, -Vtx.Y, -Vtx.Z);
   }
@@ -286,92 +291,91 @@ bool ULodMesh::ExportObjMesh( const char* Dir, int Frame )
   FVector* VertNormals = new FVector[FrameVerts];
   memset( VertNormals, 0, sizeof(FVector)*FrameVerts );
 
+  FVector FaceNormals[2];
+  FLodWedge TriWedges[2][3];
+  int v[2][3];
+  int i = 0;
+
+  if ( Faces.Size() & 1 )
   {
-    FVector FaceNormals[2];
-    FLodWedge TriWedges[2][3];
-    int v[2][3];
-    int i = 0;
+    TriWedges[0][0] = Wedges[Faces[0].WedgeIndex[0]];
+    TriWedges[0][1] = Wedges[Faces[0].WedgeIndex[1]];
+    TriWedges[0][2] = Wedges[Faces[0].WedgeIndex[2]];
+  
+    v[0][0] = TriWedges[0][0].VertexIndex;
+    v[0][1] = TriWedges[0][1].VertexIndex;
+    v[0][2] = TriWedges[0][2].VertexIndex;
+  
+    FVector U = *(FVector*)&Verts[v[0][0]] - *(FVector*)&Verts[v[0][1]];
+    FVector V = *(FVector*)&Verts[v[0][2]] - *(FVector*)&Verts[v[0][1]];
+  
+    FaceNormals[0].X = (U.Y * V.Z) - (U.Z * V.Y);
+    FaceNormals[0].Y = (U.Z * V.X) - (U.X * V.Z);
+    FaceNormals[0].Z = (U.X * V.Y) - (U.Y * V.X);
+  
+    VertNormals[v[0][0]] += FaceNormals[0];
+    VertNormals[v[0][1]] += FaceNormals[0];
+    VertNormals[v[0][2]] += FaceNormals[0];
 
-    if ( Faces.Size() & 1 )
-    {
-      TriWedges[0][0] = Wedges[Faces[0].WedgeIndex[0]];
-      TriWedges[0][1] = Wedges[Faces[0].WedgeIndex[1]];
-      TriWedges[0][2] = Wedges[Faces[0].WedgeIndex[2]];
-  
-      v[0][0] = TriWedges[0][0].VertexIndex;
-      v[0][1] = TriWedges[0][1].VertexIndex;
-      v[0][2] = TriWedges[0][2].VertexIndex;
-  
-      FVector U = *(FVector*)&Verts[v[0][0]] - *(FVector*)&Verts[v[0][1]];
-      FVector V = *(FVector*)&Verts[v[0][2]] - *(FVector*)&Verts[v[0][1]];
-  
-      FaceNormals[0].X = (U.Y * V.Z) - (U.Z * V.Y);
-      FaceNormals[0].Y = (U.Z * V.X) - (U.X * V.Z);
-      FaceNormals[0].Z = (U.X * V.Y) - (U.Y * V.X);
-  
-      VertNormals[v[0][0]] += FaceNormals[0];
-      VertNormals[v[0][1]] += FaceNormals[0];
-      VertNormals[v[0][2]] += FaceNormals[0];
-
-      i++;
-    }
-    for ( ; i < Faces.Size(); i+=2 )
-    {
-      // Loop unrolling, woo
-      TriWedges[0][0] = Wedges[Faces[i].WedgeIndex[0]];
-      TriWedges[0][1] = Wedges[Faces[i].WedgeIndex[1]];
-      TriWedges[0][2] = Wedges[Faces[i].WedgeIndex[2]];
-  
-      TriWedges[1][0] = Wedges[Faces[i+1].WedgeIndex[0]];
-      TriWedges[1][1] = Wedges[Faces[i+1].WedgeIndex[1]];
-      TriWedges[1][2] = Wedges[Faces[i+1].WedgeIndex[2]];
-  
-      v[0][0] = TriWedges[0][0].VertexIndex;
-      v[0][1] = TriWedges[0][1].VertexIndex;
-      v[0][2] = TriWedges[0][2].VertexIndex;
-  
-      v[1][0] = TriWedges[1][0].VertexIndex;
-      v[1][1] = TriWedges[1][1].VertexIndex;
-      v[1][2] = TriWedges[1][2].VertexIndex;
-  
-      FVector U1 = *(FVector*)&Verts[FirstVert+v[0][0]] - *(FVector*)&Verts[FirstVert+v[0][1]];
-      FVector V1 = *(FVector*)&Verts[FirstVert+v[0][2]] - *(FVector*)&Verts[FirstVert+v[0][1]];
-  
-      FVector U2 = *(FVector*)&Verts[FirstVert+v[1][0]] - *(FVector*)&Verts[FirstVert+v[1][1]];
-      FVector V2 = *(FVector*)&Verts[FirstVert+v[1][2]] - *(FVector*)&Verts[FirstVert+v[1][1]];
- 
-      FaceNormals[0].X = (U1.Y * V1.Z) - (U1.Z * V1.Y);
-      FaceNormals[0].Y = (U1.Z * V1.X) - (U1.X * V1.Z);
-      FaceNormals[0].Z = (U1.X * V1.Y) - (U1.Y * V1.X);
-  
-      FaceNormals[1].X = (U2.Y * V2.Z) - (U2.Z * V2.Y);
-      FaceNormals[1].Y = (U2.Z * V2.X) - (U2.X * V2.Z);
-      FaceNormals[1].Z = (U2.X * V2.Y) - (U2.Y * V2.X);
-      
-      VertNormals[v[0][0]] += FaceNormals[0];
-      VertNormals[v[0][1]] += FaceNormals[0];
-      VertNormals[v[0][2]] += FaceNormals[0];
-  
-      VertNormals[v[1][0]] += FaceNormals[1];
-      VertNormals[v[1][1]] += FaceNormals[1];
-      VertNormals[v[1][2]] += FaceNormals[1];
-    }
-    for ( int i = 0; i < FrameVerts; i++ )
-    {
-      FVector Normal = VertNormals[i];
-      if ( Normal.X == 0 && Normal.Y == 0 && Normal.Z == 0 )
-        continue;
-
-      float Norm = sqrtf((Normal.X * Normal.X) + (Normal.Y * Normal.Y) + (Normal.Z * Normal.Z));
-
-      Normal.X /= Norm;
-      Normal.Y /= Norm;
-      Normal.Z /= Norm;
-
-      Out.Printf("vn %.6f %.6f %.6f\n", Normal.X, Normal.Y, Normal.Z);
-    }
-    delete[] VertNormals;
+    i++;
   }
+  for ( ; i < Faces.Size(); i+=2 )
+  {
+    // Loop unrolling, woo
+    TriWedges[0][0] = Wedges[Faces[i].WedgeIndex[0]];
+    TriWedges[0][1] = Wedges[Faces[i].WedgeIndex[1]];
+    TriWedges[0][2] = Wedges[Faces[i].WedgeIndex[2]];
+  
+    TriWedges[1][0] = Wedges[Faces[i+1].WedgeIndex[0]];
+    TriWedges[1][1] = Wedges[Faces[i+1].WedgeIndex[1]];
+    TriWedges[1][2] = Wedges[Faces[i+1].WedgeIndex[2]];
+  
+    v[0][0] = TriWedges[0][0].VertexIndex;
+    v[0][1] = TriWedges[0][1].VertexIndex;
+    v[0][2] = TriWedges[0][2].VertexIndex;
+  
+    v[1][0] = TriWedges[1][0].VertexIndex;
+    v[1][1] = TriWedges[1][1].VertexIndex;
+    v[1][2] = TriWedges[1][2].VertexIndex;
+  
+    FVector U1 = *(FVector*)&Verts[FirstVert+v[0][0]] - *(FVector*)&Verts[FirstVert+v[0][1]];
+    FVector V1 = *(FVector*)&Verts[FirstVert+v[0][2]] - *(FVector*)&Verts[FirstVert+v[0][1]];
+  
+    FVector U2 = *(FVector*)&Verts[FirstVert+v[1][0]] - *(FVector*)&Verts[FirstVert+v[1][1]];
+    FVector V2 = *(FVector*)&Verts[FirstVert+v[1][2]] - *(FVector*)&Verts[FirstVert+v[1][1]];
+ 
+    FaceNormals[0].X = (U1.Y * V1.Z) - (U1.Z * V1.Y);
+    FaceNormals[0].Y = (U1.Z * V1.X) - (U1.X * V1.Z);
+    FaceNormals[0].Z = (U1.X * V1.Y) - (U1.Y * V1.X);
+  
+    FaceNormals[1].X = (U2.Y * V2.Z) - (U2.Z * V2.Y);
+    FaceNormals[1].Y = (U2.Z * V2.X) - (U2.X * V2.Z);
+    FaceNormals[1].Z = (U2.X * V2.Y) - (U2.Y * V2.X);
+      
+    VertNormals[v[0][0]] += FaceNormals[0];
+    VertNormals[v[0][1]] += FaceNormals[0];
+    VertNormals[v[0][2]] += FaceNormals[0];
+  
+    VertNormals[v[1][0]] += FaceNormals[1];
+    VertNormals[v[1][1]] += FaceNormals[1];
+    VertNormals[v[1][2]] += FaceNormals[1];
+  }
+  for ( u32 i = 0; i < FrameVerts; i++ )
+  {
+    FORTIFY_LOOP_SLOW( i, MAX_UINT32 );
+    FVector Normal = VertNormals[i];
+    if ( Normal.X == 0 && Normal.Y == 0 && Normal.Z == 0 )
+      continue;
+
+    float Norm = sqrtf((Normal.X * Normal.X) + (Normal.Y * Normal.Y) + (Normal.Z * Normal.Z));
+
+    Normal.X /= Norm;
+    Normal.Y /= Norm;
+    Normal.Z /= Norm;
+
+    Out.Printf("vn %.6f %.6f %.6f\n", Normal.X, Normal.Y, Normal.Z);
+  }
+  delete[] VertNormals;
 
   // Polygons
   FName TexName = 0;

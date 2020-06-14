@@ -88,7 +88,7 @@ public:
 
   virtual bool Init( UMusic* Music, int Section = 0 ) = 0;
   virtual void Exit() = 0;
-  virtual void GetPCM( void* Buffer, size_t Num ) = 0;
+  virtual void GetPCM( void* Buffer, int Num ) = 0;
   
   EStreamFormat GetStreamFormat()
   {

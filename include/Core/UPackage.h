@@ -38,6 +38,8 @@
 class LIBUNR_API FPackageFileIn : public FFileArchiveIn
 {
 public:
+  FPackageFileIn();
+
   int Ver;
   UPackage* Pkg;
 };
@@ -51,6 +53,8 @@ int ReadArrayIndex( FPackageFileIn& PkgFile );
 class LIBUNR_API FPackageFileOut : public FFileArchiveOut
 {
 public:
+  FPackageFileOut();
+
   int Ver;
   UPackage* Pkg;
 };

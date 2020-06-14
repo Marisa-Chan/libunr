@@ -52,12 +52,14 @@ void UTextBuffer::Load()
 
   idx TextSize;
   *PkgFile >> CINDEX( TextSize );
+  size_t BufSize;
   if ( TextSize > 0 )
   {
-    char* TextBuf = new char[TextSize + 1];
-    PkgFile->Read( TextBuf, TextSize + 1 );
+    BufSize = (size_t)TextSize + 1;
+    char* TextBuf = new char[BufSize];
+    PkgFile->Read( TextBuf, BufSize );
     Text = new FString( TextBuf );
-    delete TextBuf;
+    delete[] TextBuf;
   }
   else if ( TextSize < 0 )
   {
@@ -66,17 +68,18 @@ void UTextBuffer::Load()
     // Will this actually butcher the text if it has non-ascii
     // representable characters?
     TextSize = -TextSize;
+    BufSize  = (size_t)TextSize + 1;
 
-    wchar_t* TextBuf = new wchar_t[TextSize+1];
-    PkgFile->Read( TextBuf, (TextSize + 1) * 2 ); 
+    wchar_t* TextBuf = new wchar_t[BufSize];
+    PkgFile->Read( TextBuf, (size_t)(BufSize) * 2 );
 
-    char* MbsText = new char[TextSize+1];
+    char* MbsText = new char[BufSize];
     wcstombs( MbsText, TextBuf, TextSize );
 
     Text = new FString( MbsText );
 
-    delete TextBuf;
-    delete MbsText;
+    delete[] TextBuf;
+    delete[] MbsText;
   }
   else
   {
@@ -800,7 +803,7 @@ UClass::UClass()
 }
 
 UClass::UClass( FName ClassName, u32 Flags, UClass* InSuperClass, 
-    size_t InStructSize, UObject *(*NativeCtor)(size_t) )
+    u32 InStructSize, UObject *(*NativeCtor)(size_t) )
   : UState()
 {
   Export = NULL;
@@ -1027,7 +1030,7 @@ void UClass::PostLoad()
       while ( DefPropQueue.Size() > 0 )
       {
         QueuedClass = DefPropQueue.Front();
-        int OldOffset = QueuedClass->Default->PkgFile->Tell();
+        size_t OldOffset = QueuedClass->Default->PkgFile->Tell();
         QueuedClass->Default->PkgFile->Seek( QueuedClass->DefPropListOffset, Begin );
 
         // Copy property values from SuperClass default object

@@ -156,7 +156,7 @@ public:
     mpg123_exit();
   }
 
-  void GetPCM( void* Buffer, size_t Num )
+  void GetPCM( void* Buffer, int Num )
   {
     size_t Bytes = 0;
     if ( mpg123_read( Handle, (u8*)Buffer, Num, &Bytes ) != MPG123_OK )

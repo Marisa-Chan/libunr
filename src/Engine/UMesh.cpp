@@ -24,6 +24,7 @@
 */
 
 #include "Util/FString.h"
+#include "Core/USystem.h"
 #include "Engine/UMesh.h"
 #include "Engine/UModel.h"
 
@@ -34,18 +35,18 @@ FPackageFileIn& operator>>( FPackageFileIn& In, FMeshVert& MV )
     u64 XYZ;
     In >> XYZ;
 
-    MV.X = (XYZ & 0xFFFF) / 256.0;
-    MV.Y = ((XYZ >> 16) & 0xFFFF) / 256.0;
-    MV.Z = ((XYZ >> 32) & 0xFFFF) / 256.0;
+    MV.X = (XYZ & 0xFFFF) / 256.0f;
+    MV.Y = ((XYZ >> 16) & 0xFFFF) / 256.0f;
+    MV.Z = ((XYZ >> 32) & 0xFFFF) / 256.0f;
   }
   else
   {
     u32 XYZ;
     In >> XYZ;
 
-    MV.X = (XYZ & 0x7FF) / 8.0;
-    MV.Y = ((XYZ >> 11) & 0x7FF) / 8.0;
-    MV.Z = ((XYZ >> 22) & 0x3FF) / 4.0;
+    MV.X = (XYZ & 0x7FF) / 8.0f;
+    MV.Y = ((XYZ >> 11) & 0x7FF) / 8.0f;
+    MV.Z = ((XYZ >> 22) & 0x3FF) / 4.0f;
   }
     
   if ( MV.X > 128 )
@@ -127,13 +128,13 @@ void UMesh::Load()
   u32 ConnectsJump = 0;
 
   idx VertsCount;
-  idx TrisCount;
-  idx AnimsCount;
-  idx ConnectsCount;
-  idx VertLinksCount;
+  //idx TrisCount;
+  //idx AnimsCount;
+  //idx ConnectsCount;
+  //idx VertLinksCount;
   idx TexturesCount;
-  idx BoundBoxCount;
-  idx BoundSphereCount;
+  //idx BoundBoxCount;
+  //idx BoundSphereCount;
   idx TexLODCount;
 
   if ( In.Ver > PKG_VER_UN_200 )
@@ -235,7 +236,7 @@ bool UMesh::ExportUnreal3DMesh( const char* Dir, int Frame )
 
   FVertexDataHeader DataHdr;
   memset( &DataHdr, 0, sizeof(DataHdr) ); // Everything else goes unused
-  DataHdr.NumPolygons = Tris.Size();
+  DataHdr.NumPolygons = (u16)Tris.Size();
   DataHdr.NumVertices = FrameVerts;
   
   Out.Write( &DataHdr, sizeof(DataHdr) );
@@ -292,11 +293,14 @@ bool UMesh::ExportUnreal3DMesh( const char* Dir, int Frame )
   Out.Write( &AnivHdr, sizeof(AnivHdr) );
 
   uint32_t VtxOut;
-  for ( int i = 0; i < AnimFrames; i++ )
+  for ( u32 i = 0; i < AnimFrames; i++ )
   {
-    for ( int j = 0; j < FrameVerts; j++ )
+    FORTIFY_LOOP_SLOW( i, MAX_UINT32 );
+    for ( u32 j = 0; j < FrameVerts; j++ )
     {
-      FMeshVert Vtx = Verts[(i*FrameVerts)+j];
+      FORTIFY_LOOP_SLOW( j, MAX_UINT32 );
+      size_t Index = ((size_t)i * (size_t)FrameVerts) + (size_t)j;
+      FMeshVert Vtx = Verts[Index];
       VtxOut = ((int)(-Vtx.X * 8.0) & 0x7ff) | (((int)(-Vtx.Y * 8.0) & 0x7ff) << 11) | (((int)(Vtx.Z * 4.0) & 0x3ff) << 22);
       Out.Write( &VtxOut, sizeof(VtxOut) );
     }
@@ -328,8 +332,9 @@ bool UMesh::ExportToFile( const char* Dir, const char* Type, int Frame )
   {
     if ( Frame < 0 )
     {
-      for ( int i = 0; i < AnimFrames; i++ )
+      for ( u32 i = 0; i < AnimFrames; i++ )
       {
+        FORTIFY_LOOP_SLOW( i, MAX_UINT32 );
         if ( !ExportObjMesh( Dir, i ) )
           return false;
       }

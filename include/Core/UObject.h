@@ -223,7 +223,7 @@ protected: \
 private: \
   static constexpr const char* NativePkgName = TXT(pkg); \
   static const u32 StaticFlags = clsflags; \
-  static size_t NativeSize; \
+  static u32 NativeSize; \
 public: \
   typedef supcls Super; \
   void* operator new( size_t sz ) \
@@ -296,7 +296,7 @@ public: \
     } \
     return true; \
   } \
-  virtual size_t GetNativeSize() \
+  virtual u32 GetNativeSize() \
   { \
     return NativeSize; \
   } \
@@ -307,7 +307,7 @@ public: \
 
 #define IMPLEMENT_NATIVE_CLASS(cls) \
   LIBUNR_API UClass* cls::ObjectClass = NULL; \
-  LIBUNR_API size_t  cls::NativeSize  = sizeof( cls ); \
+  LIBUNR_API u32     cls::NativeSize  = sizeof( cls ); \
   LIBUNR_API FNativePropertyList* cls::StaticNativePropList = NULL; \
   bool cls::StaticSetPackageProperties() \
   { \
@@ -457,7 +457,7 @@ public:
   static UObject* StaticConstructObject( FName InName, UClass* InClass, 
     UObject* InOuter, UPackage* InPkg, FExport* InExport );
   static UClass* StaticAllocateClass( FName InName, u32 Flags, UClass* SuperClass, 
-    size_t InStructSize, UObject *(*NativeCtor)(size_t) );
+    u32 InStructSize, UObject *(*NativeCtor)(size_t) );
   static UObject* StaticFindObject( UPackage* Pkg, FName ObjName );
 
   static TArray<UObject*>* GetGlobalObjectPool();

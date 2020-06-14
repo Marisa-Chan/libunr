@@ -103,12 +103,12 @@ void URenderDevice::GetViewMatrix( FMatrix4x4& Mat, FVector& ViewLoc, FRotator& 
 
   float PiOverTwo = 3.14f / 2.0f;
 
-  float cy = cos( Rads.X );
-  float cz = cos( Rads.Y );
-  float czh = cos( Rads.Y - PiOverTwo );
-  float sy = sin( Rads.X );
-  float sz = sin( Rads.Y );
-  float szh = sin( Rads.Y - PiOverTwo );
+  float cy = cosf( Rads.X );
+  float cz = cosf( Rads.Y );
+  float czh = cosf( Rads.Y - PiOverTwo );
+  float sy = sinf( Rads.X );
+  float sz = sinf( Rads.Y );
+  float szh = sinf( Rads.Y - PiOverTwo );
 
   FVector Direction( cy * sz, sy, cy * cz );
   FVector Right( szh, 0, czh );
@@ -163,7 +163,7 @@ void URenderDevice::GetPerspectiveMatrix( FMatrix4x4& Mat, float FOV, float Widt
 {
   float zFarMinusNear = (zFar - zNear);
   float Aspect = (Width) / (Height);
-  float tanFov = tanf( DEG2RAD(FOV) / 2 );
+  float tanFov = tanf( (float)(DEG2RAD(FOV) / 2.0) );
 
   // Validate parameters
   if ( Width <= FLT_EPSILON || Height <= FLT_EPSILON || fabsf( zFarMinusNear ) <= FLT_EPSILON )

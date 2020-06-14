@@ -78,8 +78,9 @@ template<> inline UStruct* UObject::GetProperty<UStruct*>( UProperty* Prop, int 
   {
     GLogf( LOG_CRIT, "GetProperty<UStruct*> did not get a StructProperty" );
     GSystem->Exit( -1 );
+    return NULL; // shouldn't get here
   }
-  return (UStruct*)( (u8*)this + Prop->Offset + ( Idx * StructProp->Struct->StructSize ) );
+  return (UStruct*)( (u8*)this + Prop->Offset + ( (size_t)Idx * (size_t)StructProp->Struct->StructSize ) );
 }
 
 //-------------------------------------------------

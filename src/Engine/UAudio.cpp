@@ -50,14 +50,16 @@ UAudioSubsystem::~UAudioSubsystem()
 bool UAudioSubsystem::Init()
 {
   // Initialize music buffer and ring queue
-  MusicBuffer = new i16[MusicBufferCount * MusicBufferSize];
-  memset( MusicBuffer, 0, MusicBufferCount * MusicBufferSize * sizeof( i16 ) );
+  size_t BufferSize = (size_t)MusicBufferCount * (size_t)MusicBufferSize;
+  MusicBuffer = new i16[BufferSize];
+  memset( MusicBuffer, 0, BufferSize * sizeof( i16 ) );
 
   MusicQueue = new TRingQueue<i16*>( MusicBufferCount );
 
   // Fill out each buffer slot in the queue
-  for ( int i = 0; i < MusicBufferCount; i++ )
+  for ( u32 i = 0; i < MusicBufferCount; i++ )
   {
+    FORTIFY_LOOP( i, MAX_UINT32 );
     MusicQueue->Push( &MusicBuffer[MusicBufferSize * i] );
     MusicQueue->Pop();
   }

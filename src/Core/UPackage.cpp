@@ -68,6 +68,24 @@ int ReadArrayIndex( FPackageFileIn& PkgFile )
 }
 
 /*-----------------------------------------------------------------------------
+ * FPackageFileIn
+-----------------------------------------------------------------------------*/
+FPackageFileIn::FPackageFileIn()
+{
+  Ver = 0;
+  Pkg = NULL;
+}
+
+/*-----------------------------------------------------------------------------
+ * FPackageFileOut
+-----------------------------------------------------------------------------*/
+FPackageFileOut::FPackageFileOut()
+{
+  Ver = 0;
+  Pkg = NULL;
+}
+
+/*-----------------------------------------------------------------------------
  * FExport
 -----------------------------------------------------------------------------*/
 FPackageFileIn& operator>>( FPackageFileIn& In, FExport& Export )
@@ -312,8 +330,9 @@ bool UPackage::Load( const char* File )
   // read in the name table
   Names.Resize( Header.NameCount );
   PackageFile->Seek( Header.NameOffset, ESeekBase::Begin );
-  for ( int i = 0; i < Header.NameCount; i++ )
+  for ( u32 i = 0; i < Header.NameCount; i++ )
   {
+    FORTIFY_LOOP( i, MAX_UINT32 );
     FNameEntry* NameEntry = &Names[i];
     *PackageFile >> *NameEntry;
   }
@@ -321,14 +340,18 @@ bool UPackage::Load( const char* File )
   // read in imports
   Imports.Resize( Header.ImportCount );
   PackageFile->Seek( Header.ImportOffset, ESeekBase::Begin );
-  for ( int i = 0; i < Header.ImportCount; i++ )
+  for ( u32 i = 0; i < Header.ImportCount; i++ )
+  {
+    FORTIFY_LOOP( i, MAX_UINT32 );
     *PackageFile >> Imports[i];
+  }
   
   // read in exports
   Exports.Resize( Header.ExportCount );
   PackageFile->Seek( Header.ExportOffset, ESeekBase::Begin );
-  for ( int i = 0; i < Header.ExportCount; i++ )
+  for ( u32 i = 0; i < Header.ExportCount; i++ )
   {
+    FORTIFY_LOOP( i, MAX_UINT32 );
     *PackageFile >> Exports[i];
     Exports[i].Index = i;
   }
@@ -561,7 +584,7 @@ void UPackage::LoadEditableTypes()
   bool bDoGroupPathExport = false;
   const char* ClassName;
   const char* ObjName;
-  u32 ClassHash;
+  //u32 ClassHash;
   const char* Types[] =
   {
     "None",
@@ -688,4 +711,3 @@ TArray<UPackage*>* UPackage::GetLoadedPackages()
 }
 
 IMPLEMENT_NATIVE_CLASS( UPackage );
-

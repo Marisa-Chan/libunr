@@ -151,10 +151,10 @@ LRESULT UWindowsViewport::StaticWndProc( HWND Hwnd, UINT Msg, WPARAM WParam, LPA
     This->Client->HandleMouseInput( GET_X_LPARAM( LParam ), GET_Y_LPARAM( LParam ) );
     break;
   case WM_KEYDOWN:
-    This->Client->HandleInput( WParam, true );
+    This->Client->HandleInput( (int)WParam, true );
     break;
   case WM_KEYUP:
-    This->Client->HandleInput( WParam, false );
+    This->Client->HandleInput( (int)WParam, false );
     break;
   case WM_LBUTTONDOWN:
     This->Client->HandleInput( VK_LBUTTON, true );

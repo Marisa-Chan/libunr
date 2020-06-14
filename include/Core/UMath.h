@@ -188,6 +188,13 @@ struct LIBUNR_API FBox
   FVector Max;
   u8      IsValid;
 
+  FBox()
+  {
+    Min = FVector( 0, 0, 0 );
+    Max = FVector( 0, 0, 0 );
+    IsValid = false;
+  }
+
   bool IsZero()
   {
     FVector Sub = Max - Min;
@@ -465,7 +472,7 @@ struct LIBUNR_API FScale
 {
   FVector Scale;
   float   SheerRate;
-  enum ESheerAxis
+  enum class ESheerAxis
   {
     SHEER_None,
     SHEER_XY,
@@ -477,6 +484,13 @@ struct LIBUNR_API FScale
   };
 
   ESheerAxis SheerAxis;
+
+  FScale()
+  {
+    Scale = FVector( 0, 0, 0 );
+    SheerRate = 0;
+    SheerAxis = ESheerAxis::SHEER_None;
+  }
 
   void GetMatrix( FMatrix4x4& Mat );
 

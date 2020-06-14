@@ -62,10 +62,6 @@
   #endif
  
 #elif defined _MSC_VER
-	
-  #pragma warning(disable:4251) // Non dll-interface class 'type' used as based for dll-interface class 'type2'
-  #pragma warning(disable:4275) // Class 'type' needs to have dll-interface to be used by clients of class 'type2'
-  #pragma warning(disable:4005) // Macro redefinition (super annoying because TEXT is not properly defined on MBCS)
 
   #define DLL_EXPORT __declspec(dllexport)
   #define DLL_IMPORT __declspec(dllimport)
@@ -127,15 +123,37 @@
   ((a > b) ? a : b)
 
 #define OFFSET_OF(cls, member) \
- ((uintptr_t)&(((cls*)0)->member))
+ ((u32)((uintptr_t)&(((cls*)0)->member)))
 
 #define BLOCK_COPY_CTOR(cls) \
 private: \
   cls (const cls & copy); \
 
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof(*a))
+
+// Text define
 #define TXT(s) #s
 
-#define ARRAY_SIZE(a) (sizeof(a) / sizeof(*a))
+// Loop wraparound protection
+#define FORTIFY_LOOP(var, limit) \
+do { \
+  if (var == limit) { \
+    GLogf(LOG_CRIT, "FORTIFY_LOOP assert failed! %s == %p (%s:%i)", TXT(var), limit, __FUNCTION__, __LINE__); \
+    GSystem->Exit( -1 ); \
+  } \
+} while ( 0 );
+
+#ifdef LIBUNR_DEBUG
+  #define FORTIFY_LOOP_SLOW(var, limit) \
+  do { \
+    if (var == limit) { \
+      GLogf(LOG_CRIT, "FORTIFY_LOOP assert failed! %s == %p (%s:%i)", TXT(var), limit, __FUNCTION__, __LINE__); \
+      GSystem->Exit( -1 ); \
+    } \
+  } while ( 0 );
+#else
+  #define FORTIFY_LOOP_SLOW(var, limit)
+#endif
 
 // Timers
 #include <time.h>

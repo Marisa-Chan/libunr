@@ -154,7 +154,7 @@ int FConfig::Load( const char* Filename )
   char Probe = '\0';
   while ( !IniFile.Eof() ) // why doesn't Eof() work??
   {
-    Status = IniFile.Read( &Probe, 1 );
+    Status = (int)IniFile.Read( &Probe, 1 );
     if ( Status == MAX_UINT32 )
     {
       GLogf( LOG_WARN, "Failed to read from INI file '%s'", Filename );
@@ -304,7 +304,7 @@ int FConfig::Load( const char* Filename )
         }
 
         Index = strtol( IndexBuf, NULL, 10 );
-        Entry->Values->Resize( Index+1 );
+        Entry->Values->Resize( (size_t)Index+1 );
         memset( IndexBuf, 0, sizeof( IndexBuf ) );
 
         Entry->bWriteIndices = true;
@@ -322,10 +322,13 @@ int FConfig::Load( const char* Filename )
         *ValuePtr++ = Probe;
       }
 
-      if ( !bIndexed )
-        Entry->Values->PushBack( strdup( ValueBuf ) );
-      else
-        (*Entry->Values)[Index] = strdup( ValueBuf );
+      if ( Entry )
+      {
+        if ( !bIndexed )
+          Entry->Values->PushBack( strdup( ValueBuf ) );
+        else
+          (*Entry->Values)[Index] = strdup( ValueBuf );
+      }
 
       ReadNewLine( IniFile, Filename );
       bIndexed = false;
@@ -391,7 +394,7 @@ int FConfig::Save()
         memset( WriteBuf, 0, sizeof( WriteBuf ) );
         if ( UNLIKELY( Entry->bWriteIndices ) )
         {
-          WriteLen = snprintf( WriteBuf, sizeof( WriteBuf ), "%s[%lu]=%s\r\n", 
+          WriteLen = snprintf( WriteBuf, sizeof( WriteBuf ), "%s[%llu]=%s\r\n", 
               Entry->Name, k, Value );
         }
         else
@@ -480,7 +483,7 @@ static inline u64 ReadUInt( FConfig* Config, const char* Category, const char* V
 {
   u64 Value = 0;
   char StrDef[24];
-  sprintf( StrDef, "%lu", Default );
+  sprintf( StrDef, "%llu", Default );
 
   char* StrVar = Config->ReadString( Category, Variable, Index, StrDef );
   if ( LIKELY( StrVar ) )
@@ -518,7 +521,7 @@ static inline i64 ReadInt( FConfig* Config, const char* Category, const char* Va
 {
   i64 Value = 0;
   char StrDef[24];
-  sprintf( StrDef, "%ld", Default );
+  sprintf( StrDef, "%lld", Default );
 
   char* StrVar = Config->ReadString( Category, Variable, Index, StrDef );
   if ( LIKELY( StrVar ) )
@@ -794,12 +797,15 @@ FConfig* FConfigManager::GetConfig( const char* Name )
 
 void FConfigManager::DelConfig( FConfig* Cfg )
 {
-  for ( int i = 0; i < Configs.Size(); i++ )
+  if ( Cfg )
   {
-    if ( Configs[i] == Cfg )
+    for ( int i = 0; i < Configs.Size(); i++ )
     {
-      delete Cfg;
-      Configs.Data()[i] = NULL;
+      if ( Configs[i] == Cfg )
+      {
+        delete Cfg;
+        Configs.Data()[i] = NULL;
+      }
     }
   }
 }

@@ -101,7 +101,7 @@ void UFireTexture::Tick( float DeltaTime )
   }
 
   // Enforce number of sparks based on array size
-  NumSparks = Sparks->Size();
+  NumSparks = (int)Sparks->Size();
 
   u8* Buf = Buffer->DataArray.Data();
 
@@ -118,9 +118,9 @@ void UFireTexture::Tick( float DeltaTime )
 
   // TODO: SIMD acceleration?
   // Modify frame buffer
-  for ( int y = 0; y < VSize; y++ )
+  for ( u32 y = 0; y < VSize; y++ )
   {
-    for ( int x = 0; x < USize; x++ )
+    for ( u32 x = 0; x < USize; x++ )
     {
       int Value; 
       if ( bRising )
@@ -152,7 +152,6 @@ void UFireTexture::Tick( float DeltaTime )
   {
     Spark& S = Sparks->At( i );
     Spark New;
-    u8 Heat;
     u8 Extra;
 
     // General rules/mindset for figuring out how each spark type works
@@ -413,7 +412,7 @@ void UFireTexture::Load()
       // Construct framebuffer for use in software
       bHardwareAccelerated = false;
       Buffer = &Mips[0];
-      Buffer->DataArray.Resize( Buffer->USize * Buffer->VSize );
+      Buffer->DataArray.Resize( (size_t)Buffer->USize * (size_t)Buffer->VSize );
       UMask = Buffer->USize - 1;
       VMask = Buffer->VSize - 1;
       
@@ -461,8 +460,8 @@ void UFireTexture::CalculateRenderTable()
     // From there, we can use RenderHeat to adjust the color balance such
     // that colors lower in the table aren't just black/background color
     // 
-    float HeatIndex = i / 4.0;
-    float RenderHeatContrib = -(255 - RenderHeat) / 16.0;
+    float HeatIndex = (float)(i / 4.0);
+    float RenderHeatContrib = (float)(-(255 - RenderHeat) / 16.0);
     float Adjust = 1.0;
     RenderTable[i] = (int)FClamp( HeatIndex + RenderHeatContrib + Adjust, 0.0, RenderHeat );
   }
@@ -489,14 +488,15 @@ void UWaterTexture::Load()
     bHardwareAccelerated = false;
 
     Mips.Resize( 1 );
-
     Buffer = &Mips[0];
-    Buffer->DataArray.Resize( Buffer->USize * Buffer->VSize );
+
+    size_t BufferSize = (size_t)Buffer->USize * (size_t)Buffer->VSize;
+    Buffer->DataArray.Resize( BufferSize );
 
     UMask = Buffer->USize - 1;
     VMask = Buffer->VSize - 1;
     
-    size_t SourceSize = Buffer->USize * Buffer->VSize * 2;
+    size_t SourceSize = BufferSize * 2;
     SourceFields = new int[SourceSize];
     memset( SourceFields, 0, SourceSize * sizeof(int) );
 
@@ -529,7 +529,7 @@ void UWaveTexture::Load()
 
   // FIXME: Remove this once we actually implement wave textures
   if ( GEngine && GEngine->Render )
-    memset( Buffer->DataArray.Data(), 127, Buffer->USize * Buffer->VSize );
+    memset( Buffer->DataArray.Data(), 127, (size_t)Buffer->USize * (size_t)Buffer->VSize );
 }
 
 void UWaveTexture::Tick( float DeltaTime )
@@ -577,7 +577,7 @@ void UWetTexture::Load()
 
   // FIXME: Remove this once we actually implement wet textures
   if ( GEngine && GEngine->Render && SourceTexture != NULL )
-    memcpy( Buffer->DataArray.Data(), SourceTexture->Mips[0].DataArray.Data(), Buffer->USize * Buffer->VSize );
+    memcpy( Buffer->DataArray.Data(), SourceTexture->Mips[0].DataArray.Data(), SourceTexture->Mips[0].DataArray.Size() );
 }
 
 void UWetTexture::Tick( float DeltaTime )
@@ -672,11 +672,13 @@ void UIceTexture::Load()
   Super::Load();
 
   // FIXME: Remove this once we actually implement ice textures
+  size_t BufferSize = (size_t)SourceTexture->USize * (size_t)SourceTexture->VSize;
+
   Mips.Resize( 1 );
-  Mips[0].DataArray.Resize( SourceTexture->USize * SourceTexture->VSize );
+  Mips[0].DataArray.Resize( BufferSize );
 
   if ( GEngine && GEngine->Render && SourceTexture != NULL )
-    memcpy( Mips[0].DataArray.Data(), SourceTexture->Mips[0].DataArray.Data(), SourceTexture->USize * SourceTexture->VSize );
+    memcpy( Mips[0].DataArray.Data(), SourceTexture->Mips[0].DataArray.Data(), BufferSize );
 }
 
 IMPLEMENT_NATIVE_CLASS( UFractalTexture );

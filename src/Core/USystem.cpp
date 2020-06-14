@@ -299,7 +299,7 @@ void* USystem::RunThread( ThreadFunc Func, void* Args )
 int USystem::JoinThread(void* Thread, void** OutReturnVal)
 {
     int out;
-    int index = -1;
+    ssize_t Index = -1;
 
     //Thread is NULL, return fail.
     if ( Thread == NULL )
@@ -310,18 +310,18 @@ int USystem::JoinThread(void* Thread, void** OutReturnVal)
     {
         if (Threads[i] == Thread)
         {
-            index = i;
+            Index = i;
         }
     }
 
     //Thread doesnt exist, return fail.
-    if( index == -1 )
+    if( Index == -1 )
         return 1;
 
 #if defined LIBUNR_WIN32
 
     WaitForSingleObject( Thread, INFINITE );
-    Threads[index] = NULL;
+    Threads[Index] = NULL;
     out = 0;
 
 #elif defined LIBUNR_POSIX
@@ -650,7 +650,7 @@ void USystem::RealPath( const char* Path, char* FullPath, size_t FullPathSize )
 #endif
     {
       // If the path doesn't start from root, get the current directory
-      char* ignored = getcwd( FullPath, FullPathSize );
+      char* ignored = getcwd( FullPath, (int)FullPathSize );
       f += strlen( FullPath );
       *f++ = DIRECTORY_SEPARATOR;
       *c++ = DIRECTORY_SEPARATOR;
@@ -687,7 +687,7 @@ void USystem::RealPath( const char* Path, char* FullPath, size_t FullPathSize )
       else
       {
         // Copy the current folder contents to the full path
-        u16 CfLen = strlen( c );
+        u16 CfLen = (u16)strlen( c );
         if ( CfLen > 0 )
         {
           memcpy( f, c, CfLen );

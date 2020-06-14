@@ -85,8 +85,8 @@ bool UCanvas::Init()
   LargeFont = (UFont*)StaticLoadObject( Pkg, "LargeFont", UFont::StaticClass(), NULL );
   Viewport = (UViewport*)Outer;
 
-  ClipX = Viewport->Width;
-  ClipY = Viewport->Height;
+  ClipX = (float)Viewport->Width;
+  ClipY = (float)Viewport->Height;
 
   return true;
 }
@@ -99,20 +99,20 @@ void UCanvas::StrLen( FString* Str, float* XL, float* YL )
 void UCanvas::DrawText( FString* Text, bool CR, int PolyFlags )
 {
   // TODO: Implement CR (carriage return) functionality
-  FBoxInt2D Dim( CurX, CurY, ClipX, ClipY );
+  FBoxInt2D Dim( (int)CurX, (int)CurY, (int)ClipX, (int)ClipY );
   GEngine->Render->DrawText( Font, Dim, *Text, PolyFlags );
 }
 
 void UCanvas::DrawTile( UTexture* Tex, float XL, float YL, float U, float V, float UL, float VL, int PolyFlags )
 {
-  FBoxInt2D Dim( CurX, CurY, CurX + XL, CurY + YL );
+  FBoxInt2D Dim( (int)CurX, (int)CurY, (int)CurX + (int)XL, (int)CurY + (int)YL );
   FRotator Rot;
   GEngine->Render->DrawTile( Tex, Dim, Rot, U, V, UL, VL, PolyFlags );
 }
 
 void UCanvas::DrawTileClipped( UTexture* Tex, float XL, float YL, float U, float V, float UL, float VL, int PolyFlags )
 {
-  FBoxInt2D Dim( CurX, CurY, CurX + XL, CurY + YL );
+  FBoxInt2D Dim( (int)CurX, (int)CurY, (int)CurX + (int)XL, (int)CurY + (int)YL );
   FRotator Rot;
   GEngine->Render->DrawTile( Tex, Dim, Rot, U, V, UL, VL, PolyFlags );
 }

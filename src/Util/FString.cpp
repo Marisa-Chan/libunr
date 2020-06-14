@@ -485,7 +485,7 @@ FString& FString::Replace( size_t Pos, size_t Len, size_t n, char c )
   if ( Pos + Len > NumElements )
     Len = NumElements - Pos;
 
-  for ( int i = Pos; i < Len; i++ )
+  for ( size_t i = Pos; i < Len; i++ )
     Array[i] = c;
 
   return *this;
@@ -496,7 +496,7 @@ size_t FString::Find( const FString& Str, size_t Pos )
   char* Result = &Array[Pos];
   char* StrPtr = Str.Array;
 
-  int Len = Str.Length();
+  size_t Len = Str.Length();
   int Matched = 0;
   do
   {
@@ -515,7 +515,7 @@ size_t FString::Find( const char* s, size_t Pos )
   char* Result = &Array[Pos];
   const char* StrPtr = s;
 
-  int Len = strlen( s );
+  size_t Len = strlen( s );
   int Matched = 0;
   do
   {
@@ -534,7 +534,7 @@ size_t FString::Find( const char* s, size_t Pos, size_t n )
   char* Result = &Array[Pos];
   const char* StrPtr = s;
 
-  int Len = strlen( s );
+  size_t Len = strlen( s );
   int Matched = 0;
   do
   {
@@ -569,7 +569,7 @@ size_t FString::RFind( const FString& Str, size_t Pos )
   char* Result = &Array[Pos];
   const char* StrPtr = &Str.Back();
 
-  int Len = Str.Length();
+  size_t Len = Str.Length();
   int Matched = 0;
   do
   {
@@ -588,7 +588,7 @@ size_t FString::RFind( const char* s, size_t Pos )
   if ( Pos == MAX_SIZE )
     Pos = NumElements - 1;
 
-  int Len = strlen( s );
+  size_t Len = strlen( s );
   char* Result = &Array[Pos];
   const char* StrPtr = &s[Len - 1];
 
@@ -609,7 +609,7 @@ size_t FString::RFind( const char* s, size_t Pos, size_t n )
   if ( Pos == MAX_SIZE )
     Pos = NumElements - 1;
 
-  int Len = strlen( s );
+  size_t Len = strlen( s );
   char* Result = &Array[Pos];
   const char* StrPtr = &s[Len - 1];
 
@@ -1051,7 +1051,7 @@ LIBUNR_API FPackageFileIn& operator>>( FPackageFileIn& In, FString& Str )
 
   if ( Size > 0 )
   {
-    Str.Reserve( Size-1 );
+    Str.Reserve( (size_t)Size-1 );
     
     // Slow but secure
     for ( int i = 0; i < Size; i++ )
@@ -1074,15 +1074,15 @@ LIBUNR_API FPackageFileIn& operator>>( FPackageFileIn& In, FString& Str )
     Size = -Size;
 
     wchar_t* TextBuf = new wchar_t[Size];
-    In.Read( TextBuf, (Size) * 2 );
+    In.Read( TextBuf, size_t(Size) * 2 );
 
     char* MbsText = new char[Size];
     wcstombs( MbsText, TextBuf, Size );
 
     Str.Assign( MbsText );
 
-    delete TextBuf;
-    delete MbsText;
+    delete[] TextBuf;
+    delete[] MbsText;
   }
 
   return In;

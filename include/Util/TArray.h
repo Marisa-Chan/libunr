@@ -151,7 +151,7 @@ public:
     if ( n > NumElements )
     {
       if ( TDestructorInfo<T>::NeedsDestructor() )
-        for ( int i = NumElements; i < n; i++ )
+        for ( size_t i = NumElements; i < n; i++ )
           new (&Array[i]) T();
       else
         memset( &Array[NumElements], 0, (n - NumElements) * sizeof( T ) );
@@ -166,7 +166,7 @@ public:
 
     if ( n > NumElements )
     {
-      for ( int i = NumElements; i < n; i++ )
+      for ( size_t i = NumElements; i < n; i++ )
         Array[i] = Value;
     }
     NumBytes = n * sizeof( T );

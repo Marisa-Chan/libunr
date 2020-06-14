@@ -177,7 +177,7 @@ class LIBUNR_API UClass : public UState
 
   UClass();
   UClass( FName ClassName, u32 Flags, UClass* SuperClass, 
-    size_t InStructSize, UObject *(*NativeCtor)(size_t) );
+    u32 InStructSize, UObject *(*NativeCtor)(size_t) );
   
   virtual void Load();
   virtual void PostLoad();

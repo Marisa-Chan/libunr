@@ -221,18 +221,23 @@ bool UTexture::ExportToFile( const char* Dir, const char* Type )
       *Out << Alpha;
     }
     
-    bfOffBits = Out->Tell();
+    bfOffBits = (u32)Out->Tell();
     
     // Just export the first mipmap since that's probably what the user is going to want anyway
     // if there's some need for exporting choice mipmaps, implement it later
     u8* Bitmap = Mips[0].DataArray.Data();
 
     // We need to write each row from bottom to top
-    for ( int i = VSize-1; i >= 0; i-- )
-      for ( int j = 0; j < USize; j++ ) 
-        *Out << Bitmap[(i*USize) + j];
+    for ( u32 i = VSize; i > 0; i-- )
+    {
+      for ( u32 j = 0; j < USize; j++ )
+      {
+        FORTIFY_LOOP_SLOW( j, 8192 );
+        *Out << Bitmap[((i-1) * USize) + j];
+      }
+    }
     
-    bfSize = Out->Tell();
+    bfSize = (u32)Out->Tell();
     
     // Go back and write header info
     Out->Seek( 2, Begin );

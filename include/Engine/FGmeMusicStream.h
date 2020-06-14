@@ -62,7 +62,7 @@ public:
     gme_delete( MusicEmu );
   }
 
-  void GetPCM( void* Buffer, size_t Num )
+  void GetPCM( void* Buffer, int Num )
   {
     // Samples are always in stereo at 16-bit, divide Num by 2
     const char* Err = gme_play( MusicEmu, Num / 2, (i16*)Buffer );

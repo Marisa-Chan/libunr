@@ -239,7 +239,7 @@ FVector FRotator::GetDegrees()
 {
   // Convert rotator coordinates to degrees
   // 16384 rotation units = 90 degree turn, 16384 / 90 = 182.0444444 rotation units per degree
-  #define UU_ROT_TO_DEG(angle) (((double)angle * 90.0) / 16384.0)
+  #define UU_ROT_TO_DEG(angle) ((float)(((double)angle * 90.0) / 16384.0))
   return FVector( UU_ROT_TO_DEG( Pitch ), UU_ROT_TO_DEG( Yaw ), UU_ROT_TO_DEG( Roll ) );
 }
 
@@ -251,7 +251,7 @@ FVector FRotator::GetRadians()
   // Simplify -> 90/180 = 1/2 -> ((Rot*PI)/16384) * (1/2) -> (Rot*PI) / 32768
   // Use multiplication for speed, so 1/32768 = 0.000030517578125
 
-  #define UU_ROT_TO_RAD(angle) (((double)angle*PI) * 0.000030517578125)
+  #define UU_ROT_TO_RAD(angle) ((float)(((double)angle*PI) * 0.000030517578125))
 
   return FVector( UU_ROT_TO_RAD( Pitch ), UU_ROT_TO_RAD( Yaw ), UU_ROT_TO_RAD( Roll ) );
 }
@@ -264,12 +264,12 @@ void FRotator::GetMatrix( FMatrix4x4& Out )
 
   // See glm::eulerAngleYZX for original implementation
   // Here, pitch and yaw were negated to match expected rotation direction compared to UE1
-  float c1 = cos( Rads.Y );
-  float s1 = sin( Rads.Y );
-  float c2 = cos( Rads.Z );
-  float s2 = sin( Rads.Z );
-  float c3 = cos( -Rads.X );
-  float s3 = sin( -Rads.X );
+  float c1 = cosf( Rads.Y );
+  float s1 = sinf( Rads.Y );
+  float c2 = cosf( Rads.Z );
+  float s2 = sinf( Rads.Z );
+  float c3 = cosf( -Rads.X );
+  float s3 = sinf( -Rads.X );
 
   Out.Data[0][0] = c1 * c2;
   Out.Data[0][1] = s2;
@@ -296,12 +296,12 @@ void FRotator::GetAxes( FVector& Fwd, FVector& Right, FVector& Up )
   Rads.X = -Rads.X;
   float cp, sp, cy, sy, cr, sr;
 
-  cp = cos( Rads.X );
-  cy = cos( Rads.Y );
-  cr = cos( Rads.Z );
-  sp = sin( Rads.X );
-  sy = sin( Rads.Y );
-  sr = sin( Rads.Z );
+  cp = cosf( Rads.X );
+  cy = cosf( Rads.Y );
+  cr = cosf( Rads.Z );
+  sp = sinf( Rads.X );
+  sy = sinf( Rads.Y );
+  sr = sinf( Rads.Z );
 
   Fwd.X = cp * cy;
   Fwd.Y = cp * sy;

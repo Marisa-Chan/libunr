@@ -89,7 +89,7 @@ UObject* UObject::StaticConstructObject( FName InName, UClass* InClass, UObject*
   Out->Pkg = InPkg;
   Out->Export = InExport;
   Out->Name = InName;
-  Out->Index = ObjectPool.Size();
+  Out->Index = (int)ObjectPool.Size();
   Out->RefCnt = 1;
   Out->Outer = InOuter;
   Out->ObjectFlags = InExport->ObjectFlags;
@@ -115,7 +115,7 @@ UObject* UObject::StaticConstructObject( FName InName, UClass* InClass, UObject*
 }
 
 UClass* UObject::StaticAllocateClass( FName ClassName, u32 Flags, UClass* SuperClass, 
-    size_t InStructSize, UObject *(*NativeCtor)(size_t) )
+    u32 InStructSize, UObject *(*NativeCtor)(size_t) )
 {
   UClass* Out = new UClass( ClassName, Flags, SuperClass, InStructSize, NativeCtor );
   Out->Class = UClass::StaticClass();

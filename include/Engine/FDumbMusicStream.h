@@ -144,7 +144,7 @@ public:
     DuhRenderer = NULL;
   }
 
-  void GetPCM( void* Buffer, size_t Num )
+  void GetPCM( void* Buffer, int Num )
   {
     // 4 comes from (Bits / 8) * NumChannels, which is (16 / 8) * 2 = 2 * 2 = 4;
     duh_render_int( DuhRenderer, &Samples, &NumSamples, 16, 0, 1.0f, 65536.0f / (float)StreamRate, Num / 4, Buffer );

@@ -92,10 +92,10 @@ FPackageFileOut& operator<<( FPackageFileOut& Out, FNameEntry& Name )
 {
   Name.Data[NAME_LEN-1] = '\0'; // just in case
   
-  int len = 0;
+  u32 len = 0;
   if( Out.Ver > PKG_VER_UN_220 )
   {
-    len = strlen( Name.Data );
+    len = (u32)strlen( Name.Data );
     Out << CINDEX( len );
   }
   
@@ -233,10 +233,10 @@ u32 FName::FNameTableManager::FindName( const char* Text, size_t Len, int Flags,
 u32 FName::FNameTableManager::AddName( FNameEntry& Entry, u32 Bucket )
 {
   Entry.NextHash = Buckets[Bucket];
-  Buckets[Bucket] = Entries.Size();
+  Buckets[Bucket] = (int)Entries.Size();
 
   Entries.PushBack( Entry );
-  return Entries.Size() - 1;
+  return (u32)(Entries.Size() - 1);
 }
 
 u32 FName::FNameTableManager::AddName( const char* Text, size_t Len, u32 Hash, int Flags, u32 Bucket )

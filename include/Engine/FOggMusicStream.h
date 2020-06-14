@@ -83,7 +83,7 @@ class FOggMusicStream : public FMusicStream
     switch ( Whence )
     {
     case SEEK_SET:
-      if ( Offset > Len )
+      if ( (size_t)Offset > Len )
         Pos = Len;
       else
         Pos = Offset;
@@ -97,7 +97,7 @@ class FOggMusicStream : public FMusicStream
         Pos += Offset;
       break;
     case SEEK_END:
-      if ( Offset > Len )
+      if ( (size_t)Offset > Len )
         Pos = 0;
       else
         Pos = Len - Offset;
@@ -128,7 +128,7 @@ class FOggMusicStream : public FMusicStream
   static long StaticVorbisTell( void* Data )
   {
     PrivateData* PrivDataPtr = (PrivateData*)Data;
-    return PrivDataPtr->Stream->Pos;
+    return (long)PrivDataPtr->Stream->Pos;
   }
 
 public:
@@ -163,14 +163,14 @@ public:
     ov_clear( &VorbisFile );
   }
 
-  void GetPCM( void* Buffer, size_t Num )
+  void GetPCM( void* Buffer, int Num )
   {
     long IsBigEndian = 0;
 #if defined LIBUNR_BIG_ENDIAN
     IsBigEndian = 1;
 #endif
 
-    long Ret = ov_read( &VorbisFile, (char*)Buffer, Num, IsBigEndian, 2, 1, NULL );
+    long Ret = ov_read( &VorbisFile, (char*)Buffer, (int)Num, IsBigEndian, 2, 1, NULL );
     if ( Ret < 0 )
       GLogf( LOG_ERR, "Failed to get PCM from ogg stream for music '%s'", PrivData.Music->Name.Data() );
   }

@@ -49,8 +49,8 @@ bool UViewport::Init( int InWidth, int InHeight )
   BitsPerPixel = GLibunrConfig->ReadUInt8( "libunr", "RenderBpp", 0, 24 ); // Usually ignored
 
   Fov = GLibunrConfig->ReadFloat( "libunr", "RenderFOV", 0, 90.0f );
-  TanHalfXFov = tan( Fov / 2.0 );
-  TanHalfYFov = ((double)Height / (double)Width) * TanHalfXFov;
+  TanHalfXFov = tanf( Fov / 2.0f );
+  TanHalfYFov = ((float)Height / (float)Width) * TanHalfXFov;
 
   Client = GEngine->Client;
   return true;

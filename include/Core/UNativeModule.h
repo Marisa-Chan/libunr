@@ -39,7 +39,7 @@
     return cls::StaticClass(); \
   } \
   DLL_EXPORT UClass* cls::ObjectClass = NULL; \
-  DLL_EXPORT size_t  cls::NativeSize  = sizeof( cls ); \
+  DLL_EXPORT u32     cls::NativeSize  = sizeof( cls ); \
   DLL_EXPORT FNativePropertyList* cls::StaticNativePropList = NULL; \
   bool cls::StaticSetPackageProperties() \
   { \
