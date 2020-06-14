@@ -23,13 +23,14 @@
  *========================================================================
 */
 
-#ifndef _FFILEARCHIVE_H_
-#define _FFILEARCHIVE_H_
+#pragma once 
 
-#pragma once
+#if defined __APPLE__
+  #include <sys/uio.h>
+  #include <unistd.h>
+#endif
+
 #include <sys/types.h>
-#include <sys/uio.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "Util/FArchive.h"
@@ -83,5 +84,3 @@ public:
   virtual int Open( const char* Filename );
   virtual int Open( const FString& Filename );
 };
-
-#endif
