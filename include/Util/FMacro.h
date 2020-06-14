@@ -25,7 +25,7 @@
 
 #pragma once
 
-#if defined __linux__ || defined __unix__
+#if defined __linux__ || defined __unix__ || defined __APPLE__
   #define LIBUNR_POSIX
   #define DIRECTORY_SEPARATOR '/'
 #elif defined _WIN32
