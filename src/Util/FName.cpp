@@ -51,15 +51,20 @@ FNameEntry::FNameEntry()
 
 FNameEntry::FNameEntry( const char* InStr, u32 InHash, int InFlags )
 {
-  strncpy( Data, InStr, NAME_LEN );
-  Data[NAME_LEN-1] = '\0';
-  Flags = InFlags;
-  Hash = (InHash) ? InHash : SuperFastHashString( InStr );
-  NextHash = 0;
+  Init( InStr, InHash, InFlags );
 }
 
 FNameEntry::~FNameEntry()
 {
+}
+
+void FNameEntry::Init( const char* InStr, u32 InHash, int InFlags )
+{
+  strncpy( Data, InStr, NAME_LEN );
+  Data[NAME_LEN - 1] = '\0';
+  Flags = InFlags;
+  Hash = (InHash) ? InHash : SuperFastHashString( InStr );
+  NextHash = 0;
 }
 
 FPackageFileIn& operator>>( FPackageFileIn& In, FNameEntry& Name )

@@ -50,6 +50,8 @@ public:
    FNameEntry( const char* InStr, u32 InHash = 0, int InFlags = 0 );
   ~FNameEntry();
   
+  void Init( const char* InStr, u32 InHash = 0, int InFlags = 0 );
+
   friend FPackageFileIn&  operator>>( FPackageFileIn& In,  FNameEntry& Name );
   friend FPackageFileOut& operator<<( FPackageFileOut& In, FNameEntry& Name );
 

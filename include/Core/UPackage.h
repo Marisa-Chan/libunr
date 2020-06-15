@@ -159,9 +159,13 @@ class LIBUNR_API UPackage : public UObject
   FString*        GetFullObjName( FExport* ObjExp );
   size_t          GetPackageVer();
   void            LoadEditableTypes();
-
-  size_t AddName( const char* Name );
   size_t FindLocalName( const char* Name );
+
+  // Package manipulation
+  size_t AddName( const char* Name, int Flags );
+  size_t AddImport( UObject* Obj );
+  size_t AddExport( UObject* Obj );
+  void Optimize();
   
   // Name resolution
   const char* ResolveNameFromIdx( idx Index );

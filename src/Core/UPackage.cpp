@@ -559,6 +559,99 @@ size_t UPackage::FindLocalName( const char* Name )
   return MAX_SIZE;
 }
 
+size_t UPackage::AddName( const char* Name, int Flags )
+{
+  FNameEntry NewName( Name, 0, Flags );
+  Names.PushBack( NewName );
+  return Names.Size()-1;
+}
+
+size_t UPackage::AddImport( UObject* Obj )
+{
+  if ( !Obj )
+    return 0;
+
+  // FIXME: Should each instance of this be it's own function?
+  // Make sure all relevant names are added before adding this import
+  int Flags = RF_TagExp | RF_LoadContextFlags;
+  size_t ClassPackageName = FindLocalName( Obj->Class->Pkg->Name.Data() );
+  if ( ClassPackageName == MAX_SIZE )
+  {
+    if ( Obj->Class->Pkg->ObjectFlags & RF_Native )
+      Flags |= RF_Native;
+
+    ClassPackageName = AddName( Obj->Class->Pkg->Name.Data(), Flags );
+  }
+
+  Flags = RF_TagExp | RF_LoadContextFlags;
+  size_t ClassName = FindLocalName( Obj->Class->Name.Data() );
+  if ( ClassName == MAX_SIZE )
+  {
+    if ( Obj->Class->ObjectFlags & RF_Native )
+      Flags |= RF_Native;
+
+    ClassName = AddName( Obj->Class->Name.Data(), Flags );
+  }
+
+  Flags = RF_TagExp | RF_LoadContextFlags;
+  size_t PackageName = FindLocalName( Obj->Pkg->Name.Data() );
+  if ( PackageName == MAX_SIZE )
+  {
+    if ( Obj->Pkg->ObjectFlags & RF_Native )
+      Flags |= RF_Native;
+
+    PackageName = AddName( Obj->Pkg->Name.Data(), Flags );
+  }
+
+  size_t ImportName = FindLocalName( Obj->Name.Data() );
+  if ( ImportName == MAX_SIZE )
+  {
+    if ( Obj->ObjectFlags & RF_Native )
+      Flags |= RF_Native;
+
+    ImportName = AddName( Obj->Name.Data(), Flags );
+  }
+
+  // Create the new import
+  FImport NewImport;
+  NewImport.ClassPackage = ClassPackageName;
+  NewImport.ClassName    = ClassName;
+  NewImport.Package      = PackageName;
+  NewImport.ObjectName   = ImportName;
+  Imports.PushBack( NewImport );
+
+  return Imports.Size() - 1;
+}
+
+size_t UPackage::AddExport( UObject* Obj )
+{
+  return size_t();
+}
+
+void UPackage::Optimize()
+{
+  // TODO
+  //
+  // Wow, this one is going to be a real pain in the ass. 
+  //
+  // Over time, packages tend to accumulate a bunch of "None" exports or
+  // redundant entries for names (usually None) in the name table. This
+  // happens because it's not really nice to have to recalculate every
+  // offset for every object because the user wanted to delete something.
+  //
+  // This method should let you optimize a package by removing any redundant
+  // references and additionally sorting non-script related objects by type so that
+  // loading the package is a bit more efficient if you're loading it in the editor.
+  //
+  // The main problem is that, in order to properly do this, every single object
+  // must be rearranged, meaning that every class will need to be recompiled so
+  // that everything points to the new object indices instead.
+  //
+  // Needless to say, this isn't gonna happen for awhile until the UScript compiler
+  // is stable. Running this should make loading the package a bit faster, which
+  // is always a good thing.
+}
+
 const char* UPackage::ResolveNameFromIdx( idx Index )
 {
   return GetNameEntry( Index )->Data;
@@ -701,6 +794,21 @@ UPackage* UPackage::StaticCreatePackage( const char* InName, UNativeModule* InNa
 {
   UPackage* Pkg = new UPackage( InName, InNativeModule );
   Packages->PushBack( Pkg );
+
+  // Initialize names that we know we'll need
+  Pkg->AddName( "None", RF_TagExp | RF_HighlightedName | RF_LoadContextFlags | RF_Native );
+  Pkg->AddName( "InternalTime", RF_TagExp | RF_LoadContextFlags );  // I don't know if we need this one or not
+  Pkg->AddName( InName, RF_TagExp | RF_LoadContextFlags );
+
+  // We'll at least need to mark Engine.u as an import
+  UPackage* EnginePkg = StaticLoadPackage( "Engine" );
+  if ( !EnginePkg )
+  {
+    GLogf( LOG_CRIT, "Failed to load Engine.u in StaticCreatePackage???" );
+    GSystem->Exit( -1 );
+  }
+
+  Pkg->AddImport( EnginePkg );
 
   return Pkg;
 }
