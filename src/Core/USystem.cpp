@@ -329,7 +329,7 @@ int USystem::JoinThread(void* Thread, void** OutReturnVal)
     out = pthread_join( (pthread_t)Thread, OutReturnVal);
 
     if( out == 0 )
-        Threads[index] = NULL;
+        Threads[Index] = NULL;
 
 #else
 #error "Unknown operating system!Please add a section to USystem::RunThread()"
