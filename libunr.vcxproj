@@ -233,7 +233,8 @@
     <PostBuildEvent>
       <Command>mkdir $(SolutionDir)dist\
 copy $(SolutionDir)libunr\build\$(Configuration)\libunr.dll $(SolutionDir)dist\libunr.dll
-copy $(SolutionDir)libunr\res\DefaultLibunr.ini $(SolutionDir)dist\DefaultLibunr.ini</Command>
+copy $(SolutionDir)libunr\res\DefaultLibunr.ini $(SolutionDir)dist\DefaultLibunr.ini
+copy $(SolutionDir)libunr\res\OpenUE.u $(SolutionDir)dist\OpenUE.u</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
