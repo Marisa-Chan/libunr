@@ -90,6 +90,7 @@ class LIBUNR_API USystem : public USubsystem
   static const char* GetLibunrIniPath();
   static const char* GetDefaultLibunrIniPath();
   static const char* GetNativeModulesPath();
+  static const char* GetOpenUEPkgPath();
   static bool CopyFile( const char* OrigFile, const char* NewFile );
   static bool FileExists( const char* Filename );
   static void RealPath( const char* Path, char* FullPath, size_t FullPathSize );
@@ -104,6 +105,7 @@ class LIBUNR_API USystem : public USubsystem
   // libunr specific
   bool bEnhancedRuntime;
   bool bLogRefCntZero;
+  bool bLoadFailOnMissingObject;
   const char* RenderDevice;
   const char* AudioDevice;
   const char* GamePath;

@@ -81,6 +81,8 @@ typedef signed long long i64;
   #endif
 #endif
 
+#define FAILURE MAX_SIZE
+
 // TODO: make type 'idx' cast automatically to FCompactIndex
 typedef i32 idx;
 

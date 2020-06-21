@@ -30,6 +30,13 @@
 #include "Core/UPackage.h"
 #include "Core/USystem.h"
 
+#include "Engine/UTexture.h"
+#include "Engine/USound.h"
+#include "Engine/ULodMesh.h"
+#include "Engine/UMusic.h"
+
+#include "Actors/AActor.h"
+
 /*-----------------------------------------------------------------------------
  * FNativePropertyList
 -----------------------------------------------------------------------------*/
@@ -272,7 +279,7 @@ UClass* UObject::FindClass( FName ClassName )
   return NULL;
 }
 
-UObject* UObject::StaticFindObject( UPackage* Pkg, FName ObjName )
+UObject* UObject::StaticFindObject( FName ObjName )
 {
   if ( FName::IsNameNone( ObjName ) )
     return NULL;
@@ -285,6 +292,30 @@ UObject* UObject::StaticFindObject( UPackage* Pkg, FName ObjName )
   }
 
   return NULL;
+}
+
+UObject* UObject::LoadMissingObject( UClass* ClassType )
+{
+  UObject* Out = NULL;
+  UPackage* Pkg = UPackage::OpenUEPkg;
+
+  if ( ClassType->ClassIsA( UTexture::StaticClass() ) )
+    Out = StaticLoadObject( Pkg, "MissingTexture", UTexture::StaticClass(), NULL );
+  else if ( ClassType->ClassIsA( USound::StaticClass() ) )
+    Out = StaticLoadObject( Pkg, "MissingSound", USound::StaticClass(), NULL );
+  else if ( ClassType->ClassIsA( UMusic::StaticClass() ) )
+    return NULL;
+  else if ( ClassType->ClassIsA( UMesh::StaticClass() ) )
+    Out = StaticLoadObject( Pkg, "MissingMesh", ULodMesh::StaticClass(), NULL );
+  else if ( ClassType->ClassIsA( AActor::StaticClass() ) )
+    Out = StaticLoadObject( Pkg, "MissingActor", UClass::StaticClass(), NULL );
+  else
+    Out = StaticLoadObject( Pkg, "MissingObject", UClass::StaticClass(), NULL );
+
+  if ( !Out )
+    GLogf( LOG_ERR, "Failed to load fallback object for type '%s'", ClassType->Name.Data() );
+
+  return Out;
 }
 
 void UObject::ReadDefaultProperties()
@@ -542,6 +573,10 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
         {
           // We can't find the package we need, bail out
           GLogf( LOG_CRIT, "Can't load class '%s.%s', package is missing", ClsPkgName, ClsName );
+
+          if ( !GSystem->bLoadFailOnMissingObject )
+            return LoadMissingObject( ObjClass );
+
           return NULL;
         }
 
@@ -553,6 +588,10 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
         {
           // Class doesn't exist in that package, bail out
           GLogf( LOG_CRIT, "Can't load class '%s.%s', class does not exist", ClsPkgName, ClsName );
+
+          if ( !GSystem->bLoadFailOnMissingObject )
+            return LoadMissingObject( ObjClass );
+
           return NULL;
         }
       }
@@ -576,9 +615,12 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
     ObjPkg = UPackage::StaticLoadPackage( ObjPkgName );
     if ( UNLIKELY( ObjPkg == NULL ) )
     {
+      if ( !GSystem->bLoadFailOnMissingObject )
+        return LoadMissingObject( ObjClass );
+
       GLogf( LOG_CRIT, "Can't load object '%s.%s', package is missing", ObjPkgName, ObjName );
       return NULL;
-    } 
+    }
 
     // Get the corresponding export index for this package
     // Optimization: Get the package tables here rather than inside of the loop
@@ -648,6 +690,9 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
 
   Error:
     GLogf( LOG_CRIT, "Can't load object '%s.%s', object does not exist", ObjPkgName, ObjName );
+    if ( !GSystem->bLoadFailOnMissingObject )
+      return LoadMissingObject( ObjClass );
+
     return NULL;
   }
 

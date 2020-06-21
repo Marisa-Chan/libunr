@@ -272,6 +272,7 @@ LIBUNR_API FPackageFileOut& operator<<( FPackageFileOut& Out, FCompactIndex& Ind
  * UPackage
 -----------------------------------------------------------------------------*/
 TArray<UPackage*>* UPackage::Packages = NULL;
+UPackage* UPackage::OpenUEPkg = NULL;
 
 UPackage::UPackage()
   : UObject()
@@ -344,6 +345,7 @@ bool UPackage::Load( const char* File )
   {
     FORTIFY_LOOP( i, MAX_UINT32 );
     *PackageFile >> Imports[i];
+    Imports[i].Index = i;
   }
   
   // read in exports
@@ -416,6 +418,73 @@ FExport* UPackage::GetExport( size_t Index )
     return &Exports[Index];
 
   return NULL;
+}
+
+FImport* UPackage::FindImport( UObject* Obj )
+{
+  size_t ReturnIndex = FAILURE;
+
+  // Try to find the name first
+  size_t ImportName = FindLocalName( Obj->Name.Data() );
+  if ( ImportName == FAILURE )
+  {
+    // If we don't have the name in our own package, then we definitely don't have the import
+    ReturnIndex = AddImport( Obj );
+    if ( ReturnIndex == FAILURE )
+      return NULL;
+
+    return &Imports[ReturnIndex];
+  }
+
+  // Now try to find the class name
+  size_t ClassName = FindLocalName( Obj->Class->Name.Data() );
+  if ( ClassName == FAILURE )
+  {
+    // We don't have the particular type we're looking for, so we don't have the import
+    ReturnIndex = AddImport( Obj );
+    if ( ReturnIndex == FAILURE )
+      return NULL;
+
+    return &Imports[ReturnIndex];
+  }
+
+  // Get the class package name
+  size_t ClassPkgName = FindLocalName( Obj->Class->Pkg->Name.Data() );
+  if ( ClassPkgName == FAILURE )
+  {
+    // We don't have the package of the type we're looking for, so we don't have the import
+    ReturnIndex = AddImport( Obj );
+    if ( ReturnIndex == FAILURE )
+      return NULL;
+
+    return &Imports[ReturnIndex];
+  }
+
+  // Now get package reference (if the object itself is a package, then it will be 0)
+  idx PkgRef = 0;
+  if ( Obj->Class != UPackage::StaticClass() )
+  {
+    FImport* PkgImport = FindImport( Obj->Pkg );
+    if ( PkgImport == NULL )
+      return NULL;
+    PkgRef = -(PkgImport->Index + 1);
+  }
+    
+  // Now search through all imports to find our match
+  for ( size_t i = 0; i < Imports.Size(); i++ )
+  {
+    FORTIFY_LOOP_SLOW( i, MAX_SIZE );
+    FImport& Import = Imports[i];
+    if ( Import.ObjectName == ImportName &&
+         Import.ClassName == ClassName &&
+         Import.ClassPackage == ClassPkgName &&
+         Import.Package == PkgRef )
+      return &Import;
+  }
+
+  // Add the import if we don't have it
+  ReturnIndex = AddImport( Obj );
+  return &Imports[ReturnIndex];
 }
 
 FExport* UPackage::GetExportByNameAndType( size_t Name, UClass* Type )
@@ -569,13 +638,24 @@ size_t UPackage::AddName( const char* Name, int Flags )
 size_t UPackage::AddImport( UObject* Obj )
 {
   if ( !Obj )
-    return 0;
+  {
+    GLogf( LOG_ERR, "NULL object in UPackage::AddImport (%s)", Name.Data() );
+    return FAILURE;
+  }
+
+  // An object that belongs to this package can't be an import
+  if ( Obj->Pkg == this )
+  {
+    GLogf( LOG_ERR, "Tried to add local object as import (Obj: %s | Obj->Pkg: %s | Pkg: %s)",
+      Obj->Name.Data(), Obj->Pkg->Name.Data(), Name.Data() );
+    return FAILURE;
+  }
 
   // FIXME: Should each instance of this be it's own function?
   // Make sure all relevant names are added before adding this import
   int Flags = RF_TagExp | RF_LoadContextFlags;
   size_t ClassPackageName = FindLocalName( Obj->Class->Pkg->Name.Data() );
-  if ( ClassPackageName == MAX_SIZE )
+  if ( ClassPackageName == FAILURE )
   {
     if ( Obj->Class->Pkg->ObjectFlags & RF_Native )
       Flags |= RF_Native;
@@ -585,7 +665,7 @@ size_t UPackage::AddImport( UObject* Obj )
 
   Flags = RF_TagExp | RF_LoadContextFlags;
   size_t ClassName = FindLocalName( Obj->Class->Name.Data() );
-  if ( ClassName == MAX_SIZE )
+  if ( ClassName == FAILURE )
   {
     if ( Obj->Class->ObjectFlags & RF_Native )
       Flags |= RF_Native;
@@ -593,18 +673,23 @@ size_t UPackage::AddImport( UObject* Obj )
     ClassName = AddName( Obj->Class->Name.Data(), Flags );
   }
 
-  Flags = RF_TagExp | RF_LoadContextFlags;
-  size_t PackageName = FindLocalName( Obj->Pkg->Name.Data() );
-  if ( PackageName == MAX_SIZE )
+  size_t PackageName = 0;
+  if ( Obj->Pkg )
   {
-    if ( Obj->Pkg->ObjectFlags & RF_Native )
-      Flags |= RF_Native;
+    Flags = RF_TagExp | RF_LoadContextFlags;
+    PackageName = FindLocalName( Obj->Pkg->Name.Data() );
+    if ( PackageName == FAILURE )
+    {
+      if ( Obj->Pkg->ObjectFlags & RF_Native )
+        Flags |= RF_Native;
 
-    PackageName = AddName( Obj->Pkg->Name.Data(), Flags );
+      PackageName = AddName( Obj->Pkg->Name.Data(), Flags );
+    }
   }
 
+  Flags = RF_TagExp | RF_LoadContextFlags;
   size_t ImportName = FindLocalName( Obj->Name.Data() );
-  if ( ImportName == MAX_SIZE )
+  if ( ImportName == FAILURE )
   {
     if ( Obj->ObjectFlags & RF_Native )
       Flags |= RF_Native;
@@ -625,7 +710,32 @@ size_t UPackage::AddImport( UObject* Obj )
 
 size_t UPackage::AddExport( UObject* Obj )
 {
-  return size_t();
+  if ( !Obj )
+  {
+    GLogf( LOG_ERR, "NULL object in UPackage::AddExport (%s)", Name.Data() );
+    return FAILURE;
+  }
+
+  // An object that doesn't belong to this package can't be an export
+  if ( Obj->Pkg == this )
+  {
+    GLogf( LOG_ERR, "Tried to add external object as export (Obj: %s | Obj->Pkg: %s | Pkg: %s)",
+      Obj->Name.Data(), Obj->Pkg->Name.Data(), Name.Data() );
+    return FAILURE;
+  }
+
+  // Get class object reference value
+  // Figure out if the object class is within this package or not
+  idx ClassIdx = 0;
+  if ( Obj->Class->Pkg == this )
+  {
+    ClassIdx = Obj->Class->Export->Index + 1;
+  }
+  else
+  {
+    FImport* ClassImport = FindImport( Obj->Class );
+
+  }
 }
 
 void UPackage::Optimize()

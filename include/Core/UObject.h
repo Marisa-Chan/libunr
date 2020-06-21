@@ -458,7 +458,8 @@ public:
     UObject* InOuter, UPackage* InPkg, FExport* InExport );
   static UClass* StaticAllocateClass( FName InName, u32 Flags, UClass* SuperClass, 
     u32 InStructSize, UObject *(*NativeCtor)(size_t) );
-  static UObject* StaticFindObject( UPackage* Pkg, FName ObjName );
+  static UObject* StaticFindObject( FName ObjName );
+  static UObject* LoadMissingObject( UClass* ClassType );
 
   static TArray<UObject*>* GetGlobalObjectPool();
   static TArray<UClass*>* GetGlobalClassPool();

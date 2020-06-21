@@ -71,7 +71,7 @@ struct LIBUNR_API FExport
   u32 Group;        // Object reference to Package/Group
   idx ObjectName;   // Name index to Object Name
   u32 ObjectFlags;  // Object flags
-  idx SerialSize;   // Compact index to size inside file
+  idx SerialSize;   // Compact index to size inside file (-1 means new object, not written)
   idx SerialOffset; // Compact index to offset (if SerialSize>0)
   
   UObject* Obj;        // Pointer to object (if loading/already loaded)
@@ -92,6 +92,8 @@ struct LIBUNR_API FImport
   idx ClassName;    // Name index to Class Name
   int Package;      // Object reference to Package of object
   idx ObjectName;   // Name index to Object Name
+
+  int Index;        // Index in Import Table
   
   void Read( FPackageFileIn& Pkg );
 };
@@ -146,6 +148,8 @@ class LIBUNR_API UPackage : public UObject
   virtual FImport* GetImport( size_t Index );
   virtual FExport* GetExport( size_t Index );
 
+  virtual FImport* FindImport( UObject* Obj );
+
   UPackageHeader* GetHeader();
   FNameEntry*     GetNameEntry( size_t Index );
   FNameEntry*     GetNameEntryByObjRef( int ObjRef );
@@ -185,6 +189,8 @@ class LIBUNR_API UPackage : public UObject
   bool bIntrinsicPackage;
   UNativeModule* NativeModule; // May be NULL if there is no native component (or if package is intrinsic)
 
+  static UPackage* OpenUEPkg;
+
 protected:    
   TArray<FNameEntry> Names;
   TArray<FExport>    Exports;
@@ -196,4 +202,3 @@ protected:
   static EPkgLoadOpts LoadOpts;
   static TArray<UPackage*>* Packages;
 };
-

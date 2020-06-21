@@ -399,6 +399,7 @@ bool USystem::StaticInit( GamePromptCallback GPC, DevicePromptCallback DPC, bool
 
   // Get libunr specific info
   GSystem->bLogRefCntZero = GLibunrConfig->ReadBool( "libunr", "bLogRefCntZero" );
+  GSystem->bLoadFailOnMissingObject = GLibunrConfig->ReadBool( "libunr", "bLoadFailOnMissingObject" );
   GSystem->RenderDevice = GLibunrConfig->ReadString( "libunr", "RenderDevice" );
   GSystem->AudioDevice  = GLibunrConfig->ReadString( "libunr", "AudioDevice" );
   // if ( strnicmp( GSystem->RenderDevice, None ) == 0 ||
@@ -568,6 +569,28 @@ const char* USystem::GetNativeModulesPath()
   #error "Unknown operating system! Please add a section to USystem::GetNativeModulesPath()"
   return -1;
 #endif
+}
+
+const char* USystem::GetOpenUEPkgPath()
+{
+  static char DefLibUnrPath[1024] = { 0 };
+
+#if defined LIBUNR_POSIX
+
+  strcpy( DefLibUnrPath, INSTALL_PREFIX );
+  strcat( DefLibUnrPath, "/lib/libunr/OpenUE.u" );
+
+#elif defined LIBUNR_WIN32
+  
+  strcpy( DefLibUnrPath, LibunrPath );
+  strcat( DefLibUnrPath, "\\OpenUE.u" );
+
+#else
+  #error "Unknown operating system! Please add a section to USystem::GetNativeModulesPath()"
+  return -1;
+#endif
+
+  return DefLibUnrPath;
 }
 
 bool USystem::CopyFile( const char* OrigFile, const char* NewFile )

@@ -387,6 +387,13 @@ bool UObject::StaticInit()
     Result &= UEditorEngine::StaticClassInit();
   }
 
+  UPackage::OpenUEPkg = UPackage::StaticLoadPackage( GSystem->GetOpenUEPkgPath(), false );
+  if ( !UPackage::OpenUEPkg )
+  {
+    GLogf( LOG_CRIT, "Failed to load required package 'OpenUE'" );
+    return false;
+  }
+
   return Result;
 }
 
