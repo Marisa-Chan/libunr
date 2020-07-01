@@ -81,6 +81,30 @@ void UClient::SetMouseCapture( bool capture )
 
 }
 
+bool UClient::RemoveViewport( UViewport * Viewport )
+{
+  bool Found = false;
+
+  for ( int i = 0; i < Viewports.Size(); i++ )
+  {
+    if ( Viewports[i] == Viewport )
+    {
+      Found = true;
+      Viewports.Erase( i );
+      if ( Viewports.Size() == 0 )
+      {
+        CurrentViewport = NULL;
+      }
+      else
+      {
+        CurrentViewport = Viewports[0];
+      }
+    }
+  }
+
+  return Found;
+}
+
 /*-----------------------------------------------------------------------------
  * UEngine
 -----------------------------------------------------------------------------*/

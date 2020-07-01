@@ -4,6 +4,7 @@ include(CMakeFindDependencyMacro)
 message("CMAKE_CURRENT_LIST_FILE:${CMAKE_CURRENT_LIST_FILE}")
 
 find_dependency(X11)
+find_dependency(SDL2)
 find_dependency(Threads REQUIRED)
 
 list(APPEND CMAKE_MODULE_PATH ${UNR_CMAKE_DIR})

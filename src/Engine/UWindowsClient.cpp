@@ -78,19 +78,11 @@ UViewport* UWindowsClient::OpenViewport( int Width, int Height )
 
 bool UWindowsClient::CloseViewport( UViewport* Viewport )
 {
-  bool Result = false;
+  bool Result = Viewport->Exit();
 
-  for ( int i = 0; i < Viewports.Size(); i++ )
+  if (!RemoveViewport(Viewport))
   {
-    if ( Viewports[i] == Viewport )
-    {
-      Result = Viewport->Exit();
-      Viewports.Erase( i );
-      if ( Viewports.Size() == 0 )
-        CurrentViewport = NULL;
-      else
-        CurrentViewport = Viewports[0];
-    }
+    return false;
   }
 
   return Result;

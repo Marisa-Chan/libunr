@@ -141,6 +141,9 @@ class LIBUNR_API UClient : public UObject
   UViewport* CurrentViewport;
   TArray<UViewport*> Viewports;
 
+protected:
+  bool RemoveViewport( UViewport * viewport );
+
 private:
   InputFunc InputFuncs[0xFF];
   AxisInputFunc MouseFunc;

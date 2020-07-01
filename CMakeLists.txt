@@ -17,6 +17,7 @@ option(BUILD_GME "GME support" OFF)
 option(BUILD_OPENMPT "OpenMPT support" ON)
 option(BUILD_VORBISFILE "Vorbisfile support" OFF)
 option(BUILD_MPG123 "Mpg123 support" OFF)
+option(BUILD_SDL2 "SDL2 support" ON)
 
 add_library(unr SHARED)
 add_library(Unr::Unr ALIAS unr)
@@ -69,6 +70,32 @@ if (BUILD_GME)
 	target_compile_definitions(unr
 		PUBLIC
 			"BUILD_GME=1"
+	)
+endif()
+
+if (BUILD_SDL2)
+	find_package(SDL2 REQUIRED)
+
+	target_include_directories(unr
+		PUBLIC
+			${SDL2_INCLUDE_DIRS}
+	)
+
+	target_compile_definitions(unr
+		PUBLIC
+			"LIBUNR_SDL2=1"
+			"BUILD_SDL2=1"
+	)
+
+	target_sources(unr
+		PRIVATE
+			${UNR_SRC}/Engine/USdlClient.cpp
+			${UNR_SRC}/Engine/USdlViewport.cpp
+	)
+
+	target_link_libraries(unr
+		PUBLIC
+			${SDL2_LIBRARIES}
 	)
 endif()
 
@@ -161,30 +188,6 @@ if (X11_FOUND)
 	target_link_libraries(unr
 		PUBLIC
 			${X11_LIBRARIES}
-	)
-endif()
-
-if (DEFINED SDL2_LIBRARIES)
-	target_include_directories(unr
-		PUBLIC
-			${SDL2_INCLUDE_DIRS}
-	)
-
-	target_compile_definitions(unr
-		PUBLIC
-			"LIBUNR_SDL2=1"
-			"BUILD_SDL2=1"
-	)
-
-	target_sources(unr
-		PRIVATE
-			${UNR_SRC}/Engine/USdlClient.cpp
-			${UNR_SRC}/Engine/USdlViewport.cpp
-	)
-
-	target_link_libraries(unr
-		PUBLIC
-			${SDL2_LIBRARIES}
 	)
 endif()
 
