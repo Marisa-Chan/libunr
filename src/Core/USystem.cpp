@@ -831,7 +831,7 @@ std::string USystem::GetHomeDir()
 std::string USystem::GetHomeLibunrDir()
 {
   std::string Out(GetHomeDir());
-  Out += ".config/libunr";
+  Out += "/.config/libunr";
   return Out;
 }
 #endif
