@@ -58,6 +58,7 @@ class LIBUNR_API AStatLog : public AInfo
   FString* WorldBatcherParams;
   FString* WorldStatsURL;
   bool     bWorldBatcherError;
+  bool     bLogTypingEvents;
 };
 
 class LIBUNR_API AStatLogFile : public AStatLog

@@ -629,6 +629,11 @@ class LIBUNR_API ASavedMove : public AInfo
   bool bAltFire;
   bool bForceFire;
   bool bForceAltFire;
+
+  u8 MergeCount;
+  FVector SavedLocation;
+  FVector SavedVelocity;
+  FRotator SavedViewRotation;
 };
 
 class LIBUNR_API AKeypoint : public AActor

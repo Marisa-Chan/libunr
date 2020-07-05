@@ -189,6 +189,12 @@ class LIBUNR_API UEngine : public USubsystem
   float CurrentDeltaTime;
   float TimeSeconds;
 
+  FString* ErrorMsg;
+  TArray<FString>* MD5Ignore;
+  TArray<FString>* MD5Require;
+  bool MD5PostJoinCheck;
+  int MinClientVersion;
+
 protected:
   UNativeModule* AudioModule;
   UNativeModule* RenderModule;

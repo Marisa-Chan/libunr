@@ -142,6 +142,7 @@ bool UObject::StaticInit()
         Result &= UStrProperty::StaticClassInit();
         Result &= UMapProperty::StaticClassInit();
         Result &= UFixedArrayProperty::StaticClassInit();
+        Result &= UPointerProperty::StaticClassInit();
       Result &= UStruct::StaticClassInit();
         Result &= UFunction::StaticClassInit();
         Result &= UState::StaticClassInit();
@@ -183,6 +184,7 @@ bool UObject::StaticInit()
   UStrProperty::StaticClass()->LinkSuperClassChildren();
   UMapProperty::StaticClass()->LinkSuperClassChildren();
   UFixedArrayProperty::StaticClass()->LinkSuperClassChildren();
+  UPointerProperty::StaticClass()->LinkSuperClassChildren();
   UStruct::StaticClass()->LinkSuperClassChildren();
   UFunction::StaticClass()->LinkSuperClassChildren();
   UState::StaticClass()->LinkSuperClassChildren();

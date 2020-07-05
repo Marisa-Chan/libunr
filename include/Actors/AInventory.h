@@ -62,6 +62,7 @@ class LIBUNR_API AInventory : public AActor
   bool bHeldItem;
   bool bNoInventoryMarker;
   bool bTossedOut;
+  bool bCalcDrawOffsetFOV;
 
   bool bRepMuzzleFlash;
   bool bRepPlayerView;

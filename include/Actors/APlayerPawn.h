@@ -216,6 +216,29 @@ class LIBUNR_API APlayerPawn : public APawn
   class ARealCrouchController*  RealCrouchController;
   class ALadderTrigger*         ActiveLadder;
 
+  bool bNoMouseSmoothing;
+  int LoginAttempts;
+  bool bLoginDisabled;
+  float NextLoginTime;
+  float ViewDelay;
+  float TauntDelay;
+  float SpeechDelay;
+  float LastView;
+  float LastTaunt;
+  float LastSpeech;
+  bool bCyclingView;
+  float MinFOV;
+  float MaxFOV;
+  int MaxNameChanges;
+  int NameChanges;
+  bool bDisableMovementBuffering;
+  bool bPausePressed;
+  FVector PreAdjustLocation;
+  FVector AdjustLocationOffset;
+  float AdjustLocationAlpha;
+  float LastClientTimestamp;
+  FVector LastClientLocation;
+
   // Deus Ex Variables
   AActor* AdditionalViews[3];
   float TurnRateAdjuster;

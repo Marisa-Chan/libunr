@@ -164,7 +164,7 @@ class LIBUNR_API AGameInfo : public AInfo
   bool bCanViewOthers;
   bool bExternalBatcher;
   FString* IPBanned;
-  FString* IPPolicies[50]; // Dynamic arrays are cool, y'know...
+  FString* IPPolicies[255]; // Dynamic arrays are cool, y'know...
   UClass* DeathMessageClass;
   UClass* DMMessageClass;
   AMutator* DamageMutator;
@@ -174,6 +174,18 @@ class LIBUNR_API AGameInfo : public AInfo
   int DemoBuild;
   int DemoHasTuts;
   FString* EnabledMutators;
+
+  float PlayerViewDelay;
+  float PlayerSpeechDelay;
+  float PlayerTauntDelay;
+  float MinFOV;
+  float MaxFOV;
+  int MaxNameChanges;
+  int NoLockdown;
+  bool bLogAdminActions;
+  float LoginDelaySeconds;
+  int MaxLoginAttempts;
+  u8 ActionToTake;
 
   // Rune Variables
   bool bSubtitles;

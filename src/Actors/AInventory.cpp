@@ -68,7 +68,7 @@ IMPLEMENT_NATIVE_CLASS( AInventorySpot );
 IMPLEMENT_NATIVE_CLASS( AInventoryAttachment );
 IMPLEMENT_NATIVE_CLASS( APickup );
 
-BEGIN_PROPERTY_LINK( AInventory, 84 )
+BEGIN_PROPERTY_LINK( AInventory, 85 )
   LINK_NATIVE_PROPERTY( AutoSwitchPriority );
   LINK_NATIVE_PROPERTY( InventoryGroup );
   LINK_NATIVE_PROPERTY( bActivatable );
@@ -78,6 +78,7 @@ BEGIN_PROPERTY_LINK( AInventory, 84 )
   LINK_NATIVE_PROPERTY( bHeldItem );
   LINK_NATIVE_PROPERTY( bNoInventoryMarker );
   LINK_NATIVE_PROPERTY( bTossedOut );
+  LINK_NATIVE_PROPERTY( bCalcDrawOffsetFOV );
   LINK_NATIVE_PROPERTY( bRepMuzzleFlash );
   LINK_NATIVE_PROPERTY( bRepPlayerView );
   LINK_NATIVE_PROPERTY( bSteadyFlash3rd );

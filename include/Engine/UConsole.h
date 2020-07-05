@@ -106,5 +106,6 @@ class LIBUNR_API UConsole : public UObject
   FString* FpsText;
   FString* SecondsText;
   FString* FramesText;
+  bool bControlDown;
 };
 

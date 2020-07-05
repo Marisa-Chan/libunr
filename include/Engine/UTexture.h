@@ -273,6 +273,7 @@ class LIBUNR_API UTexture : public UBitmap
   TArray<FMipmap> Mips;
   TArray<FMipmap> DecompMips;
   ETextureFormat DecompFormat;
+  FMipmap* SourceMip;
 
   ESurfaceType SurfaceType;
   EUClampMode  UClampMode;

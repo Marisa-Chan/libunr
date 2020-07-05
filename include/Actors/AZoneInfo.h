@@ -362,6 +362,7 @@ class LIBUNR_API ALevelInfo : public AZoneInfo
   FString* EngineVersion;
   FString* EngineSubVersion;
   FString* MinNetVersion;
+  int ServerMoveVersion;
 
   UClass* DefaultGameType;
   class AGameInfo* Game;

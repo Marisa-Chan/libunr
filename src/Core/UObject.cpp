@@ -231,7 +231,7 @@ bool UObject::IsA( UClass* ClassType )
   {
     if ( UNLIKELY( Cls->Class != UClass::StaticClass() ) )
     {
-      GLogf( LOG_CRIT, "CLASS SUPERFIELD IS NOT A UCLASS INSTANCE!!!" );
+      GLogf( LOG_CRIT, "CLASS '%s' SUPERFIELD IS NOT A UCLASS INSTANCE!!!", Cls->Name.Data() );
       GSystem->Exit( -1 );
     }
 

@@ -50,7 +50,7 @@ IMPLEMENT_NATIVE_CLASS( APlayerPawn );
 BEGIN_PROPERTY_LINK( ACamera, 0 )
 END_PROPERTY_LINK()
 
-BEGIN_PROPERTY_LINK( APlayerPawn, 193 )
+BEGIN_PROPERTY_LINK( APlayerPawn, 215 )
   LINK_NATIVE_PROPERTY( Player );
   LINK_NATIVE_PROPERTY( Password );
   LINK_NATIVE_PROPERTY( DodgeClickTimer );
@@ -228,6 +228,28 @@ BEGIN_PROPERTY_LINK( APlayerPawn, 193 )
   LINK_NATIVE_PROPERTY( CustomPlayerStateInfo );
   LINK_NATIVE_PROPERTY( RealCrouchController );
   LINK_NATIVE_PROPERTY( ActiveLadder );
+  LINK_NATIVE_PROPERTY( bNoMouseSmoothing );
+  LINK_NATIVE_PROPERTY( LoginAttempts );
+  LINK_NATIVE_PROPERTY( bLoginDisabled );
+  LINK_NATIVE_PROPERTY( NextLoginTime );
+  LINK_NATIVE_PROPERTY( ViewDelay );
+  LINK_NATIVE_PROPERTY( TauntDelay );
+  LINK_NATIVE_PROPERTY( SpeechDelay );
+  LINK_NATIVE_PROPERTY( LastView );
+  LINK_NATIVE_PROPERTY( LastTaunt );
+  LINK_NATIVE_PROPERTY( LastSpeech );
+  LINK_NATIVE_PROPERTY( bCyclingView );
+  LINK_NATIVE_PROPERTY( MinFOV );
+  LINK_NATIVE_PROPERTY( MaxFOV );
+  LINK_NATIVE_PROPERTY( MaxNameChanges );
+  LINK_NATIVE_PROPERTY( NameChanges );
+  LINK_NATIVE_PROPERTY( bDisableMovementBuffering );
+  LINK_NATIVE_PROPERTY( bPausePressed );
+  LINK_NATIVE_PROPERTY( PreAdjustLocation );
+  LINK_NATIVE_PROPERTY( AdjustLocationOffset );
+  LINK_NATIVE_PROPERTY( AdjustLocationAlpha );
+  LINK_NATIVE_PROPERTY( LastClientTimestamp );
+  LINK_NATIVE_PROPERTY( LastClientLocation );
   LINK_NATIVE_ARRAY   ( AdditionalViews );
   LINK_NATIVE_PROPERTY( TurnRateAdjuster );
   LINK_NATIVE_PROPERTY( myDebugHUD );

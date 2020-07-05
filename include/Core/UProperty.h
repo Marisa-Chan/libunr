@@ -43,7 +43,8 @@ enum EPropertyType
   PROP_Ascii   = 0xd,
   PROP_Map     = 0xe,
   PROP_FixArr  = 0xf,
-  PROP_Long    = 0x10,
+  PROP_Ptr     = 0x10,
+  PROP_Long    = 0x11,
 };
 
 const char* const PropNames[] =
@@ -64,6 +65,7 @@ const char* const PropNames[] =
   "StrProperty",
   "MapProperty",
   "FixedArrayProperty",
+  "PointerProperty",
   "LongProperty"
 };
 
@@ -224,3 +226,9 @@ class LIBUNR_API UFixedArrayProperty : public UProperty
   virtual void GetText( FString& Buf, UObject* Obj, UObject* Default, int Idx );
 };
 
+class LIBUNR_API UPointerProperty : public UProperty
+{
+  DECLARE_NATIVE_CLASS( UPointerProperty, UProperty, CLASS_NoExport, Core )
+  virtual void Load();
+  virtual void GetText( FString& Buf, UObject* Obj, UObject* Default, int Idx );
+};

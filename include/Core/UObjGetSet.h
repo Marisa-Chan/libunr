@@ -48,11 +48,20 @@ template <class T> inline T UObject::GetProperty( UProperty* Prop, int Idx )
 template <> inline UObject* UObject::GetProperty<UObject*>( UProperty* Prop, int Idx )
 {
   UObject* Out = *GetPropAddr<UObject*>( this, Prop, Idx );
-  if ( Out && !Out->IsA( UObject::StaticClass() ) )
+  
+  if ( Out )
   {
-    // Maybe make a config way for this check to be optional? Could get very slow
-    GLogf( LOG_CRIT, "OBJECT PROPERTY DOES NOT POINT TO AN OBJECT!!!" );
-    GSystem->Exit( -1 );
+    if ( Out->Name == NAME_None )
+    {
+      // How does a "None" object even exist?
+      return NULL;
+    }
+    if ( !Out->IsA( UObject::StaticClass() ) )
+    {
+      // Maybe make a config way for this check to be optional? Could get very slow
+      GLogf( LOG_CRIT, "OBJECT PROPERTY DOES NOT POINT TO AN OBJECT!!!" );
+      GSystem->Exit( -1 );
+    }
   }
   return Out;
 }

@@ -85,7 +85,7 @@ bool UProperty::LoadDefaultPropertySafe( void* ObjMem, FPackageFileIn& In, u8 Ty
   bool Ret = false;
   if ( Type != PropertyType )
   {
-    GLogf( LOG_CRIT, "Default property '%s' expected '%s' but got '%s'", 
+    GLogf( LOG_CRIT, "Default property '%s' expected '%s' but got '%s'",
         Name.Data(), PropNames[Type], Class->Name.Data() );
     return false;
   }
@@ -815,6 +815,23 @@ UMapProperty::~UMapProperty()
 UFixedArrayProperty::~UFixedArrayProperty()
 {}
 
+UPointerProperty::~UPointerProperty()
+{
+}
+
+void UPointerProperty::Load()
+{
+  Super::Load();
+  ElementSize = 4; // Why have pointer property if its just going to be an int anyway?
+  PropertyType = PROP_Int; // ???
+}
+
+void UPointerProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int Idx )
+{
+  GLogf( LOG_CRIT, "Go pop '%s' in UTPT and see how to load a PointerProperty", Pkg->Name );
+  exit( -1 ); // <- can we not do this
+}
+
 IMPLEMENT_NATIVE_CLASS( UProperty );
   IMPLEMENT_NATIVE_CLASS( UByteProperty );
   IMPLEMENT_NATIVE_CLASS( UIntProperty );
@@ -829,4 +846,6 @@ IMPLEMENT_NATIVE_CLASS( UProperty );
   IMPLEMENT_NATIVE_CLASS( UStrProperty );
   IMPLEMENT_NATIVE_CLASS( UMapProperty );
   IMPLEMENT_NATIVE_CLASS( UFixedArrayProperty );
+  IMPLEMENT_NATIVE_CLASS( UPointerProperty );
+
 
