@@ -168,7 +168,7 @@ class LIBUNR_API UPackage : public UObject
   // Package manipulation
   size_t AddName( const char* Name, int Flags );
   size_t AddImport( UObject* Obj );
-  size_t AddExport( UObject* Obj );
+  size_t AddExport( UObject* Obj, u32 Group = 0 );
   void Optimize();
   
   // Name resolution

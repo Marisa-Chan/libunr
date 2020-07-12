@@ -699,16 +699,17 @@ size_t UPackage::AddImport( UObject* Obj )
 
   // Create the new import
   FImport NewImport;
-  NewImport.ClassPackage = ClassPackageName;
-  NewImport.ClassName    = ClassName;
-  NewImport.Package      = PackageName;
-  NewImport.ObjectName   = ImportName;
+  NewImport.ClassPackage = (idx)ClassPackageName;
+  NewImport.ClassName    = (idx)ClassName;
+  NewImport.Package      = (idx)PackageName;
+  NewImport.ObjectName   = (idx)ImportName;
+  NewImport.Index        = (idx)Imports.Size();
   Imports.PushBack( NewImport );
 
-  return Imports.Size() - 1;
+  return NewImport.Index;
 }
 
-size_t UPackage::AddExport( UObject* Obj )
+size_t UPackage::AddExport( UObject* Obj, u32 Group )
 {
   if ( !Obj )
   {
@@ -724,6 +725,8 @@ size_t UPackage::AddExport( UObject* Obj )
     return FAILURE;
   }
 
+  FImport* Import = NULL;
+
   // Get class object reference value
   // Figure out if the object class is within this package or not
   idx ClassIdx = 0;
@@ -733,9 +736,80 @@ size_t UPackage::AddExport( UObject* Obj )
   }
   else
   {
-    FImport* ClassImport = FindImport( Obj->Class );
-
+    Import = FindImport( Obj->Class );
+    ClassIdx = -(Import->Index + 1);
   }
+
+  // Get parent object reference
+  // Only applicable for classes, functions, and states
+  idx SuperIdx = 0;
+  if ( Obj->Class == UClass::StaticClass() )
+  {
+    UClass* Cls = (UClass*)Obj;
+    if ( Cls->SuperClass->Pkg == this )
+    {
+      SuperIdx = Obj->Class->Export->Index + 1;
+    }
+    else
+    {
+      Import = FindImport( Cls->SuperClass );
+      SuperIdx = -(Import->Index + 1);
+    }
+  }
+  else if ( Obj->Class == UFunction::StaticClass() )
+  {
+    UFunction* Func = (UFunction*)Obj;
+    if ( Func->SuperField )
+    {
+      if ( Func->SuperField->Pkg == this )
+      {
+        SuperIdx = Func->SuperField->Export->Index + 1;
+      }
+      else
+      {
+        Import = FindImport( Func->SuperField );
+        SuperIdx = -(Import->Index + 1);
+      }
+    }
+  }
+  else if ( Obj->Class == UState::StaticClass() )
+  {
+    UState* State = (UState*)Obj;
+    if ( State->SuperField )
+    {
+      if ( State->SuperField->Pkg == this )
+      {
+        SuperIdx = State->SuperField->Export->Index + 1;
+      }
+      else
+      {
+        Import = FindImport( State->SuperField );
+        SuperIdx = -(Import->Index + 1);
+      }
+    }
+  }
+
+  // Find object name
+  idx ObjectName = FindLocalName( Obj->Name.Data() );
+  if ( ObjectName == MAX_SIZE )
+    ObjectName = (idx)AddName( Obj->Name.Data(), Obj->Name.Flags() );
+
+  FExport NewExport =
+  {
+    ClassIdx,
+    SuperIdx,
+    Group,
+    ObjectName,
+    Obj->ObjectFlags,
+    -1,
+    -1,
+    Obj,
+    (int)Exports.Size(),
+    false
+  };
+
+  Exports.PushBack( NewExport );
+  return NewExport.Index;
 }
 
 void UPackage::Optimize()
