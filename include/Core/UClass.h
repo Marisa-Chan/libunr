@@ -181,7 +181,6 @@ class LIBUNR_API UClass : public UState
   
   virtual void Load();
   virtual void PostLoad();
-  virtual bool ExportToFile( const char* Dir, const char* Type );
 
   bool ClassIsA( UClass* ClassType );
   bool IsNative();

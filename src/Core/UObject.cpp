@@ -153,11 +153,6 @@ UObject::~UObject()
   delete OldPkgFileOffsets;
 }
 
-bool UObject::ExportToFile( const char* Dir, const char* Type )
-{
-  return false;
-}
-
 void UObject::PreLoad()
 {
   PkgFile = Pkg->GetStream();

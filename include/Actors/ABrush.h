@@ -34,7 +34,6 @@ class LIBUNR_API ABrush : public AActor
 
   ABrush();
   void ExportToLevelText( FFileArchiveOut* Out );
-  virtual bool ExportToFile( const char* Dir, const char* Type );
 
   enum ECsgOper
   {

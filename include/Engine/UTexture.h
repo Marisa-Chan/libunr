@@ -202,7 +202,6 @@ class LIBUNR_API UTexture : public UBitmap
   virtual FMipmap& GetMips( size_t MipLevel );
 
   virtual void Load();
-  virtual bool ExportToFile( const char* Dir, const char* Type );
   //virtual bool ExportToBmp( const char* Dir );
   //virtual bool ExportToPcx( const char* Dir );
   //virtual bool ExportToPng( const char* Dir );

@@ -102,7 +102,6 @@ class LIBUNR_API UAnimation : public UObject
 
   UAnimation();
   virtual void Load();
-  virtual bool ExportToFile( const char* Path, const char* Dir );
 
   TArray<FNamedBone> RefBones;
   TArray<FMotionChunk> Moves;

@@ -126,8 +126,6 @@ class LIBUNR_API UMesh : public UPrimitive
 
   UMesh();
   virtual void Load();
-  virtual bool ExportToFile( const char* Dir, const char* Type );
-  virtual bool ExportToFile( const char* Dir, const char* Type, int Frame = -1 );
 
   TArray<FMeshVert> Verts;
   TArray<FMeshTri>  Tris;
@@ -145,10 +143,6 @@ class LIBUNR_API UMesh : public UPrimitive
   FRotator RotOrigin;
   bool bCurvyMesh;
   bool bDeusExMesh;
-
-protected:
-  virtual bool ExportUnreal3DMesh( const char* Dir, int Frame );
-  virtual bool ExportObjMesh( const char* Dir, int Frame );
 };
 
 class LIBUNR_API UAnimationNotify : public UObject

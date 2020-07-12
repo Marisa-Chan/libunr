@@ -65,7 +65,6 @@ class LIBUNR_API UFireTexture : public UFractalTexture
   UFireTexture();
   virtual void Tick( float DeltaTime );
   virtual void Load();
-  virtual bool ExportToFile( const char* Dir, const char* Type );
 
   void CalculateRenderTable();
 
@@ -269,7 +268,6 @@ class LIBUNR_API UWaveTexture : public UWaterTexture
   UWaveTexture();
   virtual void Load();
   virtual void Tick( float DeltaTime );
-  virtual bool ExportToFile( const char* Dir, const char* Type );
   virtual void CalculateRenderTable();
 
   u8 BumpMapLight;
@@ -290,7 +288,6 @@ class LIBUNR_API UWetTexture : public UWaterTexture
   UWetTexture();
   virtual void Load();
   virtual void Tick( float DeltaTime );
-  virtual bool ExportToFile( const char* Dir, const char* Type );
   virtual void CalculateRenderTable();
 
   UTexture* SourceTexture;

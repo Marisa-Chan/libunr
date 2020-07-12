@@ -56,7 +56,6 @@ class LIBUNR_API UMusic : public UObject
   UMusic();
 
   virtual void Load();
-  virtual bool ExportToFile( const char* Dir, const char* Type );
   
   u16   ChunkCount; //?
   u32   _unknown0; // PackageVerison > 61

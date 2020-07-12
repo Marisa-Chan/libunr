@@ -83,65 +83,6 @@ void UAnimation::Load()
   In >> AnimSeqs;
 }
 
-bool UAnimation::ExportToFile( const char* Path, const char* Dir )
-{
-/*
-  if ( stricmp( Type, "psa" ) != 0 )
-  {
-    GLogf( LOG_ERR, "Can't export skeletal animation to file type '%s'", Type );
-    return false;
-  }
-
-  // Open psa file
-  FStringFilePath Filename( Dir, Name.Data(), Type );
-  FFileArchiveOut Out = FFileArchiveOut();
-  if ( Out.Open( Filename ) != 0 )
-  {
-    GLogf( LOG_WARN, "Failed to export skeletal animation to file '%s'", Filename.Data() );
-    return false;
-  }
-
-  FChunkHeaderOut ChunkHdr;
-
-  // Write PSA header
-  strcpy( ChunkHdr.ChunkId, "ANIMHEAD" );
-  ChunkHdr.TypeFlags = PSK_PSA_TYPE_FLAGS;
-  ChunkHdr.DataSize = 0;
-  ChunkHdr.DataCount = 0;
-
-  Out << ChunkHdr;
-
-  // Write bones
-  strcpy( ChunkHdr.ChunkId, "BONENAMES" );
-  ChunkHdr.DataSize = sizeof(FBoneChunk);
-  ChunkHdr.DataCount = RefBones.Size();
-
-  Out << ChunkHdr;
-
-  for ( int i = 0; i < RefBones.Size(); i++ )
-  {
-    // TODO
-  }
-
-  // Write anim info
-  strcpy( ChunkHdr.ChunkId, "ANIMINFO" );
-  ChunkHdr.DataSize = sizeof(FAnimInfoChunk);
-  ChunkHdr.DataCount = AnimSeqs.Size();
-
-  Out << ChunkHdr;
-
-  for ( int i = 0; i < AnimSeqs.Size(); i++ )
-  {
-    // TODO
-  }
-
-  // Write anim keys
-  strcpy( ChunkHdr.ChunkId, "ANIMKEYS" );
-  ChunkHdr.DataSize = sizeof(FAnimKeyChunk);
-*/
-  return true;
-}
-
 USkeletalMeshInstance::USkeletalMeshInstance()
   : UObject()
 {

@@ -111,41 +111,6 @@ void UMusic::Load()
   }
 }
 
-bool UMusic::ExportToFile( const char* Dir, const char* Type )
-{
-  const char* Ext = MusicType.Data();
-
-  // Set up filename
-  FString Filename( Dir );
-#if defined LIBUNR_WIN32
-  Filename.ReplaceChars( '\\', '/' );
-#endif
-  if ( Filename.Back() != '/' )
-    Filename += "/";
-
-  Filename += Name;
-  Filename += ".";
-  Filename += Ext;
-
-  GLogf( LOG_INFO, "Exporting %s.%s", Name.Data(), Ext );
-
-  // Open file
-  FFileArchiveOut* Out = new FFileArchiveOut();
-  if ( Out->Open( Filename ) != 0 )
-  {
-    GLogf( LOG_WARN, "Failed to export music to file '%s'", Filename.Data() );
-    return false;
-  }
-  
-  // Write
-  Out->Write( ChunkData, ChunkSize );
-  
-  // Close
-  Out->Close();
-  delete Out;
-  return true;
-}
-
 #include "Core/UClass.h"
 #include "Core/UPackage.h"
 IMPLEMENT_NATIVE_CLASS( UMusic );

@@ -36,11 +36,6 @@ ABrush::~ABrush()
 {
 }
 
-bool ABrush::ExportToFile( const char* Dir, const char* Type )
-{
-  return false;
-}
-
 void ABrush::ExportToLevelText( FFileArchiveOut* Out )
 {
   Out->Printf( "\r\n\tBegin Brush Name=%s\r\n", Brush->Name.Data() );

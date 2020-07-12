@@ -44,7 +44,6 @@ class LIBUNR_API USound : public UObject
   USound();
 
   virtual void Load();
-  virtual bool ExportToFile( const char* Dir, const char* Type );
   
   void* GetRawPcm();
   

@@ -433,7 +433,6 @@ public:
   virtual void Load();
   virtual void PostLoad();
   virtual void PostDefaultLoad();
-  virtual bool ExportToFile( const char* Dir, const char* Type );
 
   void AddRef();
   void DelRef();

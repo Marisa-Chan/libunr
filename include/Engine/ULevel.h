@@ -80,7 +80,6 @@ class LIBUNR_API ULevel : public ULevelBase
   ULevel();
 
   virtual void Load();
-  virtual bool ExportToFile( const char* Dir, const char* Type );
 
   TArray<FReachSpec> ReachSpecs;
   UModel* Model;

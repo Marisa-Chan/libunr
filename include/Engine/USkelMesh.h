@@ -121,7 +121,6 @@ class LIBUNR_API USkeletalMesh : public ULodMesh
 
   USkeletalMesh();
   virtual void Load();
-  virtual bool ExportToFile( const char* Dir, const char* Type );
 
   TArray<FSkeletalWedge> ExtWedges;
   TArray<FVector> Points;

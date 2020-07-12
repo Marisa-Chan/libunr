@@ -427,11 +427,6 @@ void UFireTexture::Load()
   }
 }
 
-bool UFireTexture::ExportToFile( const char* dir, const char* Type )
-{
-  return false;
-}
-
 void UFireTexture::CalculateRenderTable()
 {
   // Construct render table for fast color lookup without
@@ -549,11 +544,6 @@ void UWaveTexture::Tick( float DeltaTime )
   Super::Tick( DeltaTime );  
 }
 
-bool UWaveTexture::ExportToFile( const char* dir, const char* Type )
-{
-  return false;
-}
-
 void UWaveTexture::CalculateRenderTable()
 {
   // TODO: Calculate the table so that it effectively follows a sine wave that gradually settles to a medium color (127)
@@ -643,11 +633,6 @@ void UWetTexture::Tick( float DeltaTime )
     }
     Src += USize;
   }*/
-}
-
-bool UWetTexture::ExportToFile( const char* dir, const char* Type )
-{
-  return false;
 }
 
 void UWetTexture::CalculateRenderTable()

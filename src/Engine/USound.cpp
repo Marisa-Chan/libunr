@@ -61,42 +61,6 @@ void USound::Load()
   PkgFile->Read( SoundData, SoundSize );
 }
 
-// TODO: Support exporting to a number of different formats
-bool USound::ExportToFile( const char* Dir, const char* Type )
-{
-  const char* Ext = SoundFormat.Data();
-
-  // Set up filename
-  FString Filename( Dir );
-#if defined LIBUNR_WIN32
-  Filename.ReplaceChars( '\\', '/' );
-#endif
-  if ( Filename.Back() != '/' )
-    Filename += '/';
-
-  Filename += Name.Data();
-  Filename += ".";
-  Filename += Ext;
-
-  GLogf( LOG_INFO, "Exporting %s.%s", Name.Data(), Ext );
-
-  // Open file
-  FFileArchiveOut* Out = new FFileArchiveOut();
-  if ( Out->Open( Filename ) != 0 )
-  {
-    GLogf( LOG_WARN, "Failed to export sound to wav file '%s'", Filename.Data() );
-    return false;
-  }
-
-  // Write
-  Out->Write( SoundData, SoundSize );
-  
-  // Close
-  Out->Close();
-  delete Out;
-  return true;
-}
-
 void* USound::GetRawPcm()
 {
   if ( stricmp( SoundFormat.Data(), "wav" ) == 0 )

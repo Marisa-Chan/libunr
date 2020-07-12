@@ -64,6 +64,10 @@
 #include "Engine/UViewport.h"
 #include "Engine/UStaticMesh.h"
 
+#include "Editor/UEditorEngine.h"
+#include "Editor/UExporter.h"
+#include "Editor/UFactory.h"
+
 #include "Actors/AActor.h"
 #include "Actors/ABrush.h"
 #include "Actors/ADecal.h"
