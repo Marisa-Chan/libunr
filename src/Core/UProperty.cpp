@@ -828,8 +828,14 @@ void UPointerProperty::Load()
 
 void UPointerProperty::GetText( FString& Buf, UObject* Obj, UObject* Default, int Idx )
 {
-  GLogf( LOG_CRIT, "Go pop '%s' in UTPT and see how to load a PointerProperty", Pkg->Name );
-  exit( -1 ); // <- can we not do this
+  int DefVal = (Default) ? Default->GetProperty<int>( this, Idx ) : 0;
+  int Val = Obj->GetProperty<int>( this, Idx );
+  if ( Val != DefVal )
+  {
+    char PtrText[32];
+    snprintf( PtrText, 32, "0x%x", Val );
+    Buf += PtrText;
+  }
 }
 
 IMPLEMENT_NATIVE_CLASS( UProperty );
