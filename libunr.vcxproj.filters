@@ -306,6 +306,12 @@
     <ClInclude Include="include\Util\FMemory.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="include\Editor\UExporter.h">
+      <Filter>Header Files\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Editor\UFactory.h">
+      <Filter>Header Files\Editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Actors\AActor.cpp">
@@ -499,6 +505,12 @@
     </ClCompile>
     <ClCompile Include="src\Util\FMemory.cpp">
       <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Editor\UFactory.cpp">
+      <Filter>Source Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Editor\UExporter.cpp">
+      <Filter>Source Files\Editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -43,6 +43,8 @@
     <ClInclude Include="include\DeusEx\ACameraPoint.h" />
     <ClInclude Include="include\DeusEx\UEventManager.h" />
     <ClInclude Include="include\Editor\UEditorEngine.h" />
+    <ClInclude Include="include\Editor\UExporter.h" />
+    <ClInclude Include="include\Editor\UFactory.h" />
     <ClInclude Include="include\Engine\FDumbMusicStream.h" />
     <ClInclude Include="include\Engine\FGmeMusicStream.h" />
     <ClInclude Include="include\Engine\FMp3MusicStream.h" />
@@ -124,6 +126,8 @@
     <ClCompile Include="src\DeusEx\ACameraPoint.cpp" />
     <ClCompile Include="src\DeusEx\UEventManager.cpp" />
     <ClCompile Include="src\Editor\UEditorEngine.cpp" />
+    <ClCompile Include="src\Editor\UExporter.cpp" />
+    <ClCompile Include="src\Editor\UFactory.cpp" />
     <ClCompile Include="src\Engine\UAudio.cpp" />
     <ClCompile Include="src\Engine\UCanvas.cpp" />
     <ClCompile Include="src\Engine\UConsole.cpp" />

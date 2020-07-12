@@ -50,6 +50,8 @@
 #include "Engine/UViewport.h"
 
 #include "Editor/UEditorEngine.h"
+#include "Editor/UExporter.h"
+#include "Editor/UFactory.h"
 
 #include "Actors/AActor.h"
 #include "Actors/ABrush.h"
@@ -387,6 +389,30 @@ bool UObject::StaticInit()
   {
     Result &= UTransBuffer::StaticClassInit();
     Result &= UEditorEngine::StaticClassInit();
+    Result &= UExporter::StaticClassInit();
+      Result &= UClassExporter::StaticClassInit();
+      Result &= ULevelExporter::StaticClassInit();
+      Result &= UMeshExporter::StaticClassInit();
+      Result &= UMusicExporter::StaticClassInit();
+      Result &= UPolysExporter::StaticClassInit();
+      Result &= USoundExporter::StaticClassInit();
+      Result &= UTextBufferExporter::StaticClassInit();
+      Result &= UPaletteExporter::StaticClassInit();
+      Result &= UTextureExporter::StaticClassInit();
+      Result &= UFractalTextureExporter::StaticClassInit();
+      Result &= UFontExporter::StaticClassInit();
+    Result &= UFactory::StaticClassInit();
+      Result &= UClassFactory::StaticClassInit();
+      Result &= ULevelFactory::StaticClassInit();
+      Result &= UMeshFactory::StaticClassInit();
+      Result &= UMusicFactory::StaticClassInit();
+      Result &= UPolysFactory::StaticClassInit();
+      Result &= USoundFactory::StaticClassInit();
+      Result &= UTextBufferFactory::StaticClassInit();
+      Result &= UPaletteFactory::StaticClassInit();
+      Result &= UTextureFactory::StaticClassInit();
+      Result &= UFractalTextureFactory::StaticClassInit();
+      Result &= UFontFactory::StaticClassInit();
   }
 
   UPackage::OpenUEPkg = UPackage::StaticLoadPackage( GSystem->GetOpenUEPkgPath(), false );

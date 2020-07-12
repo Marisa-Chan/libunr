@@ -23,6 +23,8 @@
  *========================================================================
 */
 
+#pragma once
+
 #include "Engine/UEngine.h"
 #include "Engine/ULevel.h"
 
@@ -33,6 +35,10 @@ class LIBUNR_API UTransBuffer : public UObject
   UTransBuffer() {}
 };
 
+/*-----------------------------------------------------------------------------
+ * UEditorEngine
+ * Engine implementation meant for the editor
+-----------------------------------------------------------------------------*/
 class LIBUNR_API UEditorEngine : public UEngine
 {
   DECLARE_NATIVE_CLASS( UEditorEngine, UEngine, CLASS_Transient, Editor )
