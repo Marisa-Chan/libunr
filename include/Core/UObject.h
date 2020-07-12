@@ -299,11 +299,16 @@ public: \
   virtual u32 GetNativeSize() \
   { \
     return NativeSize; \
-  } \
-  virtual ~cls(); 
+  }
+
+#define DECLARE_ABSTRACT_CLASS(cls, supcls, flags, pkg) \
+  DECLARE_NATIVE_CLASS_BASE(cls, supcls, flags | CLASS_Abstract, pkg) \
+  cls(){} \
+  virtual ~cls(){}
 
 #define DECLARE_NATIVE_CLASS(cls, supcls, flags, pkg) \
   DECLARE_NATIVE_CLASS_BASE(cls, supcls, flags, pkg) \
+  virtual ~cls();
 
 #define IMPLEMENT_NATIVE_CLASS(cls) \
   LIBUNR_API UClass* cls::ObjectClass = NULL; \
@@ -418,7 +423,7 @@ bool cls::StaticLinkNativeProperties() \
 class LIBUNR_API UObject
 {
 public:
-  DECLARE_NATIVE_CLASS_BASE( UObject, UObject, CLASS_Abstract, Core )
+  DECLARE_NATIVE_CLASS( UObject, UObject, CLASS_Abstract, Core )
   EXPOSE_TO_USCRIPT()
   UObject();
 
@@ -465,7 +470,6 @@ public:
   static TArray<UClass*>* GetGlobalClassPool();
   static TArray<FNativePropertyList*>* GetGlobalNativePropertyLists();
   static TArray<UFunction*>* GetGlobalNativeFunctions();
-  //static TArray<FNameEntry*>* GetGlobalNameTable();
 
   FName     Name;     // Name of the object stored in the global name table 
   int       Index;    // Index of the object in object pool
