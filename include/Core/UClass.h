@@ -32,7 +32,7 @@
 
 class LIBUNR_API UTextBuffer : public UObject
 {
-  DECLARE_NATIVE_CLASS( UTextBuffer, UObject, CLASS_Abstract | CLASS_NoExport, Core )
+  DECLARE_NATIVE_CLASS( UTextBuffer, UObject, CLASS_NoExport, Core )
 
   UTextBuffer();
   virtual void Load();
@@ -43,7 +43,7 @@ class LIBUNR_API UTextBuffer : public UObject
 
 class LIBUNR_API UField : public UObject
 {
-  DECLARE_NATIVE_CLASS( UField, UObject, CLASS_Abstract | CLASS_NoExport, Core )
+  DECLARE_NATIVE_CLASS( UField, UObject, CLASS_NoExport, Core )
 
   UField();
   virtual void Load();

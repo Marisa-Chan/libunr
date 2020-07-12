@@ -1075,6 +1075,12 @@ UObject* UClass::CreateObject( FName InName )
 {
   UObject* Out = NULL;
 
+  if ( ClassFlags & CLASS_Abstract )
+  {
+    GLogf( LOG_WARN, "Cannot create object of abstract type '%s'", Name.Data() );
+    return NULL;
+  }
+
   if ( ClassFlags & CLASS_NoExport )
     Out = Constructor( StructSize );
   else
