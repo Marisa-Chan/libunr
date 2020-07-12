@@ -132,6 +132,11 @@ const u32 FName::Hash() const
   return NameTableManager.Entries[Index].Hash;
 }
 
+const int FName::Flags() const
+{
+  return NameTableManager.Entries[Index].Flags;
+}
+
 const FNameEntry* FName::Entry() const
 {
   return &NameTableManager.Entries[Index];

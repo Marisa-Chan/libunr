@@ -108,6 +108,7 @@ public:
 
   const char* Data() const;
   const u32 Hash() const;
+  const int Flags() const;
   const FNameEntry* Entry() const;
 
   inline FName operator=( int Idx )
