@@ -1,3 +1,0 @@
-- Hotbar showing useful properties of selected objects
-  - Selecting a mover shows buttons that let you change which keyframe the
-    mover is on
