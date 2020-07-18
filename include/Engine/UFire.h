@@ -349,3 +349,17 @@ class LIBUNR_API UIceTexture : public UFractalTexture
   int ForceRefresh;
 };
 
+static const char* PanningTypeStr[] =
+{
+  "SLIDE_Linear",
+  "SLIDE_Circular",
+  "SLIDE_Gestation",
+  "SLIDE_WavyX",
+  "SLIDE_WavyY"
+};
+
+static const char* TimingTypeStr[] =
+{
+  "TIME_FrameRateSync",
+  "TIME_RealTimeScroll"
+};

@@ -40,6 +40,7 @@ public:
   FConfig( const char* Filename );
   ~FConfig();
 
+  int Create( const char* Filename );
   int Load( const char* Filename );
   int Save();
 

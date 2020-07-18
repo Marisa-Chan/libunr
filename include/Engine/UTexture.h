@@ -91,6 +91,24 @@ public:
   
     return In;
   }
+  friend FPackageFileOut& operator<<( FPackageFileOut& Out, FColor& Color )
+  {
+    Out << Color.R;
+    Out << Color.G;
+    Out << Color.B;
+    Out << Color.A;
+
+    return Out;
+  }
+  friend FFileArchiveOut& operator<<( FFileArchiveOut& Out, FColor& Color )
+  {
+    Out << Color.R;
+    Out << Color.G;
+    Out << Color.B;
+    Out << Color.A;
+
+    return Out;
+  }
 };
 
 class LIBUNR_API FMipmap

@@ -908,6 +908,7 @@ bool UMusicExporter::ExportObject( UMusic* Obj, const char* Dir, const char* Typ
 -----------------------------------------------------------------------------*/
 bool UPolysExporter::ExportObject( UPolys* Obj, const char* Dir, const char* Type )
 {
+  // I think this is for exporting brushes to various mesh formats?
   GLogf( LOG_ERR, "UPolysExporter::ExportObject stub" );
   return false;
 }
@@ -991,8 +992,58 @@ bool UTextBufferExporter::ExportObject( UTextBuffer* Obj, const char* Dir, const
 -----------------------------------------------------------------------------*/
 bool UPaletteExporter::ExportObject( UPalette* Obj, const char* Dir, const char* Type )
 {
-  GLogf( LOG_ERR, "UPaletteExporter::ExportObject stub" );
-  return false;
+  FString Filename( Dir );
+#if defined LIBUNR_WIN32
+  Filename.ReplaceChars( '\\', '/' );
+#endif
+  if ( Filename.Back() != '/' )
+    Filename += '/';
+
+  Filename += Obj->Name;
+
+  bool bBinary = false;
+  if ( Type == NULL )
+  {
+    Type = "palt";
+  }
+  else if ( stricmp( Type, "palb" ) == 0 )
+  {
+    bBinary = true;
+  }
+  else if ( stricmp( Type, "palt" ) != 0 )
+  {
+    GLogf( LOG_ERR, "Unknown palette export type '%s'", Type );
+    return false;
+  }
+
+  Filename += '.';
+  Filename += Type;
+
+  GLogf( LOG_INFO, "Exporting %s.%s", Obj->Name.Data(), Type );
+
+  // Open file
+  FFileArchiveOut* Out = new FFileArchiveOut();
+  if ( Out->Open( Filename ) != 0 )
+  {
+    GLogf( LOG_WARN, "Failed to export palette to file '%s'", Filename.Data() );
+    return false;
+  }
+
+  // Write
+  for ( int i = 0; i < ARRAY_SIZE( Obj->Colors ); i++ )
+  {
+    FColor& Color = Obj->Colors[i];
+    if ( bBinary )
+      *Out << Color;
+    else
+      Out->Printf( "Colors[%i]=(R=%hhu,G=%hhu,B=%hhu,A=%hhu)\n",
+        i, Color.R, Color.G, Color.B, Color.A );
+  }
+
+  // Close
+  Out->Close();
+  delete Out;
+  return true;
 }
 
 /*-----------------------------------------------------------------------------
@@ -1110,8 +1161,199 @@ bool UTextureExporter::ExportObject( UTexture* Obj, const char* Dir, const char*
 -----------------------------------------------------------------------------*/
 bool UFractalTextureExporter::ExportObject( UFractalTexture* Obj, const char* Dir, const char* Type )
 {
-  GLogf( LOG_ERR, "UFractalTextureExporter::ExportObject stub" );
+  GLogf( LOG_INFO, "Exporting %s.ftx", Obj->Name.Data() );
+
+  if ( Obj->Class == UFireTexture::StaticClass() )
+    return ExportFireTexture( (UFireTexture*)Obj, Dir );
+  else if ( Obj->Class == UWaveTexture::StaticClass() )
+    return ExportWaveTexture( (UWaveTexture*)Obj, Dir );
+  else if ( Obj->Class == UWetTexture::StaticClass() )
+    return ExportWetTexture( (UWetTexture*)Obj, Dir );
+  else if ( Obj->Class == UIceTexture::StaticClass() )
+    return ExportIceTexture( (UIceTexture*)Obj, Dir );
+  else
+    GLogf( LOG_ERR, "Unknown fractal texture type '%s' (%s)", Obj->Class->Name.Data(), Obj->Name.Data() );
+
   return false;
+}
+
+bool UFractalTextureExporter::ExportFireTexture( UFireTexture* Obj, const char* Dir )
+{
+  FString Filename( Dir );
+#if defined LIBUNR_WIN32
+  Filename.ReplaceChars( '\\', '/' );
+#endif
+  if ( Filename.Back() != '/' )
+    Filename += '/';
+
+  Filename += Obj->Name;
+  Filename += ".ftx";
+
+  // Open file
+  FFileArchiveOut* Out = new FFileArchiveOut();
+  if ( Out->Open( Filename ) != 0 )
+  {
+    GLogf( LOG_WARN, "Failed to export fire texture to file '%s'", Filename.Data() );
+    return false;
+  }
+
+  Out->Printf( "Type=FireTexture\n" );
+  Out->Printf( "Width=%i\n", Obj->USize );
+  Out->Printf( "Height=%i\n", Obj->VSize );
+  Out->Printf( "Palette=Palette'%s.%s'\n", Obj->Pkg->Name.Data(), Obj->Name.Data() );
+  Out->Printf( "bRising=%s\n", Obj->bRising ? "true" : "false" );
+  Out->Printf( "RenderHeat=%i\n", Obj->RenderHeat );
+  Out->Printf( "SparksLimit=%i\n", Obj->SparksLimit );
+  Out->Printf( "NumSparks=%i\n", Obj->NumSparks );
+  
+  for ( int i = 0; i < Obj->NumSparks; i++ )
+  {
+    UFireTexture::Spark& Spark = (*Obj->Sparks)[i];
+    Out->Printf( "Sparks[%i]=(Type=%i,Heat=%i,X=%i,Y=%i,ByteA=%i,ByteB=%i,ByteC=%i,ByteD=%i)\n",
+      i, Spark.Type, Spark.Heat, Spark.X, Spark.Y, Spark.ByteA, Spark.ByteB, Spark.ByteC, Spark.ByteD );
+  }
+
+    // Close
+  Out->Close();
+  delete Out;
+  return true;
+}
+
+bool UFractalTextureExporter::ExportWaveTexture( UWaveTexture* Obj, const char* Dir )
+{
+  FString Filename( Dir );
+#if defined LIBUNR_WIN32
+  Filename.ReplaceChars( '\\', '/' );
+#endif
+  if ( Filename.Back() != '/' )
+    Filename += '/';
+
+  Filename += Obj->Name;
+  Filename += ".ftx";
+
+  // Open file
+  FFileArchiveOut* Out = new FFileArchiveOut();
+  if ( Out->Open( Filename ) != 0 )
+  {
+    GLogf( LOG_WARN, "Failed to export wave texture to file '%s'", Filename.Data() );
+    return false;
+  }
+
+  Out->Printf( "Type=WaveTexture\n" );
+  Out->Printf( "Width=%i\n", Obj->USize );
+  Out->Printf( "Height=%i\n", Obj->VSize );
+  Out->Printf( "Palette=Palette'%s.%s'\n", Obj->Pkg->Name.Data(), Obj->Name.Data() );
+  Out->Printf( "WaveAmp=%i\n", Obj->WaveAmp );
+  Out->Printf( "BumpMapAngle=%i\n", Obj->BumpMapAngle );
+  Out->Printf( "BumpMapLight=%i\n", Obj->BumpMapLight );
+  Out->Printf( "PhongRange=%i\n", Obj->PhongRange );
+  Out->Printf( "PhongSize=%i\n", Obj->PhongSize );
+
+  for ( int i = 0; i < Obj->NumDrops; i++ )
+  {
+    UWaterTexture::ADrop& Drop = Obj->Drops[i];
+    Out->Printf( "Drops[%i]=(Type=%i,Depth=%i,X=%i,Y=%i,ByteA=%i,ByteB=%i,ByteC=%i,ByteD=%i)\n",
+      i, Drop.Type, Drop.Depth, Drop.X, Drop.Y, Drop.ByteA, Drop.ByteB, Drop.ByteC, Drop.ByteD );
+  }
+
+  // Close
+  Out->Close();
+  delete Out;
+  return true;
+}
+
+bool UFractalTextureExporter::ExportWetTexture( UWetTexture* Obj, const char* Dir )
+{
+  FString Filename( Dir );
+#if defined LIBUNR_WIN32
+  Filename.ReplaceChars( '\\', '/' );
+#endif
+  if ( Filename.Back() != '/' )
+    Filename += '/';
+
+  Filename += Obj->Name;
+  Filename += ".ftx";
+
+  // Open file
+  FFileArchiveOut* Out = new FFileArchiveOut();
+  if ( Out->Open( Filename ) != 0 )
+  {
+    GLogf( LOG_WARN, "Failed to export wet texture to file '%s'", Filename.Data() );
+    return false;
+  }
+
+  Out->Printf( "Type=WetTexture\n" );
+  Out->Printf( "Width=%i\n", Obj->USize );
+  Out->Printf( "Height=%i\n", Obj->VSize );
+  Out->Printf( "Palette=Palette'%s.%s'\n", Obj->Pkg->Name.Data(), Obj->Name.Data() );
+  Out->Printf( "WaveAmp=%i\n", Obj->WaveAmp );
+  if ( Obj->SourceTexture )
+    Out->Printf( "SourceTexture=Texture'%s.%s'\n",
+      Obj->SourceTexture->Pkg->Name.Data(), Obj->SourceTexture->Name.Data() );
+  else
+    Out->Printf( "SourceTexture=None\n" );
+
+  for ( int i = 0; i < Obj->NumDrops; i++ )
+  {
+    UWaterTexture::ADrop& Drop = Obj->Drops[i];
+    Out->Printf( "Drops[%i]=(Type=%i,Depth=%i,X=%i,Y=%i,ByteA=%i,ByteB=%i,ByteC=%i,ByteD=%i)\n",
+      i, Drop.Type, Drop.Depth, Drop.X, Drop.Y, Drop.ByteA, Drop.ByteB, Drop.ByteC, Drop.ByteD );
+  }
+
+  // Close
+  Out->Close();
+  delete Out;
+  return true;
+}
+
+bool UFractalTextureExporter::ExportIceTexture( UIceTexture* Obj, const char* Dir )
+{
+  FString Filename( Dir );
+#if defined LIBUNR_WIN32
+  Filename.ReplaceChars( '\\', '/' );
+#endif
+  if ( Filename.Back() != '/' )
+    Filename += '/';
+
+  Filename += Obj->Name;
+  Filename += ".ftx";
+
+  // Open file
+  FFileArchiveOut* Out = new FFileArchiveOut();
+  if ( Out->Open( Filename ) != 0 )
+  {
+    GLogf( LOG_WARN, "Failed to export ice texture to file '%s'", Filename.Data() );
+    return false;
+  }
+
+  Out->Printf( "Type=IceTexture\n" );
+  Out->Printf( "Width=%i\n", Obj->USize );
+  Out->Printf( "Height=%i\n", Obj->VSize );
+  Out->Printf( "Palette=Palette'%s.%s'\n", Obj->Pkg->Name.Data(), Obj->Name.Data() );
+
+  if ( Obj->SourceTexture )
+    Out->Printf( "SourceTexture=Texture'%s.%s'\n",
+      Obj->SourceTexture->Pkg->Name.Data(), Obj->SourceTexture->Name.Data() );
+  else
+    Out->Printf( "SourceTexture=None\n" );
+
+  if ( Obj->GlassTexture )
+    Out->Printf( "GlassTexture=Texture'%s.%s'\n",
+      Obj->GlassTexture->Pkg->Name.Data(), Obj->GlassTexture->Name.Data() );
+  else
+    Out->Printf( "GlassTexture=None\n" );
+
+  Out->Printf( "Amplitude=%i\n", Obj->Amplitude );
+  Out->Printf( "Frequency=%i\n", Obj->Frequency );
+  Out->Printf( "HorizPanSpeed=%i\n", Obj->HorizPanSpeed );
+  Out->Printf( "MoveIce=%s\n", Obj->MoveIce ? "true" : "false" );
+  Out->Printf( "PanningStyle=%s\n", PanningTypeStr[Obj->PanningStyle] );
+  Out->Printf( "TimeMethod=%s\n", TimingTypeStr[Obj->TimeMethod] );
+
+  // Close
+  Out->Close();
+  delete Out;
+  return true;
 }
 
 /*-----------------------------------------------------------------------------
@@ -1119,8 +1361,55 @@ bool UFractalTextureExporter::ExportObject( UFractalTexture* Obj, const char* Di
 -----------------------------------------------------------------------------*/
 bool UFontExporter::ExportObject( UFont* Obj, const char* Dir, const char* Type )
 {
-  GLogf( LOG_ERR, "UFontExporter::ExportObject stub" );
-  return false;
+  FString Filename( Dir );
+#if defined LIBUNR_WIN32
+  Filename.ReplaceChars( '\\', '/' );
+#endif
+  if ( Filename.Back() != '/' )
+    Filename += '/';
+
+  Filename += Obj->Name;
+  Filename += ".ufnt";
+
+  // Open file
+  FFileArchiveOut* Out = new FFileArchiveOut();
+  if ( Out->Open( Filename ) != 0 )
+  {
+    GLogf( LOG_WARN, "Failed to export font to file '%s'", Filename.Data() );
+    return false;
+  }
+
+  // Print font data
+  Out->Printf( "NumTextures=%i\n", Obj->FontTextures->Size() );
+
+  for ( int i = 0; i < Obj->FontTextures->Size(); i++ )
+  {
+    // Print this font texture's info
+    Out->Printf( "FontTextures[%i]=\n{\n", i );
+
+    UFont::FFontTexture& FontTexture = (*Obj->FontTextures)[i];
+
+    Out->Printf( "    Texture=Texture'%s.%s'\n",
+      FontTexture.Texture->Pkg->Name.Data(), FontTexture.Texture->Name.Data() );
+
+    Out->Printf( "    NumCharacters=%i\n", FontTexture.Characters->Size() );
+    for ( int j = 0; j < FontTexture.Characters->Size(); j++ )
+    {
+      UFont::FFontCharInfo& CharInfo = (*FontTexture.Characters)[j];
+      Out->Printf( "    Characters[%i]=(X=%u,Y=%u,Width=%u,Height=%u)\n",
+        j, CharInfo.X, CharInfo.Y, CharInfo.Width, CharInfo.Height );
+    }
+
+    // Export the texture for this font section
+    UTextureExporter::ExportObject( FontTexture.Texture, Dir, "bmp" );
+
+    Out->Printf( "}\n" );
+  }
+
+  // Close
+  Out->Close();
+  delete Out;
+  return true;
 }
 
 IMPLEMENT_NATIVE_CLASS( UExporter );

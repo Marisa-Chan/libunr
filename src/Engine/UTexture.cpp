@@ -50,7 +50,8 @@ void UPalette::Load()
     GLogf( LOG_WARN, "Palette does not have 256 entries!" );
   
   // Load colors
-  for (int i = 0; i < PaletteSize; i++) {
+  for (int i = 0; i < PaletteSize; i++) 
+  {
     *PkgFile >> Colors[i];
   }
 }

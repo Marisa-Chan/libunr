@@ -479,13 +479,13 @@ UObject* UObject::Clone()
   return ClonedObj;
 }
 
-UObject* UObject::LoadObject( idx ObjRef, UClass* ObjClass, UObject* InOuter, bool bLoadClassNow )
+UObject* UObject::LoadObject( idx ObjRef, UClass* ObjClass, UObject* InOuter, ELoadFlags LoadFlags )
 {
   return StaticLoadObject( Pkg, ObjRef, ObjClass, InOuter, bLoadClassNow );
 }
 
 UObject* UObject::StaticLoadObject( UPackage* Pkg, const char* ObjName, UClass* ObjClass,
-  UObject* InOuter, bool bLoadClassNow )
+  UObject* InOuter, ELoadFlags LoadFlags )
 {
   FExport* Export = Pkg->GetExportByNameAndType( Pkg->FindLocalName( ObjName ), ObjClass );
   if ( UNLIKELY( Export == NULL ) )

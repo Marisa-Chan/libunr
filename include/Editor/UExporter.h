@@ -147,6 +147,10 @@ class LIBUNR_API UFractalTextureExporter : public UExporter
 {
   DECLARE_ABSTRACT_CLASS( UFractalTextureExporter, UExporter, CLASS_NoExport, Editor )
   static bool ExportObject( UFractalTexture* Obj, const char* Dir, const char* Type );
+  static bool ExportFireTexture( UFireTexture* Obj, const char* Dir );
+  static bool ExportWaveTexture( UWaveTexture* Obj, const char* Dir );
+  static bool ExportWetTexture( UWetTexture* Obj, const char* Dir );
+  static bool ExportIceTexture( UIceTexture* Obj, const char* Dir );
 };
 
 /*-----------------------------------------------------------------------------

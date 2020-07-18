@@ -36,18 +36,19 @@
 // Flags for loading objects.
 enum ELoadFlags
 {
-  LOAD_None          = 0x0000, // No flags.
-  LOAD_NoFail        = 0x0001, // Critical error if load fails.
-  LOAD_NoWarn        = 0x0002, // Don't display warning if load fails.
-  LOAD_Throw         = 0x0008, // Throw exceptions upon failure.
-  LOAD_Verify        = 0x0010, // Only verify existance; don't actually load.
-  LOAD_AllowDll      = 0x0020, // Allow plain DLLs.
-  LOAD_DisallowFiles = 0x0040, // Don't load from file.
-  LOAD_NoVerify      = 0x0080, // Don't verify imports yet.
-  LOAD_Forgiving     = 0x1000, // Forgive missing imports (set them to NULL).
-  LOAD_Quiet         = 0x2000, // No log warnings.
-  LOAD_NoRemap       = 0x4000, // No remapping of packages.
-  LOAD_Propagate     = 0x8000,
+  LOAD_None          = 0x00000, // No flags.
+  LOAD_NoFail        = 0x00001, // Critical error if load fails.
+  LOAD_NoWarn        = 0x00002, // Don't display warning if load fails.
+  LOAD_Throw         = 0x00008, // Throw exceptions upon failure.
+  LOAD_Verify        = 0x00010, // Only verify existance; don't actually load.
+  LOAD_AllowDll      = 0x00020, // Allow plain DLLs.
+  LOAD_DisallowFiles = 0x00040, // Don't load from file.
+  LOAD_NoVerify      = 0x00080, // Don't verify imports yet.
+  LOAD_Forgiving     = 0x01000, // Forgive missing imports (set them to NULL).
+  LOAD_Quiet         = 0x02000, // No log warnings.
+  LOAD_NoRemap       = 0x04000, // No remapping of packages.
+  LOAD_Propagate     = 0x08000,
+  LOAD_Immediate     = 0x10000, // Don't delay class load
 };
 
 // Package flags.
@@ -427,7 +428,7 @@ public:
   EXPOSE_TO_USCRIPT()
   UObject();
 
-  UObject* LoadObject( idx ObjRef, UClass* ObjClass, UObject* InOuter, bool bLoadClassNow = false );
+  UObject* LoadObject( idx ObjRef, UClass* ObjClass, UObject* InOuter, ELoadFlags LoadFlags = LOAD_None );
   UObject* Clone();
   virtual void PreLoad();
   virtual void Load();
@@ -453,11 +454,11 @@ public:
   static bool StaticInit();
   static bool StaticExit();
   static UObject* StaticLoadObject( UPackage* ObjPkg, const char* ObjName, UClass* ObjClass, 
-    UObject* InOuter, bool bLoadClassNow = false );
+    UObject* InOuter, ELoadFlags LoadFlags = LOAD_None );
   static UObject* StaticLoadObject( UPackage* ObjPkg, idx ObjRef, UClass* ObjClass, 
-    UObject* InOuter, bool bLoadClassNow = false );
+    UObject* InOuter, ELoadFlags LoadFlags = LOAD_None );
   static UObject* StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass* ObjClass,
-    UObject* InOuter, bool bLoadClassNow = false );
+    UObject* InOuter, ELoadFlags LoadFlags = LOAD_None );
   static UObject* StaticConstructObject( FName InName, UClass* InClass, 
     UObject* InOuter, UPackage* InPkg, FExport* InExport );
   static UClass* StaticAllocateClass( FName InName, u32 Flags, UClass* SuperClass, 

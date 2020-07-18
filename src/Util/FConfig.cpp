@@ -125,6 +125,39 @@ FConfig::~FConfig()
   Categories.Clear();
 }
 
+int FConfig::Create( const char* Filename )
+{
+  // Make sure we can create the file
+  FFileArchiveOut IniFile;
+  int Status = IniFile.Open( Filename );
+  if ( Status != 0 )
+  {
+    GLogf( LOG_WARN, "Can't create ini file '%s' (errno = %s)", Filename, strerror( Status ) );
+    return ERR_FILE_CREATE;
+  }
+  IniFile.Close();
+
+  Name = strdup( Filename );
+  char* Dot = strrchr( Name, '.' );
+  if ( Dot )
+    *Dot = '\0';
+
+  Path = strdup( Filename );
+  char* Slash = strrchr( Name, DIRECTORY_SEPARATOR );
+  if ( Slash )
+  {
+    *Slash = '\0';
+  }
+  else
+  {
+    FGlobalMem::Free( Path );
+    Path = new char[296];
+    getcwd( Path, 296 );
+  }
+
+  return 0;
+}
+
 int FConfig::Load( const char* Filename )
 {
   char CategoryBuf[128];
@@ -142,7 +175,6 @@ int FConfig::Load( const char* Filename )
     GLogf( LOG_WARN, "Can't open ini file '%s' (errno = %s)", Filename, strerror( Status ) );
     return ERR_FILE_NOT_EXIST;
   }
-
 
   // Read until the end of the file
   FConfigCategory* Category = NULL;
