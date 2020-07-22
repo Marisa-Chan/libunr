@@ -13,8 +13,8 @@ set (UNR_INC ${UNR_ROOT}/include)
 set (UNR_SRC ${UNR_ROOT}/src)
 
 option( BUILD_CYGWIN "Build_Cygwin" OFF )
-option( BUILD_DEUXEX "DeusEx support" OFF)
-option( BUILD_RUNE "Rune support" OFF)
+option( BUILD_DEUSEX "DeusEx support" OFF )
+option( BUILD_RUNE "Rune support" OFF )
 
 if ( WIN32 )
   add_definitions("-Wno-invalid-offsetof")
@@ -24,6 +24,8 @@ if ( UNIX )
   install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/share/libunr)
   install(FILES ${UNR_ROOT}/res/DefaultLibunr.ini DESTINATION
     ${CMAKE_INSTALL_PREFIX}/share/libunr)
+	install(FILES ${UNR_ROOT}/res/OpenUE.u DESTINATION 
+		${CMAKE_INSTALL_PREFIX}/share/libunr)
 endif()
 
 set (ACTOR_SOURCES
@@ -66,6 +68,8 @@ set (DEUSEX_SOURCES
 
 set (EDITOR_SOURCES
 	${UNR_SRC}/Editor/UEditorEngine.cpp
+	${UNR_SRC}/Editor/UExporter.cpp
+	${UNR_SRC}/Editor/UFactory.cpp
 )
 
 set (ENGINE_SOURCES
@@ -182,6 +186,8 @@ add_library(unr SHARED
 
 target_link_libraries(unr
 	dl
+	pthread
+	uuid
 	${LIBMPG123_LIBRARIES}
 	${LIBGME_LIBRARIES}
 	${LIBDUMB_LIBRARIES}

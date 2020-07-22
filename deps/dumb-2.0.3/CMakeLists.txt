@@ -28,6 +28,7 @@ check_and_add_c_compiler_flag("-Wno-unused-but-set-variable" CMAKE_C_FLAGS)
 check_and_add_c_compiler_flag("-Wall" CMAKE_C_FLAGS)
 add_definitions("-D_FILE_OFFSET_BITS=64")
 add_definitions("-DDUMB_DECLARE_DEPRECATED")
+add_definitions("-fPIC")
 
 set(CMAKE_C_FLAGS_DEBUG "-DDEBUGMODE=1 -D_DEBUG")
 check_and_add_c_compiler_flag("-ggdb" CMAKE_C_FLAGS_DEBUG)
