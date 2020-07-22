@@ -125,6 +125,27 @@ FConfig::~FConfig()
   Categories.Clear();
 }
 
+void FConfig::SetPathAndName( const char* Filename )
+{
+  Path = strdup( Filename );
+  char* Slash = strrchr( Path, DIRECTORY_SEPARATOR );
+  if ( Slash )
+  {
+    *Slash = '\0';
+    Name = strdup( Slash+1 );
+  }
+  else
+  {
+    Path = new char[296];
+    getcwd( Path, 296 );
+    Name = strdup( Filename );
+  }
+
+  char* Dot = strrchr( Name, '.' );
+  if ( Dot )
+    *Dot = '\0';
+}
+
 int FConfig::Create( const char* Filename )
 {
   // Make sure we can create the file
@@ -136,24 +157,7 @@ int FConfig::Create( const char* Filename )
     return ERR_FILE_CREATE;
   }
   IniFile.Close();
-
-  Name = strdup( Filename );
-  char* Dot = strrchr( Name, '.' );
-  if ( Dot )
-    *Dot = '\0';
-
-  Path = strdup( Filename );
-  char* Slash = strrchr( Name, DIRECTORY_SEPARATOR );
-  if ( Slash )
-  {
-    *Slash = '\0';
-  }
-  else
-  {
-    FGlobalMem::Free( Path );
-    Path = new char[296];
-    getcwd( Path, 296 );
-  }
+  SetPathAndName( Filename );
 
   return 0;
 }
@@ -368,25 +372,8 @@ int FConfig::Load( const char* Filename )
     }
   }
   GLogf( LOG_INFO, "Successfully read config file '%s'", Filename );
-
-  Name = strdup( Filename );
-  char* Dot = strrchr( Name, '.' );
-  if ( Dot )
-    *Dot = '\0';
-
-  Path = strdup( Filename );
-  char* Slash = strrchr( Name, DIRECTORY_SEPARATOR );
-  if ( Slash )
-  {
-    *Slash = '\0';
-  }
-  else
-  {
-    FGlobalMem::Free( Path );
-    Path = new char[296];
-    getcwd( Path, 296 );
-  }
-
+  SetPathAndName( Filename );
+  
   IniFile.Close();
   return 0;
 }
