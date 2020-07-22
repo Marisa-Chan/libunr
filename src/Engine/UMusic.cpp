@@ -85,7 +85,7 @@ void UMusic::Load()
     case NAME_Asy:
     case NAME_Amf:
     case NAME_Okt:
-      Stream = new FDumbMusicStream();
+      Stream = new FTrackerMusicStream();
       break;
     case NAME_Ogg:
       Stream = new FOggMusicStream();

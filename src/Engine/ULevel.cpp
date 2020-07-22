@@ -113,7 +113,7 @@ void ULevelBase::Load()
     // Don't load garbage zeroes
     if ( ActorObjRef != 0 )
     {
-      AActor* Actor = (AActor*)LoadObject( ActorObjRef, NULL, NULL, true );
+      AActor* Actor = (AActor*)LoadObject( ActorObjRef, NULL, NULL, LOAD_Immediate );
       if ( bDeletedBrushwork )
       {
         if ( Actor->Class == ABrush::StaticClass() )
@@ -147,7 +147,7 @@ void ULevelBase::Load()
       FExport* Export = &Exports[i];
       if ( stricmp( Pkg->ResolveNameFromObjRef( Export->Class ), "Brush" ) == 0 )
       {
-        ABrush* Brush = (ABrush*)StaticLoadObject( Pkg, Export, ABrush::StaticClass(), NULL, true );
+        ABrush* Brush = (ABrush*)StaticLoadObject( Pkg, Export, ABrush::StaticClass(), NULL, LOAD_Immediate );
         Actors.PushBack( Brush );
       }
     }

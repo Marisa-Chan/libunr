@@ -113,7 +113,7 @@ void UField::Load()
 
   // Never lazily load superfields
   if ( SuperIdx )
-    SuperField = (UField*)LoadObject( SuperIdx, NULL, Outer, true );
+    SuperField = (UField*)LoadObject( SuperIdx, NULL, Outer, LOAD_Immediate );
   
   if ( NextIdx )
     Next = (UField*)LoadObject( NextIdx, NULL, Outer );

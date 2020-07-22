@@ -578,7 +578,7 @@ const char* USystem::GetOpenUEPkgPath()
 #if defined LIBUNR_POSIX
 
   strcpy( DefLibUnrPath, INSTALL_PREFIX );
-  strcat( DefLibUnrPath, "/lib/libunr/OpenUE.u" );
+  strcat( DefLibUnrPath, "/share/libunr/OpenUE.u" );
 
 #elif defined LIBUNR_WIN32
   

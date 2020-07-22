@@ -481,7 +481,7 @@ UObject* UObject::Clone()
 
 UObject* UObject::LoadObject( idx ObjRef, UClass* ObjClass, UObject* InOuter, ELoadFlags LoadFlags )
 {
-  return StaticLoadObject( Pkg, ObjRef, ObjClass, InOuter, bLoadClassNow );
+  return StaticLoadObject( Pkg, ObjRef, ObjClass, InOuter, LoadFlags );
 }
 
 UObject* UObject::StaticLoadObject( UPackage* Pkg, const char* ObjName, UClass* ObjClass,
@@ -494,11 +494,11 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, const char* ObjName, UClass* 
     return NULL;
   }
 
-  return StaticLoadObject( Pkg, Export, ObjClass, InOuter, bLoadClassNow );
+  return StaticLoadObject( Pkg, Export, ObjClass, InOuter, LoadFlags );
 }
 
 UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass, 
-  UObject* InOuter, bool bLoadClassNow )
+  UObject* InOuter, ELoadFlags LoadFlags )
 {
   FExport* ObjExport = NULL;
   UPackage* ObjPkg = NULL;
@@ -680,7 +680,7 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
       if ( UNLIKELY( ObjPkg == NULL ) )
         goto Error;
 
-      return StaticLoadObject( ObjPkg, ObjName, ObjClass, InOuter, bLoadClassNow );
+      return StaticLoadObject( ObjPkg, ObjName, ObjClass, InOuter, LoadFlags );
     }
 
   Error:
@@ -691,11 +691,11 @@ UObject* UObject::StaticLoadObject( UPackage* Pkg, idx ObjRef, UClass* ObjClass,
     return NULL;
   }
 
-  return StaticLoadObject( ObjPkg, ObjExport, ObjClass, InOuter, bLoadClassNow );
+  return StaticLoadObject( ObjPkg, ObjExport, ObjClass, InOuter, LoadFlags );
 }
 
 UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass* ObjClass, 
-  UObject* InOuter, bool bLoadClassNow )
+  UObject* InOuter, ELoadFlags LoadFlags )
 {
   FName ObjName( ObjPkg->GetNameEntry( ObjExport->ObjectName ) );
   bool bNeedsFullLoad = true;
@@ -727,7 +727,7 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
     // If not, then we need to load it
     if ( UNLIKELY( ObjClass == NULL ) )
     {
-      ObjClass = (UClass*)StaticLoadObject( ObjPkg, ObjExport->Class, UClass::StaticClass(), NULL, true );
+      ObjClass = (UClass*)StaticLoadObject( ObjPkg, ObjExport->Class, UClass::StaticClass(), NULL, LOAD_Immediate );
       if ( UNLIKELY( ObjClass == NULL ) )
       {
         GLogf( LOG_CRIT, "Can't load object '%s.%s', cannot load class", 
@@ -743,7 +743,7 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
   if ( UNLIKELY( ClassType == NULL ) )
   {
     // Load the actual type that it is
-    ClassType = (UClass*)StaticLoadObject( ObjPkg, ObjExport->Class, UClass::StaticClass(), NULL, true );
+    ClassType = (UClass*)StaticLoadObject( ObjPkg, ObjExport->Class, UClass::StaticClass(), NULL, LOAD_Immediate );
     if ( UNLIKELY( ClassType == NULL ) )
     {
       GLogf( LOG_WARN, "Can't load object '%s.%s', cannot load class",
@@ -771,7 +771,7 @@ UObject* UObject::StaticLoadObject( UPackage* ObjPkg, FExport* ObjExport, UClass
 
   UObject* Obj = NULL;
 
-  if ( ( !bLoadClassNow && ObjClass == UClass::StaticClass() ) || !ObjExport->bNeedsFullLoad ) 
+  if ( ( !(LoadFlags & LOAD_Immediate) && ObjClass == UClass::StaticClass() ) || !ObjExport->bNeedsFullLoad ) 
     bNeedsFullLoad = false;
 
   // Determine if the object has already been constructed or needs constructing

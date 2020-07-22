@@ -887,7 +887,7 @@ void UPackage::LoadEditableTypes()
     {
       if ( stricmp( ClassName, Types[j] ) == 0 )
       {
-        UObject::StaticLoadObject( this, Export, NULL, NULL, true );
+        UObject::StaticLoadObject( this, Export, NULL, NULL, LOAD_Immediate );
         break;
       }
     }
