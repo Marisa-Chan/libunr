@@ -26,6 +26,8 @@ if ( UNIX )
     ${CMAKE_INSTALL_PREFIX}/share/libunr)
 	install(FILES ${UNR_ROOT}/res/OpenUE.u DESTINATION 
 		${CMAKE_INSTALL_PREFIX}/share/libunr)
+
+	install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/include/libunr)
 endif()
 
 set (ACTOR_SOURCES
@@ -148,6 +150,8 @@ set_source_files_properties( tags PROPERTIES GENERATED true )
 add_custom_target( tags COMMAND ctags --c++-kinds=+p --fields=+iaS --extra=+q
  --language-force=C++ --recurse=yes . WORKING_DIRECTORY ${UNR_ROOT} )
 
+ add_custom_target( install_headers COMMAND cp -rv ${UNR_INC}/* ${CMAKE_INSTALL_PREFIX}/include/libunr/ )
+
 set(LIBUNR_SOURCES
 	${ACTOR_SOURCES}
 	${CORE_SOURCES}
@@ -188,6 +192,7 @@ target_link_libraries(unr
 	dl
 	pthread
 	uuid
+	openmpt
 	${LIBMPG123_LIBRARIES}
 	${LIBGME_LIBRARIES}
 	${LIBDUMB_LIBRARIES}

@@ -31,7 +31,7 @@
 #include "Engine/UMusic.h"
 
 // Music stream implementations
-#include "Engine/FDumbMusicStream.h"
+#include "Engine/FTrackerMusicStream.h"
 #include "Engine/FOggMusicStream.h"
 #include "Engine/FMp3MusicStream.h"
 #include "Engine/FGmeMusicStream.h"
@@ -65,8 +65,6 @@ void UMusic::Load()
   PkgFile->Read( ChunkData, ChunkSize );
 
   // Get music type from first name in the package
-  // For some reason, "s3m" and "S3M" don't hash to the same thing
-  // with a case insensitive SuperFastHash. Force upper case
   MusicType = FName( Pkg->GetNameTable()[0] );
 
   // Set up stream
