@@ -87,7 +87,6 @@ public:
   {
     bool bModuleSupportsSkipping = false;
 
-    //openmpt_stream_buffer_init(StreamBuffer, Music->ChunkData, Music->ChunkSize);
     char SectionString[4];
     sprintf(SectionString, "%i", Section);
     Controls[OCTL_Subsong].value = strdup( SectionString );
@@ -126,7 +125,6 @@ public:
   void GetPCM( void* Buffer, int Num )
   {
     // 4 comes from (Bits / 8) * NumChannels, which is (16 / 8) * 2 = 2 * 2 = 4;
-    //duh_render_int( DuhRenderer, &Samples, &NumSamples, 16, 0, 1.0f, 65536.0f / (float)StreamRate, Num / 4, Buffer );
     openmpt_module_read_interleaved_stereo( Module, StreamRate, Num / 4, (int16_t*)Buffer );
   }
 };
