@@ -59,6 +59,9 @@ void URenderDevice::Tick( float DeltaTime )
 {
   UViewport* CurrentViewport = GEngine->Client->CurrentViewport;
 
+  if ( !CurrentViewport )
+    return;
+
   // Translate UE1 axes to OpenGL
   FVector& CameraLoc = CurrentViewport->Actor->Location;
   FRotator& CameraRot = CurrentViewport->Actor->Rotation;

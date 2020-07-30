@@ -279,9 +279,6 @@
     <ClInclude Include="include\Util\TRingQueue.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
-    <ClInclude Include="include\Engine\FDumbMusicStream.h">
-      <Filter>Header Files\Engine</Filter>
-    </ClInclude>
     <ClInclude Include="include\Engine\FGmeMusicStream.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
@@ -311,6 +308,9 @@
     </ClInclude>
     <ClInclude Include="include\Editor\UFactory.h">
       <Filter>Header Files\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Engine\FTrackerMusicStream.h">
+      <Filter>Header Files\Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
