@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.10)
 project (UNR CXX)
 
-set( CMAKE_MODULE_PATH cmake/Modules ${CMAKE_MODULE_PATH} )
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules" ${CMAKE_MODULE_PATH})
 
 set (UNR_VER_MAJOR 0)
 set (UNR_VER_MINOR 2)
@@ -31,6 +31,7 @@ add_definitions("-DINSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"" )
 message(STATUS "Install prefix: " ${CMAKE_INSTALL_PREFIX})
 
 add_library(unr SHARED)
+add_library(Unr::Unr ALIAS unr)
 
 target_sources(unr
 	PRIVATE
