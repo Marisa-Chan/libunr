@@ -171,7 +171,7 @@ void UAudioSubsystem::Tick( float DeltaTime )
   }
 
   // Handle queued track when no other track is playing
-  else if ( QueuedTrack != NULL )
+  else if ( QueuedTrack != NULL && QueuedTrack->Stream != NULL )
   {
     CurrentTrack = QueuedTrack;
     CurrentSection = QueuedSection;

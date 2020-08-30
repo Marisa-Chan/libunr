@@ -3,35 +3,77 @@ project (UNR CXX)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules" ${CMAKE_MODULE_PATH})
 
-set (UNR_VER_MAJOR 0)
-set (UNR_VER_MINOR 2)
-set (UNR_VER_PATCH 1)
-set (UNR_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
-set (UNR_INC ${UNR_ROOT}/include)
-set (UNR_SRC ${UNR_ROOT}/src)
+set(UNR_VER_MAJOR 0)
+set(UNR_VER_MINOR 2)
+set(UNR_VER_PATCH 1)
+set(UNR_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+set(UNR_INC ${UNR_ROOT}/include)
+set(UNR_SRC ${UNR_ROOT}/src)
 
-option( BUILD_CYGWIN "Build_Cygwin" OFF )
-option( BUILD_DEUSEX "DeusEx support" OFF )
-option( BUILD_RUNE "Rune support" OFF )
-
-if ( WIN32 )
-  add_definitions("-Wno-invalid-offsetof")
-endif()
-
-find_package(X11)
-find_package(Threads REQUIRED)
-find_package(Mpg123 REQUIRED)
-find_package(Vorbisfile REQUIRED)
-find_package(OpenMPT REQUIRED)
-find_package(Gme REQUIRED)
-
-find_package(Uuid REQUIRED)
-
-add_definitions("-DINSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"" )
-message(STATUS "Install prefix: " ${CMAKE_INSTALL_PREFIX})
+option(BUILD_CYGWIN "Build_Cygwin" OFF)
+option(BUILD_DEUSEX "DeusEx support" OFF)
+option(BUILD_RUNE "Rune support" OFF)
+option(BUILD_GME "GME support" OFF)
+option(BUILD_OPENMPT "OpenMPT support" ON)
+option(BUILD_VORBISFILE "Vorbisfile support" OFF)
+option(BUILD_MPG123 "Mpg123 support" OFF)
 
 add_library(unr SHARED)
 add_library(Unr::Unr ALIAS unr)
+
+find_package(X11)
+find_package(Threads REQUIRED)
+
+if (BUILD_MPG123)
+	find_package(Mpg123 REQUIRED)
+	target_link_libraries(unr
+		PUBLIC
+			Mpg123::Mpg123
+	)
+	target_compile_definitions(unr
+		PUBLIC
+			"BUILD_MPG123=1"
+	)
+endif()
+
+if (BUILD_VORBISFILE)
+	find_package(Vorbisfile REQUIRED)
+	target_link_libraries(unr
+		PUBLIC
+			Vorbisfile::Vorbisfile
+	)
+	target_compile_definitions(unr
+		PUBLIC
+			"BUILD_VORBISFILE=1"
+	)
+endif()
+
+if (BUILD_OPENMPT)
+	find_package(OpenMPT REQUIRED)
+	target_link_libraries(unr
+		PUBLIC
+			OpenMPT::OpenMPT
+	)
+	target_compile_definitions(unr
+		PUBLIC
+			"BUILD_OPENMPT=1"
+	)
+endif()
+
+if (BUILD_GME)
+	find_package(Gme REQUIRED)
+	target_link_libraries(unr
+		PUBLIC
+			Gme::Gme
+	)
+	target_compile_definitions(unr
+		PUBLIC
+			"BUILD_GME=1"
+	)
+endif()
+
+add_definitions("-DINSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"" )
+message(STATUS "Install prefix: " ${CMAKE_INSTALL_PREFIX})
 
 target_sources(unr
 	PRIVATE
@@ -99,14 +141,6 @@ target_sources(unr
 		${UNR_SRC}/Engine/UViewport.cpp
 )
 
-if (WIN32)
-	target_sources(unr
-		PRIVATE
-			${UNR_SRC}/Engine/UWindowsClient.cpp
-			${UNR_SRC}/Engine/UWindowsViewport.cpp
-	)
-endif()
-
 if (X11_FOUND)
 	target_include_directories(unr
 		PUBLIC
@@ -115,7 +149,7 @@ if (X11_FOUND)
 
 	target_compile_definitions(unr
 		PUBLIC
-			"-DBUILD_X11=1"
+			"BUILD_X11=1"
 	)
 
 	target_sources(unr
@@ -138,7 +172,8 @@ if (DEFINED SDL2_LIBRARIES)
 
 	target_compile_definitions(unr
 		PUBLIC
-			"-DLIBUNR_SDL2=1"
+			"LIBUNR_SDL2=1"
+			"BUILD_SDL2=1"
 	)
 
 	target_sources(unr
@@ -162,7 +197,7 @@ if (BUILD_DEUSEX)
 
 	target_compile_definitions(unr
 		PUBLIC
-			"-DBUILD_DEUSEX=1"
+			"BUILD_DEUSEX=1"
 	)
 endif()
 
@@ -174,7 +209,7 @@ if (BUILD_RUNE)
 
 	target_compile_definitions(unr
 		PUBLIC
-			"-DBUILD_RUNE=1"
+			"BUILD_RUNE=1"
 	)
 endif()
 
@@ -200,7 +235,20 @@ target_sources(unr
 if (APPLE)
 	target_compile_definitions(unr
 		PRIVATE
-			"-D_XOPEN_SOURCE=600"
+			"_XOPEN_SOURCE=600"
+	)
+endif()
+
+if (WIN32)
+	target_sources(unr
+		PRIVATE
+			${UNR_SRC}/Engine/UWindowsClient.cpp
+			${UNR_SRC}/Engine/UWindowsViewport.cpp
+	)
+
+	target_link_libraries(unr
+		PUBLIC
+			winmm.lib
 	)
 endif()
 
@@ -208,6 +256,15 @@ if (NOT WIN32)
 	# XXX: CMake <=3.13 does not have target_link_options()
 	# We are abusing target_link_libraries() to emulate its functionality
 	set(LIBUNR_EMULATED_TARGET_LINK_OPTIONS "-Wl,-no-undefined")
+
+	find_package(Uuid REQUIRED)
+
+	target_link_libraries(unr
+		PUBLIC
+			Uuid::Uuid
+		PRIVATE
+			dl
+	)
 endif()
 
 target_compile_features(unr PRIVATE cxx_std_11)
@@ -218,15 +275,14 @@ target_include_directories(unr
 		$<INSTALL_INTERFACE:include/unr>
 )
 
+target_compile_definitions(unr
+	PRIVATE
+		"LIBUNR_EXPORTS=1"
+)
+
 target_link_libraries(unr
 	PUBLIC
-		dl
-		Mpg123::Mpg123
-		Vorbisfile::Vorbisfile
-		Uuid::Uuid
-		Gme::Gme
 		Threads::Threads
-		OpenMPT::OpenMPT
 	PRIVATE
 		"${LIBUNR_EMULATED_TARGET_LINK_OPTIONS}"
 )
@@ -239,7 +295,6 @@ configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/UnrConfig.cmake.in
 	${CMAKE_CURRENT_BINARY_DIR}/UnrConfig.cmake
 	INSTALL_DESTINATION lib/cmake/Unr
 )
-
 
 install(TARGETS unr
 	EXPORT unr-export
