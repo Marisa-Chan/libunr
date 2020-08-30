@@ -1,5 +1,9 @@
 find_package(PkgConfig)
-pkg_check_modules(PC_VORBISFILE QUIET vorbisfile)
+
+if (PKG_CONFIG_FOUND)
+	pkg_check_modules(PC_VORBISFILE QUIET vorbisfile)
+endif()
+
 set(VORBISFILE_DEFINITIONS ${PC_VORBISFILE_CFLAGS_OTHER})
 
 find_path(Vorbisfile_INCLUDE_DIR vorbis/vorbisfile.h

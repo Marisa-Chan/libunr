@@ -1,5 +1,9 @@
 find_package(PkgConfig)
-pkg_check_modules(PC_UUID QUIET uuid)
+
+if (PKG_CONFIG_FOUND)
+	pkg_check_modules(PC_UUID QUIET uuid)
+endif()
+
 set(UUID_DEFINITIONS ${PC_UUID_CFLAGS_OTHER})
 
 find_path(Uuid_INCLUDE_DIR uuid.h

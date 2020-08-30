@@ -1,5 +1,9 @@
 find_package(PkgConfig)
-pkg_check_modules(PC_OPENMPT QUIET openmpt)
+
+if (PKG_CONFIG_FOUND)
+	pkg_check_modules(PC_OPENMPT QUIET openmpt)
+endif()
+
 set(OPENMPT_DEFINITIONS ${PC_OPENMPT_CFLAGS_OTHER})
 
 find_path(OpenMPT_INCLUDE_DIR libopenmpt/libopenmpt_stream_callbacks_buffer.h

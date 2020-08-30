@@ -1,5 +1,9 @@
 find_package(PkgConfig)
-pkg_check_modules(PC_MPG123 QUIET libmpg123)
+
+if (PKG_CONFIG_FOUND)
+	pkg_check_modules(PC_MPG123 QUIET libmpg123)
+endif()
+
 set(Mpg123_DEFINITIONS ${PC_MPG123_CFLAGS_OTHER})
 
 find_path(Mpg123_INCLUDE_DIR mpg123.h
