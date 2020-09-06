@@ -24,3 +24,14 @@ tags
 libunr-test
 .gdb_history
 install_manifest.txt
+deps/game-music-emu-0.6.2/build/gme/x64/
+deps/game-music-emu-0.6.2/build/gme/x32/
+deps/libvorbis-1.3.6/win32/VS2010/libvorbis/x64/
+deps/libvorbis-1.3.6/win32/VS2010/libvorbis/x32/
+deps/mpg123-1.25.13/ports\MSVC++/2015/win32/libmpg123/x64/
+deps/mpg123-1.25.13/ports/MSVC++/2015/win32/libmpg123/x32/
+deps/libopenmpt-0.5.0/build/obj/
+deps/libvorbis-1.3.6/win32/VS2010/libvorbisfile/x64/
+deps/libvorbis-1.3.6/win32/VS2010/libvorbisfile/x32/
+deps/mpg123-1.25.13/ports/MSVC++/2015/win32/libmpg123/x64/
+deps/mpg123-1.25.13/ports/MSVC++/2015/win32/libmpg123/x32/

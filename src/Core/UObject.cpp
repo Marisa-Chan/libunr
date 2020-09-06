@@ -313,6 +313,822 @@ UObject* UObject::LoadMissingObject( UClass* ClassType )
   return Out;
 }
 
+FString UObject::LoadFlagsString( u32 Flags )
+{
+  FString str;
+  bool bPrependComma = false;
+
+  if( Flags == ELoadFlags::LOAD_None )
+  {
+    str.Append( "LOAD_None" );
+    return str;
+  }
+
+  if( Flags & ELoadFlags::LOAD_NoFail )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "LOAD_NoFail" );
+    bPrependComma = true;
+  }
+
+  if( Flags & ELoadFlags::LOAD_NoWarn )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "LOAD_NoWarn" );
+    bPrependComma = true;
+  }
+
+  if( Flags & ELoadFlags::LOAD_Throw )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "LOAD_Throw" );
+    bPrependComma = true;
+  }
+
+  if( Flags & ELoadFlags::LOAD_Verify )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "LOAD_Verify" );
+    bPrependComma = true;
+  }
+
+  if( Flags & ELoadFlags::LOAD_AllowDll )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "LOAD_AllowDll" );
+    bPrependComma = true;
+  }
+
+  if( Flags & ELoadFlags::LOAD_DisallowFiles )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "LOAD_DisAllowFiles" );
+    bPrependComma = true;
+  }
+
+  if( Flags & ELoadFlags::LOAD_NoVerify )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "LOAD_NoVerify" );
+    bPrependComma = true;
+  }
+
+
+  if( Flags & ELoadFlags::LOAD_Forgiving )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "LOAD_Forgiving" );
+    bPrependComma = true;
+  }
+
+  if( Flags & ELoadFlags::LOAD_Quiet )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "LOAD_Quiet" );
+    bPrependComma = true;
+  }
+
+  if( Flags & ELoadFlags::LOAD_NoRemap )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "LOAD_NoRemap" );
+    bPrependComma = true;
+  }
+
+  if( Flags & ELoadFlags::LOAD_Propagate )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "LOAD_Propagate" );
+    bPrependComma = true;
+  }
+
+  if( Flags & ELoadFlags::LOAD_Immediate )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "LOAD_Immediate" );
+    bPrependComma = true;
+  }
+
+  return str;
+}
+
+FString UObject::PackageFlagsString( u32 Flags )
+{
+  FString str;
+  bool bPrependComma = false;
+
+  if( Flags == 0 )
+  {
+    str = "PKG_None";
+    return str;
+  }
+
+  if( Flags & EPackageFlags::PKG_AllowDownload )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "PKG_AllowDownload" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPackageFlags::PKG_ClientOptional )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "PKG_ClientOptional" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPackageFlags::PKG_ServerSideOnly )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "PKG_ServerSideOnly" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPackageFlags::PKG_BrokenLinks )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "PKG_BrokenLinks" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPackageFlags::PKG_Unsecure )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "PKG_Unsecure" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPackageFlags::PKG_Need )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "PKG_Need" );
+    bPrependComma = true;
+  }
+
+  return str;
+}
+
+FString UObject::ClassFlagsString( u32 Flags )
+{
+  FString str;
+  bool bPrependComma = false;
+
+  if( Flags & EClassFlags::CLASS_NoSave )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CLASS_NoSave" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EClassFlags::CLASS_Abstract )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CLASS_Abstract" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EClassFlags::CLASS_Compiled )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CLASS_Compiled" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EClassFlags::CLASS_Config )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CLASS_Config" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EClassFlags::CLASS_Transient )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CLASS_Transient" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EClassFlags::CLASS_Parsed )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CLASS_Parsed" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EClassFlags::CLASS_Localized )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CLASS_Localized" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EClassFlags::CLASS_SafeReplace )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CLASS_SafeReplace" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EClassFlags::CLASS_RuntimeStatic )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CLASS_RuntimeStatic" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EClassFlags::CLASS_NoExport )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CLASS_NoExport" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EClassFlags::CLASS_NoUserCreate )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CLASS_NoUserCreate" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EClassFlags::CLASS_PerObjectConfig )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CLASS_PerObjectConfig" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EClassFlags::CLASS_NativeReplication )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CLASS_NativeReplication" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EClassFlags::CLASS_Aliased )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CLASS_Aliased" );
+    bPrependComma = true;
+  }
+
+  return str;
+}
+
+FString UObject::PropertyFlagsString( u32 Flags )
+{
+  FString str;
+  bool bPrependComma = false;
+
+  if( Flags & EPropertyFlags::CPF_Edit )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CPF_Edit" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPropertyFlags::CPF_Const )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CPF_Const" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPropertyFlags::CPF_Input )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CPF_Input" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPropertyFlags::CPF_ExportObject )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CPF_ExportObject" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPropertyFlags::CPF_OptionalParm )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CPF_OptionalParm" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPropertyFlags::CPF_Net )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CPF_Net" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPropertyFlags::CPF_ConstRef )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CPF_ConstRef" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPropertyFlags::CPF_Parm )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CPF_Parm" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPropertyFlags::CPF_OutParm )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CPF_OutParm" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPropertyFlags::CPF_SkipParm )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CPF_SkipParm" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPropertyFlags::CPF_ReturnParm )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CPF_ReturnParm" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPropertyFlags::CPF_CoerceParm )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CPF_CoerceParm" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPropertyFlags::CPF_Native )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CPF_Native" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPropertyFlags::CPF_Transient )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CPF_Transient" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPropertyFlags::CPF_Config )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CPF_Config" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPropertyFlags::CPF_Localized )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CPF_Localized" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPropertyFlags::CPF_Travel )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CPF_Travel" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPropertyFlags::CPF_EditConst )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CPF_EditConst" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPropertyFlags::CPF_GlobalConfig )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CPF_GlobalConfig" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPropertyFlags::CPF_OnDemand )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CPF_OnDemand" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPropertyFlags::CPF_New )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CPF_New" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EPropertyFlags::CPF_NeedCtorLink )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "CPF_NeedCtorLink" );
+    bPrependComma = true;
+  }
+
+  return str;
+}
+
+FString UObject::ObjectFlagsString( u32 Flags )
+{
+  FString str;
+  bool bPrependComma = false;
+
+  if( Flags == EObjectFlags::RF_None )
+  {
+    str.Append( "RF_None" );
+    return str;
+  }
+
+  if( Flags & EObjectFlags::RF_Transactional )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_Transactional" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_Unreachable )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_Unreachable" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_Public )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_Public" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_TagImp )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_TagImp" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_TagExp )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_TagExp" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_SourceModified )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_SourceModified" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_TagGarbage )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_TagGarbage" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_NeedLoad )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_NeedLoad" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_HighlightedName )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_HighlightedName|RF_EliminateObject" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_InSingularFunc )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_InSingularFunc|RF_RemappedName" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_Suppress )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_Suppress|RF_StateChanged" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_InEndState )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_InEndState" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_Transient )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_Transient" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_Preloading )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_Preloading" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_LoadForClient )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_LoadForClient" );
+    bPrependComma = true;
+  }
+
+
+  if( Flags & EObjectFlags::RF_LoadForServer )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_LoadForServer" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_LoadForEdit )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_LoadForEdit" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_Standalone )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_Standalone" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_NotForClient )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_NotForClient" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_NotForServer )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_NotForServer" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_NotForEdit )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_NotForEdit" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_Destroyed )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_Destroyed" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_NeedPostLoad )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_NeedPostLoad" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_HasStack )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_HasStack" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_Native )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_Native" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_Marked )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_Marked" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_ErrorShutdown )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_ErrorShutdown" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_DebugPostLoad )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_DebugPostLoad" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_DebugSerialize )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_DebugSerialize" );
+    bPrependComma = true;
+  }
+
+  if( Flags & EObjectFlags::RF_DebugDestroy )
+  {
+    if( bPrependComma )
+      str.Append( ", " );
+
+    str.Append( "RF_DebugDestroy" );
+    bPrependComma = true;
+  }
+
+  return str;
+}
+
 void UObject::ReadDefaultProperties()
 {
   FName PropName = 0;
