@@ -310,9 +310,14 @@ install(DIRECTORY include/
 )
 
 if (UNIX)
-  install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/share/libunr)
-  install(FILES ${UNR_ROOT}/res/DefaultLibunr.ini DESTINATION
-    ${CMAKE_INSTALL_PREFIX}/share/libunr)
+	install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/share/libunr)
+	install(
+		FILES
+			${UNR_ROOT}/res/DefaultLibunr.ini
+			${UNR_ROOT}/res/OpenUE.u
+		DESTINATION
+			${CMAKE_INSTALL_PREFIX}/share/libunr
+	)
 endif()
 
 install(EXPORT unr-export
