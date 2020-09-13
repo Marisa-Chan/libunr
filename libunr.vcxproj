@@ -217,7 +217,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;LIBUNR_DEBUG;LIBUNR_EXPORTS;_WINDOWS;_USRDLL;HAVE_SIMD;HAVE_SSE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;LIBUNR_DEBUG;LIBUNR_EXPORTS;BUILD_GME=1;BUILD_OPENMPT=1;BUILD_VORBISFILE=1;BUILD_MPG123=1;_WINDOWS;_USRDLL;HAVE_SIMD;HAVE_SSE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
@@ -249,7 +249,7 @@ copy $(SolutionDir)libunr\res\OpenUE.u $(SolutionDir)dist\OpenUE.u</Command>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;LIBUNR_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;LIBUNR_EXPORTS;BUILD_GME=1;BUILD_OPENMPT=1;BUILD_VORBISFILE=1;BUILD_MPG123=1;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
