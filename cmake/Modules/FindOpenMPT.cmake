@@ -6,13 +6,37 @@ endif()
 
 set(OPENMPT_DEFINITIONS ${PC_OPENMPT_CFLAGS_OTHER})
 
-find_path(OpenMPT_INCLUDE_DIR libopenmpt/libopenmpt_stream_callbacks_buffer.h
-          HINTS ${PC_OPENMPT_INCLUDEDIR} ${PC_OPENMPT_INCLUDE_DIRS}
-          PATHS deps/libopenmpt-0.5.0/include )
+find_path(OpenMPT_INCLUDE_DIR
+	NAMES
+		libopenmpt/libopenmpt_stream_callbacks_buffer.h
+	HINTS
+		${PC_OPENMPT_INCLUDEDIR}
+		${PC_OPENMPT_INCLUDE_DIRS}
+	PATHS
+		deps/libopenmpt-0.5.0/include
+	PATH_SUFFIXES
+		inc
+)
 
-find_library(OpenMPT_LIBRARY NAMES libopenmpt.so openmpt
-             HINTS ${PC_OPENMPT_LIBDIR} ${PC_OPENMPT_LIBRARY_DIRS}
-             PATHS deps/libopenmpt-0.5.0/ )
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+  set(VC_LIB_PATH_SUFFIX lib/amd64)
+else()
+  set(VC_LIB_PATH_SUFFIX lib/x86)
+endif()
+
+find_library(OpenMPT_LIBRARY
+	NAMES
+		libopenmpt.so
+		libopenmpt
+		openmpt
+	HINTS
+		${PC_OPENMPT_LIBDIR}
+		${PC_OPENMPT_LIBRARY_DIRS}
+	PATHS
+		deps/libopenmpt-0.5.0/
+	PATH_SUFFIXES
+		${VC_LIB_PATH_SUFFIX}
+)
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(OpenMPT
