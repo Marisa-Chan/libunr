@@ -309,16 +309,19 @@ install(DIRECTORY include/
 	DESTINATION include/unr
 )
 
-if (UNIX)
-	install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/share/libunr)
-	install(
-		FILES
-			${UNR_ROOT}/res/DefaultLibunr.ini
-			${UNR_ROOT}/res/OpenUE.u
-		DESTINATION
-			${CMAKE_INSTALL_PREFIX}/share/libunr
-	)
+if (WIN32)
+	set(LIBUNR_RESOURCE_INSTALL_DIR bin)
+else()
+	set(LIBUNR_RESOURCE_INSTALL_DIR share/libunr)
 endif()
+
+install(
+	FILES
+		${UNR_ROOT}/res/DefaultLibunr.ini
+		${UNR_ROOT}/res/OpenUE.u
+	DESTINATION
+		${LIBUNR_RESOURCE_INSTALL_DIR}
+)
 
 install(EXPORT unr-export
 	FILE
