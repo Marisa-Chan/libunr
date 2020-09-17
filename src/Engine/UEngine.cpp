@@ -224,8 +224,17 @@ bool UEngine::Init()
 bool UEngine::Exit()
 {
   Client->Exit();
-  Audio->Exit();
-  Render->Exit();
+
+  if ( Audio )
+  {
+    Audio->Exit();
+  }
+
+  if ( Render )
+  {
+    Render->Exit();
+  }
+
   return true;
 }
 
