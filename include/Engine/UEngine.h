@@ -131,9 +131,10 @@ class LIBUNR_API UClient : public UObject
   virtual UViewport* OpenViewport( int InWidth = 0, int InHeight = 0 ) { return NULL; }
   virtual bool CloseViewport( UViewport* Viewport ) { return false; }
   virtual void HandleInput( int Key, bool bDown );
-  virtual void HandleMouseInput( int XPos, int YPos );
+  virtual void HandleMouseInput( int DeltaX, int DeltaY );
   virtual void BindKeyInput( EInputKey Key, InputFunc Func );
   virtual void BindMouseInput( AxisInputFunc Func );
+  virtual void SetMouseCapture( bool capture );
 
   UClass* ViewportClass;
   UEngine* Engine;

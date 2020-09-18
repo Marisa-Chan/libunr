@@ -57,13 +57,10 @@ void UClient::HandleInput( int Key, bool bDown )
       InputFuncs[Key]( (EInputKey)Key, Engine->CurrentDeltaTime, bDown );
 }
 
-void UClient::HandleMouseInput( int XPos, int YPos )
+void UClient::HandleMouseInput( int DeltaX, int DeltaY )
 {
   if ( MouseFunc != NULL )
   {
-    // Get delta movement from center of screen
-    int DeltaX = (CurrentViewport->Width / 2) - XPos;
-    int DeltaY = (CurrentViewport->Height / 2) - YPos;
     MouseFunc( Engine->CurrentDeltaTime, DeltaX, DeltaY );
   }
 }
@@ -77,6 +74,11 @@ void UClient::BindKeyInput( EInputKey Key, InputFunc Func )
 void UClient::BindMouseInput( AxisInputFunc Func )
 {
   MouseFunc = Func;
+}
+
+void UClient::SetMouseCapture( bool capture )
+{
+
 }
 
 /*-----------------------------------------------------------------------------

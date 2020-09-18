@@ -137,6 +137,16 @@ bool UWindowsViewport::Resize( int NewWidth, int NewHeight )
   return false;
 }
 
+void UWindowsViewport::CenterMouseCursor()
+{
+  // Reset mouse to center of screen
+  POINT Center;
+  Center.x = Width / 2;
+  Center.y = Height / 2;
+  ClientToScreen( Window, &Center );
+  SetCursorPos( Center.x, Center.y );
+}
+
 LRESULT UWindowsViewport::StaticWndProc( HWND Hwnd, UINT Msg, WPARAM WParam, LPARAM LParam )
 {
   UWindowsViewport* This = NULL;
