@@ -40,7 +40,7 @@ enum ELoadFlags
   LOAD_NoFail        = 0x00001, // Critical error if load fails.
   LOAD_NoWarn        = 0x00002, // Don't display warning if load fails.
   LOAD_Throw         = 0x00008, // Throw exceptions upon failure.
-  LOAD_Verify        = 0x00010, // Only verify existance; don't actually load.
+  LOAD_Verify        = 0x00010, // Only verify existence; don't actually load.
   LOAD_AllowDll      = 0x00020, // Allow plain DLLs.
   LOAD_DisallowFiles = 0x00040, // Don't load from file.
   LOAD_NoVerify      = 0x00080, // Don't verify imports yet.
@@ -54,6 +54,7 @@ enum ELoadFlags
 // Package flags.
 enum EPackageFlags
 {
+  PKG_None           = 0x0000,
   PKG_AllowDownload  = 0x0001, // Allow downloading package.
   PKG_ClientOptional = 0x0002, // Purely optional for clients.
   PKG_ServerSideOnly = 0x0004, // Only needed on the server side.
@@ -465,6 +466,13 @@ public:
     u32 InStructSize, UObject *(*NativeCtor)(size_t) );
   static UObject* StaticFindObject( FName ObjName );
   static UObject* LoadMissingObject( UClass* ClassType );
+
+  //Return string representations of flag values, separated by commas if multiple flags.
+  static FString LoadFlagsString( u32 Flags );
+  static FString PackageFlagsString( u32 Flags );
+  static FString ClassFlagsString( u32 Flags );
+  static FString PropertyFlagsString( u32 Flags );
+  static FString ObjectFlagsString( u32 Flags );
 
   static TArray<UObject*>* GetGlobalObjectPool();
   static TArray<UClass*>* GetGlobalClassPool();

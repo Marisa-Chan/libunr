@@ -114,7 +114,6 @@ typedef void (*InputFunc)(EInputKey Key, float DeltaTime, bool bKeyDown);
 typedef void (*AxisInputFunc)(float DeltaTime, int DeltaX, int DeltaY);
 
 /*-----------------------------------------------------------------------------
-
  * UClient
  * An object representing a client which interacts with the engine
 -----------------------------------------------------------------------------*/
@@ -131,14 +130,18 @@ class LIBUNR_API UClient : public UObject
   virtual UViewport* OpenViewport( int InWidth = 0, int InHeight = 0 ) { return NULL; }
   virtual bool CloseViewport( UViewport* Viewport ) { return false; }
   virtual void HandleInput( int Key, bool bDown );
-  virtual void HandleMouseInput( int XPos, int YPos );
+  virtual void HandleMouseInput( int DeltaX, int DeltaY );
   virtual void BindKeyInput( EInputKey Key, InputFunc Func );
   virtual void BindMouseInput( AxisInputFunc Func );
+  virtual void SetMouseCapture( bool capture );
 
   UClass* ViewportClass;
   UEngine* Engine;
   UViewport* CurrentViewport;
   TArray<UViewport*> Viewports;
+
+protected:
+  bool RemoveViewport( UViewport * viewport );
 
 private:
   InputFunc InputFuncs[0xFF];

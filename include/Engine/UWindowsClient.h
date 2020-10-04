@@ -41,6 +41,10 @@ class LIBUNR_API UWindowsClient : public UClient
   virtual bool CloseViewport( UViewport* Viewport );
   virtual void Tick( float DeltaTime );
   virtual void HandleMouseInput( int XPos, int YPos );
+  virtual void SetMouseCapture( bool capture ) override;
 
   HINSTANCE hInstance;
+
+protected:
+  bool capture = true;
 };

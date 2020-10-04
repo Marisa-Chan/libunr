@@ -63,6 +63,8 @@
     <ClInclude Include="include\Engine\UNet.h" />
     <ClInclude Include="include\Engine\UPlayer.h" />
     <ClInclude Include="include\Engine\URender.h" />
+    <ClInclude Include="include\Engine\USdlClient.h" />
+    <ClInclude Include="include\Engine\USdlViewport.h" />
     <ClInclude Include="include\Engine\USkelAnim.h" />
     <ClInclude Include="include\Engine\USkelMesh.h" />
     <ClInclude Include="include\Engine\USound.h" />
@@ -142,6 +144,8 @@
     <ClCompile Include="src\Engine\UNet.cpp" />
     <ClCompile Include="src\Engine\UPlayer.cpp" />
     <ClCompile Include="src\Engine\URender.cpp" />
+    <ClCompile Include="src\Engine\USdlClient.cpp" />
+    <ClCompile Include="src\Engine\USdlViewport.cpp" />
     <ClCompile Include="src\Engine\USkelAnim.cpp" />
     <ClCompile Include="src\Engine\USkelMesh.cpp" />
     <ClCompile Include="src\Engine\USound.cpp" />
@@ -217,11 +221,11 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;LIBUNR_DEBUG;LIBUNR_EXPORTS;_WINDOWS;_USRDLL;HAVE_SIMD;HAVE_SSE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;LIBUNR_DEBUG;LIBUNR_EXPORTS;BUILD_GME=1;BUILD_OPENMPT=1;BUILD_VORBISFILE=1;BUILD_MPG123=1;_WINDOWS;_USRDLL;HAVE_SIMD;HAVE_SSE;_CRT_SECURE_NO_WARNINGS;LIBUNR_SDL2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)deps\libopenmpt-0.5.0;$(ProjectDir)deps\libogg-1.3.4\include;$(ProjectDir)deps\libvorbis-1.3.6\include;$(ProjectDir)deps\mpg123-1.25.13\ports\MSVC++;$(ProjectDir)deps\mpg123-1.25.13\src;$(ProjectDir)deps\mpg123-1.25.13\src\libmpg123;$(ProjectDir)deps\game-music-emu-0.6.2\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)deps\libopenmpt-0.5.0;$(ProjectDir)deps\libogg-1.3.4\include;$(ProjectDir)deps\libvorbis-1.3.6\include;$(ProjectDir)deps\mpg123-1.25.13\ports\MSVC++;$(ProjectDir)deps\mpg123-1.25.13\src;$(ProjectDir)deps\mpg123-1.25.13\src\libmpg123;$(ProjectDir)deps\game-music-emu-0.6.2\;$(ProjectDir)deps\SDL2-2.0.12\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableSpecificWarnings>4251;4275;4005;4996;26812;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
@@ -230,8 +234,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <StackReserveSize>4194304</StackReserveSize>
-      <AdditionalDependencies>winmm.lib;ole32.lib;libopenmpt.lib;openmpt-zlib.lib;libvorbis_static.lib;libvorbisfile_static.lib;libogg.lib;libmpg123.lib;gme.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)deps\libopenmpt-0.5.0\build\lib\vs2019win10\x86_64\$(Configuration);$(ProjectDir)deps\libvorbis-1.3.6\win32\VS2010\libvorbisfile\$(Platform)\$(Configuration);$(ProjectDir)deps\libvorbis-1.3.6\win32\VS2010\libvorbis\$(Platform)\$(Configuration);$(ProjectDir)deps\libogg-1.3.4\win32\VS2015\$(Platform)\$(Configuration);$(ProjectDir)deps\mpg123-1.25.13\ports\MSVC++\2015\win32\libmpg123\$(Platform)\$(Configuration)_Generic;$(ProjectDir)deps\game-music-emu-0.6.2\build\gme\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>winmm.lib;ole32.lib;libopenmpt.lib;openmpt-zlib.lib;libvorbis_static.lib;libvorbisfile_static.lib;libogg.lib;libmpg123.lib;gme.lib;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)deps\libopenmpt-0.5.0\build\lib\vs2019win10\x86_64\$(Configuration);$(ProjectDir)deps\libvorbis-1.3.6\win32\VS2010\libvorbisfile\$(Platform)\$(Configuration);$(ProjectDir)deps\libvorbis-1.3.6\win32\VS2010\libvorbis\$(Platform)\$(Configuration);$(ProjectDir)deps\libogg-1.3.4\win32\VS2015\$(Platform)\$(Configuration);$(ProjectDir)deps\mpg123-1.25.13\ports\MSVC++\2015\win32\libmpg123\$(Platform)\$(Configuration)_Generic;$(ProjectDir)deps\game-music-emu-0.6.2\build\gme\$(Platform)\$(Configuration)\;$(ProjectDir)deps\SDL2-2.0.12\lib\$(Platform)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
@@ -249,7 +253,7 @@ copy $(SolutionDir)libunr\res\OpenUE.u $(SolutionDir)dist\OpenUE.u</Command>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;LIBUNR_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;LIBUNR_EXPORTS;BUILD_GME=1;BUILD_OPENMPT=1;BUILD_VORBISFILE=1;BUILD_MPG123=1;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>

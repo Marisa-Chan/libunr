@@ -31,10 +31,21 @@
 #include "Engine/UMusic.h"
 
 // Music stream implementations
-#include "Engine/FTrackerMusicStream.h"
-#include "Engine/FOggMusicStream.h"
-#include "Engine/FMp3MusicStream.h"
-#include "Engine/FGmeMusicStream.h"
+#if defined(BUILD_OPENMPT) && BUILD_OPENMPT
+#	include "Engine/FTrackerMusicStream.h"
+#endif
+
+#if defined(BUILD_VORBISFILE) && BUILD_VORBISFILE
+#	include "Engine/FOggMusicStream.h"
+#endif
+
+#if defined(BUILD_MPG123) && BUILD_MPG123
+#	include "Engine/FMp3MusicStream.h"
+#endif
+
+#if defined(BUILD_GME) && BUILD_GME
+#	include "Engine/FGmeMusicStream.h"
+#endif
 
 /*-----------------------------------------------------------------------------
  * UMusic
@@ -70,6 +81,7 @@ void UMusic::Load()
   // Set up stream
   switch ( MusicType )
   {
+#	if defined(BUILD_OPENMPT) && BUILD_OPENMPT
     case NAME_It:
     case NAME_Xm:
     case NAME_S3M:
@@ -85,12 +97,18 @@ void UMusic::Load()
     case NAME_Okt:
       Stream = new FTrackerMusicStream();
       break;
+#	endif
+#	if defined(BUILD_VORBISFILE) && BUILD_VORBISFILE
     case NAME_Ogg:
       Stream = new FOggMusicStream();
       break;
+#	endif
+#	if defined(BUILD_MPG123) && BUILD_MPG123
     case NAME_Mp3:
       Stream = new FMp3MusicStream();
       break;
+#	endif
+#	if defined(BUILD_GME) && BUILD_GME
     case NAME_Ay:
     case NAME_Gbs:
     case NAME_Gym:
@@ -103,6 +121,7 @@ void UMusic::Load()
     case NAME_Vgm:
       Stream = new FGmeMusicStream();
       break;
+#	endif
     default:
       GLogf( LOG_WARN, "Unsupported music type '%s' loaded", MusicType.Data() );
       break;

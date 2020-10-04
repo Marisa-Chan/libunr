@@ -86,6 +86,11 @@
 #include "HPSS/AParticleFX.h"
 
 // Platform specific headers
+#if defined LIBUNR_SDL2
+#	include "Engine/USdlClient.h"
+#	include "Engine/USdlViewport.h"
+#endif
+
 #if defined LIBUNR_WIN32
   #include "Engine/UWindowsClient.h"
   #include "Engine/UWindowsViewport.h"
@@ -94,6 +99,7 @@
     #include "Engine/UX11Client.h"
     #include "Engine/UX11Viewport.h"
   #endif
+
   #if defined BUILD_WAYLAND
     #include "Engine/UWaylandClient.h"
     #include "Engine/UWaylandViewport.h"
@@ -252,6 +258,11 @@ bool UObject::StaticInit()
   Result &= UVerts::StaticClassInit();
 
   // Init platform specific classes
+#if defined LIBUNR_SDL2
+  Result &= USdlClient::StaticClassInit();
+  Result &= USdlViewport::StaticClassInit();
+#endif
+
 #if defined LIBUNR_WIN32
   Result &= UWindowsClient::StaticClassInit();
   Result &= UWindowsViewport::StaticClassInit();

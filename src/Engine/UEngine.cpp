@@ -57,13 +57,10 @@ void UClient::HandleInput( int Key, bool bDown )
       InputFuncs[Key]( (EInputKey)Key, Engine->CurrentDeltaTime, bDown );
 }
 
-void UClient::HandleMouseInput( int XPos, int YPos )
+void UClient::HandleMouseInput( int DeltaX, int DeltaY )
 {
   if ( MouseFunc != NULL )
   {
-    // Get delta movement from center of screen
-    int DeltaX = (CurrentViewport->Width / 2) - XPos;
-    int DeltaY = (CurrentViewport->Height / 2) - YPos;
     MouseFunc( Engine->CurrentDeltaTime, DeltaX, DeltaY );
   }
 }
@@ -77,6 +74,35 @@ void UClient::BindKeyInput( EInputKey Key, InputFunc Func )
 void UClient::BindMouseInput( AxisInputFunc Func )
 {
   MouseFunc = Func;
+}
+
+void UClient::SetMouseCapture( bool capture )
+{
+
+}
+
+bool UClient::RemoveViewport( UViewport * Viewport )
+{
+  bool Found = false;
+
+  for ( int i = 0; i < Viewports.Size(); i++ )
+  {
+    if ( Viewports[i] == Viewport )
+    {
+      Found = true;
+      Viewports.Erase( i );
+      if ( Viewports.Size() == 0 )
+      {
+        CurrentViewport = NULL;
+      }
+      else
+      {
+        CurrentViewport = Viewports[0];
+      }
+    }
+  }
+
+  return Found;
 }
 
 /*-----------------------------------------------------------------------------
@@ -224,8 +250,17 @@ bool UEngine::Init()
 bool UEngine::Exit()
 {
   Client->Exit();
-  Audio->Exit();
-  Render->Exit();
+
+  if ( Audio )
+  {
+    Audio->Exit();
+  }
+
+  if ( Render )
+  {
+    Render->Exit();
+  }
+
   return true;
 }
 

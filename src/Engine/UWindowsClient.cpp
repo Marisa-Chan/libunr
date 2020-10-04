@@ -78,19 +78,11 @@ UViewport* UWindowsClient::OpenViewport( int Width, int Height )
 
 bool UWindowsClient::CloseViewport( UViewport* Viewport )
 {
-  bool Result = false;
+  bool Result = Viewport->Exit();
 
-  for ( int i = 0; i < Viewports.Size(); i++ )
+  if (!RemoveViewport(Viewport))
   {
-    if ( Viewports[i] == Viewport )
-    {
-      Result = Viewport->Exit();
-      Viewports.Erase( i );
-      if ( Viewports.Size() == 0 )
-        CurrentViewport = NULL;
-      else
-        CurrentViewport = Viewports[0];
-    }
+    return false;
   }
 
   return Result;
@@ -110,15 +102,22 @@ void UWindowsClient::Tick( float DeltaTime )
 
 void UWindowsClient::HandleMouseInput( int XPos, int YPos )
 {
-  // Handle normal mouse input
-  Super::HandleMouseInput( XPos, YPos );
+  // Get delta movement from center of screen
+  int DeltaX = (CurrentViewport->Width / 2) - XPos;
+  int DeltaY = (CurrentViewport->Height / 2) - YPos;
 
-  // Reset mouse to center of screen
-  POINT Center;
-  Center.x = CurrentViewport->Width / 2;
-  Center.y = CurrentViewport->Height / 2;
-  ClientToScreen( ((UWindowsViewport*)CurrentViewport)->Window, &Center );
-  SetCursorPos( Center.x, Center.y );
+  // Handle normal mouse input
+  Super::HandleMouseInput( DeltaX, DeltaY );
+
+  if ( capture )
+  {
+    reinterpret_cast<UWindowsViewport *>(CurrentViewport)->CenterMouseCursor();
+  }
+}
+
+void UWindowsClient::SetMouseCapture( bool capture )
+{
+  this->capture = capture;
 }
 
 #include "Core/UClass.h"

@@ -313,6 +313,278 @@ UObject* UObject::LoadMissingObject( UClass* ClassType )
   return Out;
 }
 
+static const char* LoadFlagsStrings[] =
+{
+  "LOAD_NoFail",
+  "LOAD_NoWarn",
+  "LOAD_Unk04",
+  "LOAD_Throw",
+  "LOAD_Verify",
+  "LOAD_AllowDll",
+  "LOAD_DisallowFiles",
+  "LOAD_NoVerify",
+  "LOAD_Forgiving",
+  "LOAD_Unk100",
+  "LOAD_Unk200",
+  "LOAD_Unk400",
+  "LOAD_Unk800",
+  "LOAD_Quiet",
+  "LOAD_NoRemap",
+  "LOAD_Propagate",
+  "LOAD_Immediate",
+};
+
+FString UObject::LoadFlagsString( u32 Flags )
+{
+  FString str;
+
+  if ( Flags == ELoadFlags::LOAD_None )
+  {
+    str = "LOAD_None";
+  }
+  else
+  {
+    int bitNum = 0;
+    bool bPrependComma = false;
+    while ( Flags )
+    {
+      if ( Flags & 1 )
+      {
+        if ( bPrependComma )
+          str.Append( ", " );
+
+        str.Append( LoadFlagsStrings[bitNum] );
+        bPrependComma = true;
+      }
+
+      bitNum++;
+      Flags >>= 1;
+    }
+  }
+
+  return str;
+}
+
+static const char* PackageFlagsStrings[] =
+{
+  "PKG_AllowDownload",
+  "PKG_ClientOptional",
+  "PKG_ServerSideOnly",
+  "PKG_BrokenLinks",
+  "PKG_Unsecure",
+  "PKG_Unk20",
+  "PKG_Unk40",
+  "PKG_Unk80",
+  "PKG_Unk100",
+  "PKG_Unk200",
+  "PKG_Unk400",
+  "PKG_Unk800",
+  "PKG_Unk1000",
+  "PKG_Unk2000",
+  "PKG_Unk4000",
+  "PKG_Need",
+};
+
+FString UObject::PackageFlagsString( u32 Flags )
+{
+  FString str;
+
+  if( Flags == EPackageFlags::PKG_None )
+  {
+    str = "PKG_None";
+  }
+  else
+  {
+    int bitNum = 0;
+    bool bPrependComma = false;
+    while ( Flags )
+    {
+      if ( Flags & 1 )
+      {
+        if ( bPrependComma )
+          str.Append( ", " );
+
+        str.Append( PackageFlagsStrings[bitNum] );
+        bPrependComma = true;
+      }
+
+      bitNum++;
+      Flags >>= 1;
+    }
+  }
+
+  return str;
+}
+
+static const char* ClassFlagsStrings[] =
+{
+  "CLASS_NoSave",
+  "CLASS_Abstract",
+  "CLASS_Compiled",
+  "CLASS_Config",
+  "CLASS_Transient",
+  "CLASS_Parsed",
+  "CLASS_Localized",
+  "CLASS_SafeReplace",
+  "CLASS_RuntimeStatic",
+  "CLASS_NoExport",
+  "CLASS_NoUserCreate",
+  "CLASS_PerObjectConfig",
+  "CLASS_NativeReplication",
+  "CLASS_Aliased",
+};
+
+FString UObject::ClassFlagsString( u32 Flags )
+{
+  FString str;
+  int bitNum = 0;
+  bool bPrependComma = false;
+
+  if ( !(Flags & 1) )
+  {
+    str.Append( "CLASS_NoSave" );
+    bitNum++;
+    Flags >>= 1;
+    bPrependComma = true;
+  }
+
+  while ( Flags )
+  {
+    if ( Flags & 1 )
+    {
+      if ( bPrependComma )
+        str.Append( ", " );
+
+      str.Append( ClassFlagsStrings[bitNum] );
+      bPrependComma = true;
+    }
+
+    bitNum++;
+    Flags >>= 1;
+  }
+
+  return str;
+}
+
+static const char* PropertyFlagsStrings[] =
+{
+  "CPF_Edit",
+  "CPF_Const",
+  "CPF_Input",
+  "CPF_ExportObject",
+  "CPF_OptionalParm",
+  "CPF_Net",
+  "CPF_ConstRef",
+  "CPF_Parm",
+  "CPF_OutParm",
+  "CPF_SkipParm",
+  "CPF_ReturnParm",
+  "CPF_CoerceParm",
+  "CPF_Native",
+  "CPF_Transient",
+  "CPF_Config",
+  "CPF_Localized",
+  "CPF_Travel",
+  "CPF_EditConst",
+  "CPF_GlobalConfig",
+  "CPF_Unk80000",
+  "CPF_OnDemand",
+  "CPF_New",
+  "CPF_NeedCtorLink",
+  "CPF_Unk800000",
+};
+
+FString UObject::PropertyFlagsString( u32 Flags )
+{
+  FString str;
+  int bitNum = 0;
+  bool bPrependComma = false;
+
+  while ( Flags )
+  {
+    if ( Flags & 1 )
+    {
+      if ( bPrependComma )
+        str.Append( ", " );
+
+      str.Append( PropertyFlagsStrings[bitNum] );
+      bPrependComma = true;
+    }
+
+    bitNum++;
+    Flags >>= 1;
+  }
+
+  return str;
+}
+
+static const char* ObjectFlagsStrings[] =
+{
+  "RF_Transactional",
+  "RF_Unreachable",
+  "RF_Public",
+  "RF_TagImp",
+  "RF_TagExp",
+  "RF_SourceModified",
+  "RF_TagGarbage",
+  "RF_Unk80",
+  "RF_Unk100",
+  "RF_NeedLoad",
+  "RF_HighlightedName",
+  "RF_EliminateObject",
+  "RF_RemappedName (RF_InSingularFunc)",
+  "RF_Suppress (RF_StateChanged)",
+  "RF_InEndState",
+  "RF_Transient",
+  "RF_Preloading",
+  "RF_LoadForClient",
+  "RF_LoadForServer",
+  "RF_LoadForEdit",
+  "RF_Standalone",
+  "RF_NotForClient",
+  "RF_NotForServer",
+  "RF_NotForEdit",
+  "RF_Destroyed",
+  "RF_NeedPostLoad",
+  "RF_HasStack",
+  "RF_Native",
+  "RF_Marked",
+  "RF_ErrorShutdown",
+  "RF_DebugPostLoad",
+  "RF_DebugSerialize",
+  "RF_DebugDestroy",
+};
+
+FString UObject::ObjectFlagsString( u32 Flags )
+{
+  FString str;
+  if ( Flags == EObjectFlags::RF_None )
+  {
+    str = "RF_None";
+  }
+  else
+  {
+    int bitNum = 0;
+    bool bPrependComma = false;
+    while ( Flags )
+    {
+      if ( Flags & 1 )
+      {
+        if ( bPrependComma )
+          str.Append( ", " );
+
+        str.Append( ObjectFlagsStrings[bitNum] );
+        bPrependComma = true;
+      }
+
+      bitNum++;
+      Flags >>= 1;
+    }
+  }
+
+  return str;
+}
+
 void UObject::ReadDefaultProperties()
 {
   FName PropName = 0;

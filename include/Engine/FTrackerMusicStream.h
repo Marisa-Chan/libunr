@@ -45,13 +45,6 @@ enum EOpenMptCtls
 
 class FTrackerMusicStream : public FMusicStream
 {
-/*
-  DUMBFILE* DumbFile;
-  DUH* Duh;
-  DUH_SIGRENDERER* DuhRenderer;
-  sample_t** Samples;
-*/
-  //openmpt_stream_buffer* StreamBuffer;
   openmpt_module_initial_ctl Controls[13] = 
   {
     { "load.skip_samples", "0" },

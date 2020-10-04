@@ -1,0 +1,26 @@
+get_filename_component(UNR_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+include(CMakeFindDependencyMacro)
+
+message("CMAKE_CURRENT_LIST_FILE:${CMAKE_CURRENT_LIST_FILE}")
+
+find_dependency(X11)
+find_dependency(SDL2)
+find_dependency(Threads REQUIRED)
+
+list(APPEND CMAKE_MODULE_PATH ${UNR_CMAKE_DIR})
+find_dependency(OpenMPT REQUIRED)
+find_dependency(Mpg123 REQUIRED)
+find_dependency(Vorbisfile REQUIRED)
+find_dependency(Gme REQUIRED)
+find_dependency(Uuid REQUIRED)
+list(REMOVE_AT CMAKE_MODULE_PATH -1)
+
+if(NOT TARGET Unr::Unr)
+	include("${UNR_CMAKE_DIR}/UnrTargets.cmake")
+endif()
+
+@PACKAGE_INIT@
+
+set(UNR_LIBRARIES Unr::Unr)
+
+check_required_components(Unr)

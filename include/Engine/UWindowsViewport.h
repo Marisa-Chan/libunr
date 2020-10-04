@@ -39,6 +39,8 @@ class LIBUNR_API UWindowsViewport : public UViewport
   virtual void Hide();
   virtual bool Resize( int NewWidth, int NewHeight );
 
+  void CenterMouseCursor();
+
   // Viewport properties
   HINSTANCE Handle;
   HWND Window;
